@@ -91,8 +91,8 @@
     }
 
     /* ── Views ───────────────────────────────── */
-    #view-list, #view-exercise { display: none; }
-    #view-list.active, #view-exercise.active { display: block; }
+    #view-intro, #view-list, #view-exercise { display: none; }
+    #view-intro.active, #view-list.active, #view-exercise.active { display: block; }
 
     /* ── List View ───────────────────────────── */
     .list-hero {
@@ -138,6 +138,8 @@
       transition: border-color 0.2s, background 0.2s, transform 0.15s;
       position: relative;
       overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(201,168,76,0.15);
     }
     .exercise-card:hover {
       border-color: var(--gold-dim);
@@ -657,6 +659,24 @@
     }
     .intro-begin-btn:hover { background: #d4b45e; transform: translateY(-1px); }
     .intro-begin-btn svg { width: 14px; height: 14px; }
+    .intro-all-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: 0.82rem;
+      padding: 10px 22px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: border-color 0.2s, color 0.2s;
+      touch-action: manipulation;
+    }
+    .intro-all-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+    @media (max-width: 700px) {
+      .intro-all-btn { display: inline-block; }
+    }
 
     .intro-videos {
       max-width: 1040px;
@@ -1034,6 +1054,7 @@
         <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
+    <button class="intro-all-btn" id="intro-all-btn">View all 24 exercises</button>
   </div>
 
   <div class="intro-videos">
@@ -2250,6 +2271,7 @@ document.getElementById('nav-exercises').addEventListener('click', goToList);
 document.getElementById('intro-begin-btn').addEventListener('click', () => {
   openExercise(1);
 });
+document.getElementById('intro-all-btn').addEventListener('click', goToList);
 document.getElementById('intro-begin-btn-2').addEventListener('click', () => {
   openExercise(1);
 });
