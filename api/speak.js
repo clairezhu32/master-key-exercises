@@ -8,7 +8,6 @@ const MAX_CHARS = 5000;
 const rateLimitMap = new Map(); // ip → last-request timestamp (ms)
 const RATE_WINDOW_MS = 30_000;
 
-export const config = { runtime: 'nodejs20.x' };
 
 function isAllowedOrigin(origin) {
   if (!origin) return false;
