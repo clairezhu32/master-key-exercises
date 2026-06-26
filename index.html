@@ -557,16 +557,16 @@
       gap: 7px;
       padding: 5px 14px;
       border-radius: 100px;
-      border: 1px solid var(--border);
-      background: none;
-      color: var(--text-dim);
+      border: 1px solid var(--gold-dim);
+      background: var(--gold-glow);
+      color: var(--gold);
       font-size: 0.78rem;
       font-family: inherit;
       cursor: pointer;
       transition: all 0.2s;
       white-space: nowrap;
     }
-    .voice-btn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--text); }
+    .voice-btn:hover:not(:disabled) { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold); }
     .voice-btn:disabled { opacity: 0.45; cursor: default; }
     .voice-btn.playing {
       border-color: var(--gold-dim);
