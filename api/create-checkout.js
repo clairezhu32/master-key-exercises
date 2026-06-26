@@ -1,4 +1,7 @@
-const ALLOWED_ORIGIN_RE = /^https:\/\/master-key-exercises[^.]*\.vercel\.app$/;
+// Vercel preview deployments use the pattern:
+//   master-key-exercises-<hash>-<team>.vercel.app
+// The regex only allows that exact prefix before the first dot.
+const ALLOWED_ORIGIN_RE = /^https:\/\/master-key-exercises(-[a-z0-9]+-[a-z0-9-]+)?\.vercel\.app$/;
 
 function isAllowedOrigin(origin) {
   if (!origin) return false;
@@ -21,14 +24,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Payment not configured' });
   }
 
-  let body;
-  try {
-    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-  } catch {
-    return res.status(400).json({ error: 'Invalid JSON' });
-  }
-
-  const origin = body?.origin ?? '';
+  // Derive origin from the request header — never trust the body for redirect URLs.
+  const origin = req.headers.origin ?? '';
   if (!isAllowedOrigin(origin)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
@@ -39,6 +36,9 @@ export default async function handler(req, res) {
     'line_items[0][quantity]': '1',
     success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/?cancelled=1`,
+    // Stamp every session so verify-session can assert it belongs to this app + price.
+    'metadata[app]': 'mks',
+    'metadata[price_id]': priceId,
   });
 
   const upstream = await fetch('https://api.stripe.com/v1/checkout/sessions', {
