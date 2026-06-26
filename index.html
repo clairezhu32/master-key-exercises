@@ -542,6 +542,71 @@
     .ex-nav-btn .nav-title { display: block; }
     .ex-nav-btn:disabled { opacity: 0.3; pointer-events: none; }
 
+    /* ── Voice button ────────────────────────── */
+    .section-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-label-row .ex-section-label { margin-bottom: 0; }
+
+    .voice-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text-dim);
+      font-size: 0.78rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .voice-btn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--text); }
+    .voice-btn:disabled { opacity: 0.45; cursor: default; }
+    .voice-btn.playing {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: var(--gold-glow);
+    }
+    .voice-btn svg { flex-shrink: 0; }
+
+    .voice-wave {
+      display: none;
+      align-items: center;
+      gap: 3px;
+      height: 14px;
+    }
+    .voice-wave.visible { display: flex; }
+    .voice-wave span {
+      display: block;
+      width: 3px;
+      border-radius: 2px;
+      background: var(--gold);
+      animation: wave 1s ease-in-out infinite;
+    }
+    .voice-wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
+    .voice-wave span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+    .voice-wave span:nth-child(3) { height: 8px; animation-delay: 0.3s; }
+    .voice-wave span:nth-child(4) { height: 12px; animation-delay: 0.45s; }
+    .voice-wave span:nth-child(5) { height: 5px; animation-delay: 0.6s; }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.35); }
+    }
+
+    .voice-error {
+      font-size: 0.78rem;
+      color: #e07070;
+      margin-top: 8px;
+      display: none;
+    }
+    .voice-error.visible { display: block; }
+
     /* ── Scrollbar ───────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -631,7 +696,28 @@
 
     <!-- Instructions -->
     <div class="ex-section">
-      <div class="ex-section-label">How to Practice</div>
+      <div class="section-label-row">
+        <div class="ex-section-label">How to Practice</div>
+        <button class="voice-btn" id="voice-btn" title="Read exercise aloud">
+          <svg id="voice-icon-play" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M3 2.5l11 5.5-11 5.5V2.5z"/>
+          </svg>
+          <svg id="voice-icon-stop" width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="display:none">
+            <rect x="3" y="3" width="4" height="10" rx="1"/>
+            <rect x="9" y="3" width="4" height="10" rx="1"/>
+          </svg>
+          <svg id="voice-icon-load" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+            <path d="M8 2a6 6 0 1 1 0 12" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="0.8s" repeatCount="indefinite"/>
+            </path>
+          </svg>
+          <span id="voice-btn-label">Read aloud</span>
+          <div class="voice-wave" id="voice-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </button>
+      </div>
+      <div class="voice-error" id="voice-error"></div>
       <ol class="ex-steps" id="ex-steps"></ol>
     </div>
 
@@ -1355,6 +1441,12 @@ function openExercise(part) {
     setTimeout(() => { banner.style.display = 'none'; }, 4000);
   };
 
+  // Voice button
+  stopVoice();
+  clearVoiceError();
+  setVoiceState('idle');
+  document.getElementById('voice-btn').onclick = () => speakExercise(ex);
+
   // Note saving
   document.getElementById('btn-save-note').onclick = () => {
     saveNote(part, document.getElementById('journal-textarea').value);
@@ -1442,12 +1534,137 @@ function renderSessions(part) {
 document.getElementById('back-btn').addEventListener('click', () => {
   clearInterval(timerInterval);
   timerRunning = false;
+  stopVoice();
   renderGrid();
   updateHeader();
   document.getElementById('view-exercise').classList.remove('active');
   document.getElementById('view-list').classList.add('active');
   window.scrollTo(0, 0);
 });
+
+// ── Voice / ElevenLabs ───────────────────────
+let voiceAudio = null;
+let voicePlaying = false;
+
+function buildNarration(ex) {
+  const intro = ex.lesson.split(/(?<=[.!?])\s+/)[0];
+  const stepsText = ex.steps
+    .map((s, i) => `Step ${i + 1}. ${s}`)
+    .join('\n\n');
+  return [
+    `${ex.title}. ${ex.theme}.`,
+    '',
+    intro,
+    '',
+    'Let us begin.',
+    '',
+    stepsText,
+    '',
+    `Hold this in mind: ${ex.affirmation}`,
+  ].join('\n');
+}
+
+function setVoiceState(state) {
+  const btn = document.getElementById('voice-btn');
+  const label = document.getElementById('voice-btn-label');
+  const wave = document.getElementById('voice-wave');
+  const iconPlay = document.getElementById('voice-icon-play');
+  const iconStop = document.getElementById('voice-icon-stop');
+  const iconLoad = document.getElementById('voice-icon-load');
+
+  iconPlay.style.display = 'none';
+  iconStop.style.display = 'none';
+  iconLoad.style.display = 'none';
+  wave.classList.remove('visible');
+  btn.classList.remove('playing');
+  btn.disabled = false;
+
+  if (state === 'idle') {
+    iconPlay.style.display = 'block';
+    label.textContent = 'Read aloud';
+  } else if (state === 'loading') {
+    iconLoad.style.display = 'block';
+    label.textContent = 'Loading…';
+    btn.disabled = true;
+  } else if (state === 'playing') {
+    iconStop.style.display = 'block';
+    label.textContent = 'Stop';
+    wave.classList.add('visible');
+    btn.classList.add('playing');
+  }
+}
+
+function showVoiceError(msg) {
+  const el = document.getElementById('voice-error');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function clearVoiceError() {
+  const el = document.getElementById('voice-error');
+  el.classList.remove('visible');
+}
+
+function stopVoice() {
+  if (voiceAudio) {
+    voiceAudio.pause();
+    voiceAudio.src = '';
+    voiceAudio = null;
+  }
+  voicePlaying = false;
+  setVoiceState('idle');
+}
+
+async function speakExercise(ex) {
+  if (voicePlaying) { stopVoice(); return; }
+
+  clearVoiceError();
+  setVoiceState('loading');
+
+  const text = buildNarration(ex);
+
+  try {
+    const res = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || `Error ${res.status}`);
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    voiceAudio = new Audio(url);
+    voicePlaying = true;
+    setVoiceState('playing');
+
+    voiceAudio.addEventListener('ended', () => {
+      URL.revokeObjectURL(url);
+      voicePlaying = false;
+      setVoiceState('idle');
+    });
+    voiceAudio.addEventListener('error', () => {
+      URL.revokeObjectURL(url);
+      showVoiceError('Playback error. Try again.');
+      voicePlaying = false;
+      setVoiceState('idle');
+    });
+
+    await voiceAudio.play();
+  } catch (err) {
+    voicePlaying = false;
+    setVoiceState('idle');
+    showVoiceError(
+      err.message.includes('API key')
+        ? 'ElevenLabs API key not configured — add ELEVENLABS_API_KEY to Vercel env vars.'
+        : `Voice error: ${err.message}`
+    );
+  }
+}
 
 // ── Init ──────────────────────────────────────
 renderGrid();
