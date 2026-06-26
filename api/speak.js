@@ -6,7 +6,7 @@ const MAX_CHARS = 5000;
 // Not shared across Vercel function instances but provides meaningful
 // protection against single-client abuse within an instance's lifetime.
 const rateLimitMap = new Map(); // ip → last-request timestamp (ms)
-const RATE_WINDOW_MS = 30_000;
+const RATE_WINDOW_MS = 8_000;
 
 
 function isAllowedOrigin(origin) {
