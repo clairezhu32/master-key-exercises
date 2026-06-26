@@ -607,17 +607,224 @@
     }
     .voice-error.visible { display: block; }
 
+    /* ── Intro page ──────────────────────────── */
+    .intro-hero {
+      max-width: 760px;
+      margin: 72px auto 56px;
+      padding: 0 32px;
+      text-align: center;
+    }
+    .intro-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 20px;
+    }
+    .intro-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .intro-hero h1 em { color: var(--gold); font-style: italic; }
+    .intro-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .intro-begin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 36px;
+      background: var(--gold);
+      color: #0e0d0b;
+      border: none;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .intro-begin-btn:hover { background: #d4b45e; transform: translateY(-1px); }
+    .intro-begin-btn svg { width: 14px; height: 14px; }
+
+    .intro-videos {
+      max-width: 1040px;
+      margin: 0 auto 72px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .intro-video-block {}
+    .intro-video-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+    }
+    .intro-video-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .intro-video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .intro-body {
+      max-width: 720px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+    .intro-section {
+      margin-bottom: 56px;
+    }
+    .intro-section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 20px;
+    }
+    .intro-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+    .intro-section p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .intro-section p:last-child { margin-bottom: 0; }
+
+    .how-steps {
+      list-style: none;
+      counter-reset: how;
+      margin-top: 8px;
+    }
+    .how-steps li {
+      counter-increment: how;
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .how-steps li:last-child { border-bottom: none; }
+    .how-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--text-faint);
+      line-height: 1;
+      min-width: 32px;
+      padding-top: 2px;
+    }
+    .how-content strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .how-content span {
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .intro-quote {
+      border-left: 2px solid var(--gold-dim);
+      padding: 4px 0 4px 24px;
+      margin: 32px 0;
+    }
+    .intro-quote blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+    .intro-quote cite {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--text-faint);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-style: normal;
+    }
+
+    .intro-cta-row {
+      text-align: center;
+      padding: 48px 0 0;
+      border-top: 1px solid var(--border);
+    }
+    .intro-cta-row p {
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+    }
+
+    /* ── Header nav link ─────────────────────── */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .header-nav-link {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      letter-spacing: 0.06em;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .header-nav-link:hover { color: var(--text); }
+    .header-nav-link.active { color: var(--gold); }
+
     /* ── Scrollbar ───────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .header { padding: 16px; }
+      .header-nav { display: none; }
       .exercises-grid { grid-template-columns: 1fr; padding: 0 16px; }
       .exercise-view { padding: 24px 20px 60px; }
       .list-hero { padding: 0 20px; }
       .list-hero h1 { font-size: 2rem; }
+      .intro-hero { padding: 0 20px; margin-top: 48px; }
+      .intro-videos { grid-template-columns: 1fr; }
+      .intro-body { padding: 0 20px; }
     }
   </style>
 </head>
@@ -625,9 +832,13 @@
 
 <!-- ── Header ───────────────────────────────── -->
 <header class="header">
-  <div>
+  <div style="cursor:pointer" id="header-logo">
     <div class="header-title">The Master Key System</div>
     <div class="header-subtitle">Charles F. Haanel · 1919</div>
+  </div>
+  <div class="header-nav">
+    <button class="header-nav-link active" id="nav-intro">Introduction</button>
+    <button class="header-nav-link" id="nav-exercises">Exercises</button>
   </div>
   <div class="header-progress">
     <div class="progress-label">Progress</div>
@@ -638,8 +849,130 @@
   </div>
 </header>
 
+<!-- ── Intro View ────────────────────────────── -->
+<div id="view-intro" class="active">
+
+  <div class="intro-hero">
+    <div class="intro-eyebrow">A 24-Week Mental Training Course</div>
+    <h1>The <em>Master Key</em><br>to Your Inner Power</h1>
+    <p class="intro-tagline">"This little book is a master key which can unlock the chambers of success — and bids those enter and partake who are wise enough to understand."</p>
+    <button class="intro-begin-btn" id="intro-begin-btn">
+      Begin the Course
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="intro-videos">
+    <div class="intro-video-block">
+      <div class="intro-video-label">10-Minute Summary</div>
+      <div class="intro-video-wrap">
+        <iframe src="https://www.youtube.com/embed/V1eyI7lKUPU"
+          title="The Master Key System — Summary"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="intro-video-block">
+      <div class="intro-video-label">Full Audiobook with All 24 Parts</div>
+      <div class="intro-video-wrap">
+        <iframe src="https://www.youtube.com/embed/7wHsMdDFVpU"
+          title="The Master Key System — Full Audiobook"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="intro-body">
+
+    <div class="intro-section">
+      <div class="intro-section-label">What is this?</div>
+      <h2>A System for Training the Mind</h2>
+      <p>In 1912, Charles F. Haanel — a successful St. Louis businessman — began distributing a correspondence course unlike anything else of its era. Rather than offering advice or motivation, it offered a <em>system</em>: a precise, progressive training of the mind based on what he called the laws governing mental action.</p>
+      <p>The course ran for 24 weeks. Each week, students received one lesson to read and one exercise to practice daily. By Part 24, students had moved from simply sitting still, all the way to a working recognition of their connection with universal creative power.</p>
+      <p>Napoleon Hill studied it and credited it as a primary source for what became <em>Think and Grow Rich</em>. The book has been in continuous publication — in various forms — for over a century.</p>
+
+      <div class="intro-quote">
+        <blockquote>"With the realization that mind is the great creative power, what does not become possible? With Desire as the great creative energy, can we not see why Desire should be cultivated, controlled and directed in our lives and destinies?"</blockquote>
+        <cite>— Charles F. Haanel, The Master Key System (1919)</cite>
+      </div>
+    </div>
+
+    <div class="intro-section">
+      <div class="intro-section-label">How the exercises work</div>
+      <h2>One Practice. One Week. Twenty-Four Weeks.</h2>
+      <ol class="how-steps">
+        <li>
+          <div class="how-num">1</div>
+          <div class="how-content">
+            <strong>One exercise per week</strong>
+            <span>Haanel designed the course to be taken one part per week. Each exercise builds on the previous one — rushing ahead skips the foundation. Spend a full week with each practice before moving on.</span>
+          </div>
+        </li>
+        <li>
+          <div class="how-num">2</div>
+          <div class="how-content">
+            <strong>Find a quiet place and sit</strong>
+            <span>Every exercise is a sitting practice — 15 to 30 minutes in a chair, spine upright, eyes closed. You don't need a meditation cushion or special room. A quiet chair where you won't be disturbed is all that's required.</span>
+          </div>
+        </li>
+        <li>
+          <div class="how-num">3</div>
+          <div class="how-content">
+            <strong>Use the timer and the Read Aloud feature</strong>
+            <span>Set your preferred duration (10–30 min) and press Begin. Before you close your eyes, tap "Read aloud" — a calm voice will guide you through the full exercise instructions, then fall silent while you practice.</span>
+          </div>
+        </li>
+        <li>
+          <div class="how-num">4</div>
+          <div class="how-content">
+            <strong>Practice daily, not just once</strong>
+            <span>The original course expected students to practice each exercise every day for seven days. Even one or two sessions a week will produce results — but daily practice is where the real change happens.</span>
+          </div>
+        </li>
+        <li>
+          <div class="how-num">5</div>
+          <div class="how-content">
+            <strong>Write in your journal after each session</strong>
+            <span>Each exercise page has a notes field. Use it. Writing after a sitting session captures insights that evaporate quickly — and reveals patterns across weeks you wouldn't otherwise notice.</span>
+          </div>
+        </li>
+        <li>
+          <div class="how-num">6</div>
+          <div class="how-content">
+            <strong>Mark the session complete and return next week</strong>
+            <span>When you're done, mark the session complete to log it. Your progress is saved locally in your browser. When you're ready for the next part — typically after a week — move on.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="intro-section">
+      <div class="intro-section-label">The progression</div>
+      <h2>Where the 24 Weeks Take You</h2>
+      <p>The course moves through three broad phases:</p>
+      <p><strong style="color:var(--text)">Parts 1–4 — Physical and mental control.</strong> You learn to sit still, quiet the mind, fully relax the body, and recognize the difference between your body/mind (instruments) and the "I" that directs them.</p>
+      <p><strong style="color:var(--text)">Parts 5–14 — Mental creation and the laws of mind.</strong> You build vivid mental images, concentrate on single ideas, work with affirmations, explore the law of attraction, and begin consciously directing thought as a creative force.</p>
+      <p><strong style="color:var(--text)">Parts 15–24 — Universal principles and integration.</strong> You work with growth, vibration, insight, truth, inspiration, health, and money consciousness — arriving finally at the recognition that the same intelligence animating the cosmos is available to you.</p>
+    </div>
+
+    <div class="intro-cta-row">
+      <p>Ready to begin? Part 1 takes 15 minutes. All you need is a quiet chair.</p>
+      <button class="intro-begin-btn" id="intro-begin-btn-2">
+        Begin Part 1
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <!-- ── List View ─────────────────────────────── -->
-<div id="view-list" class="active">
+<div id="view-list">
   <div class="list-hero">
     <h1>Twenty-Four <em>Exercises</em><br>in Mental Mastery</h1>
     <p>One practice per week, as Haanel intended. Each builds on the last — from stilling the body to realizing your connection with Universal Mind.</p>
@@ -1481,10 +1814,7 @@ function openExercise(part) {
     document.getElementById('next-title').textContent = '';
   }
 
-  // Switch view
-  document.getElementById('view-list').classList.remove('active');
-  document.getElementById('view-exercise').classList.add('active');
-  window.scrollTo(0, 0);
+  showView('exercise');
 }
 
 function renderSessions(part) {
@@ -1535,11 +1865,7 @@ document.getElementById('back-btn').addEventListener('click', () => {
   clearInterval(timerInterval);
   timerRunning = false;
   stopVoice();
-  renderGrid();
-  updateHeader();
-  document.getElementById('view-exercise').classList.remove('active');
-  document.getElementById('view-list').classList.add('active');
-  window.scrollTo(0, 0);
+  goToList();
 });
 
 // ── Voice / ElevenLabs ───────────────────────
@@ -1666,8 +1992,48 @@ async function speakExercise(ex) {
   }
 }
 
+// ── View navigation ───────────────────────────
+function showView(name) {
+  ['intro','list','exercise'].forEach(v => {
+    document.getElementById(`view-${v}`).classList.toggle('active', v === name);
+  });
+  document.getElementById('nav-intro').classList.toggle('active', name === 'intro');
+  document.getElementById('nav-exercises').classList.toggle('active', name === 'list' || name === 'exercise');
+  window.scrollTo(0, 0);
+}
+
+function goToList() {
+  renderGrid();
+  updateHeader();
+  showView('list');
+}
+
+// Header logo → intro
+document.getElementById('header-logo').addEventListener('click', () => {
+  stopVoice();
+  clearInterval(timerInterval);
+  timerRunning = false;
+  showView('intro');
+});
+
+// Header nav
+document.getElementById('nav-intro').addEventListener('click', () => {
+  stopVoice();
+  clearInterval(timerInterval);
+  timerRunning = false;
+  showView('intro');
+});
+document.getElementById('nav-exercises').addEventListener('click', goToList);
+
+// Intro "Begin" buttons → first exercise
+document.getElementById('intro-begin-btn').addEventListener('click', () => {
+  openExercise(1);
+});
+document.getElementById('intro-begin-btn-2').addEventListener('click', () => {
+  openExercise(1);
+});
+
 // ── Init ──────────────────────────────────────
-renderGrid();
 updateHeader();
 </script>
 </body>
