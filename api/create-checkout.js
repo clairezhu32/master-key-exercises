@@ -34,8 +34,8 @@ export default async function handler(req, res) {
     mode: 'payment',
     'line_items[0][price]': priceId,
     'line_items[0][quantity]': '1',
-    success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/?cancelled=1`,
+    success_url: `${origin}/exercises?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/exercises?cancelled=1`,
     // Stamp every session so verify-session can assert it belongs to this app + price.
     'metadata[app]': 'mks',
     'metadata[price_id]': priceId,
