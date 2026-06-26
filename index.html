@@ -681,14 +681,55 @@
       overflow: hidden;
       background: var(--surface);
       border: 1px solid var(--border);
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
     }
-    .intro-video-wrap iframe {
+    .intro-video-wrap:hover .yt-overlay { background: rgba(0,0,0,0.35); }
+    .intro-video-wrap:hover .yt-play { transform: translate(-50%,-50%) scale(1.1); }
+    .yt-thumb {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      border: none;
+      object-fit: cover;
     }
+    .yt-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      transition: background 0.2s;
+    }
+    .yt-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 64px;
+      height: 64px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .yt-play svg { width: 24px; height: 24px; margin-left: 4px; }
+    .yt-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .yt-badge svg { width: 14px; height: 10px; }
 
     .intro-body {
       max-width: 720px;
@@ -867,21 +908,31 @@
   <div class="intro-videos">
     <div class="intro-video-block">
       <div class="intro-video-label">10-Minute Summary</div>
-      <div class="intro-video-wrap">
-        <iframe src="https://www.youtube.com/embed/V1eyI7lKUPU"
-          title="The Master Key System — Summary"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen loading="lazy"></iframe>
-      </div>
+      <a class="intro-video-wrap" href="https://www.youtube.com/watch?v=V1eyI7lKUPU" target="_blank" rel="noopener noreferrer">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/V1eyI7lKUPU/maxresdefault.jpg" alt="The Master Key System — Summary" loading="lazy">
+        <div class="yt-overlay"></div>
+        <div class="yt-play">
+          <svg viewBox="0 0 24 24" fill="#e8924a"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="yt-badge">
+          <svg viewBox="0 0 24 14" fill="red"><rect width="24" height="14" rx="3"/><path d="M10 4l7 3.5L10 11z" fill="white"/></svg>
+          Watch on YouTube
+        </div>
+      </a>
     </div>
     <div class="intro-video-block">
-      <div class="intro-video-label">Full Audiobook with All 24 Parts</div>
-      <div class="intro-video-wrap">
-        <iframe src="https://www.youtube.com/embed/-h8dcn2edGA"
-          title="The Master Key System — Full Audiobook"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen loading="lazy"></iframe>
-      </div>
+      <div class="intro-video-label">Full Audiobook — All 24 Parts</div>
+      <a class="intro-video-wrap" href="https://www.youtube.com/watch?v=kTnvPxyECS8" target="_blank" rel="noopener noreferrer">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/kTnvPxyECS8/maxresdefault.jpg" alt="The Master Key System — Full Audiobook" loading="lazy">
+        <div class="yt-overlay"></div>
+        <div class="yt-play">
+          <svg viewBox="0 0 24 24" fill="#e8924a"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="yt-badge">
+          <svg viewBox="0 0 24 14" fill="red"><rect width="24" height="14" rx="3"/><path d="M10 4l7 3.5L10 11z" fill="white"/></svg>
+          Watch on YouTube
+        </div>
+      </a>
     </div>
   </div>
 
