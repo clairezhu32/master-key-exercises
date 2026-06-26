@@ -810,6 +810,171 @@
     .header-nav-link:hover { color: var(--text); }
     .header-nav-link.active { color: var(--gold); }
 
+    /* ── Paywall view ────────────────────────── */
+    #view-paywall { display: none; }
+    #view-paywall.active { display: block; }
+
+    .paywall-wrap {
+      max-width: 560px;
+      margin: 72px auto 80px;
+      padding: 0 28px;
+      text-align: center;
+    }
+    .paywall-ornament {
+      color: var(--gold);
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      opacity: 0.7;
+    }
+    .paywall-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 16px;
+    }
+    .paywall-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 20px;
+      line-height: 1.15;
+    }
+    .paywall-sub {
+      color: var(--text-dim);
+      font-size: 0.93rem;
+      line-height: 1.8;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .paywall-phases {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 32px 0;
+      text-align: left;
+    }
+    .paywall-phase {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .paywall-phase-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--gold);
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+    .paywall-phase-items {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+    .paywall-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+    .paywall-price-row {
+      margin-bottom: 24px;
+    }
+    .paywall-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .paywall-price-note {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+    .paywall-cta {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #e8924a;
+      border: none;
+      border-radius: 100px;
+      color: #0e0d0b;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+    .paywall-cta:hover:not(:disabled) { background: #f0a868; transform: translateY(-1px); }
+    .paywall-cta:disabled { opacity: 0.6; cursor: default; transform: none; }
+    .paywall-back {
+      background: none;
+      border: none;
+      color: var(--text-faint);
+      font-family: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.2s;
+    }
+    .paywall-back:hover { color: var(--text-dim); }
+    .paywall-error {
+      font-size: 0.8rem;
+      color: #e07070;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    /* ── Lock badge on exercise cards ────────── */
+    .card-lock {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      opacity: 0.35;
+    }
+    .card-lock svg { width: 14px; height: 14px; }
+
+    /* ── Unlocked badge in header ────────────── */
+    .unlock-badge {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      color: var(--green);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .unlock-badge.visible { display: flex; }
+    .unlock-badge svg { width: 12px; height: 12px; }
+
+    /* ── Success toast ────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card);
+      border: 1px solid rgba(76,175,122,0.4);
+      color: var(--green);
+      font-size: 0.85rem;
+      padding: 12px 24px;
+      border-radius: 100px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     /* ── Scrollbar ───────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -839,6 +1004,13 @@
   <div class="header-nav">
     <button class="header-nav-link active" id="nav-intro">Introduction</button>
     <button class="header-nav-link" id="nav-exercises">Exercises</button>
+  </div>
+  <div class="unlock-badge" id="unlock-badge">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="3" y="7" width="10" height="7" rx="1.5"/>
+      <path d="M5 7V5a3 3 0 016 0v2"/>
+    </svg>
+    Full Access
   </div>
   <div class="header-progress">
     <div class="progress-label">Progress</div>
@@ -978,6 +1150,47 @@
     <p>One practice per week, as Haanel intended. Each builds on the last — from stilling the body to realizing your connection with Universal Mind.</p>
   </div>
   <div class="exercises-grid" id="exercises-grid"></div>
+</div>
+
+<!-- ── Paywall View ──────────────────────────── -->
+<div id="view-paywall">
+  <div class="paywall-wrap">
+    <div class="paywall-ornament">✦</div>
+    <div class="paywall-eyebrow">Continue Your Training</div>
+    <h2 class="paywall-title">Unlock the Full<br><em>24-Part System</em></h2>
+
+    <p class="paywall-sub">You've completed the Foundation — the four exercises that still the body, focus the mind, and prove the system works. What follows are the twenty parts that change lives.</p>
+
+    <div class="paywall-phases">
+      <div class="paywall-phase">
+        <div class="paywall-phase-label">Creation · Parts 5–14</div>
+        <div class="paywall-phase-items">
+          Visualisation · Concentration · Desire<br>
+          Idealization · Cause &amp; Effect<br>
+          Subconscious Command
+        </div>
+      </div>
+      <div class="paywall-phase">
+        <div class="paywall-phase-label">Mastery · Parts 15–24</div>
+        <div class="paywall-phase-items">
+          Intuition · Abundance Mindset<br>
+          Universal Laws · Harmony<br>
+          The Omnipotent Self
+        </div>
+      </div>
+    </div>
+
+    <hr class="paywall-divider">
+
+    <div class="paywall-price-row">
+      <div class="paywall-price">$24</div>
+      <div class="paywall-price-note">One-time · Lifetime access · All 24 exercises</div>
+    </div>
+
+    <button class="paywall-cta" id="paywall-btn">Unlock the Full Course →</button>
+    <div class="paywall-error" id="paywall-error"></div>
+    <button class="paywall-back" id="paywall-back">← Back to exercises</button>
+  </div>
 </div>
 
 <!-- ── Exercise View ─────────────────────────── -->
@@ -1687,19 +1900,23 @@ function updateHeader() {
 function renderGrid() {
   const grid = document.getElementById('exercises-grid');
   const completed = getCompletedParts();
+  const unlocked = isUnlocked();
+  const lockSvg = `<span class="card-lock" aria-label="Locked"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></span>`;
   grid.innerHTML = EXERCISES.map(ex => {
     const done = completed.includes(ex.part);
     const data = getExData(ex.part);
     const sessionCount = data.sessions.length;
+    const locked = ex.part >= PAYWALL_PART && !unlocked;
     return `
-      <div class="exercise-card ${done ? 'completed' : ''}" data-part="${ex.part}">
+      <div class="exercise-card ${done ? 'completed' : ''} ${locked ? 'locked' : ''}" data-part="${ex.part}" style="${locked ? 'opacity:0.55' : ''}">
+        ${locked ? lockSvg : ''}
         <div class="card-part">Part <span>${String(ex.part).padStart(2, '0')}</span></div>
         <div class="card-title">${ex.title}</div>
         <div class="card-theme">${ex.theme}</div>
         <div class="card-footer">
           <span class="card-duration">${ex.defaultDuration} min</span>
           <span class="card-sessions">${sessionCount > 0 ? `${sessionCount} session${sessionCount > 1 ? 's' : ''}` : ''}</span>
-          <span class="card-status ${done ? 'done' : 'pending'}">${done ? '✓ done' : 'begin'}</span>
+          <span class="card-status ${done ? 'done' : 'pending'}">${locked ? 'locked' : done ? '✓ done' : 'begin'}</span>
         </div>
       </div>`;
   }).join('');
@@ -1713,6 +1930,10 @@ function renderGrid() {
 let currentPart = null;
 
 function openExercise(part) {
+  if (part >= PAYWALL_PART && !isUnlocked()) {
+    showView('paywall');
+    return;
+  }
   currentPart = part;
   const ex = EXERCISES[part - 1];
   const data = getExData(part);
@@ -1994,7 +2215,7 @@ async function speakExercise(ex) {
 
 // ── View navigation ───────────────────────────
 function showView(name) {
-  ['intro','list','exercise'].forEach(v => {
+  ['intro','list','exercise','paywall'].forEach(v => {
     document.getElementById(`view-${v}`).classList.toggle('active', v === name);
   });
   document.getElementById('nav-intro').classList.toggle('active', name === 'intro');
@@ -2033,7 +2254,86 @@ document.getElementById('intro-begin-btn-2').addEventListener('click', () => {
   openExercise(1);
 });
 
+// ── Paywall / Stripe ──────────────────────────
+const PAYWALL_PART = 5;
+
+function isUnlocked() {
+  return localStorage.getItem('mks_unlocked') === 'true';
+}
+
+function showToast(msg, durationMs = 3500) {
+  let toast = document.getElementById('mks-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'mks-toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), durationMs);
+}
+
+async function handleUnlock() {
+  const btn = document.getElementById('paywall-btn');
+  const errEl = document.getElementById('paywall-error');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout…';
+  errEl.textContent = '';
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ origin: location.origin }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout');
+    location.href = data.url;
+  } catch (err) {
+    errEl.textContent = err.message;
+    btn.disabled = false;
+    btn.textContent = 'Unlock the Full Course →';
+  }
+}
+
+async function verifyStripeSession(sessionId) {
+  try {
+    const res = await fetch('/api/verify-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    });
+    const data = await res.json();
+    if (data.unlocked) {
+      localStorage.setItem('mks_unlocked', 'true');
+      history.replaceState(null, '', location.pathname);
+      showToast('✓ Full access unlocked — welcome to the complete course!');
+      document.getElementById('unlock-badge').classList.add('visible');
+      renderGrid();
+    }
+  } catch {
+    // silent — user still sees the list, can retry
+  }
+}
+
+// ── On-load: handle Stripe return params ──────
+(function handleStripeReturn() {
+  const params = new URLSearchParams(location.search);
+  const sessionId = params.get('session_id');
+  const cancelled = params.get('cancelled');
+  if (sessionId) {
+    verifyStripeSession(sessionId);
+  } else if (cancelled) {
+    history.replaceState(null, '', location.pathname);
+    showToast('Checkout cancelled — you can unlock anytime from the exercises list.');
+  }
+})();
+
 // ── Init ──────────────────────────────────────
+if (isUnlocked()) document.getElementById('unlock-badge').classList.add('visible');
+document.getElementById('paywall-btn').addEventListener('click', handleUnlock);
+document.getElementById('paywall-back').addEventListener('click', goToList);
 updateHeader();
 </script>
 </body>
