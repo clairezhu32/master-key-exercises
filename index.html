@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Master Key System — Exercises</title>
+  <title>The Master Key System — Introduction</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -45,569 +45,41 @@
       top: 0;
       background: var(--bg);
       z-index: 100;
-      backdrop-filter: blur(8px);
     }
     .header-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
+      font-size: 1.05rem;
       font-weight: 400;
-      letter-spacing: 0.04em;
-      color: var(--gold);
+      color: var(--text);
+      letter-spacing: 0.03em;
     }
     .header-subtitle {
-      font-size: 0.72rem;
-      color: var(--text-dim);
+      font-size: 0.68rem;
+      color: var(--text-faint);
       letter-spacing: 0.12em;
-      text-transform: uppercase;
       margin-top: 2px;
     }
-    .header-progress {
-      text-align: right;
-    }
-    .progress-label {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .progress-count {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      color: var(--gold);
-    }
-    .progress-bar-wrap {
-      width: 120px;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--gold);
-      border-radius: 2px;
-      transition: width 0.4s ease;
-    }
 
-    /* ── Views ───────────────────────────────── */
-    #view-intro, #view-list, #view-exercise { display: none; }
-    #view-intro.active, #view-list.active, #view-exercise.active { display: block; }
-
-    /* ── List View ───────────────────────────── */
-    .list-hero {
-      max-width: 760px;
-      margin: 64px auto 48px;
-      padding: 0 32px;
-      text-align: center;
-    }
-    .list-hero h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.8rem;
-      font-weight: 300;
-      line-height: 1.2;
-      color: var(--text);
-      margin-bottom: 16px;
-    }
-    .list-hero h1 em {
-      color: var(--gold);
-      font-style: italic;
-    }
-    .list-hero p {
-      color: var(--text-dim);
-      font-size: 0.95rem;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    .exercises-grid {
-      max-width: 960px;
-      margin: 0 auto 80px;
-      padding: 0 24px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-
-    .exercise-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      position: relative;
-      overflow: hidden;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: rgba(201,168,76,0.15);
-    }
-    .exercise-card:hover {
-      border-color: var(--gold-dim);
-      background: #22201a;
-      transform: translateY(-2px);
-    }
-    .exercise-card.completed {
-      border-color: rgba(76,175,122,0.35);
-    }
-    .exercise-card.completed::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--green);
-    }
-
-    .card-part {
-      font-size: 0.68rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-faint);
-      margin-bottom: 8px;
-    }
-    .card-part span {
-      color: var(--gold-dim);
-    }
-    .card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem;
-      font-weight: 400;
-      color: var(--text);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-    .card-theme {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin-bottom: 16px;
-    }
-    .card-footer {
+    /* ── Header nav ─────────────────────────── */
+    .header-nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 16px;
+      gap: 20px;
     }
-    .card-duration {
-      font-size: 0.75rem;
-      color: var(--text-faint);
-    }
-    .card-status {
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .card-status.done { color: var(--green); }
-    .card-status.pending { color: var(--text-faint); }
-    .card-sessions {
-      font-size: 0.72rem;
+    .header-nav-link {
+      font-size: 0.78rem;
       color: var(--text-dim);
-    }
-
-    /* ── Exercise View ───────────────────────── */
-    .exercise-view {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 40px 32px 80px;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-dim);
-      font-size: 0.82rem;
       cursor: pointer;
-      padding: 8px 0;
-      margin-bottom: 40px;
-      transition: color 0.2s;
       background: none;
       border: none;
       font-family: inherit;
+      letter-spacing: 0.06em;
+      padding: 4px 0;
+      transition: color 0.2s;
+      text-decoration: none;
     }
-    .back-btn:hover { color: var(--gold); }
-    .back-btn svg { width: 14px; height: 14px; }
-
-    .ex-eyebrow {
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 12px;
-    }
-    .ex-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.4rem;
-      font-weight: 300;
-      line-height: 1.15;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-    .ex-theme {
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      margin-bottom: 36px;
-      font-style: italic;
-    }
-
-    .ex-section {
-      margin-bottom: 36px;
-    }
-    .ex-section-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-faint);
-      margin-bottom: 12px;
-    }
-    .ex-lesson {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.12rem;
-      font-weight: 300;
-      line-height: 1.75;
-      color: var(--text-dim);
-      border-left: 2px solid var(--gold-dim);
-      padding-left: 20px;
-    }
-
-    .ex-steps {
-      list-style: none;
-      counter-reset: steps;
-    }
-    .ex-steps li {
-      counter-increment: steps;
-      display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-      font-size: 0.92rem;
-      color: var(--text-dim);
-      line-height: 1.65;
-    }
-    .ex-steps li::before {
-      content: counter(steps);
-      min-width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--border);
-      color: var(--gold-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 500;
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
-
-    .ex-affirmation {
-      background: var(--gold-glow);
-      border: 1px solid rgba(201,168,76,0.2);
-      border-radius: var(--radius);
-      padding: 24px 28px;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.35rem;
-      font-style: italic;
-      font-weight: 300;
-      color: var(--gold);
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    .ex-insight {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      font-size: 0.88rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    /* ── Timer ───────────────────────────────── */
-    .timer-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      margin-bottom: 36px;
-      text-align: center;
-    }
-    .timer-duration-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 28px;
-    }
-    .dur-btn {
-      padding: 7px 18px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: none;
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-    }
-    .dur-btn:hover { border-color: var(--gold-dim); color: var(--text); }
-    .dur-btn.active {
-      background: var(--gold-glow);
-      border-color: var(--gold-dim);
-      color: var(--gold);
-    }
-
-    .timer-ring-wrap {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      margin: 0 auto 24px;
-    }
-    .timer-ring-wrap svg {
-      transform: rotate(-90deg);
-      width: 180px;
-      height: 180px;
-    }
-    .ring-track {
-      fill: none;
-      stroke: var(--border);
-      stroke-width: 4;
-    }
-    .ring-fill {
-      fill: none;
-      stroke: var(--gold);
-      stroke-width: 4;
-      stroke-linecap: round;
-      transition: stroke-dashoffset 1s linear;
-    }
-    .timer-display {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .timer-time {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.4rem;
-      font-weight: 300;
-      color: var(--text);
-      letter-spacing: 0.04em;
-    }
-    .timer-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-faint);
-      margin-top: 2px;
-    }
-
-    .timer-controls {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-    .btn {
-      padding: 10px 28px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: none;
-      color: var(--text-dim);
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-    }
-    .btn:hover { border-color: var(--gold-dim); color: var(--text); }
-    .btn-primary {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #0e0d0b;
-      font-weight: 500;
-    }
-    .btn-primary:hover { background: #d4b45e; border-color: #d4b45e; color: #0e0d0b; }
-    .btn-complete {
-      background: var(--green);
-      border-color: var(--green);
-      color: #0e0d0b;
-      font-weight: 500;
-    }
-    .btn-complete:hover { background: #5cc48a; border-color: #5cc48a; color: #0e0d0b; }
-
-    .timer-done-banner {
-      display: none;
-      background: rgba(76,175,122,0.12);
-      border: 1px solid rgba(76,175,122,0.3);
-      border-radius: var(--radius);
-      padding: 16px 24px;
-      text-align: center;
-      color: var(--green);
-      font-size: 0.9rem;
-      margin-bottom: 16px;
-    }
-    .timer-done-banner.visible { display: block; }
-
-    /* ── Journal ─────────────────────────────── */
-    .journal-wrap {
-      margin-bottom: 36px;
-    }
-    .journal-textarea {
-      width: 100%;
-      min-height: 120px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      color: var(--text);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
-      line-height: 1.7;
-      resize: vertical;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-    .journal-textarea::placeholder { color: var(--text-faint); }
-    .journal-textarea:focus { border-color: var(--gold-dim); }
-    .journal-save-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
-    }
-    .journal-saved-note {
-      font-size: 0.75rem;
-      color: var(--text-faint);
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-    .journal-saved-note.show { opacity: 1; }
-
-    /* ── Sessions log ────────────────────────── */
-    .sessions-log {
-      margin-bottom: 40px;
-    }
-    .session-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.82rem;
-    }
-    .session-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      flex-shrink: 0;
-    }
-    .session-date { color: var(--text-dim); }
-    .session-duration { color: var(--text-faint); margin-left: auto; }
-
-    .no-sessions {
-      font-size: 0.85rem;
-      color: var(--text-faint);
-      font-style: italic;
-    }
-
-    /* ── Nav between exercises ───────────────── */
-    .ex-nav {
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-      margin-top: 48px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border);
-    }
-    .ex-nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text-dim);
-      font-size: 0.82rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-      flex: 1;
-    }
-    .ex-nav-btn:hover { border-color: var(--gold-dim); color: var(--text); }
-    .ex-nav-btn.next { justify-content: flex-end; }
-    .ex-nav-btn .nav-part {
-      font-size: 0.68rem;
-      color: var(--text-faint);
-      display: block;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .ex-nav-btn .nav-title { display: block; }
-    .ex-nav-btn:disabled { opacity: 0.3; pointer-events: none; }
-
-    /* ── Voice button ────────────────────────── */
-    .section-label-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .section-label-row .ex-section-label { margin-bottom: 0; }
-
-    .voice-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 5px 14px;
-      border-radius: 100px;
-      border: 1px solid #c96e2a;
-      background: rgba(232,146,74,0.15);
-      color: #e8924a;
-      font-size: 0.78rem;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .voice-btn:hover:not(:disabled) { background: rgba(232,146,74,0.28); border-color: #e8924a; color: #f0a868; }
-    .voice-btn:disabled { opacity: 0.45; cursor: default; }
-    .voice-btn.playing {
-      border-color: #e8924a;
-      color: #f0a868;
-      background: rgba(232,146,74,0.25);
-    }
-    .voice-btn svg { flex-shrink: 0; }
-
-    .voice-wave {
-      display: none;
-      align-items: center;
-      gap: 3px;
-      height: 14px;
-    }
-    .voice-wave.visible { display: flex; }
-    .voice-wave span {
-      display: block;
-      width: 3px;
-      border-radius: 2px;
-      background: #e8924a;
-      animation: wave 1s ease-in-out infinite;
-    }
-    .voice-wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
-    .voice-wave span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
-    .voice-wave span:nth-child(3) { height: 8px; animation-delay: 0.3s; }
-    .voice-wave span:nth-child(4) { height: 12px; animation-delay: 0.45s; }
-    .voice-wave span:nth-child(5) { height: 5px; animation-delay: 0.6s; }
-    @keyframes wave {
-      0%, 100% { transform: scaleY(1); }
-      50% { transform: scaleY(0.35); }
-    }
-
-    .voice-error {
-      font-size: 0.78rem;
-      color: #e07070;
-      margin-top: 8px;
-      display: none;
-    }
-    .voice-error.visible { display: block; }
+    .header-nav-link:hover { color: var(--text); }
+    .header-nav-link.active { color: var(--gold); }
 
     /* ── Intro page ──────────────────────────── */
     .intro-hero {
@@ -656,11 +128,12 @@
       cursor: pointer;
       transition: background 0.2s, transform 0.15s;
       letter-spacing: 0.02em;
+      text-decoration: none;
     }
     .intro-begin-btn:hover { background: #d4b45e; transform: translateY(-1px); }
     .intro-begin-btn svg { width: 14px; height: 14px; }
     .intro-all-btn {
-      display: none;
+      display: block;
       background: none;
       border: 1px solid var(--border);
       border-radius: 100px;
@@ -669,14 +142,12 @@
       font-size: 0.82rem;
       padding: 10px 22px;
       cursor: pointer;
-      margin-top: 12px;
+      margin: 12px auto 0;
       transition: border-color 0.2s, color 0.2s;
       touch-action: manipulation;
+      text-decoration: none;
     }
     .intro-all-btn:hover { border-color: var(--gold-dim); color: var(--text); }
-    @media (max-width: 700px) {
-      .intro-all-btn { display: inline-block; }
-    }
 
     .intro-videos {
       max-width: 1040px;
@@ -715,9 +186,7 @@
       margin: 0 auto 80px;
       padding: 0 32px;
     }
-    .intro-section {
-      margin-bottom: 56px;
-    }
+    .intro-section { margin-bottom: 56px; }
     .intro-section-label {
       font-size: 0.68rem;
       letter-spacing: 0.2em;
@@ -743,11 +212,9 @@
 
     .how-steps {
       list-style: none;
-      counter-reset: how;
       margin-top: 8px;
     }
     .how-steps li {
-      counter-increment: how;
       display: flex;
       gap: 20px;
       padding: 20px 0;
@@ -810,203 +277,13 @@
       margin-bottom: 20px;
     }
 
-    /* ── Header nav link ─────────────────────── */
-    .header-nav {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .header-nav-link {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-family: inherit;
-      letter-spacing: 0.06em;
-      padding: 4px 0;
-      transition: color 0.2s;
-    }
-    .header-nav-link:hover { color: var(--text); }
-    .header-nav-link.active { color: var(--gold); }
-
-    /* ── Paywall view ────────────────────────── */
-    #view-paywall { display: none; }
-    #view-paywall.active { display: block; }
-
-    .paywall-wrap {
-      max-width: 560px;
-      margin: 72px auto 80px;
-      padding: 0 28px;
-      text-align: center;
-    }
-    .paywall-ornament {
-      color: var(--gold);
-      font-size: 1.6rem;
-      margin-bottom: 20px;
-      opacity: 0.7;
-    }
-    .paywall-eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 16px;
-    }
-    .paywall-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 300;
-      color: var(--text);
-      margin-bottom: 20px;
-      line-height: 1.15;
-    }
-    .paywall-sub {
-      color: var(--text-dim);
-      font-size: 0.93rem;
-      line-height: 1.8;
-      margin-bottom: 14px;
-      text-align: left;
-    }
-    .paywall-phases {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin: 32px 0;
-      text-align: left;
-    }
-    .paywall-phase {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-    }
-    .paywall-phase-label {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--gold);
-      margin-bottom: 6px;
-      letter-spacing: 0.04em;
-    }
-    .paywall-phase-items {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-    .paywall-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 28px 0;
-    }
-    .paywall-price-row {
-      margin-bottom: 24px;
-    }
-    .paywall-price {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3.5rem;
-      font-weight: 300;
-      color: var(--text);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .paywall-price-note {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      letter-spacing: 0.06em;
-    }
-    .paywall-cta {
-      display: block;
-      width: 100%;
-      padding: 16px;
-      background: #e8924a;
-      border: none;
-      border-radius: 100px;
-      color: #0e0d0b;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      margin-bottom: 14px;
-      letter-spacing: 0.02em;
-    }
-    .paywall-cta:hover:not(:disabled) { background: #f0a868; transform: translateY(-1px); }
-    .paywall-cta:disabled { opacity: 0.6; cursor: default; transform: none; }
-    .paywall-back {
-      background: none;
-      border: none;
-      color: var(--text-faint);
-      font-family: inherit;
-      font-size: 0.82rem;
-      cursor: pointer;
-      padding: 8px;
-      transition: color 0.2s;
-    }
-    .paywall-back:hover { color: var(--text-dim); }
-    .paywall-error {
-      font-size: 0.8rem;
-      color: #e07070;
-      margin-top: 10px;
-      min-height: 20px;
-    }
-
-    /* ── Lock badge on exercise cards ────────── */
-    .card-lock {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      opacity: 0.35;
-    }
-    .card-lock svg { width: 14px; height: 14px; }
-
-    /* ── Unlocked badge in header ────────────── */
-    .unlock-badge {
-      display: none;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.7rem;
-      color: var(--green);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .unlock-badge.visible { display: flex; }
-    .unlock-badge svg { width: 12px; height: 12px; }
-
-    /* ── Success toast ────────────────────────── */
-    .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--card);
-      border: 1px solid rgba(76,175,122,0.4);
-      color: var(--green);
-      font-size: 0.85rem;
-      padding: 12px 24px;
-      border-radius: 100px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s;
-      z-index: 200;
-      white-space: nowrap;
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
     /* ── Scrollbar ───────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
     @media (max-width: 700px) {
       .header { padding: 16px; }
-      .header-nav { display: none; }
-      .exercises-grid { grid-template-columns: 1fr; padding: 0 16px; }
-      .exercise-view { padding: 24px 20px 60px; }
-      .list-hero { padding: 0 20px; }
-      .list-hero h1 { font-size: 2rem; }
       .intro-hero { padding: 0 20px; margin-top: 48px; }
       .intro-videos { grid-template-columns: 1fr; }
       .intro-body { padding: 0 20px; }
@@ -1017,1346 +294,134 @@
 
 <!-- ── Header ───────────────────────────────── -->
 <header class="header">
-  <div style="cursor:pointer" id="header-logo">
+  <a href="index.html" style="text-decoration:none">
     <div class="header-title">The Master Key System</div>
     <div class="header-subtitle">Charles F. Haanel · 1919</div>
-  </div>
+  </a>
   <div class="header-nav">
-    <button class="header-nav-link active" id="nav-intro">Introduction</button>
-    <button class="header-nav-link" id="nav-exercises">Exercises</button>
-  </div>
-  <div class="unlock-badge" id="unlock-badge">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-      <rect x="3" y="7" width="10" height="7" rx="1.5"/>
-      <path d="M5 7V5a3 3 0 016 0v2"/>
-    </svg>
-    Full Access
-  </div>
-  <div class="header-progress">
-    <div class="progress-label">Progress</div>
-    <div class="progress-count" id="progress-count">0 / 24</div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
-    </div>
+    <a class="header-nav-link active" href="index.html">Introduction</a>
+    <a class="header-nav-link" href="exercises.html">Exercises</a>
   </div>
 </header>
 
-<!-- ── Intro View ────────────────────────────── -->
-<div id="view-intro" class="active">
+<!-- ── Intro ────────────────────────────────── -->
+<div class="intro-hero">
+  <div class="intro-eyebrow">A 24-Week Mental Training Course</div>
+  <h1>The <em>Master Key</em><br>to Your Inner Power</h1>
+  <p class="intro-tagline">"This little book is a master key which can unlock the chambers of success — and bids those enter and partake who are wise enough to understand."</p>
+  <a class="intro-begin-btn" href="exercises.html?part=1">
+    Begin the Course
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+  <a class="intro-all-btn" href="exercises.html">View all 24 exercises</a>
+</div>
 
-  <div class="intro-hero">
-    <div class="intro-eyebrow">A 24-Week Mental Training Course</div>
-    <h1>The <em>Master Key</em><br>to Your Inner Power</h1>
-    <p class="intro-tagline">"This little book is a master key which can unlock the chambers of success — and bids those enter and partake who are wise enough to understand."</p>
-    <button class="intro-begin-btn" id="intro-begin-btn">
-      Begin the Course
+<div class="intro-videos">
+  <div class="intro-video-block">
+    <div class="intro-video-label">10-Minute Summary</div>
+    <div class="intro-video-wrap">
+      <iframe src="https://www.youtube.com/embed/V1eyI7lKUPU"
+        title="The Master Key System — Summary"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen loading="lazy"></iframe>
+    </div>
+  </div>
+  <div class="intro-video-block">
+    <div class="intro-video-label">Full Audiobook — All 24 Parts</div>
+    <div class="intro-video-wrap">
+      <iframe src="https://www.youtube.com/embed/kTnvPxyECS8"
+        title="The Master Key System — Full Audiobook"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen loading="lazy"></iframe>
+    </div>
+  </div>
+</div>
+
+<div class="intro-body">
+
+  <div class="intro-section">
+    <div class="intro-section-label">What is this?</div>
+    <h2>A System for Training the Mind</h2>
+    <p>In 1912, Charles F. Haanel — a successful St. Louis businessman — began distributing a correspondence course unlike anything else of its era. Rather than offering advice or motivation, it offered a <em>system</em>: a precise, progressive training of the mind based on what he called the laws governing mental action.</p>
+    <p>The course ran for 24 weeks. Each week, students received one lesson to read and one exercise to practice daily. By Part 24, students had moved from simply sitting still, all the way to a working recognition of their connection with universal creative power.</p>
+    <p>Napoleon Hill studied it and credited it as a primary source for what became <em>Think and Grow Rich</em>. The book has been in continuous publication — in various forms — for over a century.</p>
+
+    <div class="intro-quote">
+      <blockquote>"With the realization that mind is the great creative power, what does not become possible? With Desire as the great creative energy, can we not see why Desire should be cultivated, controlled and directed in our lives and destinies?"</blockquote>
+      <cite>— Charles F. Haanel, The Master Key System (1919)</cite>
+    </div>
+  </div>
+
+  <div class="intro-section">
+    <div class="intro-section-label">How the exercises work</div>
+    <h2>One Practice. One Week. Twenty-Four Weeks.</h2>
+    <ol class="how-steps">
+      <li>
+        <div class="how-num">1</div>
+        <div class="how-content">
+          <strong>One exercise per week</strong>
+          <span>Haanel designed the course to be taken one part per week. Each exercise builds on the previous one — rushing ahead skips the foundation. Spend a full week with each practice before moving on.</span>
+        </div>
+      </li>
+      <li>
+        <div class="how-num">2</div>
+        <div class="how-content">
+          <strong>Find a quiet place and sit</strong>
+          <span>Every exercise is a sitting practice — 15 to 30 minutes in a chair, spine upright, eyes closed. You don't need a meditation cushion or special room. A quiet chair where you won't be disturbed is all that's required.</span>
+        </div>
+      </li>
+      <li>
+        <div class="how-num">3</div>
+        <div class="how-content">
+          <strong>Use the timer and the Read Aloud feature</strong>
+          <span>Set your preferred duration (10–30 min) and press Begin. Before you close your eyes, tap "Read aloud" — a calm voice will guide you through the full exercise instructions, then fall silent while you practice.</span>
+        </div>
+      </li>
+      <li>
+        <div class="how-num">4</div>
+        <div class="how-content">
+          <strong>Practice daily, not just once</strong>
+          <span>The original course expected students to practice each exercise every day for seven days. Even one or two sessions a week will produce results — but daily practice is where the real change happens.</span>
+        </div>
+      </li>
+      <li>
+        <div class="how-num">5</div>
+        <div class="how-content">
+          <strong>Write in your journal after each session</strong>
+          <span>Each exercise page has a notes field. Use it. Writing after a sitting session captures insights that evaporate quickly — and reveals patterns across weeks you wouldn't otherwise notice.</span>
+        </div>
+      </li>
+      <li>
+        <div class="how-num">6</div>
+        <div class="how-content">
+          <strong>Mark the session complete, then return when ready</strong>
+          <span>When you're done, mark the session complete to log it. Your progress is saved locally in your browser. Haanel recommended staying with each part for a full week before moving on — until the exercise feels effortless. That's the intended pace, though you're free to follow your own rhythm.</span>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="intro-section">
+    <div class="intro-section-label">The progression</div>
+    <h2>Where the 24 Weeks Take You</h2>
+    <p>The course moves through three broad phases:</p>
+    <p><strong style="color:var(--text)">Parts 1–4 — Physical and mental control.</strong> You learn to sit still, quiet the mind, fully relax the body, and recognize the difference between your body/mind (instruments) and the "I" that directs them.</p>
+    <p><strong style="color:var(--text)">Parts 5–14 — Mental creation and the laws of mind.</strong> You build vivid mental images, concentrate on single ideas, work with affirmations, explore the law of attraction, and begin consciously directing thought as a creative force.</p>
+    <p><strong style="color:var(--text)">Parts 15–24 — Universal principles and integration.</strong> You work with growth, vibration, insight, truth, inspiration, health, and money consciousness — arriving finally at the recognition that the same intelligence animating the cosmos is available to you.</p>
+  </div>
+
+  <div class="intro-cta-row">
+    <p>Ready to begin? Part 1 takes 15 minutes. All you need is a quiet chair.</p>
+    <a class="intro-begin-btn" href="exercises.html?part=1">
+      Begin Part 1
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-    </button>
-    <button class="intro-all-btn" id="intro-all-btn">View all 24 exercises</button>
+    </a>
   </div>
 
-  <div class="intro-videos">
-    <div class="intro-video-block">
-      <div class="intro-video-label">10-Minute Summary</div>
-      <div class="intro-video-wrap">
-        <iframe src="https://www.youtube.com/embed/V1eyI7lKUPU"
-          title="The Master Key System — Summary"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen loading="lazy"></iframe>
-      </div>
-    </div>
-    <div class="intro-video-block">
-      <div class="intro-video-label">Full Audiobook — All 24 Parts</div>
-      <div class="intro-video-wrap">
-        <iframe src="https://www.youtube.com/embed/kTnvPxyECS8"
-          title="The Master Key System — Full Audiobook"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen loading="lazy"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <div class="intro-body">
-
-    <div class="intro-section">
-      <div class="intro-section-label">What is this?</div>
-      <h2>A System for Training the Mind</h2>
-      <p>In 1912, Charles F. Haanel — a successful St. Louis businessman — began distributing a correspondence course unlike anything else of its era. Rather than offering advice or motivation, it offered a <em>system</em>: a precise, progressive training of the mind based on what he called the laws governing mental action.</p>
-      <p>The course ran for 24 weeks. Each week, students received one lesson to read and one exercise to practice daily. By Part 24, students had moved from simply sitting still, all the way to a working recognition of their connection with universal creative power.</p>
-      <p>Napoleon Hill studied it and credited it as a primary source for what became <em>Think and Grow Rich</em>. The book has been in continuous publication — in various forms — for over a century.</p>
-
-      <div class="intro-quote">
-        <blockquote>"With the realization that mind is the great creative power, what does not become possible? With Desire as the great creative energy, can we not see why Desire should be cultivated, controlled and directed in our lives and destinies?"</blockquote>
-        <cite>— Charles F. Haanel, The Master Key System (1919)</cite>
-      </div>
-    </div>
-
-    <div class="intro-section">
-      <div class="intro-section-label">How the exercises work</div>
-      <h2>One Practice. One Week. Twenty-Four Weeks.</h2>
-      <ol class="how-steps">
-        <li>
-          <div class="how-num">1</div>
-          <div class="how-content">
-            <strong>One exercise per week</strong>
-            <span>Haanel designed the course to be taken one part per week. Each exercise builds on the previous one — rushing ahead skips the foundation. Spend a full week with each practice before moving on.</span>
-          </div>
-        </li>
-        <li>
-          <div class="how-num">2</div>
-          <div class="how-content">
-            <strong>Find a quiet place and sit</strong>
-            <span>Every exercise is a sitting practice — 15 to 30 minutes in a chair, spine upright, eyes closed. You don't need a meditation cushion or special room. A quiet chair where you won't be disturbed is all that's required.</span>
-          </div>
-        </li>
-        <li>
-          <div class="how-num">3</div>
-          <div class="how-content">
-            <strong>Use the timer and the Read Aloud feature</strong>
-            <span>Set your preferred duration (10–30 min) and press Begin. Before you close your eyes, tap "Read aloud" — a calm voice will guide you through the full exercise instructions, then fall silent while you practice.</span>
-          </div>
-        </li>
-        <li>
-          <div class="how-num">4</div>
-          <div class="how-content">
-            <strong>Practice daily, not just once</strong>
-            <span>The original course expected students to practice each exercise every day for seven days. Even one or two sessions a week will produce results — but daily practice is where the real change happens.</span>
-          </div>
-        </li>
-        <li>
-          <div class="how-num">5</div>
-          <div class="how-content">
-            <strong>Write in your journal after each session</strong>
-            <span>Each exercise page has a notes field. Use it. Writing after a sitting session captures insights that evaporate quickly — and reveals patterns across weeks you wouldn't otherwise notice.</span>
-          </div>
-        </li>
-        <li>
-          <div class="how-num">6</div>
-          <div class="how-content">
-            <strong>Mark the session complete, then return when ready</strong>
-            <span>When you're done, mark the session complete to log it. Your progress is saved locally in your browser. Haanel recommended staying with each part for a full week before moving on — until the exercise feels effortless. That's the intended pace, though you're free to follow your own rhythm.</span>
-          </div>
-        </li>
-      </ol>
-    </div>
-
-    <div class="intro-section">
-      <div class="intro-section-label">The progression</div>
-      <h2>Where the 24 Weeks Take You</h2>
-      <p>The course moves through three broad phases:</p>
-      <p><strong style="color:var(--text)">Parts 1–4 — Physical and mental control.</strong> You learn to sit still, quiet the mind, fully relax the body, and recognize the difference between your body/mind (instruments) and the "I" that directs them.</p>
-      <p><strong style="color:var(--text)">Parts 5–14 — Mental creation and the laws of mind.</strong> You build vivid mental images, concentrate on single ideas, work with affirmations, explore the law of attraction, and begin consciously directing thought as a creative force.</p>
-      <p><strong style="color:var(--text)">Parts 15–24 — Universal principles and integration.</strong> You work with growth, vibration, insight, truth, inspiration, health, and money consciousness — arriving finally at the recognition that the same intelligence animating the cosmos is available to you.</p>
-    </div>
-
-    <div class="intro-cta-row">
-      <p>Ready to begin? Part 1 takes 15 minutes. All you need is a quiet chair.</p>
-      <button class="intro-begin-btn" id="intro-begin-btn-2">
-        Begin Part 1
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-
-  </div>
 </div>
-
-<!-- ── List View ─────────────────────────────── -->
-<div id="view-list">
-  <div class="list-hero">
-    <h1>Twenty-Four <em>Exercises</em><br>in Mental Mastery</h1>
-    <p>Haanel designed this as a 24-week course — one part per week. His instruction was not to move on until the current exercise feels effortless and automatic. That said, follow your own rhythm. Some people revisit a part for two or three weeks; others move faster. What matters is that each layer is genuinely absorbed before the next is added.</p>
-  </div>
-  <div class="exercises-grid" id="exercises-grid"></div>
-</div>
-
-<!-- ── Paywall View ──────────────────────────── -->
-<div id="view-paywall">
-  <div class="paywall-wrap">
-    <div class="paywall-ornament">✦</div>
-    <div class="paywall-eyebrow">Continue Your Training</div>
-    <h2 class="paywall-title">Unlock the Full<br><em>24-Part System</em></h2>
-
-    <p class="paywall-sub">You've completed the Foundation — the four exercises that still the body, focus the mind, and prove the system works. What follows are the twenty parts that change lives.</p>
-
-    <div class="paywall-phases">
-      <div class="paywall-phase">
-        <div class="paywall-phase-label">Creation · Parts 5–14</div>
-        <div class="paywall-phase-items">
-          Visualisation · Concentration · Desire<br>
-          Idealization · Cause &amp; Effect<br>
-          Subconscious Command
-        </div>
-      </div>
-      <div class="paywall-phase">
-        <div class="paywall-phase-label">Mastery · Parts 15–24</div>
-        <div class="paywall-phase-items">
-          Intuition · Abundance Mindset<br>
-          Universal Laws · Harmony<br>
-          The Omnipotent Self
-        </div>
-      </div>
-    </div>
-
-    <hr class="paywall-divider">
-
-    <div class="paywall-price-row">
-      <div class="paywall-price">$24</div>
-      <div class="paywall-price-note">One-time · Lifetime access · All 24 exercises</div>
-    </div>
-
-    <button class="paywall-cta" id="paywall-btn">Unlock the Full Course →</button>
-    <div class="paywall-error" id="paywall-error"></div>
-    <button class="paywall-back" id="paywall-back">← Back to exercises</button>
-  </div>
-</div>
-
-<!-- ── Exercise View ─────────────────────────── -->
-<div id="view-exercise">
-  <div class="exercise-view">
-    <button class="back-btn" id="back-btn">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M10 3L5 8l5 5"/>
-      </svg>
-      All exercises
-    </button>
-
-    <div class="ex-eyebrow" id="ex-eyebrow"></div>
-    <h2 class="ex-title" id="ex-title"></h2>
-    <p class="ex-theme" id="ex-theme"></p>
-
-    <!-- Lesson context -->
-    <div class="ex-section">
-      <div class="ex-section-label">From the Lesson</div>
-      <p class="ex-lesson" id="ex-lesson"></p>
-    </div>
-
-    <!-- Timer -->
-    <div class="ex-section">
-      <div class="ex-section-label">Session Timer</div>
-      <div class="timer-card">
-        <div class="timer-duration-row" id="dur-row"></div>
-        <div class="timer-ring-wrap">
-          <svg viewBox="0 0 180 180">
-            <circle class="ring-track" cx="90" cy="90" r="82"/>
-            <circle class="ring-fill" id="ring-fill" cx="90" cy="90" r="82"
-              stroke-dasharray="515.2"
-              stroke-dashoffset="0"/>
-          </svg>
-          <div class="timer-display">
-            <div class="timer-time" id="timer-display">15:00</div>
-            <div class="timer-label" id="timer-state-label">ready</div>
-          </div>
-        </div>
-        <div class="timer-done-banner" id="timer-done-banner">
-          Session complete. Take a moment before opening your eyes.
-        </div>
-        <div class="timer-controls">
-          <button class="btn btn-primary" id="btn-start">Begin</button>
-          <button class="btn" id="btn-reset" style="display:none">Reset</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Instructions -->
-    <div class="ex-section">
-      <div class="section-label-row">
-        <div class="ex-section-label">How to Practice</div>
-        <button class="voice-btn" id="voice-btn" title="Read exercise aloud">
-          <svg id="voice-icon-play" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M3 2.5l11 5.5-11 5.5V2.5z"/>
-          </svg>
-          <svg id="voice-icon-stop" width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="display:none">
-            <rect x="3" y="3" width="4" height="10" rx="1"/>
-            <rect x="9" y="3" width="4" height="10" rx="1"/>
-          </svg>
-          <svg id="voice-icon-load" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
-            <path d="M8 2a6 6 0 1 1 0 12" stroke-linecap="round">
-              <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="0.8s" repeatCount="indefinite"/>
-            </path>
-          </svg>
-          <span id="voice-btn-label">Read aloud</span>
-          <div class="voice-wave" id="voice-wave">
-            <span></span><span></span><span></span><span></span><span></span>
-          </div>
-        </button>
-      </div>
-      <div class="voice-error" id="voice-error"></div>
-      <ol class="ex-steps" id="ex-steps"></ol>
-    </div>
-
-    <!-- Affirmation -->
-    <div class="ex-section" id="affirmation-section">
-      <div class="ex-section-label">Affirmation / Focus</div>
-      <div class="ex-affirmation" id="ex-affirmation"></div>
-    </div>
-
-    <!-- Insight -->
-    <div class="ex-section">
-      <div class="ex-section-label">Why This Matters</div>
-      <div class="ex-insight" id="ex-insight"></div>
-    </div>
-
-    <!-- Journal -->
-    <div class="ex-section journal-wrap">
-      <div class="ex-section-label">Session Notes</div>
-      <textarea class="journal-textarea" id="journal-textarea"
-        placeholder="What did you notice? What arose? What shifted? Write freely — this is only for you."></textarea>
-      <div class="journal-save-row">
-        <button class="btn" id="btn-save-note">Save note</button>
-        <span class="journal-saved-note" id="save-note-feedback">Saved</span>
-      </div>
-    </div>
-
-    <!-- Mark complete / sessions -->
-    <div class="ex-section">
-      <div class="ex-section-label">Sessions</div>
-      <div class="timer-done-banner" id="mark-banner" style="margin-bottom:16px"></div>
-      <button class="btn btn-complete" id="btn-mark-complete" style="width:100%;margin-bottom:24px">
-        Mark session complete
-      </button>
-      <div class="sessions-log" id="sessions-log"></div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="ex-nav">
-      <button class="ex-nav-btn prev" id="btn-prev">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M10 3L5 8l5 5"/>
-        </svg>
-        <span>
-          <span class="nav-part" id="prev-part"></span>
-          <span class="nav-title" id="prev-title"></span>
-        </span>
-      </button>
-      <button class="ex-nav-btn next" id="btn-next">
-        <span style="text-align:right">
-          <span class="nav-part" id="next-part"></span>
-          <span class="nav-title" id="next-title"></span>
-        </span>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M6 3l5 5-5 5"/>
-        </svg>
-      </button>
-    </div>
-
-  </div>
-</div>
-
-<script>
-// ── Exercise data ─────────────────────────────
-const EXERCISES = [
-  {
-    part: 1,
-    title: "Physical Stillness",
-    theme: "Mastery of the Body",
-    lesson: "Before any environment can be created, action is necessary — and before action is possible, there must be thought. Mind is the creative center from which all activities proceed. But to access that center, you must first learn to be still.",
-    steps: [
-      "Choose a quiet room where you will not be disturbed for the duration.",
-      "Sit in a comfortable chair with your spine naturally upright, hands resting in your lap.",
-      "Close your eyes and take three slow, full breaths.",
-      "Now: become completely still. Do not move a single muscle — not a finger, not an eyelid, not a foot.",
-      "When discomfort or the urge to fidget arises, simply observe it without acting on it. Let it pass.",
-      "Your sole purpose is unbroken physical stillness for the entire session.",
-      "When the timer ends, open your eyes slowly and sit quietly for a moment before rising."
-    ],
-    affirmation: "I am the master of my body.",
-    insight: "Most people have never truly been still. The body moves in constant unconscious reaction — fidgeting, adjusting, twitching. This exercise reveals the gap between intention and habit. Haanel taught that the ability to control the body is the foundation of all other power. You cannot govern external circumstances if you cannot first govern the instrument you inhabit.",
-    defaultDuration: 15
-  },
-  {
-    part: 2,
-    title: "Mental Quiet",
-    theme: "Mastery of the Mind",
-    lesson: "The operations of the mind are carried on by two modes: the conscious and the subconscious. Ease and power depend on the degree to which you can still the conscious chatter — and access the deeper, vaster storehouse beneath it.",
-    steps: [
-      "Sit in the same place as last week, in the same upright, still position.",
-      "Close your eyes and settle into physical stillness, as practiced in Part 1.",
-      "Now turn your attention inward. Notice the stream of thoughts passing through your mind.",
-      "Do not engage with any thought. Do not fight it. Simply let each thought arise and pass like a cloud.",
-      "Practice resting in the gap between thoughts — in the quiet awareness that watches the thinking.",
-      "If you become absorbed in a thought, gently return to the watching. No frustration — just return.",
-      "The goal is not a blank mind but an unhurried, undistracted awareness."
-    ],
-    affirmation: "I am still. I am aware. I am the watcher.",
-    insight: "Ninety percent of our mental processes are subconscious — below the threshold of our ordinary awareness. The constant noise of conscious thought is actually the smaller part of the mind. When you learn to quiet it, you gain access to the vast storehouse where insight, creativity, and genuine power reside. This is why the most important discoveries, artistic breakthroughs, and moments of clarity tend to come in stillness.",
-    defaultDuration: 15
-  },
-  {
-    part: 3,
-    title: "Complete Relaxation",
-    theme: "Releasing Tension",
-    lesson: "Nature is constantly seeking to express Harmony. When thought is harmonious, nature begins to create the material conditions that correspond. But tension — held in the body — blocks this natural flow. Relaxation is not weakness; it is alignment.",
-    steps: [
-      "Sit comfortably and close your eyes.",
-      "Begin at your feet: deliberately tense the muscles of both feet for five seconds, then release completely.",
-      "Move upward — calves, thighs, abdomen, chest, hands, arms, shoulders, neck, face.",
-      "At each area, tense for five seconds, then fully release. Notice the contrast.",
-      "Once you have moved through the whole body, scan from feet to crown for any remaining tension.",
-      "Let every muscle go. Breathe naturally. Feel the difference between held and released.",
-      "For the remaining session, simply rest in this state of full, conscious relaxation."
-    ],
-    affirmation: "I release all tension. I am open. I am at peace.",
-    insight: "Haanel understood what modern neuroscience confirms: chronic muscular tension is the body's record of unresolved stress, fear, and resistance. When you deliberately practice release, you are not just relaxing muscles — you are retraining the nervous system out of a default state of bracing against life. Deep relaxation is the physiological state in which new beliefs can actually take hold.",
-    defaultDuration: 20
-  },
-  {
-    part: 4,
-    title: "The True 'I'",
-    theme: "Identity and Awareness",
-    lesson: "You are not your body — the body is simply the physical instrument which the ego uses to carry out its purpose. You are not your mind — the mind is another instrument for thinking, reasoning, planning. When you say 'I go,' you tell the body. When you say 'I think,' you tell the mind. But who is the 'I' doing the telling?",
-    steps: [
-      "Sit in your usual still, relaxed position. Close your eyes.",
-      "Notice your body. Observe sensation, weight, warmth. Now gently recognize: you are the one noticing the body, not the body itself.",
-      "Notice your thoughts as they arise. Recognize: you are the one watching the thoughts, not the thoughts themselves.",
-      "Notice your feelings. Recognize: you are the one aware of the feeling, not the feeling itself.",
-      "Rest in that awareness — the witnessing presence that cannot itself be observed because it is the observer.",
-      "Simply be that. No effort. No doing. Just the quiet recognition: 'I AM.'",
-      "Whenever you get drawn into thoughts or sensations, return to the simple fact of being aware."
-    ],
-    affirmation: "I am not my body. I am not my mind. I AM.",
-    insight: "This exercise is one of the most profound in the course. Every tradition of wisdom — from Vedanta to Stoicism to modern contemplative science — arrives at the same discovery: there is an awareness behind and beneath all experience that cannot itself be an object of experience. Haanel calls this the 'I.' When you contact it, even briefly, you realize that this 'I' is unshakeable — and that this is where your real power lives.",
-    defaultDuration: 20
-  },
-  {
-    part: 5,
-    title: "The Mental Home",
-    theme: "Conscious Creation",
-    lesson: "We are constantly creating and recreating ourselves through the thoughts we entertain. The 'world without' is always a reflection of the 'world within.' This part asks: if you are building your future right now, what are you building? And what do you wish to build?",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Begin to construct a vivid mental image of your life exactly as you most deeply wish it to be.",
-      "Include your physical environment: where do you live, work, move? See the details.",
-      "Include your body: how does it feel? What is your energy and vitality like?",
-      "Include your relationships: who is around you? What is the quality of your connections?",
-      "Include your work: what are you creating? What value are you giving? How does it feel?",
-      "Make this image as rich and specific as possible. Dwell in it. Feel it as already real."
-    ],
-    affirmation: "My mental home is already built. The outer world is catching up.",
-    insight: "Haanel describes the subconscious mind as a 'mental home' we are constantly furnishing with our habitual thoughts. Most people furnish theirs unconsciously — installing fears, scarcity, resentment, limitation. This exercise makes the process conscious and deliberate. The detail matters: vague wishes produce vague results. Specific, felt mental images produce specific, felt changes in behavior and perception.",
-    defaultDuration: 20
-  },
-  {
-    part: 6,
-    title: "Concentration on Harmony",
-    theme: "The Law of Attraction",
-    lesson: "The Law of Attraction is fundamental and eternal — there is no escape from its operation. It operates to bring to you only what is in harmony with your predominant mental state. Harmony is therefore both the condition for receiving good and the quality of mind that must be cultivated.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Bring the word and idea of Harmony to the center of your attention.",
-      "Think about what harmony means in your body: organs working together, breath flowing freely.",
-      "Think about harmony in your relationships: ease, mutual understanding, goodwill.",
-      "Think about harmony in your work: effort and result aligned, energy well spent.",
-      "Think about the harmony of nature: the seasons, the tides, the growth of living things.",
-      "Hold the single idea of Harmony in your mind. Whenever attention wanders, gently return to it."
-    ],
-    affirmation: "I am in harmony with all that is. Good flows to me naturally.",
-    insight: "This is the first exercise in pure concentration — directing the mind to a single idea for an extended period. It is harder than it sounds. The mind will wander dozens of times in 20 minutes. Each time you notice and return is a repetition of the mental muscle. Haanel chose Harmony as the first concentration object because it directly opposes the most common mental patterns blocking abundance: discord, friction, resistance, and anxiety.",
-    defaultDuration: 20
-  },
-  {
-    part: 7,
-    title: "Visualization",
-    theme: "Developing the Inner Eye",
-    lesson: "The ability to visualize clearly is one of the most important attributes of the Master-Key student. Every great achievement — every invention, every work of art, every business built — first existed as a clear mental image. This faculty can be developed with practice.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Bring to mind someone you know well — a friend, family member, or colleague.",
-      "See them in a familiar setting: their home, their office, their usual posture.",
-      "Notice the details: their face, expression, how they hold themselves, what they are wearing.",
-      "Hold the image steady. When it flickers or fades, patiently reconstruct it.",
-      "Try to make the image vivid enough that you could almost hear their voice.",
-      "Practice holding it clear and still for as long as possible without effort."
-    ],
-    affirmation: "I see clearly. My inner eye is focused and precise.",
-    insight: "Most people have a flickering, unstable mind's eye — images form briefly and dissolve. Visualization practice trains the capacity to hold a clear, stable mental image, which is the foundation of all deliberate mental creation. Haanel starts with visualizing a person (rather than an abstract goal) because people are concrete, familiar, and emotionally engaging — making the image easier to form and hold.",
-    defaultDuration: 20
-  },
-  {
-    part: 8,
-    title: "The Core Affirmation",
-    theme: "Imprinting Truth",
-    lesson: "Character, health, and circumstances are formed by the thoughts we habitually entertain. We have, perhaps, been creating our conditions unconsciously. To improve conditions we must first improve our thinking — substituting definite, constructive truths for vague, negative, or limiting beliefs.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Bring to mind the following statement. Read it slowly, then close your eyes and hold it:",
-      "'I am whole, perfect, strong, powerful, loving, harmonious and happy.'",
-      "Say it again, silently, and feel the meaning of each word:",
-      "Whole — nothing is missing. Perfect — your nature is already complete. Strong — capable of meeting what comes. Powerful — you have access to real force. Loving — your deepest nature is benevolent. Harmonious — aligned with the flow of life. Happy — this is your natural state.",
-      "Repeat the statement slowly, many times, letting it sink deeper with each repetition.",
-      "Let any resistance arise and pass. Return to the statement."
-    ],
-    affirmation: "I am whole, perfect, strong, powerful, loving, harmonious and happy.",
-    insight: "This is perhaps the most famous line in the entire course. Haanel uses it as an antidote to the 'crude thinking of the race' — the inherited impressions of fear, disability, inferiority, and lack that most of us absorbed without choosing them. Repeating a specific, felt truth is not self-deception; it is the deliberate replacement of one mental pattern with a truer one. The subconscious does not distinguish between a vividly imagined truth and a physical fact.",
-    defaultDuration: 20
-  },
-  {
-    part: 9,
-    title: "The Greatest Good",
-    theme: "Constructive Service",
-    lesson: "The fundamental principle underlying every successful business relation and every fulfilling life is this: we can receive only what we give. The Law of Attraction operates not through grasping but through giving — through placing your mental energy in service of something larger than personal gain.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Ask yourself honestly: what is the greatest good I am capable of contributing?",
-      "What do I uniquely have to offer — in skill, in knowledge, in presence, in care?",
-      "Who would benefit most from what only I can give?",
-      "How large can I make this contribution? What would it look like at its fullest expression?",
-      "Hold this vision of your highest contribution steadily in mind.",
-      "Notice what arises: resistance, excitement, doubt, clarity. Observe without judgment."
-    ],
-    affirmation: "I give freely. My service is my power.",
-    insight: "Haanel is emphatic that the Law of Attraction is not a selfish formula for personal acquisition. It operates through a principle of exchange: value received requires value given. This exercise shifts the mental orientation from 'what can I get?' to 'what can I give?' — which paradoxically is the more powerful attractor. The person focused on genuine service tends to receive abundance, while the person focused solely on receiving tends to repel it.",
-    defaultDuration: 20
-  },
-  {
-    part: 10,
-    title: "The Law of Abundance",
-    theme: "Aligning with Supply",
-    lesson: "Abundance is a natural law of the universe. Everywhere nature is lavish — profusion is manifested in everything. If there seems to be a lack of supply anywhere, it is only because the channels of distribution are as yet imperfect — not because the supply itself is limited.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Look around you (in your mind) at the natural world: the millions of trees, plants, animals, stars.",
-      "Notice the extravagance of creation — nothing is held back, nothing is scarce at the source.",
-      "Now recognize: you are part of this same creative system. The same abundance is available to you.",
-      "Breathe into this recognition. Let the feeling of sufficiency — of there being enough — settle into your body.",
-      "If the feeling of lack or scarcity arises, observe it as a mental habit, not a fact. Return to abundance.",
-      "Hold the quiet certainty: 'All that I need is available to me now.'"
-    ],
-    affirmation: "All that I need is available to me now. Supply is limitless.",
-    insight: "The experience of scarcity is real, but Haanel argues it is always a mental condition before it is a material one. People who consistently think and feel abundance tend to notice and seize opportunities that people in a scarcity mindset literally cannot perceive — because the mind filters experience through its dominant beliefs. This exercise trains the felt sense of sufficiency, which is the prerequisite for receiving more.",
-    defaultDuration: 20
-  },
-  {
-    part: 11,
-    title: "Universal Connection",
-    theme: "Part of the Whole",
-    lesson: "The infinite small and the infinite large are, in the last analysis, nothing but force, motion, life, and mind. You are not separate from this universal intelligence — you are an expression of it. All the power you need is already within you because you are part of the source of all power.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Breathe deeply. With each inhale, imagine you are drawing in the same life-force that animates all living things.",
-      "Recognize that the intelligence governing your heartbeat, your immune system, the growth of your cells, is the same intelligence that orders the cosmos.",
-      "You are not a small thing in a large universe. You are the universe in a particular form.",
-      "Let this recognition soften any sense of isolation, inadequacy, or limitation.",
-      "Rest in the felt sense of being held, supported, and part of something vast.",
-      "Hold the thought: 'I am one with Universal Mind. All intelligence and power are available to me.'"
-    ],
-    affirmation: "I am one with Universal Mind. All intelligence flows through me.",
-    insight: "This is one of Haanel's most metaphysically ambitious claims — that individual mind is an expression of a universal mind. Whether understood literally or as a metaphor, the psychological effect of this belief is documented: people who feel a sense of connection to something larger than themselves show greater resilience, creativity, and altruism. The exercise of consciously practicing this recognition produces real changes in how one meets challenges.",
-    defaultDuration: 25
-  },
-  {
-    part: 12,
-    title: "The Creative Power",
-    theme: "Thought as Cause",
-    lesson: "Mind is the creative force — the only creative force. Everything that has ever been built, written, composed, or discovered first existed as a thought. To understand this is to understand that you have access to the same power that produced every great achievement in history.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Think of something you wish to create — a condition, a project, a relationship, a quality in yourself.",
-      "Build a clear, vivid mental image of it as already complete. See the details.",
-      "Feel what it would feel like to live inside this completed reality.",
-      "Now recognize: this mental image is not a wish. It is a cause. The outer world must eventually reflect it.",
-      "Hold the image with conviction but without strain. Certainty, not effort, is the operative quality.",
-      "When doubt arises, gently set it aside and return to the image of completion."
-    ],
-    affirmation: "My thought is creative. What I hold in mind, I am bringing into being.",
-    insight: "Haanel is describing what modern psychology calls 'implementation intention' and 'mental contrasting' — the practice of mentally rehearsing a desired outcome in detail. Decades of research confirm that vivid mental simulation of a goal significantly increases the likelihood of achieving it, partly by priming the mind to notice relevant opportunities and partly by reducing anxiety and building behavioral readiness.",
-    defaultDuration: 20
-  },
-  {
-    part: 13,
-    title: "Oneness",
-    theme: "Spiritual Foundation",
-    lesson: "All things are finally resolvable into one thing, and as they are thus translatable into one another, they must ever be in relation and can never be in opposition to one another. This is the foundation of true power — the recognition of unity underlying apparent division.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Bring to mind the phrase: 'In him we live and move and have our being.'",
-      "Let the words settle. You did not create yourself — you arose from something larger.",
-      "Your breathing happens without your effort. Your heart beats without your instruction.",
-      "This same power sustaining your life is available to sustain your goals, your work, your healing.",
-      "Relax into complete trust — not passive resignation, but active alignment with a force greater than personal will.",
-      "Sit with this feeling of being held and sustained by the ground of being itself."
-    ],
-    affirmation: "In the Source I live, and move, and have my being.",
-    insight: "This exercise invites a fundamental shift in the locus of agency — from the isolated personal will to a deeper alignment with something larger. Haanel is not advocating passivity; he is distinguishing between the effortful will that pushes against life and the inspired will that moves with it. The latter is consistently more effective. Athletes call it 'flow'; Haanel calls it aligning with Universal Mind.",
-    defaultDuration: 25
-  },
-  {
-    part: 14,
-    title: "Inner Radiance",
-    theme: "Becoming the Affirmation",
-    lesson: "There is a change in the thought of the world. The person who understands the principle of mental causation — who truly grasps that thought creates — gets results in exact proportion to their understanding. This exercise deepens the imprint of the central truth.",
-    steps: [
-      "Sit in your usual position. Take three slow, full breaths.",
-      "Bring the affirmation to mind: 'I am whole, perfect, strong, powerful, loving, harmonious and happy.'",
-      "This time, do not merely recite it. Begin at the center of your chest and feel it radiate outward.",
-      "Feel wholeness — nothing lacking in this moment. Feel strength — you are capable.",
-      "Feel love — the genuine wish for goodness for yourself and all living things.",
-      "Feel harmony — the quiet alignment with the natural order of things.",
-      "Feel happiness — not excitement, but the deep, quiet contentment of being aligned with life.",
-      "Let each quality fill you before moving to the next. The whole session is this one statement, fully felt."
-    ],
-    affirmation: "I am whole, perfect, strong, powerful, loving, harmonious and happy.",
-    insight: "Haanel returns to this affirmation for the second time because it is the pivot of the entire course. The first time (Part 8), the practice is recitation — repeating the words and exploring their meaning. Here, the practice is embodiment — actually feeling the qualities described. The difference matters enormously. Words that are merely thought produce surface impressions. Words that are deeply felt alter the nervous system.",
-    defaultDuration: 25
-  },
-  {
-    part: 15,
-    title: "The Law of Growth",
-    theme: "Giving and Receiving",
-    lesson: "Growth is attained through an exchange of the old for the new. We can receive only as we give. We cannot obtain what we lack if we tenaciously cling to what we have. Difficulties and inharmonies indicate that we are either refusing to give out what we no longer need, or refusing to accept what we require.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Ask yourself: what am I clinging to that no longer serves me? An old belief, a resentment, a self-image, a behavior?",
-      "Breathe, and practice mentally releasing it — letting it go as you exhale.",
-      "Now ask: what is trying to enter my life that I have been resisting? A new direction, a new understanding, a new way of being?",
-      "Practice opening to it. Allow the possibility in.",
-      "Concentrate on the Law of Growth itself: what you genuinely give out — energy, value, care, attention — returns to you multiplied.",
-      "Rest in this law. Let it guide what you focus your energy on for the rest of the week."
-    ],
-    affirmation: "I release freely. I receive openly. I grow continuously.",
-    insight: "Haanel anticipates what modern behavioral science calls 'loss aversion' — our tendency to cling to what we have at the cost of what we could gain. Growth always requires releasing an old form to take on a new one. The caterpillar does not become a butterfly by clinging to being a caterpillar. This exercise makes the psychological act of release conscious and deliberate.",
-    defaultDuration: 20
-  },
-  {
-    part: 16,
-    title: "The Power of Insight",
-    theme: "Seeing the Possible",
-    lesson: "Insight is the ability to see what others cannot see — to look at a situation and perceive not only the difficulty but the opportunity within it. This is the distinguishing characteristic of every successful person and the practical expression of the intelligence that underlies all things.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Bring to mind a current situation in your life — a challenge, a decision, an uncertainty.",
-      "Look at it not as a problem to solve but as a situation to understand.",
-      "Ask: what am I not seeing? What assumption am I making that might not be true?",
-      "Ask: what opportunity might be hidden in this difficulty?",
-      "Sit with the questions rather than forcing answers. Let insight arise naturally.",
-      "Practice the felt sense of trust that the answer exists and will become clear."
-    ],
-    affirmation: "Insight is mine. I see what others miss. Opportunity is everywhere.",
-    insight: "Haanel identifies insight as the rarest and most valuable mental faculty — the ability to see beneath the surface of situations to their underlying structure and potential. This is different from analysis (breaking things apart) or intuition (felt knowing). Insight is the flash of recognition that restructures how a situation is seen. It cannot be forced, but it can be cultivated by learning to hold questions open rather than rushing to conclusions.",
-    defaultDuration: 20
-  },
-  {
-    part: 17,
-    title: "The Law of Vibration",
-    theme: "What You Radiate, You Attract",
-    lesson: "The highest principle necessarily determines the circumstances, aspects, and relations of everything with which it comes in contact. Knowledge of higher forces makes all physical force seem secondary. The mind may become a magnet — irresistibly attracting the conditions it desires.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Think of a quality you wish to have more of in your life: confidence, clarity, abundance, peace, love.",
-      "Rather than asking for it, practice being it — right now, in this moment.",
-      "Breathe as a confident person breathes. Hold your attention as a clear person holds theirs.",
-      "Notice how even a shift in inner state begins to shift the feeling of the moment.",
-      "Concentrate on the truth: you attract what you are, not merely what you want.",
-      "Ask yourself: what am I being, right now? Is that what I wish to attract?"
-    ],
-    affirmation: "I am what I wish to attract. What I am, I radiate. What I radiate, returns.",
-    insight: "The Law of Vibration is Haanel's way of expressing what modern psychology calls 'behavioral priming' and 'embodied cognition.' Your inner state — your posture, tone, attention, emotional quality — is continuously communicating with the world around you in ways both subtle and profound. People respond to what you are more reliably than to what you say. And you perceive more of what you are already attuned to. The practical implication: change the inner state first.",
-    defaultDuration: 20
-  },
-  {
-    part: 18,
-    title: "The Power of Attention",
-    theme: "Focused Concentration",
-    lesson: "The power of attention is the distinguishing characteristic of every person of ability. The degree to which we can focus attention — hold a single thought, a single purpose, a single image — determines the degree of creative power we can bring to bear on any situation.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Choose a single, simple object as your focus: a candle flame, a geometric shape, a sphere of light.",
-      "Hold this image in your mind as clearly and stably as you can.",
-      "When the image fades or the mind wanders, calmly bring it back without self-criticism.",
-      "Each return of attention is a repetition of the mental muscle. Welcome the wandering — it gives you the opportunity to return.",
-      "Gradually extend the period during which you can hold the image clearly.",
-      "Notice: as concentration deepens, a subtle quality of power and clarity enters the mind."
-    ],
-    affirmation: "My attention is focused. My mind is a lens, concentrating power.",
-    insight: "Attention is the currency of the mind. Where attention goes, energy flows — and where energy flows, change happens. In a world of constant distraction, the ability to direct and hold attention has become extraordinarily rare and correspondingly valuable. Haanel's concentration exercises are in essence a training of this faculty. Every session of practice builds the capacity to focus, which compounds over weeks into a genuinely different quality of mind.",
-    defaultDuration: 20
-  },
-  {
-    part: 19,
-    title: "Truth",
-    theme: "The Foundation of Power",
-    lesson: "If we can find the truth, we shall have found the cause for every effect — and having found cause, we are in a position to control the effect. A knowledge of truth is power. Wealth is the offspring of power. All things represent certain forms and degrees of power.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Bring to mind a situation in your life where you feel uncertain, confused, or stuck.",
-      "Ask yourself, very directly: what is actually true here? Strip away what you've assumed, been told, or feared.",
-      "What do you know for certain? What are you guessing? What are you avoiding?",
-      "Practice staying with the discomfort of genuine uncertainty rather than substituting a false certainty.",
-      "Ask: if I knew the truth of this situation fully, what would I do?",
-      "Let truth be more important than comfort. Recognize that every lie or evasion costs you power."
-    ],
-    affirmation: "I seek truth above all. Truth is the ground on which I stand.",
-    insight: "Haanel's treatment of truth is surprisingly practical. He is not talking about abstract metaphysical truth but about the everyday courage to see situations as they actually are. Most human suffering stems from operating on false premises — beliefs about ourselves, others, and the world that we've never examined. The practice of truth-seeking is the practice of withdrawing energy from illusions and investing it in reality, which is always more workable than any fantasy.",
-    defaultDuration: 25
-  },
-  {
-    part: 20,
-    title: "Inspiration",
-    theme: "The Universal Flowing Through",
-    lesson: "Inspiration is the art of becoming a channel for the flow of infinite wisdom. The Universal can act only through the individual — we are the channels for its activity. It is within us; it is us. We can fail to recognize it and so exclude it from our consciousness — but it is nevertheless the basic fact of all existence.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Begin by setting aside all preoccupation with problems, plans, and tasks.",
-      "Hold your highest ideal for yourself and your life — not what you think is possible, but what calls to you most deeply.",
-      "Rather than thinking about it, simply be present to it. Let it be there, whole, without analysis.",
-      "Practice the posture of receptivity — not grasping, not pushing, just open.",
-      "If clarity, images, or words arise, receive them without immediately judging or planning.",
-      "Know that the same intelligence that organized the cosmos is available to organize your life."
-    ],
-    affirmation: "I am a channel for universal wisdom. Inspiration flows through me freely.",
-    insight: "The distinction Haanel draws between 'working' the mind and 'receiving through' the mind maps onto what psychologists call the difference between convergent thinking (focused problem-solving) and divergent thinking (open, generative discovery). Both are necessary, but most people over-rely on the former. The creative breakthroughs that change lives tend to come in moments of receptive openness, not effortful striving. This exercise trains that receptive mode.",
-    defaultDuration: 25
-  },
-  {
-    part: 21,
-    title: "Money Consciousness",
-    theme: "Becoming a Channel for Value",
-    lesson: "Money is woven into the outer fabric of our existence and engages the best thought of the best minds. It is not the love of money that is the root of all evil — it is the misunderstanding of money. Money is a symbol and a medium: it flows toward value and away from its absence.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Consider your current relationship with money. Without judgment, observe what feelings arise.",
-      "Ask: do I see money as scarce, dangerous, or beyond me? Observe these as beliefs, not facts.",
-      "Now consider the value you create for others — through your work, your presence, your ideas.",
-      "Recognize: money is simply a representation of value exchanged. The more genuine value you create and offer, the more naturally money flows.",
-      "Concentrate on becoming an ever-greater source of genuine value in the world.",
-      "Affirm: 'I am a generous channel through which value flows — and returns.'"
-    ],
-    affirmation: "I create real value. Money flows to me as naturally as value flows from me.",
-    insight: "Haanel's treatment of money is unusually clear-eyed for a metaphysical text. He does not say 'think rich thoughts and money will appear.' He says: understand what money is (a measure of exchanged value), recognize your capacity to create value, and align your attention and effort with creation rather than acquisition. The 'money consciousness' he describes is not greed but a confident, matter-of-fact orientation toward generating and exchanging value.",
-    defaultDuration: 20
-  },
-  {
-    part: 22,
-    title: "Perfect Health",
-    theme: "The Vibration of Vitality",
-    lesson: "The Law of Health is based on the Law of Vibration. With a proper knowledge of this law, we may externalize health conditions. Every cell in the body is responsive to the quality of mind that dwells within it. Mental patterns of fear, anxiety, and limitation produce corresponding physical conditions.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Take several slow, full breaths. With each exhale, release any held tension in the body.",
-      "Bring your attention to the life force within you — the steady pulse of your heartbeat, the rhythm of breath.",
-      "Visualize every cell of your body vibrating with health, energy, and perfect function.",
-      "See your blood flowing cleanly, your organs working in harmony, your nervous system at ease.",
-      "If there is an area of difficulty or pain, bring gentle, loving attention to it — without fear, without resistance.",
-      "Affirm the truth of your body's deep intelligence and its natural tendency toward wholeness."
-    ],
-    affirmation: "Every cell of my body is alive with health and perfect vitality.",
-    insight: "The mind-body connection Haanel describes in 1919 is now extensively documented. Psychological stress demonstrably impairs immune function, cardiovascular health, and wound healing. Conversely, practices that cultivate relaxation, positive emotion, and felt safety improve measurable health markers. This exercise is not a denial of physical illness; it is a deliberate cultivation of the mental-emotional conditions most supportive of the body's own healing intelligence.",
-    defaultDuration: 20
-  },
-  {
-    part: 23,
-    title: "The Large Idea",
-    theme: "Expanding Mental Scope",
-    lesson: "Great ideas tend to eliminate smaller ideas. It is well to hold ideas which are large enough to counteract and destroy all small, undesirable tendencies. The creative energy finds no more difficulty in handling a large situation than a small one. Think as largely as you dare.",
-    steps: [
-      "Sit in stillness and close your eyes.",
-      "Think of the largest, most constructive, most beneficial idea you can hold — an idea for your life, your work, or the world.",
-      "This idea should feel a little too large — slightly beyond comfortable reach.",
-      "Hold it in your mind and notice how it changes the quality of your thinking.",
-      "Notice that smaller anxieties, petty concerns, and habitual worries naturally recede when the mind is occupied with something genuinely large.",
-      "Let the large idea fill your consciousness completely. For this session, nothing smaller is allowed in.",
-      "Carry this expanded mental posture back into your day."
-    ],
-    affirmation: "I think large. Small thoughts cannot survive in the presence of great ones.",
-    insight: "This is one of Haanel's most psychologically astute observations: the mind can only hold so much at once, and a large, positive, constructive idea naturally displaces smaller, negative ones — not through suppression but through crowding. If you are plagued by anxiety, the most effective cure is not to fight the anxiety but to fill the mental space with something larger. This is why people engaged in genuinely meaningful work tend to suffer less from petty fears.",
-    defaultDuration: 20
-  },
-  {
-    part: 24,
-    title: "The Master Key",
-    theme: "The Door Opens From Within",
-    lesson: "This is the entire theory and practice of the system: to express harmony, to express health, to express abundance. Every difficulty, no matter what it is or where it is, can be removed or dissolved. And there is only one way in which this is ever done — from within.",
-    steps: [
-      "Sit in your usual position. This is the final exercise of the course.",
-      "Close your eyes. Take your time settling into complete stillness — physical and mental.",
-      "Let everything you have practiced over the past weeks gather in this moment of quiet.",
-      "Rest in the simple, clear awareness of your own being — the same 'I AM' encountered in Part 4.",
-      "Recognize that this awareness is undiminished by circumstance, unthreatened by change, whole right now.",
-      "From this place, hold the vision of your life at its fullest, most expressed, most harmonious.",
-      "And know: the Master Key is not in this book. It is not in any system. It is in you. It has always been in you."
-    ],
-    affirmation: "I hold the Master Key. The door to every good is within me, and it opens now.",
-    insight: "Haanel ends where he began: with the proposition that mind is the creative center from which all activity proceeds. The course has moved from the physical (stillness of the body) through the psychological (mastery of thought) to the spiritual (recognition of one's identity with the source of all things). The final exercise asks you not to do something new but to recognize what has been true throughout — and to live from that recognition.",
-    defaultDuration: 30
-  }
-];
-
-// ── Storage helpers ───────────────────────────
-const STORE_KEY = 'mks_progress_v2';
-
-function loadStore() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
-  catch { return {}; }
-}
-
-function saveStore(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
-}
-
-function getExData(part) {
-  const store = loadStore();
-  return store[part] || { sessions: [], note: '' };
-}
-
-function saveSession(part, durationMin) {
-  const store = loadStore();
-  if (!store[part]) store[part] = { sessions: [], note: '' };
-  store[part].sessions.push({ ts: Date.now(), duration: durationMin });
-  saveStore(store);
-}
-
-function saveNote(part, text) {
-  const store = loadStore();
-  if (!store[part]) store[part] = { sessions: [], note: '' };
-  store[part].note = text;
-  saveStore(store);
-}
-
-function getCompletedParts() {
-  const store = loadStore();
-  return Object.entries(store)
-    .filter(([, v]) => v.sessions && v.sessions.length > 0)
-    .map(([k]) => parseInt(k));
-}
-
-// ── Timer state ───────────────────────────────
-let timerInterval = null;
-let timerSecondsLeft = 0;
-let timerTotalSeconds = 0;
-let timerRunning = false;
-let selectedDuration = 15;
-
-const CIRCUMFERENCE = 2 * Math.PI * 82; // 515.2
-
-function formatTime(s) {
-  const m = Math.floor(s / 60).toString().padStart(2, '0');
-  const sec = (s % 60).toString().padStart(2, '0');
-  return `${m}:${sec}`;
-}
-
-function updateRing(secondsLeft, totalSeconds) {
-  const fill = document.getElementById('ring-fill');
-  const fraction = secondsLeft / totalSeconds;
-  fill.style.strokeDashoffset = CIRCUMFERENCE * (1 - fraction);
-}
-
-function chime() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const freqs = [528, 660, 792];
-    freqs.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      const t = ctx.currentTime + i * 0.6;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.18, t + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
-      osc.start(t);
-      osc.stop(t + 2.5);
-    });
-  } catch {}
-}
-
-function startTimer(durationMin) {
-  if (timerRunning) return;
-  timerTotalSeconds = durationMin * 60;
-  timerSecondsLeft = timerTotalSeconds;
-  timerRunning = true;
-  document.getElementById('btn-start').textContent = 'Pause';
-  document.getElementById('btn-reset').style.display = 'inline-block';
-  document.getElementById('timer-state-label').textContent = 'in session';
-  document.getElementById('timer-done-banner').classList.remove('visible');
-
-  timerInterval = setInterval(() => {
-    timerSecondsLeft--;
-    document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
-    updateRing(timerSecondsLeft, timerTotalSeconds);
-
-    if (timerSecondsLeft <= 0) {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      document.getElementById('btn-start').textContent = 'Begin';
-      document.getElementById('timer-state-label').textContent = 'complete';
-      document.getElementById('timer-done-banner').classList.add('visible');
-      chime();
-    }
-  }, 1000);
-}
-
-function pauseTimer() {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  document.getElementById('btn-start').textContent = 'Resume';
-  document.getElementById('timer-state-label').textContent = 'paused';
-}
-
-function resetTimer(durationMin) {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  timerSecondsLeft = durationMin * 60;
-  timerTotalSeconds = timerSecondsLeft;
-  document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
-  document.getElementById('btn-start').textContent = 'Begin';
-  document.getElementById('btn-reset').style.display = 'none';
-  document.getElementById('timer-state-label').textContent = 'ready';
-  document.getElementById('timer-done-banner').classList.remove('visible');
-  updateRing(timerSecondsLeft, timerTotalSeconds);
-}
-
-// ── Render helpers ────────────────────────────
-function updateHeader() {
-  const completed = getCompletedParts();
-  const count = completed.length;
-  document.getElementById('progress-count').textContent = `${count} / 24`;
-  document.getElementById('progress-bar').style.width = `${(count / 24) * 100}%`;
-}
-
-function renderGrid() {
-  const grid = document.getElementById('exercises-grid');
-  const completed = getCompletedParts();
-  const unlocked = isUnlocked();
-  const lockSvg = `<span class="card-lock" aria-label="Locked"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></span>`;
-  grid.innerHTML = EXERCISES.map(ex => {
-    const done = completed.includes(ex.part);
-    const data = getExData(ex.part);
-    const sessionCount = data.sessions.length;
-    const locked = ex.part >= PAYWALL_PART && !unlocked;
-    return `
-      <div class="exercise-card ${done ? 'completed' : ''} ${locked ? 'locked' : ''}" data-part="${ex.part}" style="${locked ? 'opacity:0.55' : ''}">
-        ${locked ? lockSvg : ''}
-        <div class="card-part">Part <span>${String(ex.part).padStart(2, '0')}</span></div>
-        <div class="card-title">${ex.title}</div>
-        <div class="card-theme">${ex.theme}</div>
-        <div class="card-footer">
-          <span class="card-duration">${ex.defaultDuration} min</span>
-          <span class="card-sessions">${sessionCount > 0 ? `${sessionCount} session${sessionCount > 1 ? 's' : ''}` : ''}</span>
-          <span class="card-status ${done ? 'done' : 'pending'}">${locked ? 'locked' : done ? '✓ done' : 'begin'}</span>
-        </div>
-      </div>`;
-  }).join('');
-
-  grid.querySelectorAll('.exercise-card').forEach(card => {
-    card.addEventListener('click', () => openExercise(parseInt(card.dataset.part)));
-  });
-}
-
-// ── Exercise view ─────────────────────────────
-let currentPart = null;
-
-function openExercise(part) {
-  if (part >= PAYWALL_PART && !isUnlocked()) {
-    showView('paywall');
-    return;
-  }
-  currentPart = part;
-  const ex = EXERCISES[part - 1];
-  const data = getExData(part);
-
-  // Reset timer
-  clearInterval(timerInterval);
-  timerRunning = false;
-  selectedDuration = ex.defaultDuration;
-
-  // Populate content
-  document.getElementById('ex-eyebrow').textContent = `Part ${part} of 24`;
-  document.getElementById('ex-title').textContent = ex.title;
-  document.getElementById('ex-theme').textContent = ex.theme;
-  document.getElementById('ex-lesson').textContent = ex.lesson;
-  document.getElementById('ex-affirmation').textContent = `"${ex.affirmation}"`;
-  document.getElementById('ex-insight').textContent = ex.insight;
-  document.getElementById('journal-textarea').value = data.note || '';
-
-  // Steps
-  document.getElementById('ex-steps').innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
-
-  // Duration buttons
-  const durations = [10, 15, 20, 25, 30];
-  document.getElementById('dur-row').innerHTML = durations.map(d =>
-    `<button class="dur-btn ${d === selectedDuration ? 'active' : ''}" data-dur="${d}">${d} min</button>`
-  ).join('');
-  document.getElementById('dur-row').querySelectorAll('.dur-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedDuration = parseInt(btn.dataset.dur);
-      document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      resetTimer(selectedDuration);
-    });
-  });
-
-  // Timer init
-  resetTimer(selectedDuration);
-  document.getElementById('btn-start').onclick = () => {
-    if (timerRunning) pauseTimer();
-    else startTimer(selectedDuration);
-  };
-  document.getElementById('btn-reset').onclick = () => resetTimer(selectedDuration);
-
-  // Sessions log
-  renderSessions(part);
-
-  // Mark complete button
-  document.getElementById('btn-mark-complete').onclick = () => {
-    saveSession(part, selectedDuration);
-    renderSessions(part);
-    renderGrid();
-    updateHeader();
-    const banner = document.getElementById('mark-banner');
-    banner.textContent = `Session recorded — ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`;
-    banner.style.display = 'block';
-    banner.style.color = 'var(--green)';
-    banner.style.background = 'rgba(76,175,122,0.1)';
-    banner.style.border = '1px solid rgba(76,175,122,0.3)';
-    setTimeout(() => { banner.style.display = 'none'; }, 4000);
-  };
-
-  // Voice button
-  stopVoice();
-  clearVoiceError();
-  setVoiceState('idle');
-  document.getElementById('voice-btn').onclick = () => speakExercise(ex);
-
-  // Note saving
-  document.getElementById('btn-save-note').onclick = () => {
-    saveNote(part, document.getElementById('journal-textarea').value);
-    const fb = document.getElementById('save-note-feedback');
-    fb.classList.add('show');
-    setTimeout(() => fb.classList.remove('show'), 2000);
-  };
-
-  // Prev / Next
-  const prevBtn = document.getElementById('btn-prev');
-  const nextBtn = document.getElementById('btn-next');
-  if (part > 1) {
-    const prev = EXERCISES[part - 2];
-    prevBtn.disabled = false;
-    document.getElementById('prev-part').textContent = `Part ${prev.part}`;
-    document.getElementById('prev-title').textContent = prev.title;
-    prevBtn.onclick = () => openExercise(prev.part);
-  } else {
-    prevBtn.disabled = true;
-    document.getElementById('prev-part').textContent = '';
-    document.getElementById('prev-title').textContent = '';
-  }
-  if (part < 24) {
-    const next = EXERCISES[part];
-    nextBtn.disabled = false;
-    document.getElementById('next-part').textContent = `Part ${next.part}`;
-    document.getElementById('next-title').textContent = next.title;
-    nextBtn.onclick = () => openExercise(next.part);
-  } else {
-    nextBtn.disabled = true;
-    document.getElementById('next-part').textContent = '';
-    document.getElementById('next-title').textContent = '';
-  }
-
-  showView('exercise');
-}
-
-function renderSessions(part) {
-  const data = getExData(part);
-  const log = document.getElementById('sessions-log');
-  log.innerHTML = '';
-
-  if (!data.sessions || data.sessions.length === 0) {
-    const empty = document.createElement('p');
-    empty.className = 'no-sessions';
-    empty.textContent = 'No sessions recorded yet.';
-    log.appendChild(empty);
-    return;
-  }
-
-  [...data.sessions].reverse().forEach(s => {
-    const ts = Number(s.ts);
-    const dur = parseInt(s.duration, 10);
-    if (!ts || !dur) return;
-
-    const dateStr = new Date(ts).toLocaleDateString('en-US', {
-      weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-    });
-
-    const row = document.createElement('div');
-    row.className = 'session-item';
-
-    const dot = document.createElement('div');
-    dot.className = 'session-dot';
-
-    const date = document.createElement('span');
-    date.className = 'session-date';
-    date.textContent = dateStr;
-
-    const duration = document.createElement('span');
-    duration.className = 'session-duration';
-    duration.textContent = `${dur} min`;
-
-    row.appendChild(dot);
-    row.appendChild(date);
-    row.appendChild(duration);
-    log.appendChild(row);
-  });
-}
-
-// ── Back button ───────────────────────────────
-document.getElementById('back-btn').addEventListener('click', () => {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  stopVoice();
-  goToList();
-});
-
-// ── Voice / ElevenLabs ───────────────────────
-let voiceAudio = null;
-let voicePlaying = false;
-
-function buildNarration(ex) {
-  const intro = ex.lesson.split(/(?<=[.!?])\s+/)[0];
-  const stepsText = ex.steps
-    .map((s, i) => `Step ${i + 1}. ${s}`)
-    .join('\n\n');
-  return [
-    `${ex.title}. ${ex.theme}.`,
-    '',
-    intro,
-    '',
-    'Let us begin.',
-    '',
-    stepsText,
-    '',
-    `Hold this in mind: ${ex.affirmation}`,
-  ].join('\n');
-}
-
-function setVoiceState(state) {
-  const btn = document.getElementById('voice-btn');
-  const label = document.getElementById('voice-btn-label');
-  const wave = document.getElementById('voice-wave');
-  const iconPlay = document.getElementById('voice-icon-play');
-  const iconStop = document.getElementById('voice-icon-stop');
-  const iconLoad = document.getElementById('voice-icon-load');
-
-  iconPlay.style.display = 'none';
-  iconStop.style.display = 'none';
-  iconLoad.style.display = 'none';
-  wave.classList.remove('visible');
-  btn.classList.remove('playing');
-  btn.disabled = false;
-
-  if (state === 'idle') {
-    iconPlay.style.display = 'block';
-    label.textContent = 'Read aloud';
-  } else if (state === 'loading') {
-    iconLoad.style.display = 'block';
-    label.textContent = 'Loading…';
-    btn.disabled = true;
-  } else if (state === 'playing') {
-    iconStop.style.display = 'block';
-    label.textContent = 'Stop';
-    wave.classList.add('visible');
-    btn.classList.add('playing');
-  }
-}
-
-function showVoiceError(msg) {
-  const el = document.getElementById('voice-error');
-  el.textContent = msg;
-  el.classList.add('visible');
-}
-
-function clearVoiceError() {
-  const el = document.getElementById('voice-error');
-  el.classList.remove('visible');
-}
-
-function stopVoice() {
-  if (voiceAudio) {
-    voiceAudio.pause();
-    voiceAudio.src = '';
-    voiceAudio = null;
-  }
-  voicePlaying = false;
-  setVoiceState('idle');
-}
-
-async function speakExercise(ex) {
-  if (voicePlaying) { stopVoice(); return; }
-
-  clearVoiceError();
-  setVoiceState('loading');
-
-  const text = buildNarration(ex);
-
-  try {
-    const res = await fetch('/api/speak', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err.error || `Error ${res.status}`);
-    }
-
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-
-    voiceAudio = new Audio(url);
-    voicePlaying = true;
-    setVoiceState('playing');
-
-    voiceAudio.addEventListener('ended', () => {
-      URL.revokeObjectURL(url);
-      voicePlaying = false;
-      setVoiceState('idle');
-    });
-    voiceAudio.addEventListener('error', () => {
-      URL.revokeObjectURL(url);
-      showVoiceError('Playback error. Try again.');
-      voicePlaying = false;
-      setVoiceState('idle');
-    });
-
-    await voiceAudio.play();
-  } catch (err) {
-    voicePlaying = false;
-    setVoiceState('idle');
-    showVoiceError(
-      err.message.includes('API key')
-        ? 'ElevenLabs API key not configured — add ELEVENLABS_API_KEY to Vercel env vars.'
-        : `Voice error: ${err.message}`
-    );
-  }
-}
-
-// ── View navigation ───────────────────────────
-function showView(name) {
-  ['intro','list','exercise','paywall'].forEach(v => {
-    document.getElementById(`view-${v}`).classList.toggle('active', v === name);
-  });
-  document.getElementById('nav-intro').classList.toggle('active', name === 'intro');
-  document.getElementById('nav-exercises').classList.toggle('active', name === 'list' || name === 'exercise');
-  window.scrollTo(0, 0);
-}
-
-function goToList() {
-  renderGrid();
-  updateHeader();
-  showView('list');
-}
-
-// Header logo → intro
-document.getElementById('header-logo').addEventListener('click', () => {
-  stopVoice();
-  clearInterval(timerInterval);
-  timerRunning = false;
-  showView('intro');
-});
-
-// Header nav
-document.getElementById('nav-intro').addEventListener('click', () => {
-  stopVoice();
-  clearInterval(timerInterval);
-  timerRunning = false;
-  showView('intro');
-});
-document.getElementById('nav-exercises').addEventListener('click', goToList);
-
-// Intro "Begin" buttons → first exercise
-document.getElementById('intro-begin-btn').addEventListener('click', () => {
-  openExercise(1);
-});
-document.getElementById('intro-all-btn').addEventListener('click', goToList);
-document.getElementById('intro-begin-btn-2').addEventListener('click', () => {
-  openExercise(1);
-});
-
-// ── Paywall / Stripe ──────────────────────────
-const PAYWALL_PART = 5;
-
-function isUnlocked() {
-  return localStorage.getItem('mks_unlocked') === 'true';
-}
-
-function showToast(msg, durationMs = 3500) {
-  let toast = document.getElementById('mks-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'mks-toast';
-    toast.className = 'toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove('show'), durationMs);
-}
-
-async function handleUnlock() {
-  const btn = document.getElementById('paywall-btn');
-  const errEl = document.getElementById('paywall-error');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to checkout…';
-  errEl.textContent = '';
-  try {
-    const res = await fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout');
-    location.href = data.url;
-  } catch (err) {
-    errEl.textContent = err.message;
-    btn.disabled = false;
-    btn.textContent = 'Unlock the Full Course →';
-  }
-}
-
-async function verifyStripeSession(sessionId) {
-  try {
-    const res = await fetch('/api/verify-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId }),
-    });
-    const data = await res.json();
-    if (data.unlocked) {
-      localStorage.setItem('mks_unlocked', 'true');
-      history.replaceState(null, '', location.pathname);
-      showToast('✓ Full access unlocked — welcome to the complete course!');
-      document.getElementById('unlock-badge').classList.add('visible');
-      renderGrid();
-    }
-  } catch {
-    // silent — user still sees the list, can retry
-  }
-}
-
-// ── On-load: handle Stripe return params ──────
-(function handleStripeReturn() {
-  const params = new URLSearchParams(location.search);
-  const sessionId = params.get('session_id');
-  const cancelled = params.get('cancelled');
-  if (sessionId) {
-    verifyStripeSession(sessionId);
-  } else if (cancelled) {
-    history.replaceState(null, '', location.pathname);
-    showToast('Checkout cancelled — you can unlock anytime from the exercises list.');
-  }
-})();
-
-// ── Init ──────────────────────────────────────
-if (isUnlocked()) document.getElementById('unlock-badge').classList.add('visible');
-document.getElementById('paywall-btn').addEventListener('click', handleUnlock);
-document.getElementById('paywall-back').addEventListener('click', goToList);
-updateHeader();
-</script>
 </body>
 </html>
