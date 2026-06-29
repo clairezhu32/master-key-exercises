@@ -307,6 +307,175 @@
       line-height: 1.7;
     }
 
+    /* ── Profile / Goal ─────────────────────────── */
+    .goal-banner {
+      margin: 0 auto 0;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--gold-glow);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .goal-banner p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin: 0;
+    }
+    .goal-banner strong { color: var(--text); font-weight: 500; }
+    .goal-banner-btn {
+      flex-shrink: 0;
+      padding: 7px 18px;
+      background: none;
+      border: 1px solid var(--gold-dim);
+      border-radius: 20px;
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.2s;
+    }
+    .goal-banner-btn:hover { background: var(--gold-glow); }
+
+    .goal-display {
+      padding: 0 32px 24px;
+      display: none;
+    }
+    .goal-display.visible { display: flex; align-items: baseline; gap: 10px; }
+    .goal-display-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      flex-shrink: 0;
+    }
+    .goal-display-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--gold);
+      font-style: italic;
+      font-weight: 300;
+    }
+    .goal-display-edit {
+      font-size: 0.72rem;
+      color: var(--text-faint);
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit;
+      padding: 0;
+      transition: color 0.2s;
+    }
+    .goal-display-edit:hover { color: var(--text-dim); }
+
+    /* Journey card inside exercise */
+    .journey-card {
+      background: var(--gold-glow);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .journey-goal-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 4px;
+    }
+    .journey-goal-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--gold);
+      font-weight: 300;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .journey-bridge {
+      font-size: 0.87rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* Personalized affirmation override */
+    .ex-affirmation.personalized {
+      border: 1px solid rgba(201,168,76,0.4);
+    }
+
+    /* Profile modal */
+    .profile-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 400;
+      backdrop-filter: blur(4px);
+      display: none;
+    }
+    .profile-modal-overlay.open { display: block; }
+    .profile-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 401;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: min(460px, calc(100vw - 40px));
+    }
+    .profile-modal-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none; border: none;
+      color: var(--text-faint);
+      font-size: 1rem; cursor: pointer;
+      padding: 4px 8px; transition: color 0.2s;
+    }
+    .profile-modal-close:hover { color: var(--text); }
+    .profile-modal h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .profile-modal p {
+      font-size: 0.85rem; color: var(--text-dim);
+      line-height: 1.6; margin-bottom: 28px;
+    }
+    .profile-field { margin-bottom: 20px; }
+    .profile-field label {
+      display: block;
+      font-size: 0.68rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+    .profile-field input,
+    .profile-field textarea {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit;
+      font-size: 0.9rem; padding: 12px 14px;
+      outline: none; resize: none;
+      transition: border-color 0.2s;
+    }
+    .profile-field input:focus,
+    .profile-field textarea:focus { border-color: var(--gold-dim); }
+    .profile-field input::placeholder,
+    .profile-field textarea::placeholder { color: var(--text-faint); }
+    .profile-save-btn {
+      width: 100%; padding: 13px;
+      background: var(--gold); color: var(--bg);
+      border: none; border-radius: 8px;
+      font-family: inherit; font-size: 0.9rem;
+      font-weight: 500; cursor: pointer;
+      letter-spacing: 0.04em; transition: background 0.2s;
+    }
+    .profile-save-btn:hover { background: #debb6a; }
+    .profile-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
     /* ── Intention ───────────────────────────────── */
     .intention-wrap {
       background: var(--gold-glow);
@@ -1250,6 +1419,19 @@
 
 <!-- ── List View ─────────────────────────────── -->
 <div id="view-list" class="active">
+  <!-- Goal setup banner (shown when no goal is set) -->
+  <div class="goal-banner" id="goal-setup-banner" style="display:none">
+    <p>Set your goal to make all 24 exercises <strong>specific to your life</strong>.</p>
+    <button class="goal-banner-btn" id="goal-setup-btn">Set my goal →</button>
+  </div>
+
+  <!-- Goal display (shown when goal is set) -->
+  <div class="goal-display" id="goal-display">
+    <span class="goal-display-label">Your goal</span>
+    <span class="goal-display-text" id="goal-display-text"></span>
+    <button class="goal-display-edit" id="goal-display-edit">Edit</button>
+  </div>
+
   <div class="list-hero">
     <h1>Twenty-Four <em>Exercises</em><br>in Mental Mastery</h1>
     <p>Haanel designed this as a 24-week course — one part per week. His instruction was not to move on until the current exercise feels effortless and automatic. That said, follow your own rhythm. Some people revisit a part for two or three weeks; others move faster. What matters is that each layer is genuinely absorbed before the next is added.</p>
@@ -1392,6 +1574,12 @@
       <div class="ex-affirmation" id="ex-affirmation"></div>
     </div>
 
+    <!-- Your Journey (personalized, hidden when no goal) -->
+    <div class="ex-section" id="journey-section" style="display:none">
+      <div class="ex-section-label">For Your Journey</div>
+      <div class="journey-card" id="journey-card"></div>
+    </div>
+
     <!-- Insight -->
     <div class="ex-section">
       <div class="ex-section-label">Why This Matters</div>
@@ -1460,6 +1648,24 @@
     Continue with Google
   </button>
   <p class="auth-modal-note">Or close to continue without an account — your progress stays saved in this browser.</p>
+</div>
+
+<!-- Profile modal -->
+<div class="profile-modal-overlay" id="profile-modal-overlay">
+  <div class="profile-modal" id="profile-modal">
+    <button class="profile-modal-close" id="profile-modal-close">✕</button>
+    <h3>Your Goal</h3>
+    <p>Tell us what you are working toward. Every exercise will be reframed around this — making each session speak directly to your life.</p>
+    <div class="profile-field">
+      <label for="profile-name-input">Your name (optional)</label>
+      <input type="text" id="profile-name-input" placeholder="How should we address you?" maxlength="60" />
+    </div>
+    <div class="profile-field">
+      <label for="profile-goal-input">What do you want to create or achieve? *</label>
+      <textarea id="profile-goal-input" rows="3" placeholder="e.g. Start my own business, get promoted to senior engineer, write my first book…" maxlength="200"></textarea>
+    </div>
+    <button class="profile-save-btn" id="profile-save-btn" disabled>Save my goal</button>
+  </div>
 </div>
 
 <script>
@@ -2041,6 +2247,108 @@ const EXERCISES = [
   }
 ];
 
+// ── Per-part personalization ──────────────────
+// Each entry: { bridge, affirmation }
+// {goal} is replaced with the user's actual goal at render time.
+const PART_PERSONALIZATION = [
+  { // Part 1 — Physical Stillness
+    bridge: "The ability to command your body is the first discipline of anyone who intends to command their circumstances. Every distraction, every fidget, every unconscious movement is a small vote against {goal}. This practice is how you begin casting different votes.",
+    affirmation: "I master my body. I am building the stillness that makes {goal} inevitable.",
+  },
+  { // Part 2 — Mental Quiet
+    bridge: "The clarity needed to pursue {goal} does not come from more thinking — it comes from the gap beneath the thinking. This practice opens that space. The subconscious mind working silently on {goal} is more powerful than the conscious mind worrying about it.",
+    affirmation: "In stillness, I find the clarity that guides me toward {goal}.",
+  },
+  { // Part 3 — Complete Relaxation
+    bridge: "Tension is the body's record of all the ways you've been bracing against {goal} — fearing failure, expecting struggle, holding on too tightly. Releasing that tension is not weakness. It is removing the only real obstacle between you and what you want.",
+    affirmation: "I release all resistance. I am open. {goal} flows toward me naturally.",
+  },
+  { // Part 4 — The True 'I'
+    bridge: "The 'I' working toward {goal} is not your anxiety, your self-doubt, or your past failures. It is the quiet witnessing presence that has been watching all of those without being diminished by any of them. That is the 'I' doing this work. It is unshakeable.",
+    affirmation: "I am not my fears. I am not my past. The 'I' pursuing {goal} is whole and clear.",
+  },
+  { // Part 5 — The Mental Home
+    bridge: "Your subconscious mind is already furnished with thoughts, images, and beliefs about {goal}. This exercise makes that furnishing conscious and deliberate. The outer conditions of your life are always catching up to the mental home you've built. Build the right one.",
+    affirmation: "{goal} is already real in my mind. The outer world is catching up.",
+  },
+  { // Part 6 — Concentration on Harmony
+    bridge: "A mind in discord — anxious, scattered, resentful — cannot attract harmonious outcomes. {goal} requires not just effort but alignment: inner harmony that makes you a consistent attractor of the conditions it needs. This practice builds that alignment.",
+    affirmation: "I am in harmony with {goal}. What I seek is also seeking me.",
+  },
+  { // Part 7 — Visualization
+    bridge: "The clearer and more stable your inner image of {goal}, the more precisely your mind navigates toward it — noticing opportunities, generating ideas, recognizing the right people and moments. Vague wishes produce vague results. Clear images produce clear movement.",
+    affirmation: "I see {goal} clearly and completely. My inner eye is steady and precise.",
+  },
+  { // Part 8 — The Core Affirmation
+    bridge: "Wholeness, strength, and power are not things you acquire on the way to {goal}. They are the inner posture from which {goal} naturally proceeds. This affirmation plants that posture at the root level — where it becomes the lens through which you perceive and act.",
+    affirmation: "I am whole, strong, and powerful. I am the person for whom {goal} is a natural outcome.",
+  },
+  { // Part 9 — The Greatest Good
+    bridge: "The surest path to {goal} runs through genuine service to others. Ask yourself: who benefits when I achieve {goal}? What value does it create beyond yourself? Anchoring {goal} to contribution makes it a stronger attractor — and makes the pursuit more sustaining.",
+    affirmation: "My path to {goal} creates real value for others. I give freely. I receive fully.",
+  },
+  { // Part 10 — The Law of Abundance
+    bridge: "{goal} is not scarce. The resources, connections, opportunities, and insight required to achieve it are not in short supply. What limits access to them is a mind habituated to scarcity. This practice directly dissolves that habit — and opens the channels.",
+    affirmation: "Everything I need to achieve {goal} is available to me now. Supply is limitless.",
+  },
+  { // Part 11 — Universal Connection
+    bridge: "The intelligence that can achieve {goal} is not something you must acquire from outside. It is already what you are made of — the same universal intelligence that governs every living system. This practice is the recognition of that fact, which is also the access point.",
+    affirmation: "The intelligence within me is equal to {goal}. I am supported by universal power.",
+  },
+  { // Part 12 — The Creative Power
+    bridge: "Hold {goal} in your mind not as a wish or a hope but as a completed fact — as a cause already set in motion. This is not delusion; it is the correct use of the creative faculty that every achievement in history has relied on. The image precedes the reality.",
+    affirmation: "{goal} is held in my mind as already complete. My thought is the creative cause.",
+  },
+  { // Part 13 — Oneness
+    bridge: "The resistance you feel toward {goal} — the doubt, the friction, the sense that it's too hard — dissolves when you stop treating yourself as a separate agent pushing against the world and recognize that the force capable of creating {goal} is already moving through you.",
+    affirmation: "I am aligned with the source of {goal}. In it I live and move and have my being.",
+  },
+  { // Part 14 — Inner Radiance
+    bridge: "This exercise asks you to inhabit the qualities of the person who has already achieved {goal}: their wholeness, their confidence, their ease. Not to pretend — but to practice, until practicing becomes being, and being becomes having.",
+    affirmation: "I am whole, strong, and radiant. I am already becoming the person who achieves {goal}.",
+  },
+  { // Part 15 — The Law of Growth
+    bridge: "Something in you is holding on to a version of yourself that has not yet achieved {goal}. A belief, a story, a familiar identity. Growth requires releasing it. This exercise makes that release deliberate — and creates the opening for {goal} to enter.",
+    affirmation: "I release what no longer serves {goal}. I grow into who I need to be.",
+  },
+  { // Part 16 — The Power of Insight
+    bridge: "The next breakthrough toward {goal} is almost certainly not a matter of more effort. It is a shift in how you see the situation — a realization that restructures the problem. This practice cultivates the open, receptive state where that kind of insight becomes possible.",
+    affirmation: "I see the path to {goal} clearly. Insight finds me when my mind is still.",
+  },
+  { // Part 17 — The Law of Vibration
+    bridge: "You attract the conditions for {goal} not by wanting them but by being the person for whom they are a natural consequence. This exercise asks: who is that person? What do they radiate — in attention, in energy, in how they hold themselves? Practice being that now.",
+    affirmation: "I am becoming the person for whom {goal} is a natural outcome. What I am, I attract.",
+  },
+  { // Part 18 — The Power of Attention
+    bridge: "Every moment your attention drifts from what matters and toward distraction or anxiety, you are spending the currency that {goal} requires. Every moment you bring it back, you are investing. This practice is the training of that faculty — the most valuable one you have.",
+    affirmation: "My full attention is on {goal}. I direct this power with precision.",
+  },
+  { // Part 19 — Truth
+    bridge: "The clearest path to {goal} runs through seeing your situation exactly as it is — without the comfort of flattery or the distortion of fear. Where are you genuinely? What is actually in the way? Truth is not discouraging; it is the only solid ground to stand on.",
+    affirmation: "I see my situation with courage and clarity. Truth is my most direct path to {goal}.",
+  },
+  { // Part 20 — Inspiration
+    bridge: "Some of what you need to achieve {goal} cannot be thought your way to — it must be received. The deepest insights, the most creative solutions, the unexpected connections that change everything, arise in receptivity. This practice trains that mode.",
+    affirmation: "I am open to inspiration. {goal} comes to me through wisdom as well as effort.",
+  },
+  { // Part 21 — Money Consciousness
+    bridge: "{goal} likely has a financial dimension — or creates the conditions for one. This exercise reorients your relationship to abundance: not as something to grasp for, but as the natural return on genuine value created. Align with value creation, and abundance follows.",
+    affirmation: "I create real value on my path to {goal}. Abundance flows toward me naturally.",
+  },
+  { // Part 22 — Perfect Health
+    bridge: "A vital, energized body is the foundation from which {goal} is pursued. Fatigue, tension, and depletion are not neutral conditions — they narrow perception and reduce creative capacity. This practice cultivates the physical state that {goal} deserves.",
+    affirmation: "I am vital and energized. My body supports me fully in the pursuit of {goal}.",
+  },
+  { // Part 23 — The Large Idea
+    bridge: "Is your current mental image of {goal} large enough? Or has habit and self-protection made it smaller than it could be? This practice asks you to expand deliberately — to think as largely as you dare. The creative energy handles large and small with equal ease.",
+    affirmation: "{goal} is as large as I dare to imagine it. And it is large enough to displace every small fear.",
+  },
+  { // Part 24 — The Master Key
+    bridge: "Every insight from this course, every practice, every expansion of belief has been preparation for this: the recognition that everything required to achieve {goal} is already within you. Not as potential to be developed — as a living fact. The door opens from within.",
+    affirmation: "I hold the Master Key to {goal}. It was always within me. It opens now.",
+  },
+];
+
 // ── Storage helpers ───────────────────────────
 const STORE_KEY = 'mks_progress_v2';
 
@@ -2056,6 +2364,106 @@ function saveStore(data) {
 function getExData(part) {
   const store = loadStore();
   return store[part] || { sessions: [], note: '' };
+}
+
+// ── Profile helpers ───────────────────────────
+const PROFILE_KEY = 'mks_profile_v1';
+
+function loadProfile() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function saveProfile(profile) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+}
+
+function applyGoalText(template, goal) {
+  return template.replace(/\{goal\}/g, goal);
+}
+
+function renderGoalUI() {
+  const profile = loadProfile();
+  const goal = profile.goal || '';
+  const setupBanner = document.getElementById('goal-setup-banner');
+  const goalDisplay = document.getElementById('goal-display');
+  const goalDisplayText = document.getElementById('goal-display-text');
+  if (goal) {
+    setupBanner.style.display = 'none';
+    goalDisplay.classList.add('visible');
+    goalDisplayText.textContent = goal;
+  } else {
+    setupBanner.style.display = 'flex';
+    goalDisplay.classList.remove('visible');
+  }
+}
+
+function openProfileModal() {
+  const profile = loadProfile();
+  document.getElementById('profile-name-input').value = profile.name || '';
+  document.getElementById('profile-goal-input').value = profile.goal || '';
+  document.getElementById('profile-modal-overlay').classList.add('open');
+  document.getElementById('profile-save-btn').disabled = !(profile.goal || '').trim();
+}
+
+function closeProfileModal() {
+  document.getElementById('profile-modal-overlay').classList.remove('open');
+}
+
+document.getElementById('profile-modal-close').addEventListener('click', closeProfileModal);
+document.getElementById('profile-modal-overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('profile-modal-overlay')) closeProfileModal();
+});
+document.getElementById('profile-goal-input').addEventListener('input', (e) => {
+  document.getElementById('profile-save-btn').disabled = !e.target.value.trim();
+});
+document.getElementById('profile-save-btn').addEventListener('click', () => {
+  const name = document.getElementById('profile-name-input').value.trim();
+  const goal = document.getElementById('profile-goal-input').value.trim();
+  if (!goal) return;
+  saveProfile({ name, goal });
+  closeProfileModal();
+  renderGoalUI();
+  if (currentPart) populateJourneySection(currentPart);
+});
+document.getElementById('goal-setup-btn').addEventListener('click', openProfileModal);
+document.getElementById('goal-display-edit').addEventListener('click', openProfileModal);
+
+function populateJourneySection(part) {
+  const profile = loadProfile();
+  const goal = profile.goal || '';
+  const section = document.getElementById('journey-section');
+  const card = document.getElementById('journey-card');
+
+  if (!goal) { section.style.display = 'none'; return; }
+
+  const p = PART_PERSONALIZATION[part - 1];
+  const bridge = applyGoalText(p.bridge, goal);
+  const affirmation = applyGoalText(p.affirmation, goal);
+
+  card.textContent = '';
+
+  const goalLabel = document.createElement('div');
+  goalLabel.className = 'journey-goal-label';
+  goalLabel.textContent = (profile.name ? `${profile.name}'s goal` : 'Your goal');
+
+  const goalText = document.createElement('div');
+  goalText.className = 'journey-goal-text';
+  goalText.textContent = goal;
+
+  const bridgeEl = document.createElement('div');
+  bridgeEl.className = 'journey-bridge';
+  bridgeEl.textContent = bridge;
+
+  card.appendChild(goalLabel);
+  card.appendChild(goalText);
+  card.appendChild(bridgeEl);
+  section.style.display = 'block';
+
+  // Override affirmation display with personalized version
+  const affirmationEl = document.getElementById('ex-affirmation');
+  affirmationEl.textContent = `"${affirmation}"`;
+  affirmationEl.classList.add('personalized');
 }
 
 function saveSession(part, durationMin) {
@@ -2233,6 +2641,9 @@ function openExercise(part) {
   document.getElementById('ex-insight').textContent = ex.insight;
   document.getElementById('journal-textarea').value = data.note || '';
 
+  // Personalize with goal
+  populateJourneySection(part);
+
   // Intention — pre-fill with last session's intention, show callback
   const intentionInput = document.getElementById('intention-input');
   const intentionCallback = document.getElementById('intention-callback');
@@ -2404,8 +2815,22 @@ let voiceAudio = null;
 let voicePlaying = false;
 
 function buildNarration(ex, intention, previousIntention) {
+  const profile = loadProfile();
+  const goal = profile.goal || '';
+  const name = profile.name || '';
   const stepsText = ex.steps.join('\n\n');
-  const lines = [`${ex.title}. ${ex.theme}.`, '', ex.lesson, ''];
+  const lines = [`${ex.title}. ${ex.theme}.`, ''];
+
+  // Goal-aware opening
+  if (goal) {
+    const greeting = name ? `${name}, you` : 'You';
+    lines.push(`${greeting} are here working toward ${goal}.`);
+    const p = PART_PERSONALIZATION[ex.part - 1];
+    lines.push(applyGoalText(p.bridge, goal));
+    lines.push('');
+  }
+
+  lines.push(ex.lesson, '');
 
   if (previousIntention && previousIntention !== intention) {
     lines.push(`Last time, you came here focused on: ${previousIntention}. Today you bring a new intention.`);
@@ -2418,7 +2843,15 @@ function buildNarration(ex, intention, previousIntention) {
     lines.push('');
   }
 
-  lines.push('Let us begin.', '', stepsText, '', `Hold this in mind: ${ex.affirmation}`);
+  lines.push('Let us begin.', '', stepsText, '');
+
+  // Close with personalized affirmation if goal is set, else generic
+  if (goal) {
+    const p = PART_PERSONALIZATION[ex.part - 1];
+    lines.push(`Hold this in mind: ${applyGoalText(p.affirmation, goal)}`);
+  } else {
+    lines.push(`Hold this in mind: ${ex.affirmation}`);
+  }
 
   if (intention) {
     lines.push('', `Return now to your intention: ${intention}. Carry it with you as you close this session.`);
@@ -2546,6 +2979,7 @@ function showView(name) {
 function goToList() {
   renderGrid();
   updateHeader();
+  renderGoalUI();
   showView('list');
 }
 
@@ -2661,6 +3095,7 @@ document.getElementById('paywall-back').addEventListener('click', goToList);
   } else {
     renderGrid();
     updateHeader();
+    renderGoalUI();
   }
 })();
 </script>
