@@ -6,6 +6,9 @@
   <title>Exercises — The Master Key System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js"
+    integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p"
+    crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -270,31 +273,14 @@
 
     .ex-steps {
       list-style: none;
-      counter-reset: steps;
     }
     .ex-steps li {
-      counter-increment: steps;
-      display: flex;
-      gap: 16px;
       margin-bottom: 16px;
       font-size: 0.92rem;
       color: var(--text-dim);
       line-height: 1.65;
-    }
-    .ex-steps li::before {
-      content: counter(steps);
-      min-width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--border);
-      color: var(--gold-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 500;
-      margin-top: 2px;
-      flex-shrink: 0;
+      padding-left: 16px;
+      border-left: 2px solid var(--border);
     }
 
     .ex-affirmation {
@@ -320,6 +306,41 @@
       color: var(--text-dim);
       line-height: 1.7;
     }
+
+    /* ── Intention ───────────────────────────────── */
+    .intention-wrap {
+      background: var(--gold-glow);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .intention-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(201,168,76,0.25);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      padding: 4px 0 10px;
+      outline: none;
+      resize: none;
+      line-height: 1.6;
+    }
+    .intention-input::placeholder { color: var(--text-faint); font-style: italic; }
+    .intention-input:focus { border-bottom-color: var(--gold-dim); }
+    .intention-callback {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(201,168,76,0.12);
+      font-size: 0.78rem;
+      color: var(--text-faint);
+      line-height: 1.55;
+      display: none;
+    }
+    .intention-callback.visible { display: block; }
+    .intention-callback strong { color: var(--text-dim); font-weight: 400; }
 
     /* ── Timer ───────────────────────────────── */
     .timer-card {
@@ -501,6 +522,15 @@
     }
     .session-date { color: var(--text-dim); }
     .session-duration { color: var(--text-faint); margin-left: auto; }
+    .session-intention {
+      color: var(--gold-dim);
+      font-style: italic;
+      font-size: 0.78rem;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     .no-sessions {
       font-size: 0.85rem;
@@ -996,6 +1026,169 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* ── Auth UI ────────────────────────────── */
+    .auth-area {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .auth-signin-btn {
+      font-family: inherit;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      letter-spacing: 0.04em;
+    }
+    .auth-signin-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+
+    .auth-user-area {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .auth-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      color: #0e0d0b;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+    .auth-avatar:hover { opacity: 0.85; }
+
+    .auth-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      min-width: 200px;
+      z-index: 300;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .auth-dropdown-email {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      word-break: break-all;
+    }
+    .auth-dropdown button {
+      font-family: inherit;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.2s;
+    }
+    .auth-dropdown button:hover { color: var(--text); }
+
+    /* Auth modal */
+    .auth-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 400;
+      backdrop-filter: blur(4px);
+    }
+    .auth-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 401;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: min(420px, calc(100vw - 40px));
+      text-align: center;
+    }
+    .auth-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-faint);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: color 0.2s;
+    }
+    .auth-modal-close:hover { color: var(--text); }
+    .auth-modal h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .auth-modal p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 13px 20px;
+      background: #fff;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-btn:active { transform: scale(0.98); }
+    .google-btn:disabled { opacity: 0.6; cursor: default; }
+    .auth-modal-note {
+      margin-top: 20px;
+      font-size: 0.78rem !important;
+      color: var(--text-faint) !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Sync indicator */
+    .sync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      display: inline-block;
+      margin-left: 6px;
+      animation: pulse-sync 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse-sync {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
     /* ── Scrollbar ───────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -1026,6 +1219,19 @@
     <a class="header-nav-link" href="/">Introduction</a>
     <a class="header-nav-link active" href="/exercises">Exercises</a>
   </div>
+
+  <!-- Auth area -->
+  <div class="auth-area">
+    <button class="auth-signin-btn" id="auth-signin-btn">Sign in</button>
+    <div class="auth-user-area" id="auth-user-area" style="display:none">
+      <div class="auth-avatar" id="auth-avatar" title="Account"></div>
+      <div class="auth-dropdown" id="auth-dropdown" style="display:none">
+        <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
+        <button id="auth-signout-btn">Sign out</button>
+      </div>
+    </div>
+  </div>
+
   <div class="unlock-badge" id="unlock-badge">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
       <rect x="3" y="7" width="10" height="7" rx="1.5"/>
@@ -1110,6 +1316,20 @@
     <div class="ex-section">
       <div class="ex-section-label">From the Lesson</div>
       <p class="ex-lesson" id="ex-lesson"></p>
+    </div>
+
+    <!-- Intention -->
+    <div class="ex-section">
+      <div class="ex-section-label">Your Intention</div>
+      <div class="intention-wrap">
+        <textarea
+          id="intention-input"
+          class="intention-input"
+          rows="2"
+          placeholder="What do you want to bring into focus today?"
+        ></textarea>
+        <div class="intention-callback" id="intention-callback"></div>
+      </div>
     </div>
 
     <!-- Timer -->
@@ -1224,7 +1444,166 @@
   </div>
 </div>
 
+<!-- ── Auth Modal ───────────────────────────── -->
+<div class="auth-modal-overlay" id="auth-modal-overlay" style="display:none"></div>
+<div class="auth-modal" id="auth-modal" style="display:none">
+  <button class="auth-modal-close" id="auth-modal-close">✕</button>
+  <h3>Save Your Progress</h3>
+  <p>Sign in to sync your sessions, notes, and course access across every device — so you never lose your place.</p>
+  <button class="google-btn" id="google-sign-in-btn">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+    Continue with Google
+  </button>
+  <p class="auth-modal-note">Or close to continue without an account — your progress stays saved in this browser.</p>
+</div>
+
 <script>
+// ── Supabase client ───────────────────────────
+const SUPABASE_URL = 'https://bylgictpjghjrqcozbkw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5bGdpY3RwamdoanJxY296Ymt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjQzNzQsImV4cCI6MjA5MDE0MDM3NH0.d166Zr7Jqb1diMp03CExT-blc2bgvzjTGqlP3pjwrYg';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+
+// ── Auth UI helpers ───────────────────────────
+function updateAuthUI() {
+  const signinBtn  = document.getElementById('auth-signin-btn');
+  const userArea   = document.getElementById('auth-user-area');
+  const avatar     = document.getElementById('auth-avatar');
+  const emailEl    = document.getElementById('auth-dropdown-email');
+  if (currentUser) {
+    signinBtn.style.display  = 'none';
+    userArea.style.display   = 'flex';
+    const name = currentUser.user_metadata?.full_name
+              || currentUser.user_metadata?.name
+              || currentUser.email
+              || '?';
+    avatar.textContent       = name[0].toUpperCase();
+    if (emailEl) emailEl.textContent = currentUser.email || '';
+  } else {
+    signinBtn.style.display  = 'block';
+    userArea.style.display   = 'none';
+  }
+}
+
+function openAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'block';
+  document.getElementById('auth-modal').style.display         = 'block';
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'none';
+  document.getElementById('auth-modal').style.display         = 'none';
+}
+
+function toggleUserMenu() {
+  const dd = document.getElementById('auth-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  const userArea = document.getElementById('auth-user-area');
+  const dd = document.getElementById('auth-dropdown');
+  if (dd && !userArea.contains(e.target)) dd.style.display = 'none';
+});
+
+async function signInWithGoogle() {
+  const btn = document.getElementById('google-sign-in-btn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to Google…';
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/exercises' },
+  });
+}
+
+async function handleSignOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  document.getElementById('auth-dropdown').style.display = 'none';
+  showToast('Signed out — your progress is still saved locally.');
+}
+
+// ── Cloud sync ────────────────────────────────
+async function cloudUpsertProgress(part) {
+  if (!currentUser) return;
+  const data = getExData(part);
+  await sb.from('mks_user_progress').upsert({
+    user_id:    currentUser.id,
+    part,
+    sessions:   data.sessions,
+    note:       data.note,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id,part' });
+}
+
+async function cloudLoadAll() {
+  if (!currentUser) return;
+  const [{ data: rows }, { data: unlock }] = await Promise.all([
+    sb.from('mks_user_progress').select('*').eq('user_id', currentUser.id),
+    sb.from('mks_unlocks').select('*').eq('user_id', currentUser.id).maybeSingle(),
+  ]);
+
+  if (rows?.length) {
+    const store = loadStore();
+    rows.forEach(row => {
+      const local = store[row.part] || { sessions: [], note: '' };
+      // Cloud wins on sessions count; merge notes (keep whichever is longer)
+      const cloudSessions = Array.isArray(row.sessions) ? row.sessions : [];
+      const localSessions = Array.isArray(local.sessions) ? local.sessions : [];
+      store[row.part] = {
+        sessions: cloudSessions.length >= localSessions.length ? cloudSessions : localSessions,
+        note:     (row.note || '').length >= (local.note || '').length ? (row.note || '') : (local.note || ''),
+      };
+    });
+    saveStore(store);
+  }
+
+  if (unlock) {
+    localStorage.setItem('mks_unlocked', 'true');
+    document.getElementById('unlock-badge').classList.add('visible');
+  }
+}
+
+// Offer to push any existing localStorage progress to cloud for new sign-ins
+async function syncLocalToCloud() {
+  if (!currentUser) return;
+  const store = loadStore();
+  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 24);
+  if (!parts.length) return;
+  await Promise.all(parts.map(part => cloudUpsertProgress(part)));
+}
+
+// ── Auth state listener ───────────────────────
+sb.auth.onAuthStateChange(async (event, session) => {
+  const wasSignedIn = !!currentUser;
+  currentUser = session?.user ?? null;
+  updateAuthUI();
+
+  if (currentUser) {
+    await cloudLoadAll();
+    if (!wasSignedIn) {
+      await syncLocalToCloud(); // upload pre-existing local progress on first sign-in
+    }
+    renderGrid();
+    updateHeader();
+  }
+});
+
+// Wire up auth button events
+document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
+document.getElementById('auth-modal-overlay').addEventListener('click', closeAuthModal);
+document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
+document.getElementById('auth-signout-btn').addEventListener('click', handleSignOut);
+document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu);
+
 // ── Exercise data ─────────────────────────────
 const EXERCISES = [
   {
@@ -1682,8 +2061,10 @@ function getExData(part) {
 function saveSession(part, durationMin) {
   const store = loadStore();
   if (!store[part]) store[part] = { sessions: [], note: '' };
-  store[part].sessions.push({ ts: Date.now(), duration: durationMin });
+  const intention = (document.getElementById('intention-input')?.value ?? '').trim();
+  store[part].sessions.push({ ts: Date.now(), duration: durationMin, intention });
   saveStore(store);
+  cloudUpsertProgress(part); // fire-and-forget cloud sync
 }
 
 function saveNote(part, text) {
@@ -1691,6 +2072,7 @@ function saveNote(part, text) {
   if (!store[part]) store[part] = { sessions: [], note: '' };
   store[part].note = text;
   saveStore(store);
+  cloudUpsertProgress(part); // fire-and-forget cloud sync
 }
 
 function getCompletedParts() {
@@ -1851,6 +2233,27 @@ function openExercise(part) {
   document.getElementById('ex-insight').textContent = ex.insight;
   document.getElementById('journal-textarea').value = data.note || '';
 
+  // Intention — pre-fill with last session's intention, show callback
+  const intentionInput = document.getElementById('intention-input');
+  const intentionCallback = document.getElementById('intention-callback');
+  const sessions = data.sessions || [];
+  const lastSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+  const lastIntention = lastSession?.intention ?? '';
+  intentionInput.value = lastIntention;
+  if (lastIntention) {
+    const lastDate = new Date(lastSession.ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    intentionCallback.textContent = '';
+    const prefix = document.createTextNode(`Last session (${lastDate}): `);
+    const bold = document.createElement('strong');
+    bold.textContent = lastIntention;
+    intentionCallback.appendChild(prefix);
+    intentionCallback.appendChild(bold);
+    intentionCallback.classList.add('visible');
+  } else {
+    intentionCallback.classList.remove('visible');
+    intentionCallback.textContent = '';
+  }
+
   // Steps
   document.getElementById('ex-steps').innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
 
@@ -1976,6 +2379,14 @@ function renderSessions(part) {
     row.appendChild(dot);
     row.appendChild(date);
     row.appendChild(duration);
+
+    if (s.intention) {
+      const intent = document.createElement('span');
+      intent.className = 'session-intention';
+      intent.textContent = `"${s.intention}"`;
+      row.appendChild(intent);
+    }
+
     log.appendChild(row);
   });
 }
@@ -1992,22 +2403,28 @@ document.getElementById('back-btn').addEventListener('click', () => {
 let voiceAudio = null;
 let voicePlaying = false;
 
-function buildNarration(ex) {
-  const intro = ex.lesson.split(/(?<=[.!?])\s+/)[0];
-  const stepsText = ex.steps
-    .map((s, i) => `Step ${i + 1}. ${s}`)
-    .join('\n\n');
-  return [
-    `${ex.title}. ${ex.theme}.`,
-    '',
-    intro,
-    '',
-    'Let us begin.',
-    '',
-    stepsText,
-    '',
-    `Hold this in mind: ${ex.affirmation}`,
-  ].join('\n');
+function buildNarration(ex, intention, previousIntention) {
+  const stepsText = ex.steps.join('\n\n');
+  const lines = [`${ex.title}. ${ex.theme}.`, '', ex.lesson, ''];
+
+  if (previousIntention && previousIntention !== intention) {
+    lines.push(`Last time, you came here focused on: ${previousIntention}. Today you bring a new intention.`);
+    lines.push('');
+  }
+
+  if (intention) {
+    lines.push(`Your intention for this session: ${intention}.`);
+    lines.push('Hold that clearly as we begin.');
+    lines.push('');
+  }
+
+  lines.push('Let us begin.', '', stepsText, '', `Hold this in mind: ${ex.affirmation}`);
+
+  if (intention) {
+    lines.push('', `Return now to your intention: ${intention}. Carry it with you as you close this session.`);
+  }
+
+  return lines.join('\n');
 }
 
 function setVoiceState(state) {
@@ -2067,7 +2484,12 @@ async function speakExercise(ex) {
   clearVoiceError();
   setVoiceState('loading');
 
-  const text = buildNarration(ex);
+  const intention = (document.getElementById('intention-input')?.value ?? '').trim();
+  const data = getExData(currentPart);
+  const sessions = data.sessions || [];
+  const prevSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+  const previousIntention = prevSession?.intention ?? '';
+  const text = buildNarration(ex, intention, previousIntention);
 
   try {
     const res = await fetch('/api/speak', {
@@ -2085,6 +2507,7 @@ async function speakExercise(ex) {
     const url = URL.createObjectURL(blob);
 
     voiceAudio = new Audio(url);
+    voiceAudio.playbackRate = 0.75;
     voicePlaying = true;
     setVoiceState('playing');
 
@@ -2135,7 +2558,7 @@ document.getElementById('header-logo').addEventListener('click', () => {
 });
 
 // ── Paywall / Stripe ──────────────────────────
-const PAYWALL_PART = 5;
+const PAYWALL_PART = 25; // temporarily open — all 24 parts free
 
 function isUnlocked() {
   return localStorage.getItem('mks_unlocked') === 'true';
@@ -2191,6 +2614,19 @@ async function verifyStripeSession(sessionId) {
       showToast('✓ Full access unlocked — welcome to the complete course!');
       document.getElementById('unlock-badge').classList.add('visible');
       renderGrid();
+
+      // Persist unlock to Supabase so it survives across devices
+      if (currentUser) {
+        await sb.from('mks_unlocks').upsert({
+          user_id:           currentUser.id,
+          stripe_session_id: sessionId,
+        }, { onConflict: 'user_id' });
+      } else {
+        // Not signed in — prompt them to sign in to secure their purchase
+        setTimeout(() => {
+          showToast('Sign in to lock in your access across all devices.');
+        }, 3800);
+      }
     }
   } catch {
     // silent — user still sees the list, can retry
