@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your 90-Day Goal Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0c;
+      --surface: #141414;
+      --border: rgba(255,255,255,0.08);
+      --gold: #c9a96e;
+      --gold-light: #e8d5b0;
+      --text: #e8e0d5;
+      --muted: rgba(232,224,213,0.5);
+      --accent: #4a90d9;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+    /* ── Layout ── */
+    .page { max-width: 560px; margin: 0 auto; padding: 0 20px 80px; }
+    .page-header { padding: 28px 0 0; display: flex; justify-content: space-between; align-items: center; }
+    .page-header a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .page-header a:hover { color: var(--gold); }
+    .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; }
+
+    /* ── Onboarding ── */
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-hero { padding: 52px 0 32px; }
+    .step-num { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .step-q { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; line-height: 1.25; color: var(--gold-light); margin-bottom: 10px; }
+    .step-hint { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+    textarea, input[type=text] {
+      width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text); font-family: 'Inter', sans-serif; font-size: 16px;
+      padding: 16px 18px; resize: none; outline: none; transition: border-color 0.2s;
+    }
+    textarea:focus, input[type=text]:focus { border-color: var(--gold); }
+    textarea { min-height: 120px; }
+    .hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hours-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--muted); font-size: 14px; padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .hours-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+    .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+    .btn-back { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 8px 0; }
+    .btn-back:hover { color: var(--text); }
+    .btn-next {
+      background: var(--gold); color: #0c0c0c; font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600; border: none; border-radius: 8px;
+      padding: 14px 32px; cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.3px;
+    }
+    .btn-next:hover { opacity: 0.88; }
+    .btn-next:disabled { opacity: 0.35; cursor: default; }
+    .dots { display: flex; gap: 6px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
+    .dot.active { background: var(--gold); }
+    .dot.done { background: rgba(201,169,110,0.4); }
+
+    /* ── Generating ── */
+    #view-generating { display: none; text-align: center; padding: 80px 0; }
+    #view-generating.active { display: block; }
+    .spinner { width: 48px; height: 48px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 24px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gen-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold-light); margin-bottom: 10px; }
+    .gen-sub { font-size: 14px; color: var(--muted); }
+    .gen-steps { margin: 32px auto 0; max-width: 280px; text-align: left; }
+    .gen-step { font-size: 13px; color: var(--muted); padding: 6px 0; display: flex; align-items: center; gap: 10px; }
+    .gen-step.done { color: var(--gold); }
+    .gen-step .check { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 9px; }
+
+    /* ── Error ── */
+    #view-error { display: none; padding: 52px 0; }
+    #view-error.active { display: block; }
+    .error-card { background: rgba(180,60,60,0.1); border: 1px solid rgba(180,60,60,0.3); border-radius: 14px; padding: 24px; }
+    .error-card h3 { font-size: 18px; color: #e88; margin-bottom: 8px; }
+    .error-card p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .error-card .api-hint { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px; color: var(--gold); margin-bottom: 16px; }
+    .btn-retry { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 22px; font-size: 14px; cursor: pointer; }
+    .btn-retry:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Dashboard ── */
+    #view-dashboard { display: none; }
+    #view-dashboard.active { display: block; }
+    .dash-hero { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .dash-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .dash-goal { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--gold-light); line-height: 1.25; margin-bottom: 10px; }
+    .dash-summary { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .milestone-tag { display: inline-block; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); border-radius: 20px; font-size: 12px; color: var(--gold); padding: 4px 12px; margin-top: 12px; }
+
+    /* Week card */
+    .week-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .week-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .week-badge { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+    .week-progress { font-size: 12px; color: var(--muted); }
+    .week-theme { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; }
+    .week-target { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+    .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 20px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #e8d5b0); border-radius: 2px; transition: width 0.5s; }
+
+    /* Actions */
+    .actions-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .action-item {
+      display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.2s;
+    }
+    .action-item:last-child { border-bottom: none; }
+    .action-item.done { opacity: 0.45; }
+    .action-check {
+      width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(201,169,110,0.4);
+      flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .action-item.done .action-check { background: var(--gold); border-color: var(--gold); }
+    .action-item.done .action-check::after { content: '✓'; font-size: 10px; color: #0c0c0c; }
+    .action-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .action-item.done .action-text { text-decoration: line-through; }
+
+    /* Streak */
+    .streak-row { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
+    .streak-num { font-size: 20px; font-weight: 600; color: var(--gold); }
+    .streak-label { font-size: 12px; color: var(--muted); }
+
+    /* Insight */
+    .insight-card { background: rgba(201,169,110,0.05); border: 1px solid rgba(201,169,110,0.15); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .insight-card .insight-label { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
+    .insight-card p { font-size: 14px; color: var(--muted); line-height: 1.65; font-style: italic; }
+
+    /* Funnel */
+    .funnel-stage { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+    .funnel-stage-header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; cursor: pointer; }
+    .funnel-stage-num { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .funnel-stage-label { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold-light); flex: 1; }
+    .funnel-stage-toggle { color: var(--muted); font-size: 11px; transition: transform 0.2s; }
+    .funnel-stage.expanded .funnel-stage-toggle { transform: rotate(180deg); }
+    .funnel-stage-body { display: none; padding: 0 18px 18px; }
+    .funnel-stage.expanded .funnel-stage-body { display: block; }
+    .funnel-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+
+    .funnel-list-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .funnel-list-item:last-child { border-bottom: none; }
+    .funnel-item-check { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(201,169,110,0.4); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .funnel-item-check.done { background: var(--gold); border-color: var(--gold); }
+    .funnel-item-check.done::after { content: '✓'; font-size: 9px; color: #0c0c0c; }
+    .funnel-item-main { flex: 1; }
+    .funnel-item-title { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .funnel-item-sub { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 3px; }
+    .funnel-item-title.done, .funnel-item-sub.done { text-decoration: line-through; opacity: 0.5; }
+
+    .script-box { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; margin-bottom: 10px; }
+    .script-label { font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+    .btn-copy { display: block; background: none; border: 1px solid rgba(201,169,110,0.3); color: var(--gold); font-size: 11px; font-family: 'Inter', sans-serif; border-radius: 6px; padding: 5px 10px; cursor: pointer; margin-top: 10px; }
+    .btn-copy:hover { background: rgba(201,169,110,0.1); }
+    .cadence-note { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; line-height: 1.5; }
+
+    .funnel-metrics-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .funnel-metrics-row:last-child { border-bottom: none; }
+    .fm-step { flex: 1; }
+    .fm-step-name { font-size: 13px; color: var(--text); }
+    .fm-benchmark { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .fm-input { width: 56px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--gold); font-size: 13px; padding: 6px 8px; text-align: center; font-family: 'Inter', sans-serif; }
+    .fm-rate { font-size: 11px; color: var(--gold); width: 44px; text-align: right; flex-shrink: 0; }
+    .iteration-note { background: rgba(201,169,110,0.05); border: 1px solid rgba(201,169,110,0.15); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 12px; }
+
+    .week-stage-tag { display: inline-block; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; padding: 2px 8px; margin-bottom: 8px; }
+
+    /* Exercises */
+    .section-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin: 28px 0 14px; }
+    .exercise-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .exercise-card .ex-info { flex: 1; }
+    .exercise-card .ex-part { font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+    .exercise-card .ex-reason { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .ex-link { background: none; border: 1px solid rgba(201,169,110,0.3); color: var(--gold); font-size: 12px; font-family: 'Inter', sans-serif; border-radius: 6px; padding: 7px 14px; cursor: pointer; white-space: nowrap; text-decoration: none; transition: all 0.2s; }
+    .ex-link:hover { background: rgba(201,169,110,0.1); }
+
+    /* Week dots */
+    .weeks-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .week-dot {
+      width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+      color: var(--muted); transition: all 0.2s;
+    }
+    .week-dot.current { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.1); font-weight: 600; }
+    .week-dot.past { background: rgba(201,169,110,0.08); color: rgba(201,169,110,0.5); border-color: rgba(201,169,110,0.2); }
+
+    /* Reset */
+    .reset-link { display: block; text-align: center; margin-top: 40px; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: none; }
+    .reset-link:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <span class="wordmark">Master Key</span>
+    <a href="/exercises">← Exercises</a>
+  </div>
+
+  <!-- ── Onboarding ── -->
+  <div id="view-onboard">
+    <div id="step-1" class="step active">
+      <div class="step-hero">
+        <div class="step-num">Step 1 of 5</div>
+        <div class="step-q">What is your most important goal right now?</div>
+        <div class="step-hint">Be specific. "Get promoted to senior engineer at my company" beats "advance my career."</div>
+        <input type="text" id="input-goal" placeholder="My goal is to…" maxlength="200" autocomplete="off">
+      </div>
+      <div class="step-nav">
+        <div class="dots">
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-1">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-2" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 2 of 5</div>
+        <div class="step-q">Why does achieving this matter to you?</div>
+        <div class="step-hint">The deeper the reason, the stronger the motivation. What's really at stake?</div>
+        <textarea id="input-why" placeholder="It matters because…" maxlength="500"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-2">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-3" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 3 of 5</div>
+        <div class="step-q">In 90 days, what would meaningful progress look like?</div>
+        <div class="step-hint">Describe the concrete outcome you're aiming for — not perfection, just real progress.</div>
+        <textarea id="input-vision" placeholder="In 90 days, I will have…" maxlength="500"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-3">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-4" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 4 of 5</div>
+        <div class="step-q">What's your biggest obstacle right now?</div>
+        <div class="step-hint">Honest obstacles lead to honest plans. What's actually in the way?</div>
+        <textarea id="input-obstacle" placeholder="The main thing stopping me is…" maxlength="500"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(3)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-4">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-5" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 5 of 5</div>
+        <div class="step-q">How many hours per week can you commit?</div>
+        <div class="step-hint">Be honest — a realistic plan beats an ambitious plan you won't follow.</div>
+        <div class="hours-grid">
+          <button class="hours-btn" data-hours="1-2">1–2 hours</button>
+          <button class="hours-btn" data-hours="3-5">3–5 hours</button>
+          <button class="hours-btn" data-hours="5-10">5–10 hours</button>
+          <button class="hours-btn" data-hours="10+">10+ hours</button>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(4)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+        </div>
+        <button class="btn-next" id="btn-5" disabled>Generate My Plan →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Generating ── -->
+  <div id="view-generating">
+    <div class="spinner"></div>
+    <div class="gen-title">Building your plan…</div>
+    <div class="gen-sub">This takes just a moment</div>
+    <div class="gen-steps">
+      <div class="gen-step" id="gen-s1"><div class="check">·</div> Reading your goal</div>
+      <div class="gen-step" id="gen-s2"><div class="check">·</div> Building your strategic funnel</div>
+      <div class="gen-step" id="gen-s3"><div class="check">·</div> Selecting exercises for your obstacle</div>
+      <div class="gen-step" id="gen-s4"><div class="check">·</div> Finalizing your roadmap</div>
+    </div>
+  </div>
+
+  <!-- ── Error ── -->
+  <div id="view-error">
+    <div class="error-card">
+      <h3>Couldn't generate your plan</h3>
+      <p id="error-msg">Something went wrong. Please try again.</p>
+      <div class="api-hint" id="api-hint" style="display:none">Check that the API server is reachable and try again.</div>
+      <button class="btn-retry" onclick="retryGenerate()">Try again</button>
+    </div>
+  </div>
+
+  <!-- ── Dashboard ── -->
+  <div id="view-dashboard">
+    <div class="dash-hero">
+      <div class="dash-label" id="d-domain-label">Your Goal</div>
+      <div class="dash-goal" id="d-goal"></div>
+      <div class="dash-summary" id="d-summary"></div>
+      <div class="milestone-tag" id="d-milestone"></div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-label">Coach's Insight</div>
+      <p id="d-insight"></p>
+    </div>
+
+    <div class="section-title">Your Strategic Funnel</div>
+    <div id="d-funnel"></div>
+
+    <div class="week-card">
+      <div class="week-header">
+        <div>
+          <div class="week-badge" id="d-week-badge"></div>
+          <div class="week-stage-tag" id="d-week-stage"></div>
+          <div class="week-theme" id="d-week-theme"></div>
+          <div class="week-target" id="d-week-target"></div>
+        </div>
+        <div class="week-progress" id="d-week-progress"></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="d-progress-fill"></div></div>
+      <div class="actions-title">Today's Actions</div>
+      <div id="d-actions"></div>
+      <div class="streak-row">
+        <div class="streak-num" id="d-streak">0</div>
+        <div class="streak-label">day streak</div>
+      </div>
+    </div>
+
+    <div class="section-title">Recommended Exercises</div>
+    <div id="d-exercises"></div>
+
+    <div class="section-title">90-Day Roadmap</div>
+    <div class="weeks-grid" id="d-weeks-grid"></div>
+
+    <a class="reset-link" onclick="confirmReset()">Start over with a new goal</a>
+  </div>
+
+</div>
+
+<script>
+// ── Storage ────────────────────────────────────
+const GOAL_KEY = 'mks_goal_v1';
+const PLAN_KEY = 'mks_goal_plan_v1';
+
+function saveGoal(data) { localStorage.setItem(GOAL_KEY, JSON.stringify(data)); }
+function loadGoal() { try { return JSON.parse(localStorage.getItem(GOAL_KEY)); } catch { return null; } }
+function savePlan(data) { localStorage.setItem(PLAN_KEY, JSON.stringify(data)); }
+function loadPlan() { try { return JSON.parse(localStorage.getItem(PLAN_KEY)); } catch { return null; } }
+
+function todayKey() { return `mks_goal_actions_${new Date().toISOString().split('T')[0]}`; }
+function getCompletedToday() { return new Set(JSON.parse(localStorage.getItem(todayKey()) || '[]')); }
+function setCompletedToday(set) { localStorage.setItem(todayKey(), JSON.stringify([...set])); }
+
+const FUNNEL_DONE_KEY = 'mks_funnel_done_v1';
+const FUNNEL_METRICS_KEY = 'mks_funnel_metrics_v1';
+function getFunnelDone() { try { return new Set(JSON.parse(localStorage.getItem(FUNNEL_DONE_KEY) || '[]')); } catch { return new Set(); } }
+function setFunnelDone(set) { localStorage.setItem(FUNNEL_DONE_KEY, JSON.stringify([...set])); }
+function getFunnelMetrics() { try { return JSON.parse(localStorage.getItem(FUNNEL_METRICS_KEY) || '{}'); } catch { return {}; } }
+function setFunnelMetrics(obj) { localStorage.setItem(FUNNEL_METRICS_KEY, JSON.stringify(obj)); }
+
+// ── View switching ──────────────────────────────
+function show(id) {
+  ['view-onboard','view-generating','view-error','view-dashboard'].forEach(v => {
+    const el = document.getElementById(v);
+    el.style.display = 'none';
+    el.classList.remove('active');
+  });
+  const target = document.getElementById(id);
+  target.style.display = 'block';
+  target.classList.add('active');
+}
+
+// ── Onboarding steps ───────────────────────────
+let currentStep = 1;
+let selectedHours = null;
+
+function goStep(n) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`step-${n}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Validate and advance
+document.getElementById('btn-1').addEventListener('click', () => {
+  if (!document.getElementById('input-goal').value.trim()) return;
+  goStep(2);
+});
+document.getElementById('btn-2').addEventListener('click', () => { goStep(3); });
+document.getElementById('btn-3').addEventListener('click', () => { goStep(4); });
+document.getElementById('btn-4').addEventListener('click', () => { goStep(5); });
+document.getElementById('btn-5').addEventListener('click', generatePlan);
+
+// Enter key to advance on text inputs
+document.getElementById('input-goal').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-1').click(); } });
+
+// Hours selection
+document.querySelectorAll('.hours-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hours-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedHours = btn.dataset.hours;
+    document.getElementById('btn-5').disabled = false;
+  });
+});
+
+// ── Generate plan ──────────────────────────────
+let lastGoalData = null;
+
+async function generatePlan() {
+  const goalData = {
+    goal: document.getElementById('input-goal').value.trim(),
+    why: document.getElementById('input-why').value.trim(),
+    vision: document.getElementById('input-vision').value.trim(),
+    obstacle: document.getElementById('input-obstacle').value.trim(),
+    hours: selectedHours,
+    createdAt: Date.now(),
+  };
+  lastGoalData = goalData;
+  saveGoal(goalData);
+  show('view-generating');
+  animateGenSteps();
+
+  try {
+    const res = await fetch('/api/decompose-goal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(goalData),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
+    savePlan({ ...json.plan, generatedAt: Date.now() });
+    renderDashboard();
+    show('view-dashboard');
+  } catch (err) {
+    document.getElementById('error-msg').textContent = err.message;
+    document.getElementById('api-hint').style.display = 'none';
+    show('view-error');
+  }
+}
+
+function retryGenerate() {
+  if (lastGoalData) {
+    show('view-generating');
+    animateGenSteps();
+    fetch('/api/decompose-goal', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(lastGoalData),
+    }).then(r => r.json()).then(json => {
+      if (!json.plan) throw new Error(json.error || 'Unknown error');
+      savePlan({ ...json.plan, generatedAt: Date.now() });
+      renderDashboard(); show('view-dashboard');
+    }).catch(err => {
+      document.getElementById('error-msg').textContent = err.message;
+      show('view-error');
+    });
+  } else {
+    show('view-onboard');
+  }
+}
+
+function animateGenSteps() {
+  const steps = ['gen-s1','gen-s2','gen-s3','gen-s4'];
+  steps.forEach(s => { document.getElementById(s).classList.remove('done'); document.getElementById(s).querySelector('.check').textContent = '·'; });
+  steps.forEach((s, i) => {
+    setTimeout(() => {
+      document.getElementById(s).classList.add('done');
+      document.getElementById(s).querySelector('.check').textContent = '✓';
+    }, 200 + i * 300);
+  });
+}
+
+// ── Dashboard ──────────────────────────────────
+function getCurrentWeek(createdAt) {
+  const daysSince = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
+  return Math.min(12, Math.max(1, Math.ceil((daysSince + 1) / 7)));
+}
+
+function getStreak() {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 90; i++) {
+    const key = `mks_goal_actions_${d.toISOString().split('T')[0]}`;
+    const actions = JSON.parse(localStorage.getItem(key) || '[]');
+    if (actions.length === 0 && i > 0) break;
+    if (actions.length > 0) streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+// ── Strategic funnel ───────────────────────────
+const FUNNEL_STAGES = [
+  { key: 'targets', label: 'Targets', build: buildTargetsBody },
+  { key: 'access_points', label: 'Access Points', build: buildAccessBody },
+  { key: 'outreach', label: 'Outreach & Script', build: buildOutreachBody },
+  { key: 'gap_closing', label: 'Close the Gap', build: buildGapBody },
+  { key: 'core_prep', label: 'Core Preparation', build: buildPrepBody },
+  { key: 'funnel_metrics', label: 'Funnel & Iteration', build: buildMetricsBody },
+  { key: 'close', label: 'Close & Land', build: buildCloseBody },
+];
+const FUNNEL_STAGE_LABELS = Object.fromEntries(FUNNEL_STAGES.map(s => [s.key, s.label]));
+
+function makeChecklistItem(id, title, sub) {
+  const done = getFunnelDone().has(id);
+  const item = document.createElement('div');
+  item.className = 'funnel-list-item';
+  const check = document.createElement('div');
+  check.className = 'funnel-item-check' + (done ? ' done' : '');
+  const main = document.createElement('div');
+  main.className = 'funnel-item-main';
+  const t = document.createElement('div');
+  t.className = 'funnel-item-title' + (done ? ' done' : '');
+  t.textContent = title;
+  main.appendChild(t);
+  let s;
+  if (sub) {
+    s = document.createElement('div');
+    s.className = 'funnel-item-sub' + (done ? ' done' : '');
+    s.textContent = sub;
+    main.appendChild(s);
+  }
+  item.appendChild(check);
+  item.appendChild(main);
+  item.addEventListener('click', () => {
+    const set = getFunnelDone();
+    if (set.has(id)) set.delete(id); else set.add(id);
+    setFunnelDone(set);
+    const nowDone = set.has(id);
+    check.classList.toggle('done', nowDone);
+    t.classList.toggle('done', nowDone);
+    if (s) s.classList.toggle('done', nowDone);
+  });
+  return item;
+}
+
+function buildScriptBox(label, text) {
+  const box = document.createElement('div');
+  box.className = 'script-box';
+  const l = document.createElement('div');
+  l.className = 'script-label';
+  l.textContent = label;
+  const body = document.createElement('div');
+  body.textContent = text || '';
+  const btn = document.createElement('button');
+  btn.className = 'btn-copy';
+  btn.type = 'button';
+  btn.textContent = 'Copy';
+  btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(text || '').then(() => {
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    });
+  });
+  box.appendChild(l);
+  box.appendChild(body);
+  box.appendChild(btn);
+  return box;
+}
+
+function buildTargetsBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.items || []).forEach((it, i) => wrap.appendChild(makeChecklistItem(`targets-${i}`, it.name, it.why_it_fits)));
+  return wrap;
+}
+
+function buildAccessBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.items || []).forEach((it, i) => wrap.appendChild(makeChecklistItem(`access-${i}`, it.role_to_reach, it.how_to_find_them)));
+  return wrap;
+}
+
+function buildOutreachBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  wrap.appendChild(buildScriptBox('First Message', f.first_message_script));
+  wrap.appendChild(buildScriptBox('Follow-Up', f.follow_up_script));
+  if (f.cadence) {
+    const c = document.createElement('div');
+    c.className = 'cadence-note';
+    c.textContent = f.cadence;
+    wrap.appendChild(c);
+  }
+  return wrap;
+}
+
+function buildGapBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.gaps || []).forEach((g, i) => wrap.appendChild(makeChecklistItem(`gap-${i}`, g.gap, `${g.why_it_matters} — Resource: ${g.resource}. Next: ${g.action}`)));
+  return wrap;
+}
+
+function buildPrepBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.tasks || []).forEach((t, i) => wrap.appendChild(makeChecklistItem(`prep-${i}`, t.task, t.detail)));
+  return wrap;
+}
+
+function buildMetricsBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  const steps = f.steps || [];
+  const rateEls = [];
+  const metrics = getFunnelMetrics();
+  steps.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'funnel-metrics-row';
+    const info = document.createElement('div');
+    info.className = 'fm-step';
+    const name = document.createElement('div');
+    name.className = 'fm-step-name';
+    name.textContent = s.step_name;
+    const bench = document.createElement('div');
+    bench.className = 'fm-benchmark';
+    bench.textContent = `Target: ${s.benchmark}`;
+    info.appendChild(name);
+    info.appendChild(bench);
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.className = 'fm-input';
+    input.placeholder = '0';
+    input.value = metrics[i] ?? '';
+    const rate = document.createElement('div');
+    rate.className = 'fm-rate';
+    rateEls.push(rate);
+    input.addEventListener('input', () => {
+      const m = getFunnelMetrics();
+      m[i] = input.value === '' ? undefined : Number(input.value);
+      setFunnelMetrics(m);
+      updateRates();
+    });
+    row.appendChild(info);
+    row.appendChild(input);
+    row.appendChild(rate);
+    wrap.appendChild(row);
+  });
+  function updateRates() {
+    const m = getFunnelMetrics();
+    rateEls.forEach((rateEl, i) => {
+      if (i === 0 || !m[i - 1] || m[i] == null) { rateEl.textContent = ''; return; }
+      rateEl.textContent = `${Math.round((m[i] / m[i - 1]) * 100)}%`;
+    });
+  }
+  updateRates();
+  if (f.iteration_plan) {
+    const note = document.createElement('div');
+    note.className = 'iteration-note';
+    note.textContent = f.iteration_plan;
+    wrap.appendChild(note);
+  }
+  return wrap;
+}
+
+function buildCloseBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.checklist || []).forEach((c, i) => wrap.appendChild(makeChecklistItem(`close-${i}`, c)));
+  return wrap;
+}
+
+function renderFunnel(plan) {
+  const container = document.getElementById('d-funnel');
+  container.replaceChildren();
+  const funnel = plan.funnel || {};
+  FUNNEL_STAGES.forEach((stage, i) => {
+    const data = funnel[stage.key];
+    if (!data) return;
+    const card = document.createElement('div');
+    card.className = 'funnel-stage' + (i === 0 ? ' expanded' : '');
+    const header = document.createElement('div');
+    header.className = 'funnel-stage-header';
+    const num = document.createElement('div'); num.className = 'funnel-stage-num'; num.textContent = i + 1;
+    const label = document.createElement('div'); label.className = 'funnel-stage-label'; label.textContent = stage.label;
+    const toggle = document.createElement('div'); toggle.className = 'funnel-stage-toggle'; toggle.textContent = '▾';
+    header.appendChild(num);
+    header.appendChild(label);
+    header.appendChild(toggle);
+    header.addEventListener('click', () => card.classList.toggle('expanded'));
+    const body = document.createElement('div');
+    body.className = 'funnel-stage-body';
+    body.appendChild(stage.build(data));
+    card.appendChild(header);
+    card.appendChild(body);
+    container.appendChild(card);
+  });
+}
+
+function renderDashboard() {
+  const goal = loadGoal();
+  const plan = loadPlan();
+  if (!goal || !plan) return;
+
+  const weekNum = getCurrentWeek(goal.createdAt);
+  const weekData = plan.weeks?.[weekNum - 1];
+  if (!weekData) return;
+
+  // Hero
+  document.getElementById('d-domain-label').textContent = plan.domain_label || 'Your Goal';
+  document.getElementById('d-goal').textContent = goal.goal;
+  document.getElementById('d-summary').textContent = plan.summary || '';
+  document.getElementById('d-milestone').textContent = '🎯 ' + (plan.milestone_90day || '');
+  document.getElementById('d-insight').textContent = plan.insight || '';
+
+  // Strategic funnel
+  renderFunnel(plan);
+
+  // Week card
+  document.getElementById('d-week-badge').textContent = `Week ${weekNum} of 12`;
+  document.getElementById('d-week-stage').textContent = FUNNEL_STAGE_LABELS[weekData.funnel_stage] || '';
+  document.getElementById('d-week-theme').textContent = weekData.theme || '';
+  document.getElementById('d-week-target').textContent = weekData.target || '';
+  document.getElementById('d-week-progress').textContent = `${weekNum}/12`;
+  document.getElementById('d-progress-fill').style.width = `${Math.round((weekNum / 12) * 100)}%`;
+
+  // Actions
+  renderActions(weekData.actions || []);
+
+  // Streak
+  document.getElementById('d-streak').textContent = getStreak();
+
+  // Exercises
+  const exContainer = document.getElementById('d-exercises');
+  exContainer.replaceChildren();
+  (plan.exercises || []).forEach(ex => {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+    const info = document.createElement('div');
+    info.className = 'ex-info';
+    const part = document.createElement('div');
+    part.className = 'ex-part';
+    part.textContent = `Part ${Number(ex.part)}`;
+    const reason = document.createElement('div');
+    reason.className = 'ex-reason';
+    reason.textContent = ex.reason;
+    info.appendChild(part);
+    info.appendChild(reason);
+    const link = document.createElement('a');
+    link.className = 'ex-link';
+    link.href = '/exercises';
+    link.textContent = 'Go →';
+    card.appendChild(info);
+    card.appendChild(link);
+    exContainer.appendChild(card);
+  });
+
+  // Weeks grid
+  const grid = document.getElementById('d-weeks-grid');
+  grid.replaceChildren();
+  for (let w = 1; w <= 12; w++) {
+    const dot = document.createElement('div');
+    dot.className = 'week-dot' + (w === weekNum ? ' current' : w < weekNum ? ' past' : '');
+    dot.textContent = w;
+    dot.title = plan.weeks?.[w - 1]?.theme || `Week ${w}`;
+    dot.addEventListener('click', () => showWeekDetail(w, plan));
+    grid.appendChild(dot);
+  }
+}
+
+function renderActions(actions) {
+  const completed = getCompletedToday();
+  const container = document.getElementById('d-actions');
+  container.replaceChildren();
+  actions.forEach((action, idx) => {
+    const item = document.createElement('div');
+    item.className = 'action-item' + (completed.has(idx) ? ' done' : '');
+    const check = document.createElement('div');
+    check.className = 'action-check';
+    const text = document.createElement('div');
+    text.className = 'action-text';
+    text.textContent = action;
+    item.appendChild(check);
+    item.appendChild(text);
+    item.addEventListener('click', () => {
+      const c = getCompletedToday();
+      if (c.has(idx)) c.delete(idx); else c.add(idx);
+      setCompletedToday(c);
+      const plan = loadPlan();
+      const goal = loadGoal();
+      const weekNum = getCurrentWeek(goal.createdAt);
+      renderActions(plan.weeks?.[weekNum - 1]?.actions || []);
+      document.getElementById('d-streak').textContent = getStreak();
+    });
+    container.appendChild(item);
+  });
+}
+
+function showWeekDetail(w, plan) {
+  const weekData = plan.weeks?.[w - 1];
+  if (!weekData) return;
+  const stage = FUNNEL_STAGE_LABELS[weekData.funnel_stage] ? ` (${FUNNEL_STAGE_LABELS[weekData.funnel_stage]})` : '';
+  alert(`Week ${w}: ${weekData.theme}${stage}\n\n${weekData.target}\n\n• ${weekData.actions.join('\n• ')}`);
+}
+
+function confirmReset() {
+  if (confirm('This will clear your current plan and goal. Are you sure?')) {
+    localStorage.removeItem(GOAL_KEY);
+    localStorage.removeItem(PLAN_KEY);
+    localStorage.removeItem(FUNNEL_DONE_KEY);
+    localStorage.removeItem(FUNNEL_METRICS_KEY);
+    location.reload();
+  }
+}
+
+// ── Init ───────────────────────────────────────
+const existingPlan = loadPlan();
+const existingGoal = loadGoal();
+if (existingPlan && existingGoal) {
+  renderDashboard();
+  show('view-dashboard');
+} else {
+  show('view-onboard');
+}
+</script>
+</body>
+</html>

@@ -2810,7 +2810,7 @@ document.getElementById('back-btn').addEventListener('click', () => {
   goToList();
 });
 
-// ── Voice / ElevenLabs ───────────────────────
+// ── Voice / TTS ────────────────────────────────
 let voiceAudio = null;
 let voicePlaying = false;
 
@@ -2962,7 +2962,7 @@ async function speakExercise(ex) {
     setVoiceState('idle');
     showVoiceError(
       err.message.includes('API key')
-        ? 'ElevenLabs API key not configured — add ELEVENLABS_API_KEY to Vercel env vars.'
+        ? 'Voice API key not configured — add OPENAI_API_KEY to Vercel env vars.'
         : `Voice error: ${err.message}`
     );
   }
