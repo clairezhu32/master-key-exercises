@@ -2,11 +2,11 @@ const rateLimitMap = new Map();
 const RATE_WINDOW_MS = 3_600_000;
 const RATE_MAX = 10;
 
-// gpt-4o is the safe, well-established default for Structured Outputs (json_schema
-// strict mode). Override via env var for a different model — note that o-series
-// reasoning models require `max_completion_tokens` instead of `max_tokens` below.
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+// Use Google's "-latest" alias rather than a pinned version — pinned model IDs
+// can lose availability for newer API keys/projects even while still listed
+// in the models catalog. Override via env var if needed.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // Part themes are embedded in the prompt so the model grounds its exercise
 // picks in the real course instead of guessing at what each part covers.
@@ -34,36 +34,32 @@ function getClientIp(req) {
 
 const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing', 'core_prep', 'funnel_metrics', 'close'];
 
-// OpenAI's strict Structured Outputs mode requires every object node to set
-// additionalProperties: false and list every property as required, and does not
-// support minItems/maxItems — those count expectations live in the prompt instead.
+// Gemini's Schema object uses uppercase type names and doesn't support
+// additionalProperties — it's a distinct (OpenAPI-derived) format from the
+// JSON Schema draft OpenAI/Anthropic use.
 const PLAN_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
+  type: 'OBJECT',
   properties: {
-    domain_label: { type: 'string', description: "Short label for the goal domain, e.g. 'Career / Job Search', 'Business Launch', 'Marathon Training'." },
-    summary: { type: 'string', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
-    insight: { type: 'string', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
-    milestone_90day: { type: 'string', description: 'The single concrete, measurable outcome that defines success at day 90.' },
+    domain_label: { type: 'STRING', description: "Short label for the goal domain, e.g. 'Career / Job Search', 'Business Launch', 'Marathon Training'." },
+    summary: { type: 'STRING', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
+    insight: { type: 'STRING', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
+    milestone_90day: { type: 'STRING', description: 'The single concrete, measurable outcome that defines success at day 90.' },
     funnel: {
-      type: 'object',
-      additionalProperties: false,
+      type: 'OBJECT',
       description: 'A 7-stage strategic funnel adapted to this specific goal domain, modeled on: targets -> access points -> outreach -> gap-closing -> core preparation -> funnel metrics/iteration -> close.',
       properties: {
         targets: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string', description: 'What "targets" means for this specific goal and how to build the list.' },
+            description: { type: 'STRING', description: 'What "targets" means for this specific goal and how to build the list.' },
             items: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'Provide 5 to 12 specific targets.',
               items: {
-                type: 'object',
-                additionalProperties: false,
+                type: 'OBJECT',
                 properties: {
-                  name: { type: 'string', description: 'A specific target or a specific, well-defined target archetype (e.g. a real well-known company/organization if genuinely relevant, or a precise criteria-based category — never a fabricated specific entity presented as real).' },
-                  why_it_fits: { type: 'string' },
+                  name: { type: 'STRING', description: 'A specific target or a specific, well-defined target archetype (e.g. a real well-known company/organization if genuinely relevant, or a precise criteria-based category — never a fabricated specific entity presented as real).' },
+                  why_it_fits: { type: 'STRING' },
                 },
                 required: ['name', 'why_it_fits'],
               },
@@ -72,19 +68,17 @@ const PLAN_SCHEMA = {
           required: ['description', 'items'],
         },
         access_points: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string' },
+            description: { type: 'STRING' },
             items: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'Provide 3 to 10 access points.',
               items: {
-                type: 'object',
-                additionalProperties: false,
+                type: 'OBJECT',
                 properties: {
-                  role_to_reach: { type: 'string', description: "The type of person/channel to reach, e.g. 'Hiring manager for the team', 'Recruiter for the function', never a fabricated named individual." },
-                  how_to_find_them: { type: 'string', description: 'A concrete, actionable method to identify a real person or channel in this role.' },
+                  role_to_reach: { type: 'STRING', description: "The type of person/channel to reach, e.g. 'Hiring manager for the team', 'Recruiter for the function', never a fabricated named individual." },
+                  how_to_find_them: { type: 'STRING', description: 'A concrete, actionable method to identify a real person or channel in this role.' },
                 },
                 required: ['role_to_reach', 'how_to_find_them'],
               },
@@ -93,32 +87,29 @@ const PLAN_SCHEMA = {
           required: ['description', 'items'],
         },
         outreach: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string' },
-            first_message_script: { type: 'string', description: 'A ready-to-send outreach message template, personalized with [bracketed placeholders] for the person to fill in.' },
-            follow_up_script: { type: 'string', description: 'A ready-to-send follow-up template for no response.' },
-            cadence: { type: 'string', description: 'How often and in what pattern to send outreach and follow-ups.' },
+            description: { type: 'STRING' },
+            first_message_script: { type: 'STRING', description: 'A ready-to-send outreach message template, personalized with [bracketed placeholders] for the person to fill in.' },
+            follow_up_script: { type: 'STRING', description: 'A ready-to-send follow-up template for no response.' },
+            cadence: { type: 'STRING', description: 'How often and in what pattern to send outreach and follow-ups.' },
           },
           required: ['description', 'first_message_script', 'follow_up_script', 'cadence'],
         },
         gap_closing: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string' },
+            description: { type: 'STRING' },
             gaps: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'Provide 3 to 6 gaps.',
               items: {
-                type: 'object',
-                additionalProperties: false,
+                type: 'OBJECT',
                 properties: {
-                  gap: { type: 'string', description: 'A specific gap between where they are now and what the target expects, inferred from their stated goal/obstacle.' },
-                  why_it_matters: { type: 'string' },
-                  resource: { type: 'string', description: 'A specific type of resource to close it (course, template, book, tool, practice method) — describe it concretely even if you cannot verify a live link.' },
-                  action: { type: 'string', description: 'The concrete next action to close this gap.' },
+                  gap: { type: 'STRING', description: 'A specific gap between where they are now and what the target expects, inferred from their stated goal/obstacle.' },
+                  why_it_matters: { type: 'STRING' },
+                  resource: { type: 'STRING', description: 'A specific type of resource to close it (course, template, book, tool, practice method) — describe it concretely even if you cannot verify a live link.' },
+                  action: { type: 'STRING', description: 'The concrete next action to close this gap.' },
                 },
                 required: ['gap', 'why_it_matters', 'resource', 'action'],
               },
@@ -127,17 +118,15 @@ const PLAN_SCHEMA = {
           required: ['description', 'gaps'],
         },
         core_prep: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string', description: "What the 'make-or-break moment' is for this goal (interview, pitch, audition, negotiation, launch, race day, etc.) and how prep breaks down." },
+            description: { type: 'STRING', description: "What the 'make-or-break moment' is for this goal (interview, pitch, audition, negotiation, launch, race day, etc.) and how prep breaks down." },
             tasks: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'Provide 4 to 8 tasks.',
               items: {
-                type: 'object',
-                additionalProperties: false,
-                properties: { task: { type: 'string' }, detail: { type: 'string' } },
+                type: 'OBJECT',
+                properties: { task: { type: 'STRING' }, detail: { type: 'STRING' } },
                 required: ['task', 'detail'],
               },
             },
@@ -145,36 +134,33 @@ const PLAN_SCHEMA = {
           required: ['description', 'tasks'],
         },
         funnel_metrics: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string' },
+            description: { type: 'STRING' },
             steps: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'The ordered conversion funnel for this goal, e.g. outreach sent -> replies -> meetings -> next-round -> close. Provide 3 to 6 steps.',
               items: {
-                type: 'object',
-                additionalProperties: false,
+                type: 'OBJECT',
                 properties: {
-                  step_name: { type: 'string' },
-                  benchmark: { type: 'string', description: 'A realistic target count or conversion rate for this step, stated as a number/range.' },
+                  step_name: { type: 'STRING' },
+                  benchmark: { type: 'STRING', description: 'A realistic target count or conversion rate for this step, stated as a number/range.' },
                 },
                 required: ['step_name', 'benchmark'],
               },
             },
-            iteration_plan: { type: 'string', description: 'How and how often to review the funnel numbers and what to change at the weakest step.' },
+            iteration_plan: { type: 'STRING', description: 'How and how often to review the funnel numbers and what to change at the weakest step.' },
           },
           required: ['description', 'steps', 'iteration_plan'],
         },
         close: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            description: { type: 'string' },
+            description: { type: 'STRING' },
             checklist: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'Provide 4 to 8 checklist items.',
-              items: { type: 'string' },
+              items: { type: 'STRING' },
             },
           },
           required: ['description', 'checklist'],
@@ -183,19 +169,18 @@ const PLAN_SCHEMA = {
       required: FUNNEL_STAGE_KEYS,
     },
     weeks: {
-      type: 'array',
+      type: 'ARRAY',
       description: 'Exactly 12 weeks — a full execution cadence. Front-load early weeks on targets/access/outreach and later weeks on prep/close, matching how this specific goal actually plays out over 90 days.',
       items: {
-        type: 'object',
-        additionalProperties: false,
+        type: 'OBJECT',
         properties: {
-          week: { type: 'integer', description: '1 through 12.' },
-          funnel_stage: { type: 'string', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
-          theme: { type: 'string' },
-          target: { type: 'string', description: 'The concrete outcome to hit by the end of this specific week.' },
+          week: { type: 'INTEGER', description: '1 through 12.' },
+          funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
+          theme: { type: 'STRING' },
+          target: { type: 'STRING', description: 'The concrete outcome to hit by the end of this specific week.' },
           actions: {
-            type: 'array',
-            items: { type: 'string' },
+            type: 'ARRAY',
+            items: { type: 'STRING' },
             description: 'Exactly 3 concrete, doable-today actions for this week.',
           },
         },
@@ -203,14 +188,13 @@ const PLAN_SCHEMA = {
       },
     },
     exercises: {
-      type: 'array',
+      type: 'ARRAY',
       description: 'Exactly 3 exercises.',
       items: {
-        type: 'object',
-        additionalProperties: false,
+        type: 'OBJECT',
         properties: {
-          part: { type: 'integer', description: '1 through 24, matching the course part number.' },
-          reason: { type: 'string', description: "Why this specific part's theme addresses this person's stated obstacle." },
+          part: { type: 'INTEGER', description: '1 through 24, matching the course part number.' },
+          reason: { type: 'STRING', description: "Why this specific part's theme addresses this person's stated obstacle." },
         },
         required: ['part', 'reason'],
       },
@@ -252,57 +236,63 @@ Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensit
 Build their strategic funnel plan now.`;
 }
 
-async function callOpenAI(goalData) {
-  const apiKey = process.env.OPENAI_API_KEY;
+async function callGemini(goalData) {
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     const err = new Error('AI planning is not configured');
     err.status = 500;
     throw err;
   }
 
-  const res = await fetch(OPENAI_API_URL, {
+  const res = await fetch(GEMINI_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
+      'x-goog-api-key': apiKey,
     },
     body: JSON.stringify({
-      model: OPENAI_MODEL,
-      max_tokens: 8000,
-      messages: [
-        { role: 'system', content: buildSystemPrompt() },
-        { role: 'user', content: buildUserPrompt(goalData) },
-      ],
-      response_format: {
-        type: 'json_schema',
-        json_schema: { name: 'strategic_plan', strict: true, schema: PLAN_SCHEMA },
+      systemInstruction: { parts: [{ text: buildSystemPrompt() }] },
+      contents: [{ role: 'user', parts: [{ text: buildUserPrompt(goalData) }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: PLAN_SCHEMA,
+        maxOutputTokens: 8000,
       },
     }),
   });
 
   if (!res.ok) {
     const detail = await res.text().catch(() => '');
-    console.error(`OpenAI ${res.status}: ${detail}`);
+    console.error(`Gemini ${res.status}: ${detail}`);
     const err = new Error('The AI planner is temporarily unavailable');
     err.status = 502;
     throw err;
   }
 
   const data = await res.json();
-  const message = data.choices?.[0]?.message;
-  if (message?.refusal) {
+
+  if (data.promptFeedback?.blockReason) {
     const err = new Error('The AI planner declined to generate this plan');
     err.status = 502;
     throw err;
   }
-  if (!message?.content) {
+
+  const candidate = data.candidates?.[0];
+  if (!candidate || candidate.finishReason === 'SAFETY' || candidate.finishReason === 'RECITATION') {
+    const err = new Error('The AI planner declined to generate this plan');
+    err.status = 502;
+    throw err;
+  }
+
+  const text = candidate.content?.parts?.[0]?.text;
+  if (!text) {
     const err = new Error('The AI planner returned an unexpected response');
     err.status = 502;
     throw err;
   }
 
   try {
-    return JSON.parse(message.content);
+    return JSON.parse(text);
   } catch {
     const err = new Error('The AI planner returned invalid JSON');
     err.status = 502;
@@ -344,7 +334,7 @@ export default async function handler(req, res) {
   const intensity = hoursNum <= 2 ? 'light' : hoursNum <= 5 ? 'moderate' : 'intensive';
 
   try {
-    const plan = await callOpenAI({ goal, why, vision, obstacle, hours, intensity });
+    const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity });
     return res.status(200).json({ plan: { ...plan, intensity } });
   } catch (err) {
     const status = err.status || 500;
