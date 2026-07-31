@@ -26,6 +26,8 @@
     .page-header { padding: 28px 0 0; display: flex; justify-content: space-between; align-items: center; }
     .page-header a { color: var(--muted); font-size: 13px; text-decoration: none; }
     .page-header a:hover { color: var(--gold); }
+    .header-nav { display: flex; align-items: center; gap: 18px; }
+    .header-nav-link.active { color: var(--gold); }
     .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; }
 
     /* ── Onboarding ── */
@@ -192,14 +194,105 @@
     /* Reset */
     .reset-link { display: block; text-align: center; margin-top: 40px; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: none; }
     .reset-link:hover { color: var(--text); }
+
+    /* ── Auth ── */
+    .auth-area { display: flex; align-items: center; gap: 14px; }
+    .auth-signin-btn {
+      font-family: inherit; font-size: 13px; color: var(--muted); background: none;
+      border: 1px solid var(--border); border-radius: 100px; padding: 6px 16px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .auth-signin-btn:hover { border-color: var(--gold); color: var(--text); }
+    .auth-user-area { display: flex; align-items: center; position: relative; }
+    .auth-avatar {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--gold);
+      color: var(--bg); font-size: 13px; font-weight: 600; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; user-select: none;
+      transition: opacity 0.2s;
+    }
+    .auth-avatar:hover { opacity: 0.85; }
+    .auth-dropdown {
+      position: absolute; top: calc(100% + 10px); right: 0; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 200px;
+      z-index: 300; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .auth-dropdown-email {
+      font-size: 12px; color: var(--muted); margin-bottom: 10px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border); word-break: break-all;
+    }
+    .auth-dropdown-status { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .auth-dropdown button {
+      font-family: inherit; font-size: 13px; color: var(--muted); background: none;
+      border: none; cursor: pointer; padding: 0; transition: color 0.2s;
+    }
+    .auth-dropdown button:hover { color: var(--text); }
+
+    .auth-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; backdrop-filter: blur(4px); }
+    .auth-modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 401;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 40px 36px; width: min(420px, calc(100vw - 40px)); text-align: center;
+    }
+    .auth-modal-close {
+      position: absolute; top: 14px; right: 16px; background: none; border: none;
+      color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 8px; transition: color 0.2s;
+    }
+    .auth-modal-close:hover { color: var(--text); }
+    .auth-modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; color: var(--gold-light); margin-bottom: 12px; }
+    .auth-modal p { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+      padding: 13px 20px; background: #fff; color: #1a1a1a; border: none; border-radius: 10px;
+      font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-btn:active { transform: scale(0.98); }
+    .google-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* ── Paywall ── */
+    #view-paywall { display: none; padding: 52px 0; }
+    #view-paywall.active { display: block; }
+    .paywall-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 36px 32px; text-align: center; }
+    .paywall-eyebrow { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+    .paywall-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 400; color: var(--gold-light); line-height: 1.25; margin-bottom: 14px; }
+    .paywall-sub { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
+    .paywall-price { font-family: 'Cormorant Garamond', serif; font-size: 44px; color: var(--text); margin-bottom: 4px; }
+    .paywall-price span { font-size: 15px; color: var(--muted); font-family: 'Inter', sans-serif; }
+    .paywall-note { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+    .btn-subscribe {
+      width: 100%; background: var(--gold); color: var(--bg); font-family: 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600; border: none; border-radius: 10px; padding: 15px 32px;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-subscribe:hover { opacity: 0.88; }
+    .btn-subscribe:disabled { opacity: 0.5; cursor: default; }
+    .paywall-error { margin-top: 14px; font-size: 13px; color: #e88; }
+    .paywall-pending { text-align: center; padding: 52px 0; color: var(--muted); font-size: 14px; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="page">
 
   <div class="page-header">
     <span class="wordmark">Master Key</span>
-    <a href="/exercises">← Exercises</a>
+    <div class="header-nav">
+      <a class="header-nav-link" href="/">Introduction</a>
+      <a class="header-nav-link" href="/exercises">Exercises</a>
+      <a class="header-nav-link active" href="/goals">Plan</a>
+    </div>
+    <div class="auth-area">
+      <button class="auth-signin-btn" id="auth-signin-btn">Sign in</button>
+      <div class="auth-user-area" id="auth-user-area" style="display:none">
+        <div class="auth-avatar" id="auth-avatar" title="Account"></div>
+        <div class="auth-dropdown" id="auth-dropdown" style="display:none">
+          <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
+          <div class="auth-dropdown-status" id="auth-dropdown-status"></div>
+          <button id="auth-signout-btn">Sign out</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ── Onboarding ── -->
@@ -357,6 +450,45 @@
     <a class="reset-link" onclick="confirmReset()">Start over with a new goal</a>
   </div>
 
+  <!-- ── Paywall ── -->
+  <div id="view-paywall">
+    <div class="paywall-card">
+      <div class="paywall-eyebrow">Your Strategic Funnel</div>
+      <div class="paywall-title">Subscribe to generate<br>your plan</div>
+      <p class="paywall-sub">Every plan is built fresh for your specific goal by an AI strategist — targets, outreach scripts, gap-closing resources, and a funnel to track and iterate on. That takes real computation per plan, which is why this part of Master Key is a subscription.</p>
+      <div class="paywall-price">$19.99<span>/month</span></div>
+      <div class="paywall-note">Cancel anytime. Have a promo code? You'll get a chance to enter it at checkout.</div>
+      <button class="btn-subscribe" id="paywall-subscribe-btn">Subscribe →</button>
+      <div class="paywall-error" id="paywall-error"></div>
+    </div>
+  </div>
+
+  <!-- ── Checkout pending ── -->
+  <div id="view-checkout-pending">
+    <div class="paywall-pending">
+      <div class="spinner" id="checkout-pending-spinner" style="margin: 0 auto 20px;"></div>
+      <div id="checkout-pending-text">Confirming your subscription…</div>
+      <button class="btn-retry" id="checkout-retry-btn" style="display:none; margin-top:16px;">Check again</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Auth Modal ───────────────────────────── -->
+<div class="auth-modal-overlay" id="auth-modal-overlay" style="display:none"></div>
+<div class="auth-modal" id="auth-modal" style="display:none">
+  <button class="auth-modal-close" id="auth-modal-close">✕</button>
+  <h3>Sign In to Continue</h3>
+  <p>Your strategic funnel plan is generated for your account, so you can come back to it from any device.</p>
+  <button class="google-btn" id="google-sign-in-btn">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+    Continue with Google
+  </button>
 </div>
 
 <script>
@@ -380,9 +512,102 @@ function setFunnelDone(set) { localStorage.setItem(FUNNEL_DONE_KEY, JSON.stringi
 function getFunnelMetrics() { try { return JSON.parse(localStorage.getItem(FUNNEL_METRICS_KEY) || '{}'); } catch { return {}; } }
 function setFunnelMetrics(obj) { localStorage.setItem(FUNNEL_METRICS_KEY, JSON.stringify(obj)); }
 
+// ── Auth ─────────────────────────────────────────
+const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+
+function updateAuthUI() {
+  const signinBtn = document.getElementById('auth-signin-btn');
+  const userArea  = document.getElementById('auth-user-area');
+  const avatar    = document.getElementById('auth-avatar');
+  const emailEl   = document.getElementById('auth-dropdown-email');
+  if (currentUser) {
+    signinBtn.style.display = 'none';
+    userArea.style.display  = 'flex';
+    const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email || '?';
+    avatar.textContent = name[0].toUpperCase();
+    if (emailEl) emailEl.textContent = currentUser.email || '';
+  } else {
+    signinBtn.style.display = 'block';
+    userArea.style.display  = 'none';
+  }
+}
+
+function openAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'block';
+  document.getElementById('auth-modal').style.display         = 'block';
+}
+function closeAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'none';
+  document.getElementById('auth-modal').style.display         = 'none';
+}
+function toggleUserMenu() {
+  const dd = document.getElementById('auth-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  const userArea = document.getElementById('auth-user-area');
+  const dd = document.getElementById('auth-dropdown');
+  if (dd && userArea && !userArea.contains(e.target)) dd.style.display = 'none';
+});
+
+async function signInWithGoogle() {
+  const btn = document.getElementById('google-sign-in-btn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to Google…';
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/goals' },
+  });
+}
+
+async function handleSignOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  document.getElementById('auth-dropdown').style.display = 'none';
+  // /goals is account-gated — don't leave a previously-generated plan on
+  // screen for whoever uses this browser next.
+  show('view-onboard');
+}
+
+async function checkSubscriptionStatus() {
+  if (!currentUser) return false;
+  const { data, error } = await sb.from('mks_subscriptions').select('status').eq('user_id', currentUser.id).maybeSingle();
+  if (error) return false;
+  return data?.status === 'active';
+}
+
+async function refreshSubscriptionBadge() {
+  const statusEl = document.getElementById('auth-dropdown-status');
+  if (!statusEl) return;
+  if (!currentUser) { statusEl.textContent = ''; return; }
+  statusEl.textContent = (await checkSubscriptionStatus()) ? '✓ Subscribed' : 'Not subscribed';
+}
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  const wasSignedIn = !!currentUser;
+  currentUser = session?.user ?? null;
+  updateAuthUI();
+  refreshSubscriptionBadge();
+  if (currentUser && !wasSignedIn) {
+    closeAuthModal();
+    await tryResumeGeneration();
+  }
+});
+
+document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
+document.getElementById('auth-modal-overlay').addEventListener('click', closeAuthModal);
+document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
+document.getElementById('auth-signout-btn').addEventListener('click', handleSignOut);
+document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu);
+
 // ── View switching ──────────────────────────────
 function show(id) {
-  ['view-onboard','view-generating','view-error','view-dashboard'].forEach(v => {
+  ['view-onboard','view-generating','view-error','view-dashboard','view-paywall','view-checkout-pending'].forEach(v => {
     const el = document.getElementById(v);
     el.style.display = 'none';
     el.classList.remove('active');
@@ -411,7 +636,7 @@ document.getElementById('btn-1').addEventListener('click', () => {
 document.getElementById('btn-2').addEventListener('click', () => { goStep(3); });
 document.getElementById('btn-3').addEventListener('click', () => { goStep(4); });
 document.getElementById('btn-4').addEventListener('click', () => { goStep(5); });
-document.getElementById('btn-5').addEventListener('click', generatePlan);
+document.getElementById('btn-5').addEventListener('click', handleGenerateClick);
 
 // Enter key to advance on text inputs
 document.getElementById('input-goal').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-1').click(); } });
@@ -429,8 +654,8 @@ document.querySelectorAll('.hours-btn').forEach(btn => {
 // ── Generate plan ──────────────────────────────
 let lastGoalData = null;
 
-async function generatePlan() {
-  const goalData = {
+function collectGoalData() {
+  return {
     goal: document.getElementById('input-goal').value.trim(),
     why: document.getElementById('input-why').value.trim(),
     vision: document.getElementById('input-vision').value.trim(),
@@ -438,16 +663,50 @@ async function generatePlan() {
     hours: selectedHours,
     createdAt: Date.now(),
   };
-  lastGoalData = goalData;
+}
+
+// Gate for the onboarding "Generate My Plan" button: requires sign-in and an
+// active subscription before ever calling the API. Saves the draft first so
+// it survives the full-page redirects sign-in and checkout both require.
+async function handleGenerateClick() {
+  const goalData = collectGoalData();
   saveGoal(goalData);
+
+  if (!currentUser) { openAuthModal(); return; }
+  const subscribed = await checkSubscriptionStatus();
+  if (!subscribed) { show('view-paywall'); return; }
+  await generatePlan(goalData);
+}
+
+// Called after returning from a sign-in or checkout redirect: if there's a
+// saved draft with no plan generated yet, pick up where the user left off.
+async function tryResumeGeneration() {
+  const draft = loadGoal();
+  if (!draft || loadPlan()) return false;
+  if (!currentUser) return false;
+  const subscribed = await checkSubscriptionStatus();
+  if (!subscribed) { show('view-paywall'); return false; }
+  await generatePlan(draft);
+  return true;
+}
+
+async function generatePlan(goalData) {
+  const data = goalData || loadGoal();
+  if (!data) { show('view-onboard'); return; }
+  lastGoalData = data;
   show('view-generating');
   animateGenSteps();
 
   try {
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token;
     const res = await fetch('/api/decompose-goal', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(goalData),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(data),
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
@@ -463,23 +722,81 @@ async function generatePlan() {
 
 function retryGenerate() {
   if (lastGoalData) {
-    show('view-generating');
-    animateGenSteps();
-    fetch('/api/decompose-goal', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(lastGoalData),
-    }).then(r => r.json()).then(json => {
-      if (!json.plan) throw new Error(json.error || 'Unknown error');
-      savePlan({ ...json.plan, generatedAt: Date.now() });
-      renderDashboard(); show('view-dashboard');
-    }).catch(err => {
-      document.getElementById('error-msg').textContent = err.message;
-      show('view-error');
-    });
+    generatePlan(lastGoalData);
   } else {
     show('view-onboard');
   }
 }
+
+// ── Subscription checkout ──────────────────────
+async function startCheckout() {
+  const btn = document.getElementById('paywall-subscribe-btn');
+  const errEl = document.getElementById('paywall-error');
+  errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Redirecting…';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token;
+    if (!token) throw new Error('Please sign in again.');
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
+    window.location.href = json.url;
+  } catch (err) {
+    errEl.textContent = err.message;
+    btn.disabled = false;
+    btn.textContent = 'Subscribe →';
+  }
+}
+document.getElementById('paywall-subscribe-btn').addEventListener('click', startCheckout);
+
+// Stripe's webhook lands asynchronously, so poll briefly rather than trusting
+// an instant read right after the checkout redirect back.
+async function pollForActiveSubscription(maxTries = 6, delayMs = 1500) {
+  for (let i = 0; i < maxTries; i++) {
+    await new Promise(r => setTimeout(r, delayMs));
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      currentUser = session.user;
+      updateAuthUI();
+      if (await checkSubscriptionStatus()) return true;
+    }
+  }
+  return false;
+}
+
+function routeInitialView() {
+  const existingPlan = loadPlan();
+  const existingGoal = loadGoal();
+  if (existingPlan && existingGoal) {
+    renderDashboard();
+    show('view-dashboard');
+  } else {
+    show('view-onboard');
+  }
+}
+
+async function handleCheckoutSuccess() {
+  show('view-checkout-pending');
+  document.getElementById('checkout-pending-text').textContent = 'Confirming your subscription…';
+  document.getElementById('checkout-pending-spinner').style.display = 'block';
+  document.getElementById('checkout-retry-btn').style.display = 'none';
+
+  const confirmed = await pollForActiveSubscription();
+  if (confirmed) {
+    const resumed = await tryResumeGeneration();
+    if (!resumed) routeInitialView();
+  } else {
+    document.getElementById('checkout-pending-spinner').style.display = 'none';
+    document.getElementById('checkout-pending-text').textContent = 'Still confirming — this can take a few seconds.';
+    document.getElementById('checkout-retry-btn').style.display = 'inline-block';
+  }
+}
+document.getElementById('checkout-retry-btn').addEventListener('click', handleCheckoutSuccess);
 
 function animateGenSteps() {
   const steps = ['gen-s1','gen-s2','gen-s3','gen-s4'];
@@ -836,14 +1153,18 @@ function confirmReset() {
 }
 
 // ── Init ───────────────────────────────────────
-const existingPlan = loadPlan();
-const existingGoal = loadGoal();
-if (existingPlan && existingGoal) {
-  renderDashboard();
-  show('view-dashboard');
-} else {
-  show('view-onboard');
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const checkoutStatus = params.get('checkout');
+  if (checkoutStatus) window.history.replaceState({}, '', window.location.pathname);
+
+  if (checkoutStatus === 'success') {
+    await handleCheckoutSuccess();
+    return;
+  }
+  routeInitialView();
 }
+init();
 </script>
 </body>
 </html>

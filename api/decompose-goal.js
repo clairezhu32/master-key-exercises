@@ -32,6 +32,28 @@ function getClientIp(req) {
   return req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0].trim() || 'unknown';
 }
 
+const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+
+async function getUserFromToken(authHeader, serviceRoleKey) {
+  const token = authHeader?.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return null;
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { Authorization: `Bearer ${token}`, apikey: serviceRoleKey },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+async function hasActiveSubscription(userId, serviceRoleKey) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/mks_subscriptions?user_id=eq.${userId}&select=status`,
+    { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
+  );
+  if (!res.ok) return false;
+  const rows = await res.json();
+  return rows[0]?.status === 'active';
+}
+
 const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing', 'core_prep', 'funnel_metrics', 'close'];
 
 // Gemini's Schema object uses uppercase type names and doesn't support
@@ -318,6 +340,22 @@ export default async function handler(req, res) {
   if (entry.count > RATE_MAX) {
     res.setHeader('Retry-After', '60');
     return res.status(429).json({ error: 'Too many requests' });
+  }
+
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) {
+    console.error('SUPABASE_SERVICE_ROLE_KEY not set');
+    return res.status(500).json({ error: 'Goal planning is not configured' });
+  }
+
+  const user = await getUserFromToken(req.headers.authorization, serviceRoleKey);
+  if (!user) {
+    return res.status(401).json({ error: 'Sign in required' });
+  }
+
+  const subscribed = await hasActiveSubscription(user.id, serviceRoleKey);
+  if (!subscribed) {
+    return res.status(402).json({ error: 'An active subscription is required to generate a plan' });
   }
 
   let body;

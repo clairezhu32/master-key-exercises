@@ -3,12 +3,24 @@
 // The regex only allows that exact prefix before the first dot.
 const ALLOWED_ORIGIN_RE = /^https:\/\/master-key-exercises(-[a-z0-9]+-[a-z0-9-]+)?\.vercel\.app$/;
 
+const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+
 function isAllowedOrigin(origin) {
   if (!origin) return false;
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
   if (ALLOWED_ORIGIN_RE.test(origin)) return true;
   const custom = process.env.ALLOWED_ORIGIN;
   return !!(custom && origin === custom);
+}
+
+async function getUserFromToken(authHeader, serviceRoleKey) {
+  const token = authHeader?.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return null;
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { Authorization: `Bearer ${token}`, apikey: serviceRoleKey },
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 export default async function handler(req, res) {
@@ -19,8 +31,9 @@ export default async function handler(req, res) {
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const priceId = process.env.STRIPE_PRICE_ID;
-  if (!secretKey || !priceId) {
-    console.error('STRIPE_SECRET_KEY or STRIPE_PRICE_ID not set');
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!secretKey || !priceId || !serviceRoleKey) {
+    console.error('STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or SUPABASE_SERVICE_ROLE_KEY not set');
     return res.status(500).json({ error: 'Payment not configured' });
   }
 
@@ -30,15 +43,24 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
+  const user = await getUserFromToken(req.headers.authorization, serviceRoleKey);
+  if (!user) {
+    return res.status(401).json({ error: 'Sign in required' });
+  }
+
   const params = new URLSearchParams({
-    mode: 'payment',
+    mode: 'subscription',
     'line_items[0][price]': priceId,
     'line_items[0][quantity]': '1',
-    success_url: `${origin}/exercises?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/exercises?cancelled=1`,
-    // Stamp every session so verify-session can assert it belongs to this app + price.
+    allow_promotion_codes: 'true',
+    customer_email: user.email,
+    client_reference_id: user.id,
+    success_url: `${origin}/goals?checkout=success`,
+    cancel_url: `${origin}/goals?checkout=cancelled`,
+    // Stamp every session so the webhook can link it back to the Supabase user
+    // without trusting anything from the client.
     'metadata[app]': 'mks',
-    'metadata[price_id]': priceId,
+    'metadata[user_id]': user.id,
   });
 
   const upstream = await fetch('https://api.stripe.com/v1/checkout/sessions', {
