@@ -2,6 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
-    { "src": "/exercises", "dest": "/exercises.html" }
+    { "src": "/exercises", "dest": "/exercises.html" },
+    { "src": "/exercises-zh", "dest": "/exercises-zh.html" },
+    { "src": "/goals", "dest": "/goals.html" }
   ]
 }

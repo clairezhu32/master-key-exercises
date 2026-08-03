@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>练习 — 主宰键系统</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js"
+    integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p"
+    crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0d0f1f;
+      --surface:   #161a33;
+      --card:      #1c2140;
+      --border:    #2b2f57;
+      --gold:      #c9a84c;
+      --gold-dim:  #8a6f2e;
+      --gold-glow: rgba(201,168,76,0.12);
+      --text:      #e6e3f2;
+      --text-dim:  #9a97b5;
+      --text-faint:#423f5c;
+      --green:     #4caf7a;
+      --radius:    12px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans SC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.7; }
+    .header { border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); z-index: 100; backdrop-filter: blur(8px); }
+    .header-title { font-family: 'Noto Serif SC', serif; font-size: 1.1rem; font-weight: 400; letter-spacing: 0.04em; color: var(--gold); }
+    .header-subtitle { font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em; margin-top: 2px; }
+    .header-progress { text-align: right; }
+    .progress-label { font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em; }
+    .progress-count { font-family: 'Noto Serif SC', serif; font-size: 1.4rem; color: var(--gold); }
+    .progress-bar-wrap { width: 120px; height: 3px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.4s ease; }
+    #view-intro, #view-list, #view-exercise { display: none; }
+    #view-intro.active, #view-list.active, #view-exercise.active { display: block; }
+    .list-hero { max-width: 760px; margin: 64px auto 48px; padding: 0 32px; text-align: center; }
+    .list-hero h1 { font-family: 'Noto Serif SC', serif; font-size: 2.4rem; font-weight: 300; line-height: 1.3; color: var(--text); margin-bottom: 16px; }
+    .list-hero h1 em { color: var(--gold); font-style: normal; }
+    .list-hero p { color: var(--text-dim); font-size: 0.93rem; max-width: 520px; margin: 0 auto; }
+    .exercises-grid { max-width: 960px; margin: 0 auto 80px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .exercise-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s; position: relative; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: rgba(201,168,76,0.15); }
+    .exercise-card:hover { border-color: var(--gold-dim); background: #22201a; transform: translateY(-2px); }
+    .exercise-card.completed { border-color: rgba(76,175,122,0.35); }
+    .exercise-card.completed::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--green); }
+    .card-part { font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-faint); margin-bottom: 8px; }
+    .card-part span { color: var(--gold-dim); }
+    .card-title { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 400; color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+    .card-theme { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 16px; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+    .card-duration { font-size: 0.75rem; color: var(--text-faint); }
+    .card-status { font-size: 0.72rem; letter-spacing: 0.05em; }
+    .card-status.done { color: var(--green); }
+    .card-status.pending { color: var(--text-faint); }
+    .card-sessions { font-size: 0.72rem; color: var(--text-dim); }
+    .exercise-view { max-width: 720px; margin: 0 auto; padding: 40px 32px 80px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); font-size: 0.82rem; cursor: pointer; padding: 8px 0; margin-bottom: 40px; transition: color 0.2s; background: none; border: none; font-family: inherit; }
+    .back-btn:hover { color: var(--gold); }
+    .back-btn svg { width: 14px; height: 14px; }
+    .ex-eyebrow { font-size: 0.72rem; letter-spacing: 0.12em; color: var(--gold-dim); margin-bottom: 12px; }
+    .ex-title { font-family: 'Noto Serif SC', serif; font-size: 2.1rem; font-weight: 300; line-height: 1.25; color: var(--text); margin-bottom: 8px; }
+    .ex-theme { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 36px; }
+    .ex-section { margin-bottom: 36px; }
+    .ex-section-label { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--text-faint); margin-bottom: 12px; }
+    .ex-lesson { font-family: 'Noto Serif SC', serif; font-size: 1.05rem; font-weight: 300; line-height: 1.9; color: var(--text-dim); border-left: 2px solid var(--gold-dim); padding-left: 20px; }
+    .ex-steps { list-style: none; }
+    .ex-steps li { margin-bottom: 16px; font-size: 0.92rem; color: var(--text-dim); line-height: 1.75; padding-left: 16px; border-left: 2px solid var(--border); }
+    .ex-affirmation { background: var(--gold-glow); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius); padding: 24px 28px; font-family: 'Noto Serif SC', serif; font-size: 1.2rem; font-weight: 300; color: var(--gold); text-align: center; line-height: 1.7; }
+    .ex-insight { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; font-size: 0.88rem; color: var(--text-dim); line-height: 1.85; }
+    .goal-banner { margin: 0 auto 0; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--gold-glow); border-bottom: 1px solid rgba(201,168,76,0.15); }
+    .goal-banner p { font-size: 0.85rem; color: var(--text-dim); margin: 0; }
+    .goal-banner strong { color: var(--text); font-weight: 500; }
+    .goal-banner-btn { flex-shrink: 0; padding: 7px 18px; background: none; border: 1px solid var(--gold-dim); border-radius: 20px; color: var(--gold); font-size: 0.78rem; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+    .goal-banner-btn:hover { background: var(--gold-glow); }
+    .goal-display { padding: 0 32px 24px; display: none; }
+    .goal-display.visible { display: flex; align-items: baseline; gap: 10px; }
+    .goal-display-label { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--text-faint); flex-shrink: 0; }
+    .goal-display-text { font-family: 'Noto Serif SC', serif; font-size: 1.05rem; color: var(--gold); font-weight: 300; }
+    .goal-display-edit { font-size: 0.72rem; color: var(--text-faint); cursor: pointer; border: none; background: none; font-family: inherit; padding: 0; transition: color 0.2s; }
+    .goal-display-edit:hover { color: var(--text-dim); }
+    .journey-card { background: var(--gold-glow); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius); padding: 20px 24px; }
+    .journey-goal-label { font-size: 0.65rem; letter-spacing: 0.12em; color: var(--gold-dim); margin-bottom: 4px; }
+    .journey-goal-text { font-family: 'Noto Serif SC', serif; font-size: 1.05rem; color: var(--gold); font-weight: 300; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(201,168,76,0.15); }
+    .journey-bridge { font-size: 0.87rem; color: var(--text-dim); line-height: 1.85; }
+    .ex-affirmation.personalized { border: 1px solid rgba(201,168,76,0.4); }
+    .profile-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 400; backdrop-filter: blur(4px); display: none; }
+    .profile-modal-overlay.open { display: block; }
+    .profile-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 401; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px 36px; width: min(460px, calc(100vw - 40px)); }
+    .profile-modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-faint); font-size: 1rem; cursor: pointer; padding: 4px 8px; transition: color 0.2s; }
+    .profile-modal-close:hover { color: var(--text); }
+    .profile-modal h3 { font-family: 'Noto Serif SC', serif; font-size: 1.5rem; font-weight: 300; color: var(--text); margin-bottom: 8px; }
+    .profile-modal p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; }
+    .profile-field { margin-bottom: 20px; }
+    .profile-field label { display: block; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-faint); margin-bottom: 8px; }
+    .profile-field input, .profile-field textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.9rem; padding: 12px 14px; outline: none; resize: none; transition: border-color 0.2s; }
+    .profile-field input:focus, .profile-field textarea:focus { border-color: var(--gold-dim); }
+    .profile-field input::placeholder, .profile-field textarea::placeholder { color: var(--text-faint); }
+    .profile-save-btn { width: 100%; padding: 13px; background: var(--gold); color: var(--bg); border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+    .profile-save-btn:hover { background: #debb6a; }
+    .profile-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .intention-wrap { background: var(--gold-glow); border: 1px solid rgba(201,168,76,0.18); border-radius: var(--radius); padding: 20px 24px; }
+    .intention-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,168,76,0.25); color: var(--text); font-family: 'Noto Serif SC', serif; font-size: 1.05rem; font-weight: 300; padding: 4px 0 10px; outline: none; resize: none; line-height: 1.7; }
+    .intention-input::placeholder { color: var(--text-faint); }
+    .intention-input:focus { border-bottom-color: var(--gold-dim); }
+    .intention-callback { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(201,168,76,0.12); font-size: 0.78rem; color: var(--text-faint); line-height: 1.6; display: none; }
+    .intention-callback.visible { display: block; }
+    .intention-callback strong { color: var(--text-dim); font-weight: 400; }
+    .timer-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 36px; text-align: center; }
+    .timer-duration-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 28px; }
+    .dur-btn { padding: 7px 18px; border-radius: 100px; border: 1px solid var(--border); background: none; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .dur-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+    .dur-btn.active { background: var(--gold-glow); border-color: var(--gold-dim); color: var(--gold); }
+    .timer-ring-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 24px; }
+    .timer-ring-wrap svg { transform: rotate(-90deg); width: 180px; height: 180px; }
+    .ring-track { fill: none; stroke: var(--border); stroke-width: 4; }
+    .ring-fill { fill: none; stroke: var(--gold); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+    .timer-display { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .timer-time { font-family: 'Noto Serif SC', serif; font-size: 2.4rem; font-weight: 300; color: var(--text); letter-spacing: 0.04em; }
+    .timer-label { font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-faint); margin-top: 2px; }
+    .timer-controls { display: flex; gap: 12px; justify-content: center; }
+    .btn { padding: 10px 28px; border-radius: 100px; border: 1px solid var(--border); background: none; color: var(--text-dim); font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .btn:hover { border-color: var(--gold-dim); color: var(--text); }
+    .btn-primary { background: var(--gold); border-color: var(--gold); color: #0e0d0b; font-weight: 500; }
+    .btn-primary:hover { background: #d4b45e; border-color: #d4b45e; color: #0e0d0b; }
+    .btn-complete { background: var(--green); border-color: var(--green); color: #0e0d0b; font-weight: 500; }
+    .btn-complete:hover { background: #5cc48a; border-color: #5cc48a; color: #0e0d0b; }
+    .timer-done-banner { display: none; background: rgba(76,175,122,0.12); border: 1px solid rgba(76,175,122,0.3); border-radius: var(--radius); padding: 16px 24px; text-align: center; color: var(--green); font-size: 0.9rem; margin-bottom: 16px; }
+    .timer-done-banner.visible { display: block; }
+    .journal-wrap { margin-bottom: 36px; }
+    .journal-textarea { width: 100%; min-height: 120px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; color: var(--text); font-family: 'Noto Serif SC', serif; font-size: 1rem; line-height: 1.8; resize: vertical; transition: border-color 0.2s; outline: none; }
+    .journal-textarea::placeholder { color: var(--text-faint); }
+    .journal-textarea:focus { border-color: var(--gold-dim); }
+    .journal-save-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .journal-saved-note { font-size: 0.75rem; color: var(--text-faint); opacity: 0; transition: opacity 0.4s; }
+    .journal-saved-note.show { opacity: 1; }
+    .sessions-log { margin-bottom: 40px; }
+    .session-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+    .session-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .session-date { color: var(--text-dim); }
+    .session-duration { color: var(--text-faint); margin-left: auto; }
+    .session-intention { color: var(--gold-dim); font-size: 0.78rem; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .no-sessions { font-size: 0.85rem; color: var(--text-faint); }
+    .ex-nav { display: flex; gap: 12px; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .ex-nav-btn { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: none; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all 0.2s; flex: 1; }
+    .ex-nav-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+    .ex-nav-btn.next { justify-content: flex-end; }
+    .ex-nav-btn .nav-part { font-size: 0.68rem; color: var(--text-faint); display: block; letter-spacing: 0.08em; }
+    .ex-nav-btn .nav-title { display: block; }
+    .ex-nav-btn:disabled { opacity: 0.3; pointer-events: none; }
+    .section-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .section-label-row .ex-section-label { margin-bottom: 0; }
+    .voice-btn { display: inline-flex; align-items: center; gap: 7px; padding: 5px 14px; border-radius: 100px; border: 1px solid #c96e2a; background: rgba(232,146,74,0.15); color: #e8924a; font-size: 0.78rem; font-family: inherit; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .voice-btn:hover:not(:disabled) { background: rgba(232,146,74,0.28); border-color: #e8924a; color: #f0a868; }
+    .voice-btn:disabled { opacity: 0.45; cursor: default; }
+    .voice-btn.playing { border-color: #e8924a; color: #f0a868; background: rgba(232,146,74,0.25); }
+    .voice-btn svg { flex-shrink: 0; }
+    .voice-wave { display: none; align-items: center; gap: 3px; height: 14px; }
+    .voice-wave.visible { display: flex; }
+    .voice-wave span { display: block; width: 3px; border-radius: 2px; background: #e8924a; animation: wave 1s ease-in-out infinite; }
+    .voice-wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
+    .voice-wave span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+    .voice-wave span:nth-child(3) { height: 8px; animation-delay: 0.3s; }
+    .voice-wave span:nth-child(4) { height: 12px; animation-delay: 0.45s; }
+    .voice-wave span:nth-child(5) { height: 5px; animation-delay: 0.6s; }
+    @keyframes wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.35); } }
+    .voice-error { font-size: 0.78rem; color: #e07070; margin-top: 8px; display: none; }
+    .voice-error.visible { display: block; }
+    .header-nav { display: flex; align-items: center; gap: 20px; }
+    .header-nav-link { font-size: 0.78rem; color: var(--text-dim); cursor: pointer; background: none; border: none; font-family: inherit; letter-spacing: 0.04em; padding: 4px 0; transition: color 0.2s; text-decoration: none; }
+    .header-nav-link:hover { color: var(--text); }
+    .header-nav-link.active { color: var(--gold); }
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card); border: 1px solid rgba(76,175,122,0.4); color: var(--green); font-size: 0.85rem; padding: 12px 24px; border-radius: 100px; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .auth-area { display: flex; align-items: center; position: relative; }
+    .auth-signin-btn { font-family: inherit; font-size: 0.78rem; color: var(--text-dim); background: none; border: 1px solid var(--border); border-radius: 100px; padding: 6px 16px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .auth-signin-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+    .auth-user-area { display: flex; align-items: center; position: relative; }
+    .auth-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--gold-dim); color: #0e0d0b; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: opacity 0.2s; }
+    .auth-avatar:hover { opacity: 0.85; }
+    .auth-dropdown { position: absolute; top: calc(100% + 10px); right: 0; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; min-width: 200px; z-index: 300; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .auth-dropdown-email { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); word-break: break-all; }
+    .auth-dropdown button { font-family: inherit; font-size: 0.8rem; color: var(--text-dim); background: none; border: none; cursor: pointer; padding: 0; transition: color 0.2s; }
+    .auth-dropdown button:hover { color: var(--text); }
+    .auth-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; backdrop-filter: blur(4px); }
+    .auth-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 401; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px 36px; width: min(420px, calc(100vw - 40px)); text-align: center; }
+    .auth-modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-faint); font-size: 1rem; cursor: pointer; padding: 4px 8px; transition: color 0.2s; }
+    .auth-modal-close:hover { color: var(--text); }
+    .auth-modal h3 { font-family: 'Noto Serif SC', serif; font-size: 1.5rem; font-weight: 300; color: var(--text); margin-bottom: 12px; }
+    .auth-modal p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; }
+    .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 20px; background: #fff; color: #1a1a1a; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-btn:active { transform: scale(0.98); }
+    .google-btn:disabled { opacity: 0.6; cursor: default; }
+    .auth-modal-note { margin-top: 20px; font-size: 0.78rem !important; color: var(--text-faint) !important; margin-bottom: 0 !important; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    @media (max-width: 700px) {
+      .header { padding: 16px; }
+      .header-nav { display: none; }
+      .exercises-grid { grid-template-columns: 1fr; padding: 0 16px; }
+      .exercise-view { padding: 24px 20px 60px; }
+      .list-hero { padding: 0 20px; }
+      .list-hero h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 页头 -->
+<header class="header">
+  <div id="header-logo" style="cursor:pointer">
+    <div class="header-title">主宰键系统</div>
+    <div class="header-subtitle">查尔斯·哈内尔 · 1919</div>
+  </div>
+  <div class="header-nav">
+    <a class="header-nav-link" href="/">简介</a>
+    <a class="header-nav-link active" href="/exercises-zh">练习</a>
+    <a class="header-nav-link" href="/goals">计划</a>
+  </div>
+  <div class="auth-area">
+    <button class="auth-signin-btn" id="auth-signin-btn">登录</button>
+    <div class="auth-user-area" id="auth-user-area" style="display:none">
+      <div class="auth-avatar" id="auth-avatar" title="账户"></div>
+      <div class="auth-dropdown" id="auth-dropdown" style="display:none">
+        <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
+        <button id="auth-signout-btn">退出登录</button>
+      </div>
+    </div>
+  </div>
+  <div class="header-progress">
+    <div class="progress-label">进度</div>
+    <div class="progress-count" id="progress-count">0 / 24</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+</header>
+
+<!-- 列表视图 -->
+<div id="view-list" class="active">
+  <div class="goal-banner" id="goal-setup-banner" style="display:none">
+    <p>设定你的目标，让全部 24 节练习<strong>与你的生活紧密相关</strong>。</p>
+    <button class="goal-banner-btn" id="goal-setup-btn">设定我的目标 →</button>
+  </div>
+  <div class="goal-display" id="goal-display">
+    <span class="goal-display-label">你的目标</span>
+    <span class="goal-display-text" id="goal-display-text"></span>
+    <button class="goal-display-edit" id="goal-display-edit">编辑</button>
+  </div>
+  <div class="list-hero">
+    <h1>二十四节<em>心灵精通</em>练习</h1>
+    <p>哈内尔最初将此设计为一套为期 24 周的课程——每周一部分。本应用将节奏调整为 12 周，每次两部分，但保留他的核心指导：在当前练习感觉毫不费力、自然而然之前，不要继续前进。当然，请遵循你自己的节奏。有些人会在某一部分多停留一两周；有些人则进展更快。重要的是，每一层次都真正被吸收，然后再加入下一层。</p>
+  </div>
+  <div class="exercises-grid" id="exercises-grid"></div>
+</div>
+
+<!-- 练习视图 -->
+<div id="view-exercise">
+  <div class="exercise-view">
+    <button class="back-btn" id="back-btn">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
+      全部练习
+    </button>
+    <div class="ex-eyebrow" id="ex-eyebrow"></div>
+    <h2 class="ex-title" id="ex-title"></h2>
+    <p class="ex-theme" id="ex-theme"></p>
+    <div class="ex-section">
+      <div class="ex-section-label">课程要旨</div>
+      <p class="ex-lesson" id="ex-lesson"></p>
+    </div>
+    <div class="ex-section">
+      <div class="ex-section-label">本次意图</div>
+      <div class="intention-wrap">
+        <textarea id="intention-input" class="intention-input" rows="2" placeholder="今天你想专注于什么？"></textarea>
+        <div class="intention-callback" id="intention-callback"></div>
+      </div>
+    </div>
+    <div class="ex-section">
+      <div class="ex-section-label">练习计时</div>
+      <div class="timer-card">
+        <div class="timer-duration-row" id="dur-row"></div>
+        <div class="timer-ring-wrap">
+          <svg viewBox="0 0 180 180">
+            <circle class="ring-track" cx="90" cy="90" r="82"/>
+            <circle class="ring-fill" id="ring-fill" cx="90" cy="90" r="82" stroke-dasharray="515.2" stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-display">
+            <div class="timer-time" id="timer-display">15:00</div>
+            <div class="timer-label" id="timer-state-label">就绪</div>
+          </div>
+        </div>
+        <div class="timer-done-banner" id="timer-done-banner">练习完成。慢慢睁开眼睛，静候片刻。</div>
+        <div class="timer-controls">
+          <button class="btn btn-primary" id="btn-start">开始</button>
+          <button class="btn" id="btn-reset" style="display:none">重置</button>
+        </div>
+      </div>
+    </div>
+    <div class="ex-section">
+      <div class="section-label-row">
+        <div class="ex-section-label">练习方法</div>
+        <button class="voice-btn" id="voice-btn" title="朗读练习内容">
+          <svg id="voice-icon-play" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5l11 5.5-11 5.5V2.5z"/></svg>
+          <svg id="voice-icon-stop" width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="display:none"><rect x="3" y="3" width="4" height="10" rx="1"/><rect x="9" y="3" width="4" height="10" rx="1"/></svg>
+          <svg id="voice-icon-load" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M8 2a6 6 0 1 1 0 12" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="0.8s" repeatCount="indefinite"/></path></svg>
+          <span id="voice-btn-label">朗读</span>
+          <div class="voice-wave" id="voice-wave"><span></span><span></span><span></span><span></span><span></span></div>
+        </button>
+      </div>
+      <div class="voice-error" id="voice-error"></div>
+      <ol class="ex-steps" id="ex-steps"></ol>
+    </div>
+    <div class="ex-section" id="affirmation-section">
+      <div class="ex-section-label">肯定语 / 专注点</div>
+      <div class="ex-affirmation" id="ex-affirmation"></div>
+    </div>
+    <div class="ex-section" id="journey-section" style="display:none">
+      <div class="ex-section-label">为你的旅程</div>
+      <div class="journey-card" id="journey-card"></div>
+    </div>
+    <div class="ex-section">
+      <div class="ex-section-label">为何重要</div>
+      <div class="ex-insight" id="ex-insight"></div>
+    </div>
+    <div class="ex-section journal-wrap">
+      <div class="ex-section-label">课后笔记</div>
+      <textarea class="journal-textarea" id="journal-textarea" placeholder="你注意到了什么？有什么涌现？有什么转变？自由书写——这只属于你。"></textarea>
+      <div class="journal-save-row">
+        <button class="btn" id="btn-save-note">保存笔记</button>
+        <span class="journal-saved-note" id="save-note-feedback">已保存</span>
+      </div>
+    </div>
+    <div class="ex-section">
+      <div class="ex-section-label">练习记录</div>
+      <div class="timer-done-banner" id="mark-banner" style="margin-bottom:16px"></div>
+      <button class="btn btn-complete" id="btn-mark-complete" style="width:100%;margin-bottom:24px">标记本次练习完成</button>
+      <div class="sessions-log" id="sessions-log"></div>
+    </div>
+    <div class="ex-nav">
+      <button class="ex-nav-btn prev" id="btn-prev">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
+        <span>
+          <span class="nav-part" id="prev-part"></span>
+          <span class="nav-title" id="prev-title"></span>
+        </span>
+      </button>
+      <button class="ex-nav-btn next" id="btn-next">
+        <span style="text-align:right">
+          <span class="nav-part" id="next-part"></span>
+          <span class="nav-title" id="next-title"></span>
+        </span>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 登录弹窗 -->
+<div class="auth-modal-overlay" id="auth-modal-overlay" style="display:none"></div>
+<div class="auth-modal" id="auth-modal" style="display:none">
+  <button class="auth-modal-close" id="auth-modal-close">✕</button>
+  <h3>保存你的进度</h3>
+  <p>登录后可在所有设备间同步你的练习记录、笔记和课程权限——永不丢失进度。</p>
+  <button class="google-btn" id="google-sign-in-btn">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+    使用 Google 继续
+  </button>
+  <p class="auth-modal-note">或关闭以无账户继续——你的进度仍保存在此浏览器中。</p>
+</div>
+
+<!-- 目标弹窗 -->
+<div class="profile-modal-overlay" id="profile-modal-overlay">
+  <div class="profile-modal" id="profile-modal">
+    <button class="profile-modal-close" id="profile-modal-close">✕</button>
+    <h3>你的目标</h3>
+    <p>告诉我们你正在努力实现什么。每一节练习都将围绕这一目标重新定向——让每次课程直接关联你的生活。</p>
+    <div class="profile-field">
+      <label for="profile-name-input">你的名字（可选）</label>
+      <input type="text" id="profile-name-input" placeholder="我们该如何称呼你？" maxlength="60" />
+    </div>
+    <div class="profile-field">
+      <label for="profile-goal-input">你想创造或实现什么？ *</label>
+      <textarea id="profile-goal-input" rows="3" placeholder="例如：创办自己的企业、晋升为高级工程师、写完第一本书……" maxlength="200"></textarea>
+    </div>
+    <button class="profile-save-btn" id="profile-save-btn" disabled>保存我的目标</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+
+function updateAuthUI() {
+  const signinBtn = document.getElementById('auth-signin-btn');
+  const userArea  = document.getElementById('auth-user-area');
+  const avatar    = document.getElementById('auth-avatar');
+  const emailEl   = document.getElementById('auth-dropdown-email');
+  if (currentUser) {
+    signinBtn.style.display = 'none';
+    userArea.style.display  = 'flex';
+    const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email || '?';
+    avatar.textContent = name[0].toUpperCase();
+    if (emailEl) emailEl.textContent = currentUser.email || '';
+  } else {
+    signinBtn.style.display = 'block';
+    userArea.style.display  = 'none';
+  }
+}
+
+function openAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'block';
+  document.getElementById('auth-modal').style.display         = 'block';
+}
+function closeAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'none';
+  document.getElementById('auth-modal').style.display         = 'none';
+}
+function toggleUserMenu() {
+  const dd = document.getElementById('auth-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  const userArea = document.getElementById('auth-user-area');
+  const dd = document.getElementById('auth-dropdown');
+  if (dd && !userArea.contains(e.target)) dd.style.display = 'none';
+});
+async function signInWithGoogle() {
+  const btn = document.getElementById('google-sign-in-btn');
+  btn.disabled = true;
+  btn.textContent = '正在跳转至 Google…';
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/exercises-zh' },
+  });
+}
+async function handleSignOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  document.getElementById('auth-dropdown').style.display = 'none';
+  showToast('已退出登录——你的进度仍保存在本地。');
+}
+
+async function cloudUpsertProgress(part) {
+  if (!currentUser) return;
+  const data = getExData(part);
+  await sb.from('mks_user_progress').upsert({
+    user_id: currentUser.id, part,
+    sessions: data.sessions, note: data.note,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id,part' });
+}
+async function cloudLoadAll() {
+  if (!currentUser) return;
+  const { data: rows } = await sb.from('mks_user_progress').select('*').eq('user_id', currentUser.id);
+  if (rows?.length) {
+    const store = loadStore();
+    rows.forEach(row => {
+      const local = store[row.part] || { sessions: [], note: '' };
+      const cloudSessions = Array.isArray(row.sessions) ? row.sessions : [];
+      const localSessions = Array.isArray(local.sessions) ? local.sessions : [];
+      store[row.part] = {
+        sessions: cloudSessions.length >= localSessions.length ? cloudSessions : localSessions,
+        note: (row.note || '').length >= (local.note || '').length ? (row.note || '') : (local.note || ''),
+      };
+    });
+    saveStore(store);
+  }
+}
+async function syncLocalToCloud() {
+  if (!currentUser) return;
+  const store = loadStore();
+  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 24);
+  if (!parts.length) return;
+  await Promise.all(parts.map(part => cloudUpsertProgress(part)));
+}
+sb.auth.onAuthStateChange(async (event, session) => {
+  const wasSignedIn = !!currentUser;
+  currentUser = session?.user ?? null;
+  updateAuthUI();
+  if (currentUser) {
+    await cloudLoadAll();
+    if (!wasSignedIn) await syncLocalToCloud();
+    renderGrid();
+    updateHeader();
+  }
+});
+document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
+document.getElementById('auth-modal-overlay').addEventListener('click', closeAuthModal);
+document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
+document.getElementById('auth-signout-btn').addEventListener('click', handleSignOut);
+document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu);
+
+const EXERCISES = [
+  {
+    part: 1, title: "身体静定", theme: "掌控身体",
+    lesson: "在任何环境被创造之前，行动是必要的——而行动可能之前，必须先有思想。心智是一切活动发起的创造中心。但要进入那个中心，你首先必须学会静止。",
+    steps: [
+      "选择一个安静的房间，在整个练习期间不会被打扰。",
+      "坐在舒适的椅子上，脊柱自然挺直，双手放在膝上。",
+      "闭上眼睛，做三次缓慢、深长的呼吸。",
+      "现在：保持完全静止。不要移动任何一块肌肉——不移动手指、眼皮、脚。",
+      "当不适或坐立不安的冲动涌现时，只需观察它，而不做出反应。让它过去。",
+      "你唯一的目的是在整个练习期间保持不间断的身体静止。",
+      "当计时器结束时，慢慢睁开眼睛，起身前静坐片刻。"
+    ],
+    affirmation: "我是身体的主宰。",
+    insight: "大多数人从未真正静止过。身体在不断的无意识反应中运动——坐立不安、调整、抽动。这个练习揭示了意图与习惯之间的差距。哈内尔教导说，控制身体的能力是所有其他力量的基础。如果你不能首先主宰你所居住的这一工具，你就无法主宰外在的环境。",
+    defaultDuration: 15
+  },
+  {
+    part: 2, title: "心灵宁静", theme: "掌控心智",
+    lesson: "心智的运作通过两种模式进行：有意识和潜意识。轻松与力量取决于你能在多大程度上静止有意识的噪音——并进入其下更深、更广阔的宝库。",
+    steps: [
+      "坐在与上周相同的地方，保持相同的挺直、静止的姿势。",
+      "闭上眼睛，进入身体静止的状态，如第一部分中所练习的。",
+      "现在将注意力转向内部。注意流过你心智的思想流。",
+      "不要与任何思想交战。不要与之对抗。只是让每个思想像云一样升起和消散。",
+      "练习安住在思想之间的间隙——在观察思维的平静意识中。",
+      "如果你被某个思想所吸引，轻轻回到观察。不要有挫败感——只是回来。",
+      "目标不是空白的心智，而是从容、不分心的意识。"
+    ],
+    affirmation: "我静止。我觉知。我是观察者。",
+    insight: "我们百分之九十的心理过程是潜意识的——低于我们普通意识的阈值。有意识思维的持续噪音实际上是心智较小的部分。当你学会使它平静，你就能进入巨大的宝库，洞见、创造力和真正的力量就居住在那里。这就是为什么最重要的发现、艺术突破和清明的时刻往往在静默中到来。",
+    defaultDuration: 15
+  },
+  {
+    part: 3, title: "完全放松", theme: "释放张力",
+    lesson: "自然不断地寻求表达和谐。当思想是和谐的，自然就开始创造相应的物质条件。但张力——身体中保持的张力——阻碍了这种自然流动。放松不是软弱；它是对齐。",
+    steps: [
+      "舒适地坐下，闭上眼睛。",
+      "从双脚开始：有意地绷紧双脚的肌肉五秒钟，然后完全放松。",
+      "向上移动——小腿、大腿、腹部、胸部、双手、手臂、肩膀、颈部、面部。",
+      "在每个区域，绷紧五秒钟，然后完全放松。注意其中的对比。",
+      "一旦通过了整个身体，从脚到头顶扫描任何残余的张力。",
+      "让每块肌肉放开。自然呼吸。感受保持与放松之间的差异。",
+      "在剩余的练习中，只是在这种完全、有意识的放松状态中休息。"
+    ],
+    affirmation: "我释放所有张力。我是开放的。我内心平和。",
+    insight: "哈内尔理解了现代神经科学所证实的：慢性肌肉张力是身体记录未解决的压力、恐惧和抵抗的方式。当你有意识地练习放松，你不仅仅是在放松肌肉——你正在从一种默认的对抗生活状态中重新训练神经系统。深度放松是新信念真正能够扎根的生理状态。",
+    defaultDuration: 20
+  },
+  {
+    part: 4, title: "真正的「我」", theme: "身份与意识",
+    lesson: "你不是你的身体——身体只是自我用来实现目的的物质工具。你不是你的心智——心智是另一种用于思考、推理、规划的工具。当你说「我去」，你是在告诉身体。当你说「我思考」，你是在告诉心智。但那个发出指令的「我」是谁？",
+    steps: [
+      "坐在你惯常的静止、放松的姿势中。闭上眼睛。",
+      "注意你的身体。观察感觉、重量、温暖。然后轻轻认识：你是注意到身体的那一个，而不是身体本身。",
+      "注意你的思想升起。认识：你是观察思想的那一个，而不是思想本身。",
+      "注意你的感受。认识：你是意识到感受的那一个，而不是感受本身。",
+      "安住在那种意识中——那个本身不能被观察到的见证者临在，因为它就是观察者。",
+      "只是成为那个。没有努力。没有作为。只是平静的认识：「我存在。」",
+      "每当你被思想或感觉吸引，回到简单的觉知事实。"
+    ],
+    affirmation: "我不是我的身体。我不是我的心智。我存在。",
+    insight: "这是课程中最深刻的练习之一。每一个智慧传统——从吠檀多到斯多葛主义到现代沉思科学——都得出同样的发现：在所有经验背后和之下有一种意识，它本身不能成为经验的对象。哈内尔称之为「我」。当你接触到它，哪怕是短暂的，你就意识到这个「我」是不可动摇的——而这就是你真正力量所在的地方。",
+    defaultDuration: 20
+  },
+  {
+    part: 5, title: "心灵的家", theme: "有意识的创造",
+    lesson: "我们通过我们所怀有的思想不断地创造和重塑自己。「外在世界」始终是「内在世界」的反映。这一部分问：如果你现在正在建造你的未来，你在建造什么？你希望建造什么？",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "开始构建一个生动的心灵图像，展示你的生活完全如你最深切希望的那样。",
+      "包括你的物质环境：你住在哪里、工作、移动？看到细节。",
+      "包括你的身体：感觉如何？你的精力和活力如何？",
+      "包括你的关系：谁在你身边？你的连接质量如何？",
+      "包括你的工作：你在创造什么？你在给予什么价值？感觉如何？",
+      "使这个图像尽可能丰富和具体。停留在其中。将它感受为已经是真实的。"
+    ],
+    affirmation: "我的心灵之家已经建好。外在世界正在追上来。",
+    insight: "哈内尔将潜意识心智描述为一个「心灵的家」，我们用习惯性思想不断地装饰它。大多数人无意识地装饰自己的家——安装恐惧、匮乏、怨恨、限制。这个练习使这个过程变得有意识和刻意。细节很重要：模糊的愿望产生模糊的结果。具体的、被感受到的心灵图像产生具体的、被感受到的行为和感知变化。",
+    defaultDuration: 20
+  },
+  {
+    part: 6, title: "专注和谐", theme: "吸引力法则",
+    lesson: "吸引力法则是根本和永恒的——无法逃脱其运作。它运作以带给你只有与你的主导心灵状态和谐的东西。因此，和谐既是接受善的条件，也是必须培养的心灵品质。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "将「和谐」这个词和概念带到你注意力的中心。",
+      "思考和谐在你身体中的含义：器官协同工作，呼吸自由流动。",
+      "思考你关系中的和谐：轻松、相互理解、善意。",
+      "思考你工作中的和谐：努力与结果对齐，精力得到良好运用。",
+      "思考自然的和谐：季节、潮汐、生物的成长。",
+      "将和谐这单一概念保持在你的心智中。每当注意力游离，轻轻回到它。"
+    ],
+    affirmation: "我与一切和谐共处。善自然流向我。",
+    insight: "这是第一个纯粹专注的练习——将心智引导到单一概念上延伸一段时间。这比听起来更难。心智在 20 分钟内会游离几十次。每次你注意到并回来就是心灵肌肉的一次重复。哈内尔选择「和谐」作为第一个专注对象，因为它直接对立于最常见的阻碍丰盛的心灵模式：不和谐、摩擦、抵抗和焦虑。",
+    defaultDuration: 20
+  },
+  {
+    part: 7, title: "观想", theme: "培养内在之眼",
+    lesson: "清晰观想的能力是主宰键学生最重要的特质之一。每一项伟大成就——每一项发明、每一件艺术作品、每一个建立的事业——首先存在于清晰的心灵图像中。这种能力可以通过练习来发展。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "想起你认识的某个人——朋友、家人或同事。",
+      "在熟悉的环境中看到他们：他们的家、他们的办公室、他们惯常的姿态。",
+      "注意细节：他们的面孔、表情、他们如何持守自己、他们穿着什么。",
+      "保持图像稳定。当它闪烁或消退时，耐心地重建它。",
+      "尽量使图像足够生动，让你几乎能听到他们的声音。",
+      "练习尽可能清晰、稳定地保持它，不费力地。"
+    ],
+    affirmation: "我看得清晰。我的内在之眼专注而精准。",
+    insight: "大多数人都有一个闪烁、不稳定的心灵之眼——图像短暂形成然后消散。观想练习训练保持清晰、稳定的心灵图像的能力，这是所有刻意心灵创造的基础。哈内尔从观想一个人（而不是抽象目标）开始，因为人是具体的、熟悉的和情感上吸引人的——使图像更容易形成和保持。",
+    defaultDuration: 20
+  },
+  {
+    part: 8, title: "核心肯定语", theme: "印记真理",
+    lesson: "品格、健康和环境由我们习惯性怀有的思想形成。或许，我们一直在无意识地创造我们的条件。要改善条件，我们首先必须改善我们的思想——用明确的、建设性的真理替换模糊的、消极的或限制性的信念。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "将以下陈述带到心中。慢慢地读它，然后闭上眼睛持守它：",
+      "「我完整、完美、强大、有力、充满爱、和谐而快乐。」",
+      "再次默默地说它，感受每个词的含义：",
+      "完整——没有任何缺失。完美——你的本性已经是完整的。强大——能够迎接来临的一切。有力——你能够获得真正的力量。充满爱——你最深的本性是仁慈的。和谐——与生命的流动对齐。快乐——这是你的自然状态。",
+      "慢慢地重复这个陈述很多次，让它随着每次重复而沉入更深处。",
+      "让任何抵抗升起并消散。回到这个陈述。"
+    ],
+    affirmation: "我完整、完美、强大、有力、充满爱、和谐而快乐。",
+    insight: "这可能是整个课程中最著名的一句话。哈内尔将它作为对「人类粗鄙思维」的解药——我们大多数人在没有选择的情况下吸收的对恐惧、残疾、自卑和匮乏的遗传印象。重复一个具体的、被感受到的真理不是自欺欺人；它是用一个更真实的心灵模式有意替换另一个。潜意识不区分生动想象的真理和物质事实。",
+    defaultDuration: 20
+  },
+  {
+    part: 9, title: "至善", theme: "建设性服务",
+    lesson: "每个成功商业关系和每个充实生活背后的基本原则是：我们只能接受我们所给予的。吸引力法则不是通过抓取而运作，而是通过给予——通过将你的心灵能量置于服务于比个人利益更大的事物中。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "诚实地问自己：我能够贡献的最大善是什么？",
+      "我有什么独特的东西可以提供——在技能、知识、临在、关怀方面？",
+      "谁会从只有我能给予的东西中获益最多？",
+      "我能使这种贡献多大？它在最充分表达时会是什么样子？",
+      "在心智中稳定地持守这个你最高贡献的愿景。",
+      "注意升起的：抵抗、兴奋、怀疑、清明。不加判断地观察。"
+    ],
+    affirmation: "我自由给予。我的服务是我的力量。",
+    insight: "哈内尔强调吸引力法则不是一个用于个人获取的自私公式。它通过交换原则运作：接受的价值需要给予的价值。这个练习将心灵取向从「我能得到什么？」转移到「我能给予什么？」——这悖论地是更强大的吸引者。专注于真诚服务的人往往会收获丰盛，而仅仅专注于接受的人往往会排斥它。",
+    defaultDuration: 20
+  },
+  {
+    part: 10, title: "丰盛法则", theme: "与供给对齐",
+    lesson: "丰盛是宇宙的自然法则。自然到处都是慷慨的——在一切事物中都表现出富足。如果在任何地方似乎缺乏供给，那只是因为分配渠道尚不完善——而不是因为供给本身有限。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "在脑海中看看你周围的自然世界：数百万棵树木、植物、动物、星星。",
+      "注意创造的奢华——没有任何东西被保留，没有任何东西在源头上是稀缺的。",
+      "现在认识：你是同一个创造系统的一部分。同样的丰盛对你可用。",
+      "呼吸进入这种认识。让充足感——有足够的感觉——沉入你的身体。",
+      "如果匮乏或稀缺的感觉升起，将其视为一种心灵习惯，而非事实。回到丰盛。",
+      "持守平静的确信：「我现在所需的一切对我是可用的。」"
+    ],
+    affirmation: "我现在所需的一切对我是可用的。供给是无限的。",
+    insight: "匮乏的体验是真实的，但哈内尔认为它在成为物质条件之前始终是心灵条件。一贯地思考和感受丰盛的人往往会注意和抓住机会，而处于匮乏心态的人字面上无法感知这些机会——因为心智通过其主导信念过滤体验。这个练习训练充足感，这是接受更多的先决条件。",
+    defaultDuration: 20
+  },
+  {
+    part: 11, title: "宇宙连接", theme: "整体的一部分",
+    lesson: "无限小和无限大，在最终分析中，不过是力量、运动、生命和心智。你不是与这种宇宙智慧分离的——你是它的表达。你所需的所有力量都已经在你内部，因为你是所有力量之源的一部分。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "深深呼吸。随着每次吸气，想象你正在汲取激活所有生物的同一生命力。",
+      "认识到支配你心跳、免疫系统、细胞生长的智慧，与宇宙秩序的智慧是同一种。",
+      "你不是宏大宇宙中的一个小东西。你是宇宙以特定形式存在。",
+      "让这种认识软化任何孤立感、不足感或限制感。",
+      "安住在被持守、被支持、成为广阔事物一部分的感受中。",
+      "持守这个思想：「我与宇宙心智合一。所有智慧和力量对我可用。」"
+    ],
+    affirmation: "我与宇宙心智合一。所有智慧流经我。",
+    insight: "这是哈内尔最具形而上雄心的主张之一——个体心智是宇宙心智的表达。无论字面理解还是作为隐喻，这种信念的心理影响已有记录：感受到与比自身更大的事物连接的人表现出更大的韧性、创造力和利他主义。有意识地练习这种认识会在一个人面对挑战的方式上产生真实的变化。",
+    defaultDuration: 25
+  },
+  {
+    part: 12, title: "创造力量", theme: "思想即原因",
+    lesson: "心智是创造力量——唯一的创造力量。每一件被建造、书写、创作或发现的东西首先存在于思想中。理解这一点就是理解你拥有访问历史上每一项伟大成就所依赖的同一力量的能力。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "想想你希望创造的东西——一个条件、一个项目、一段关系、你自身的一种品质。",
+      "构建一个清晰、生动的心灵图像，展示它已经完成。看到细节。",
+      "感受居住在这个完成现实中的感觉。",
+      "现在认识：这个心灵图像不是一个愿望。它是一个原因。外在世界最终必须反映它。",
+      "以确信而非紧张地持守图像。确定性，而非努力，是起效的品质。",
+      "当怀疑升起时，轻轻放下它，回到完成的图像。"
+    ],
+    affirmation: "我的思想是创造性的。我心中所持守的，我正在带入存在。",
+    insight: "哈内尔描述的是现代心理学称为「执行意图」和「心理对比」的内容——在细节上心理演练期望结果的练习。数十年的研究证实，对目标的生动心理模拟显著提高了实现它的可能性，部分原因是通过准备心智注意相关机会，部分原因是通过减少焦虑和建立行为准备。",
+    defaultDuration: 20
+  },
+  {
+    part: 13, title: "合一", theme: "精神基础",
+    lesson: "所有事物最终可以归结为一件事，因为它们彼此可以转化，所以它们必然永远处于关系中，而不能彼此对立。这是真正力量的基础——认识表面分裂之下的统一性。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "将这个短语带到心中：「在祂里面，我们生活、移动并存在。」",
+      "让这些词沉淀。你没有创造自己——你从更大的事物中涌现。",
+      "你的呼吸无需你的努力就发生。你的心跳无需你的指令就跳动。",
+      "这种维持你生命的同一力量可以维持你的目标、你的工作、你的愈合。",
+      "放松进入完全的信任——不是消极的顺从，而是主动地与比个人意志更大的力量对齐。",
+      "安住在被持守和被存在之基础本身支持的感受中。"
+    ],
+    affirmation: "在源头中，我生活、移动并存在。",
+    insight: "这个练习邀请力量所在的根本转变——从孤立的个人意志到与更大事物的更深对齐。哈内尔不是在主张消极；他是在区分推拒生活的努力意志和随生命流动的受启示意志。后者一贯更有效。运动员称之为「流动」；哈内尔称之为与宇宙心智对齐。",
+    defaultDuration: 25
+  },
+  {
+    part: 14, title: "内在光辉", theme: "成为肯定语本身",
+    lesson: "世界思想正在发生变化。真正理解心灵因果原则的人——真正掌握思想创造的人——获得的结果与其理解程度完全成比例。这个练习加深了核心真理的印记。",
+    steps: [
+      "坐在你惯常的姿势中。做三次缓慢、深长的呼吸。",
+      "将肯定语带到心中：「我完整、完美、强大、有力、充满爱、和谐而快乐。」",
+      "这次，不仅仅是背诵它。从你胸口中心开始，感受它向外辐射。",
+      "感受完整——此刻没有任何缺失。感受力量——你有能力。",
+      "感受爱——对自己和所有生命的真诚善意祝愿。",
+      "感受和谐——与事物自然秩序的平静对齐。",
+      "感受快乐——不是兴奋，而是与生命对齐的深沉、平静的满足。",
+      "在进入下一个之前，让每种品质充满你。整个练习就是这一个陈述，完全被感受。"
+    ],
+    affirmation: "我完整、完美、强大、有力、充满爱、和谐而快乐。",
+    insight: "哈内尔第二次回到这个肯定语，因为它是整个课程的枢轴。第一次（第八部分），练习是背诵——重复这些词并探索其含义。在这里，练习是体现——实际感受所描述的品质。这种差异非常重要。仅仅被思考的词产生表面印象。被深刻感受的词改变神经系统。",
+    defaultDuration: 25
+  },
+  {
+    part: 15, title: "成长法则", theme: "给予与接受",
+    lesson: "成长是通过以新换旧来实现的。我们只能在给予的程度上接受。如果我们固执地坚持已有的，就无法获得我们所缺乏的。困难和不和谐表明我们要么拒绝给出我们不再需要的，要么拒绝接受我们所需要的。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "问自己：我正在执着于什么已经不再服务我的东西？一个旧信念、一种怨恨、一种自我形象、一种行为？",
+      "呼吸，并在心理上练习释放它——在呼气时让它离开。",
+      "现在问：什么正在试图进入我的生活而我一直在抵抗？一个新方向、一种新理解、一种新存在方式？",
+      "练习向它开放。允许这种可能性进入。",
+      "专注于成长法则本身：你真正给出的——能量、价值、关怀、注意——成倍地回报给你。",
+      "安住在这个法则中。让它在本周剩余时间里引导你将精力集中在何处。"
+    ],
+    affirmation: "我自由释放。我开放接受。我持续成长。",
+    insight: "哈内尔预见了现代行为科学所称的「损失厌恶」——我们以失去可能获得的为代价而执着于已有的倾向。成长总是需要释放一种旧形式以接受一种新形式。毛毛虫不是通过执着于成为毛毛虫而变成蝴蝶的。这个练习使释放的心理行为变得有意识和刻意。",
+    defaultDuration: 20
+  },
+  {
+    part: 16, title: "洞察力量", theme: "看见可能",
+    lesson: "洞察是看见他人看不见的能力——看一个情况并感知不仅是困难，还有其中的机会。这是每个成功者的显著特征，也是支撑一切的智慧的实际表达。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "想起你生活中的当前情况——一个挑战、一个决定、一种不确定性。",
+      "不是把它看作一个要解决的问题，而是看作一个要理解的情况。",
+      "问：我没有看到什么？我正在做出什么可能不真实的假设？",
+      "问：这个困难中可能隐藏着什么机会？",
+      "坐在问题中而不是强迫答案。让洞察自然升起。",
+      "练习信任的感受：答案存在，将变得清晰。"
+    ],
+    affirmation: "洞察属于我。我看见他人所错过的。机会无处不在。",
+    insight: "哈内尔将洞察识别为最稀有和最有价值的心灵能力——能够看穿情况表面到其底层结构和潜力。这与分析（分解事物）或直觉（感受知识）不同。洞察是重新构建情况被看待方式的认识闪光。它不能被强迫，但可以通过学习保持问题开放而不是急于得出结论来培养。",
+    defaultDuration: 20
+  },
+  {
+    part: 17, title: "振动法则", theme: "你散发什么，就吸引什么",
+    lesson: "最高原则必然决定与它接触的一切事物的环境、方面和关系。对更高力量的了解使所有物质力量显得次要。心智可以成为磁铁——不可抗拒地吸引它所渴望的条件。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "想想你希望在生活中拥有更多的品质：自信、清明、丰盛、平和、爱。",
+      "不是请求它，而是练习成为它——就在此刻，在这个当下。",
+      "像一个自信的人那样呼吸。像一个清醒的人那样持守你的注意力。",
+      "注意即使是内在状态的轻微转变也开始改变此刻的感受。",
+      "专注于真理：你吸引你所是的，而不仅仅是你所想要的。",
+      "问自己：我现在是什么？那是我希望吸引的吗？"
+    ],
+    affirmation: "我就是我希望吸引的。我所是的，我散发。我所散发的，回来。",
+    insight: "振动法则是哈内尔表达现代心理学所称「行为启动」和「具身认知」的方式。你的内在状态——你的姿态、语调、注意力、情感品质——以微妙而深刻的方式持续地与你周围的世界沟通。人们对你所是的反应比对你所说的反应更可靠。你感知的也是你已经与之调谐的。实际意义：首先改变内在状态。",
+    defaultDuration: 20
+  },
+  {
+    part: 18, title: "专注力量", theme: "聚焦集中",
+    lesson: "专注的力量是每个有能力者的显著特征。我们能集中注意力的程度——持守单一思想、单一目的、单一图像——决定了我们能在任何情况下运用的创造力量的程度。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "选择一个单一、简单的对象作为你的焦点：烛焰、几何形状、光球。",
+      "尽可能清晰稳定地在你的心智中持守这个图像。",
+      "当图像消退或心智游离时，平静地将其带回，不自我批评。",
+      "每次注意力的回归都是心灵肌肉的一次重复。欢迎游离——它给你回来的机会。",
+      "逐渐延长你能清晰持守图像的时间段。",
+      "注意：随着专注加深，心智中进入一种微妙的力量和清明品质。"
+    ],
+    affirmation: "我的注意力是专注的。我的心智是一个透镜，集中力量。",
+    insight: "注意力是心智的货币。注意力去哪里，能量就流向哪里——能量流向哪里，改变就发生。在持续分心的世界中，定向和持守注意力的能力变得非常稀有，相应地也非常有价值。哈内尔的专注练习本质上是这种能力的训练。每个练习课程都建立了专注能力，这在几周内复利成一种真正不同的心灵品质。",
+    defaultDuration: 20
+  },
+  {
+    part: 19, title: "真理", theme: "力量之基",
+    lesson: "如果我们能找到真理，我们就能找到每个结果的原因——找到原因，我们就处于控制结果的位置。对真理的了解就是力量。财富是力量的后代。所有事物代表某些形式和程度的力量。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "想起你生活中感到不确定、困惑或卡住的情况。",
+      "非常直接地问自己：这里什么是真实的？剥去你假设的、被告知的或害怕的。",
+      "你确切地知道什么？你在猜测什么？你在回避什么？",
+      "练习在真正的不确定性的不适中停留，而不是用虚假的确定性代替。",
+      "问：如果我完全知道这个情况的真相，我会怎么做？",
+      "让真理比舒适更重要。认识到每一个谎言或回避都让你损失力量。"
+    ],
+    affirmation: "我寻求高于一切的真理。真理是我站立的基础。",
+    insight: "哈内尔对真理的处理出人意料地实际。他谈论的不是抽象的形而上真理，而是每天看清情况实际是什么样子的勇气。大多数人类痛苦来自于在错误前提上运作——关于我们自己、他人和世界的从未检验过的信念。寻求真理的练习是从幻觉中撤回能量并投入现实的练习，现实总是比任何幻想更可行。",
+    defaultDuration: 25
+  },
+  {
+    part: 20, title: "灵感", theme: "宇宙流经",
+    lesson: "灵感是成为无限智慧流动渠道的艺术。宇宙只能通过个体行动——我们是其活动的渠道。它在我们内部；它就是我们。我们可能无法认识它，从而将它排除在意识之外——但它仍然是所有存在的基本事实。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "首先放下所有对问题、计划和任务的专注。",
+      "持守你对自己和生活的最高理想——不是你认为可能的，而是最深切地呼唤你的。",
+      "不是思考它，而是简单地临在于它。让它完整地存在，不加分析。",
+      "练习接受的姿态——不抓取，不推动，只是开放。",
+      "如果清明、图像或词语升起，接受它们而不立即判断或规划。",
+      "知道组织宇宙的同一智慧可以组织你的生活。"
+    ],
+    affirmation: "我是宇宙智慧的渠道。灵感自由地流经我。",
+    insight: "哈内尔在「运作」心智和「通过」心智接受之间所作的区分，对应于心理学家所称的收敛思维（专注的问题解决）和发散思维（开放的、生成性的发现）之间的差异。两者都是必要的，但大多数人过度依赖前者。改变生活的创造性突破往往在接受性开放的时刻到来，而非费力的奋斗中。这个练习训练那种接受模式。",
+    defaultDuration: 25
+  },
+  {
+    part: 21, title: "财富意识", theme: "成为价值之渠",
+    lesson: "金钱编织进我们存在的外在结构，吸引着最优秀头脑的最佳思考。不是对金钱的爱是万恶之根——而是对金钱的误解。金钱是一个符号和媒介：它流向价值，远离价值缺失。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "考虑你与金钱的当前关系。不加判断地观察升起的感受。",
+      "问：我把金钱视为稀缺、危险或超出我能力范围的吗？将这些观察为信念，而非事实。",
+      "现在考虑你为他人创造的价值——通过你的工作、你的临在、你的想法。",
+      "认识：金钱只是交换价值的表现。你创造和提供的真实价值越多，金钱自然流动越多。",
+      "专注于成为世界上更伟大的真实价值来源。",
+      "肯定：「我是一个慷慨的渠道，价值通过它流动——并回来。」"
+    ],
+    affirmation: "我创造真实价值。金钱像价值从我流出一样自然地流向我。",
+    insight: "哈内尔对金钱的处理对于一本形而上文本来说异常清醒。他不说「想着富有的思想，金钱就会出现。」他说：理解金钱是什么（交换价值的衡量），认识你创造价值的能力，并将你的注意力和努力与创造而非获取对齐。他描述的「财富意识」不是贪婪，而是一种对产生和交换价值充满自信、理所当然的取向。",
+    defaultDuration: 20
+  },
+  {
+    part: 22, title: "完美健康", theme: "生命力的振动",
+    lesson: "健康法则基于振动法则。有了对这个法则的适当了解，我们可以将健康条件外化。身体中的每个细胞都对居住其中的心灵品质有响应。恐惧、焦虑和限制的心灵模式产生相应的身体条件。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "做几次缓慢、深长的呼吸。随着每次呼气，释放身体中任何保持的张力。",
+      "将你的注意力带到你内部的生命力上——你心跳的稳定脉搏，呼吸的节奏。",
+      "观想你身体的每个细胞以健康、能量和完美功能振动。",
+      "看到你的血液干净地流动，你的器官和谐地工作，你的神经系统处于平静。",
+      "如果有困难或疼痛的区域，带着温和、慈爱的注意力去关注它——不带恐惧，不带抵抗。",
+      "肯定你身体深层智慧的真理和它趋向整体的自然倾向。"
+    ],
+    affirmation: "我身体的每个细胞都充满健康和完美的活力。",
+    insight: "哈内尔在 1919 年描述的心身连接现已被广泛记录。心理压力明显损害免疫功能、心血管健康和伤口愈合。相反，培养放松、积极情绪和安全感的练习改善了可测量的健康指标。这个练习不是否认身体疾病；它是有意识地培养最支持身体自身愈合智慧的心理-情感条件。",
+    defaultDuration: 20
+  },
+  {
+    part: 23, title: "宏大思想", theme: "扩展心灵视野",
+    lesson: "伟大的思想往往消除更小的思想。持守足够大的思想以抵消和消除所有小的、不受欢迎的倾向是明智的。创造能量在处理大情况和小情况时没有更多困难。尽你所敢地宏大地思考。",
+    steps: [
+      "在静止中坐下，闭上眼睛。",
+      "想想你能持守的最大的、最建设性的、最有益的思想——一个关于你的生活、你的工作或世界的思想。",
+      "这个思想应该感觉有点太大了——略微超出舒适的范围。",
+      "在你的心智中持守它，注意它如何改变你思想的质量。",
+      "注意当心智被真正宏大的事物占据时，更小的焦虑、琐碎的担忧和习惯性的烦恼自然退去。",
+      "让宏大的思想完全充满你的意识。在这次练习中，不允许任何更小的东西进入。",
+      "将这种扩展的心灵姿态带回你的一天。"
+    ],
+    affirmation: "我宏大地思考。小思想无法在伟大思想的临在中存活。",
+    insight: "这是哈内尔最具心理洞察力的观察之一：心智一次只能持守这么多，一个大的、积极的、建设性的思想自然排挤更小的、消极的思想——不是通过压制而是通过占据。如果你被焦虑所困扰，最有效的治疗不是与焦虑战斗，而是用更大的事物填满心灵空间。这就是为什么真正从事有意义工作的人往往不那么受小恐惧的困扰。",
+    defaultDuration: 20
+  },
+  {
+    part: 24, title: "主宰键", theme: "门从内部打开",
+    lesson: "这是系统的全部理论和实践：表达和谐，表达健康，表达丰盛。每一个困难，无论它是什么或在哪里，都可以被消除或溶解。而这只有一种方式——从内部。",
+    steps: [
+      "坐在你惯常的位置上。这是课程的最后一个练习。",
+      "闭上眼睛。花时间慢慢进入完全的静止——身体和心灵的。",
+      "让你在过去几周练习的一切在这个平静的时刻汇聚。",
+      "安住在简单、清明的自身存在意识中——与第四部分中遇到的同一个「我存在」。",
+      "认识到这种意识不因环境而减损，不因变化而受威胁，此刻是完整的。",
+      "从这个地方，持守你的生活最充分、最表达、最和谐的愿景。",
+      "并知道：主宰键不在这本书中。它不在任何系统中。它在你内部。它一直都在你内部。"
+    ],
+    affirmation: "我持有主宰键。通往每一种善的门在我内部，它现在打开。",
+    insight: "哈内尔在他开始的地方结束：心智是一切活动发起的创造中心这一命题。这个课程从身体（身体静定）经过心理（思想主宰）到精神（认识自己与万物之源的同一性）。最后的练习不是要你做某件新事，而是认识一直都是真实的——并从那种认识中生活。",
+    defaultDuration: 30
+  }
+];
+
+const PART_PERSONALIZATION = [
+  { bridge: "指挥身体的能力是任何打算指挥环境的人的第一项纪律。每一个分心、每一次坐立不安、每一个无意识的动作都是对{goal}的小小反对票。这个练习是你开始投出不同票的方式。", affirmation: "我掌控我的身体。我正在建立使{goal}成为必然的静定。" },
+  { bridge: "追求{goal}所需的清明不来自更多思考——它来自思考之下的间隙。这个练习打开那个空间。潜意识心智默默地为{goal}工作比有意识心智为它担忧更强大。", affirmation: "在静定中，我找到引导我走向{goal}的清明。" },
+  { bridge: "张力是身体记录你一直在对抗{goal}的所有方式——害怕失败，期待挣扎，执着过紧。释放那种张力不是软弱。它是消除你与你想要的东西之间唯一真正的障碍。", affirmation: "我释放所有抵抗。我是开放的。{goal}自然流向我。" },
+  { bridge: "追求{goal}的「我」不是你的焦虑、你的自我怀疑或你过去的失败。它是平静地见证所有这些而不被任何一个所减损的那个。那是做这项工作的「我」。它是不可动摇的。", affirmation: "我不是我的恐惧。我不是我的过去。追求{goal}的「我」是完整而清明的。" },
+  { bridge: "你的潜意识心智已经充满了关于{goal}的思想、图像和信念。这个练习使那种装饰变得有意识和刻意。你生活的外在条件总是在追赶你建立的心灵家园。建立正确的那个。", affirmation: "{goal}在我心中已经是真实的。外在世界正在追上来。" },
+  { bridge: "一个不和谐的心智——焦虑的、分散的、怨恨的——无法吸引和谐的结果。{goal}不仅需要努力，还需要对齐：使你成为其所需条件的一致吸引者的内在和谐。这个练习建立那种对齐。", affirmation: "我与{goal}和谐。我所寻求的也在寻求我。" },
+  { bridge: "{goal}的内在图像越清晰和稳定，你的心智越精确地导向它——注意机会，产生想法，认识合适的人和时机。模糊的愿望产生模糊的结果。清晰的图像产生清晰的行动。", affirmation: "我清晰完整地看到{goal}。我的内在之眼是稳定而精准的。" },
+  { bridge: "完整性、力量和能量不是你在走向{goal}的途中获得的东西。它们是{goal}自然从中产生的内在姿态。这个肯定语将那种姿态植入根本层次——在那里它成为你感知和行动的透镜。", affirmation: "我是完整、强大和有力的。我是{goal}对其来说是自然结果的那个人。" },
+  { bridge: "通向{goal}的最可靠道路穿越对他人的真诚服务。问自己：当我实现{goal}时，谁受益？它在你自身之外创造什么价值？将{goal}锚定于贡献使它成为更强大的吸引者——并使追求更持久。", affirmation: "我通向{goal}的道路为他人创造真实价值。我自由给予。我完全接受。" },
+  { bridge: "{goal}并不稀缺。实现它所需的资源、连接、机会和洞察并不短缺。限制进入它们的是一个习惯于稀缺的心智。这个练习直接溶解那种习惯——并打开渠道。", affirmation: "我实现{goal}所需的一切现在对我可用。供给是无限的。" },
+  { bridge: "能够实现{goal}的智慧不是你必须从外部获得的东西。它已经是你所由构成的——与支配每个生命系统的同一宇宙智慧。这个练习是对那个事实的认识，也是进入点。", affirmation: "我内部的智慧足以实现{goal}。我得到宇宙力量的支持。" },
+  { bridge: "在你的心智中持守{goal}不是作为一个愿望或希望，而是作为一个已完成的事实——作为一个已经启动的原因。这不是妄想；这是历史上每一项成就所依赖的创造能力的正确使用。图像先于现实。", affirmation: "{goal}在我心中被持守为已经完成。我的思想是创造性原因。" },
+  { bridge: "你对{goal}感到的抵抗——怀疑、摩擦、太难的感觉——当你停止将自己视为一个推拒世界的独立力量，并认识到能够创造{goal}的力量已经流经你时，就会溶解。", affirmation: "我与{goal}之源对齐。在其中，我生活、移动并存在。" },
+  { bridge: "这个练习要求你居住在已经实现{goal}的人的品质中：他们的完整性、他们的自信、他们的从容。不是假装——而是练习，直到练习成为存在，而存在成为拥有。", affirmation: "我是完整、强大而有光辉的。我已经在成为实现{goal}的那个人。" },
+  { bridge: "你内部有什么东西正在执着于一个尚未实现{goal}的自我版本。一种信念、一个故事、一种熟悉的身份。成长需要释放它。这个练习使那种释放变得刻意——并为{goal}进入创造开口。", affirmation: "我释放不再服务于{goal}的东西。我成长为我需要成为的人。" },
+  { bridge: "下一个走向{goal}的突破几乎肯定不是更多努力的问题。它是你看待情况方式的转变——一种重新构建问题的认识。这个练习培养那种洞察成为可能的开放、接受状态。", affirmation: "我清晰地看到通向{goal}的道路。当我的心智静止时，洞察找到我。" },
+  { bridge: "你不是通过想要{goal}的条件来吸引它，而是通过成为对他们来说是自然结果的那个人。这个练习问：那个人是谁？他们散发什么——在注意力、能量、他们如何持守自己方面？现在练习成为那样。", affirmation: "我正在成为{goal}对其来说是自然结果的那个人。我所是的，我吸引。" },
+  { bridge: "每一刻你的注意力从重要的事情漂移到分心或焦虑，你都在花费{goal}所需的货币。每一刻你带它回来，你都在投资。这个练习是那种能力的训练——你拥有的最有价值的能力。", affirmation: "我的全部注意力在{goal}上。我以精准引导这种力量。" },
+  { bridge: "通向{goal}的最清晰道路穿越精确地看待你的情况——不带恭维的舒适或恐惧的扭曲。你真正在哪里？实际上什么在阻碍？真理不是令人沮丧的；它是唯一坚实的立足之地。", affirmation: "我以勇气和清明看待我的情况。真理是我通向{goal}最直接的道路。" },
+  { bridge: "你实现{goal}所需的一些东西无法被思考——它必须被接受。最深刻的洞察、最有创造力的解决方案、改变一切的意外连接，都在接受性中升起。这个练习训练那种模式。", affirmation: "我对灵感开放。{goal}通过智慧和努力来到我这里。" },
+  { bridge: "{goal}可能有一个财务维度——或者创造了一个维度的条件。这个练习重新定向你与丰盛的关系：不是作为要抓取的东西，而是作为创造真实价值的自然回报。与价值创造对齐，丰盛随之而来。", affirmation: "我在通向{goal}的道路上创造真实价值。丰盛自然流向我。" },
+  { bridge: "一个充满活力、精力充沛的身体是追求{goal}的基础。疲劳、张力和耗竭不是中性条件——它们缩小感知并降低创造能力。这个练习培养{goal}所值得的身体状态。", affirmation: "我充满活力和精力。我的身体在追求{goal}的过程中完全支持我。" },
+  { bridge: "你当前对{goal}的心灵图像足够大吗？或者习惯和自我保护使它比它可以的更小？这个练习要求你有意地扩展——尽你所敢地宏大地思考。创造能量处理大和小的情况同样轻松。", affirmation: "{goal}和我敢于想象的一样大。它足够大，能够取代每一个小的恐惧。" },
+  { bridge: "这个课程的每一个洞察、每一个练习、每一次信念的扩展都是为了这个做的准备：认识实现{goal}所需的一切已经在你内部。不是作为有待发展的潜力——而是作为活生生的事实。门从内部打开。", affirmation: "我持有{goal}的主宰键。它一直都在我内部。它现在打开。" },
+];
+
+const STORE_KEY = 'mks_zh_progress_v2';
+function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; } }
+function saveStore(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+function getExData(part) { const store = loadStore(); return store[part] || { sessions: [], note: '' }; }
+
+const PROFILE_KEY = 'mks_zh_profile_v1';
+function loadProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch { return {}; } }
+function saveProfile(profile) { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }
+function applyGoalText(template, goal) { return template.replace(/\{goal\}/g, goal); }
+
+function renderGoalUI() {
+  const profile = loadProfile();
+  const goal = profile.goal || '';
+  const setupBanner = document.getElementById('goal-setup-banner');
+  const goalDisplay = document.getElementById('goal-display');
+  const goalDisplayText = document.getElementById('goal-display-text');
+  if (goal) {
+    setupBanner.style.display = 'none';
+    goalDisplay.classList.add('visible');
+    goalDisplayText.textContent = goal;
+  } else {
+    setupBanner.style.display = 'flex';
+    goalDisplay.classList.remove('visible');
+  }
+}
+
+function openProfileModal() {
+  const profile = loadProfile();
+  document.getElementById('profile-name-input').value = profile.name || '';
+  document.getElementById('profile-goal-input').value = profile.goal || '';
+  document.getElementById('profile-modal-overlay').classList.add('open');
+  document.getElementById('profile-save-btn').disabled = !(profile.goal || '').trim();
+}
+function closeProfileModal() { document.getElementById('profile-modal-overlay').classList.remove('open'); }
+
+document.getElementById('profile-modal-close').addEventListener('click', closeProfileModal);
+document.getElementById('profile-modal-overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('profile-modal-overlay')) closeProfileModal();
+});
+document.getElementById('profile-goal-input').addEventListener('input', (e) => {
+  document.getElementById('profile-save-btn').disabled = !e.target.value.trim();
+});
+document.getElementById('profile-save-btn').addEventListener('click', () => {
+  const name = document.getElementById('profile-name-input').value.trim();
+  const goal = document.getElementById('profile-goal-input').value.trim();
+  if (!goal) return;
+  saveProfile({ name, goal });
+  closeProfileModal();
+  renderGoalUI();
+  if (currentPart) populateJourneySection(currentPart);
+});
+document.getElementById('goal-setup-btn').addEventListener('click', openProfileModal);
+document.getElementById('goal-display-edit').addEventListener('click', openProfileModal);
+
+function populateJourneySection(part) {
+  const profile = loadProfile();
+  const goal = profile.goal || '';
+  const section = document.getElementById('journey-section');
+  const card = document.getElementById('journey-card');
+  if (!goal) { section.style.display = 'none'; return; }
+  const p = PART_PERSONALIZATION[part - 1];
+  const bridge = applyGoalText(p.bridge, goal);
+  const affirmation = applyGoalText(p.affirmation, goal);
+  card.textContent = '';
+  const goalLabel = document.createElement('div');
+  goalLabel.className = 'journey-goal-label';
+  goalLabel.textContent = profile.name ? `${profile.name}的目标` : '你的目标';
+  const goalText = document.createElement('div');
+  goalText.className = 'journey-goal-text';
+  goalText.textContent = goal;
+  const bridgeEl = document.createElement('div');
+  bridgeEl.className = 'journey-bridge';
+  bridgeEl.textContent = bridge;
+  card.appendChild(goalLabel);
+  card.appendChild(goalText);
+  card.appendChild(bridgeEl);
+  section.style.display = 'block';
+  const affirmationEl = document.getElementById('ex-affirmation');
+  affirmationEl.textContent = `「${affirmation}」`;
+  affirmationEl.classList.add('personalized');
+}
+
+function saveSession(part, durationMin) {
+  const store = loadStore();
+  if (!store[part]) store[part] = { sessions: [], note: '' };
+  const intention = (document.getElementById('intention-input')?.value ?? '').trim();
+  store[part].sessions.push({ ts: Date.now(), duration: durationMin, intention });
+  saveStore(store);
+  cloudUpsertProgress(part);
+}
+function saveNote(part, text) {
+  const store = loadStore();
+  if (!store[part]) store[part] = { sessions: [], note: '' };
+  store[part].note = text;
+  saveStore(store);
+  cloudUpsertProgress(part);
+}
+function getCompletedParts() {
+  const store = loadStore();
+  return Object.entries(store).filter(([, v]) => v.sessions && v.sessions.length > 0).map(([k]) => parseInt(k));
+}
+
+let timerInterval = null, timerSecondsLeft = 0, timerTotalSeconds = 0, timerRunning = false, selectedDuration = 15;
+const CIRCUMFERENCE = 2 * Math.PI * 82;
+
+function formatTime(s) {
+  return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+}
+function updateRing(secondsLeft, totalSeconds) {
+  document.getElementById('ring-fill').style.strokeDashoffset = CIRCUMFERENCE * (1 - secondsLeft / totalSeconds);
+}
+function chime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [528, 660, 792].forEach((freq, i) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq; osc.type = 'sine';
+      const t = ctx.currentTime + i * 0.6;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
+      osc.start(t); osc.stop(t + 2.5);
+    });
+  } catch {}
+}
+function startTimer(durationMin) {
+  if (timerRunning) return;
+  timerTotalSeconds = durationMin * 60; timerSecondsLeft = timerTotalSeconds; timerRunning = true;
+  document.getElementById('btn-start').textContent = '暂停';
+  document.getElementById('btn-reset').style.display = 'inline-block';
+  document.getElementById('timer-state-label').textContent = '进行中';
+  document.getElementById('timer-done-banner').classList.remove('visible');
+  timerInterval = setInterval(() => {
+    timerSecondsLeft--;
+    document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
+    updateRing(timerSecondsLeft, timerTotalSeconds);
+    if (timerSecondsLeft <= 0) {
+      clearInterval(timerInterval); timerRunning = false;
+      document.getElementById('btn-start').textContent = '开始';
+      document.getElementById('timer-state-label').textContent = '已完成';
+      document.getElementById('timer-done-banner').classList.add('visible');
+      chime();
+    }
+  }, 1000);
+}
+function pauseTimer() {
+  clearInterval(timerInterval); timerRunning = false;
+  document.getElementById('btn-start').textContent = '继续';
+  document.getElementById('timer-state-label').textContent = '已暂停';
+}
+function resetTimer(durationMin) {
+  clearInterval(timerInterval); timerRunning = false;
+  timerSecondsLeft = durationMin * 60; timerTotalSeconds = timerSecondsLeft;
+  document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
+  document.getElementById('btn-start').textContent = '开始';
+  document.getElementById('btn-reset').style.display = 'none';
+  document.getElementById('timer-state-label').textContent = '就绪';
+  document.getElementById('timer-done-banner').classList.remove('visible');
+  updateRing(timerSecondsLeft, timerTotalSeconds);
+}
+
+function updateHeader() {
+  const count = getCompletedParts().length;
+  document.getElementById('progress-count').textContent = `${count} / 24`;
+  document.getElementById('progress-bar').style.width = `${(count / 24) * 100}%`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('exercises-grid');
+  const completed = getCompletedParts();
+  grid.innerHTML = EXERCISES.map(ex => {
+    const done = completed.includes(ex.part);
+    const data = getExData(ex.part);
+    const sessionCount = data.sessions.length;
+    return `
+      <div class="exercise-card ${done ? 'completed' : ''}" data-part="${ex.part}">
+        <div class="card-part">第 <span>${String(ex.part).padStart(2,'0')}</span> 部分</div>
+        <div class="card-title">${ex.title}</div>
+        <div class="card-theme">${ex.theme}</div>
+        <div class="card-footer">
+          <span class="card-duration">${ex.defaultDuration} 分钟</span>
+          <span class="card-sessions">${sessionCount > 0 ? `${sessionCount} 次练习` : ''}</span>
+          <span class="card-status ${done ? 'done' : 'pending'}">${done ? '✓ 完成' : '开始'}</span>
+        </div>
+      </div>`;
+  }).join('');
+  grid.querySelectorAll('.exercise-card').forEach(card => {
+    card.addEventListener('click', () => openExercise(parseInt(card.dataset.part)));
+  });
+}
+
+let currentPart = null;
+
+function openExercise(part) {
+  currentPart = part;
+  const ex = EXERCISES[part - 1];
+  const data = getExData(part);
+  clearInterval(timerInterval); timerRunning = false; selectedDuration = ex.defaultDuration;
+  document.getElementById('ex-eyebrow').textContent = `第 ${part} / 24 部分`;
+  document.getElementById('ex-title').textContent = ex.title;
+  document.getElementById('ex-theme').textContent = ex.theme;
+  document.getElementById('ex-lesson').textContent = ex.lesson;
+  document.getElementById('ex-affirmation').textContent = `「${ex.affirmation}」`;
+  document.getElementById('ex-insight').textContent = ex.insight;
+  document.getElementById('journal-textarea').value = data.note || '';
+  populateJourneySection(part);
+
+  const intentionInput = document.getElementById('intention-input');
+  const intentionCallback = document.getElementById('intention-callback');
+  const sessions = data.sessions || [];
+  const lastSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+  const lastIntention = lastSession?.intention ?? '';
+  intentionInput.value = lastIntention;
+  if (lastIntention) {
+    const lastDate = new Date(lastSession.ts).toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+    intentionCallback.textContent = '';
+    const prefix = document.createTextNode(`上次练习（${lastDate}）：`);
+    const bold = document.createElement('strong');
+    bold.textContent = lastIntention;
+    intentionCallback.appendChild(prefix);
+    intentionCallback.appendChild(bold);
+    intentionCallback.classList.add('visible');
+  } else {
+    intentionCallback.classList.remove('visible');
+    intentionCallback.textContent = '';
+  }
+
+  document.getElementById('ex-steps').innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
+
+  const durations = [10, 15, 20, 25, 30];
+  document.getElementById('dur-row').innerHTML = durations.map(d =>
+    `<button class="dur-btn ${d === selectedDuration ? 'active' : ''}" data-dur="${d}">${d} 分</button>`
+  ).join('');
+  document.getElementById('dur-row').querySelectorAll('.dur-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedDuration = parseInt(btn.dataset.dur);
+      document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      resetTimer(selectedDuration);
+    });
+  });
+
+  resetTimer(selectedDuration);
+  document.getElementById('btn-start').onclick = () => { if (timerRunning) pauseTimer(); else startTimer(selectedDuration); };
+  document.getElementById('btn-reset').onclick = () => resetTimer(selectedDuration);
+  renderSessions(part);
+
+  document.getElementById('btn-mark-complete').onclick = () => {
+    saveSession(part, selectedDuration);
+    renderSessions(part); renderGrid(); updateHeader();
+    const banner = document.getElementById('mark-banner');
+    banner.textContent = `练习已记录——${new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    banner.style.display = 'block';
+    banner.style.color = 'var(--green)';
+    banner.style.background = 'rgba(76,175,122,0.1)';
+    banner.style.border = '1px solid rgba(76,175,122,0.3)';
+    setTimeout(() => { banner.style.display = 'none'; }, 4000);
+  };
+
+  stopVoice(); clearVoiceError(); setVoiceState('idle');
+  document.getElementById('voice-btn').onclick = () => speakExercise(ex);
+
+  document.getElementById('btn-save-note').onclick = () => {
+    saveNote(part, document.getElementById('journal-textarea').value);
+    const fb = document.getElementById('save-note-feedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+  };
+
+  const prevBtn = document.getElementById('btn-prev');
+  const nextBtn = document.getElementById('btn-next');
+  if (part > 1) {
+    const prev = EXERCISES[part - 2];
+    prevBtn.disabled = false;
+    document.getElementById('prev-part').textContent = `第 ${prev.part} 部分`;
+    document.getElementById('prev-title').textContent = prev.title;
+    prevBtn.onclick = () => openExercise(prev.part);
+  } else {
+    prevBtn.disabled = true;
+    document.getElementById('prev-part').textContent = '';
+    document.getElementById('prev-title').textContent = '';
+  }
+  if (part < 24) {
+    const next = EXERCISES[part];
+    nextBtn.disabled = false;
+    document.getElementById('next-part').textContent = `第 ${next.part} 部分`;
+    document.getElementById('next-title').textContent = next.title;
+    nextBtn.onclick = () => openExercise(next.part);
+  } else {
+    nextBtn.disabled = true;
+    document.getElementById('next-part').textContent = '';
+    document.getElementById('next-title').textContent = '';
+  }
+  showView('exercise');
+}
+
+function renderSessions(part) {
+  const data = getExData(part);
+  const log = document.getElementById('sessions-log');
+  log.innerHTML = '';
+  if (!data.sessions || data.sessions.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'no-sessions';
+    empty.textContent = '暂无练习记录。';
+    log.appendChild(empty);
+    return;
+  }
+  [...data.sessions].reverse().forEach(s => {
+    const ts = Number(s.ts), dur = parseInt(s.duration, 10);
+    if (!ts || !dur) return;
+    const dateStr = new Date(ts).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' });
+    const row = document.createElement('div'); row.className = 'session-item';
+    const dot = document.createElement('div'); dot.className = 'session-dot';
+    const date = document.createElement('span'); date.className = 'session-date'; date.textContent = dateStr;
+    const duration = document.createElement('span'); duration.className = 'session-duration'; duration.textContent = `${dur} 分钟`;
+    row.appendChild(dot); row.appendChild(date); row.appendChild(duration);
+    if (s.intention) {
+      const intent = document.createElement('span');
+      intent.className = 'session-intention';
+      intent.textContent = `「${s.intention}」`;
+      row.appendChild(intent);
+    }
+    log.appendChild(row);
+  });
+}
+
+document.getElementById('back-btn').addEventListener('click', () => {
+  clearInterval(timerInterval); timerRunning = false; stopVoice(); goToList();
+});
+
+let voiceAudio = null, voicePlaying = false;
+
+// ── Audio cache (IndexedDB) ───────────────────
+function audioHash(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) { h = Math.imul(h << 5 + h, 1) ^ str.charCodeAt(i); }
+  return (h >>> 0).toString(36);
+}
+function openAudioDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mks_zh_audio_v1', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('narrations', { keyPath: 'key' });
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+async function getCachedAudio(key) {
+  try {
+    const db = await openAudioDB();
+    return new Promise(resolve => {
+      const req = db.transaction('narrations', 'readonly').objectStore('narrations').get(key);
+      req.onsuccess = () => {
+        const r = req.result;
+        resolve(r && Date.now() - r.ts < 30 * 864e5 ? r.data : null);
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch { return null; }
+}
+async function setCachedAudio(key, buffer) {
+  try {
+    const db = await openAudioDB();
+    return new Promise(resolve => {
+      const tx = db.transaction('narrations', 'readwrite');
+      tx.objectStore('narrations').put({ key, data: buffer, ts: Date.now() });
+      tx.oncomplete = resolve; tx.onerror = resolve;
+    });
+  } catch {}
+}
+
+function buildNarrationSegments(ex, intention, previousIntention) {
+  const profile = loadProfile();
+  const goal = profile.goal || '';
+  const name = profile.name || '';
+  const segments = [];
+
+  // A — 标题 + 主题 (stable per exercise)
+  segments.push({ key: `zh-a-${ex.part}`, text: `${ex.title}。${ex.theme}。` });
+
+  // B — 目标开场 (varies by part + goal + name)
+  if (goal) {
+    const greeting = name ? `${name}，你` : '你';
+    const p = PART_PERSONALIZATION[ex.part - 1];
+    const gk = audioHash(`${ex.part}|${goal}|${name}`);
+    segments.push({ key: `zh-b-${gk}`, text: `${greeting}此刻在这里，为${goal}而努力。\n${applyGoalText(p.bridge, goal)}` });
+  }
+
+  // C — 课程 (stable per exercise)
+  segments.push({ key: `zh-c-${ex.part}`, text: ex.lesson });
+
+  // D — 意图介绍 (varies by intention + previousIntention only)
+  if ((previousIntention && previousIntention !== intention) || intention) {
+    const lines = [];
+    if (previousIntention && previousIntention !== intention) {
+      lines.push(`上次，你带着这个意图而来：${previousIntention}。今天你带来了新的意图。`);
+    }
+    if (intention) {
+      lines.push(`本次练习的意图：${intention}。\n清晰地持守它，让我们开始。`);
+    }
+    segments.push({ key: `zh-d-${audioHash(`${intention}|${previousIntention}`)}`, text: lines.join('\n\n') });
+  }
+
+  // E — 步骤 (stable per exercise)
+  segments.push({ key: `zh-e-${ex.part}`, text: `让我们开始。\n\n${ex.steps.join('\n\n')}` });
+
+  // F — 肯定语 (varies by part + goal)
+  if (goal) {
+    const p = PART_PERSONALIZATION[ex.part - 1];
+    segments.push({ key: `zh-f-${audioHash(`${ex.part}|${goal}`)}`, text: `铭记于心：${applyGoalText(p.affirmation, goal)}` });
+  } else {
+    segments.push({ key: `zh-f-${ex.part}`, text: `铭记于心：${ex.affirmation}` });
+  }
+
+  // G — 结束意图 (varies by intention only)
+  if (intention) {
+    segments.push({ key: `zh-g-${audioHash(intention)}`, text: `现在回到你的意图：${intention}。在你结束本次练习时，将它带走。` });
+  }
+
+  return segments;
+}
+
+function setVoiceState(state) {
+  const btn = document.getElementById('voice-btn');
+  const label = document.getElementById('voice-btn-label');
+  const wave = document.getElementById('voice-wave');
+  const iconPlay = document.getElementById('voice-icon-play');
+  const iconStop = document.getElementById('voice-icon-stop');
+  const iconLoad = document.getElementById('voice-icon-load');
+  iconPlay.style.display = 'none'; iconStop.style.display = 'none'; iconLoad.style.display = 'none';
+  wave.classList.remove('visible'); btn.classList.remove('playing'); btn.disabled = false;
+  if (state === 'idle') { iconPlay.style.display = 'block'; label.textContent = '朗读'; }
+  else if (state === 'loading') { iconLoad.style.display = 'block'; label.textContent = '加载中…'; btn.disabled = true; }
+  else if (state === 'playing') { iconStop.style.display = 'block'; label.textContent = '停止'; wave.classList.add('visible'); btn.classList.add('playing'); }
+}
+function showVoiceError(msg) { const el = document.getElementById('voice-error'); el.textContent = msg; el.classList.add('visible'); }
+function clearVoiceError() { document.getElementById('voice-error').classList.remove('visible'); }
+function stopVoice() {
+  if (voiceAudio) { voiceAudio.pause(); voiceAudio.src = ''; voiceAudio = null; }
+  voicePlaying = false; setVoiceState('idle');
+}
+async function speakExercise(ex) {
+  if (voicePlaying) { stopVoice(); return; }
+  clearVoiceError(); setVoiceState('loading');
+  const intention = (document.getElementById('intention-input')?.value ?? '').trim();
+  const data = getExData(currentPart);
+  const sessions = data.sessions || [];
+  const prevSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+  const previousIntention = prevSession?.intention ?? '';
+  try {
+    const segments = buildNarrationSegments(ex, intention, previousIntention);
+    const cached = await Promise.all(segments.map(s => getCachedAudio(s.key)));
+    const buffers = [];
+    for (let i = 0; i < segments.length; i++) {
+      if (cached[i]) {
+        buffers.push(cached[i]);
+      } else {
+        const res = await fetch('/api/speak-zh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: segments[i].text }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: res.statusText }));
+          throw new Error(err.error || `错误 ${res.status}`);
+        }
+        const buf = await res.arrayBuffer();
+        setCachedAudio(segments[i].key, buf);
+        buffers.push(buf);
+      }
+    }
+    voicePlaying = true; setVoiceState('playing');
+    let idx = 0;
+    function playNext() {
+      if (idx >= buffers.length || !voicePlaying) { voicePlaying = false; setVoiceState('idle'); return; }
+      const url = URL.createObjectURL(new Blob([buffers[idx]], { type: 'audio/wav' }));
+      voiceAudio = new Audio(url);
+      voiceAudio.playbackRate = 0.85;
+      voiceAudio.addEventListener('ended', () => { URL.revokeObjectURL(url); idx++; playNext(); });
+      voiceAudio.addEventListener('error', () => { URL.revokeObjectURL(url); showVoiceError('播放错误，请重试。'); voicePlaying = false; setVoiceState('idle'); });
+      voiceAudio.play().catch(() => { showVoiceError('播放错误，请重试。'); voicePlaying = false; setVoiceState('idle'); });
+    }
+    playNext();
+  } catch (err) {
+    voicePlaying = false; setVoiceState('idle');
+    showVoiceError(`语音错误：${err.message}`);
+  }
+}
+
+function showView(name) {
+  ['list','exercise'].forEach(v => {
+    document.getElementById(`view-${v}`).classList.toggle('active', v === name);
+  });
+  window.scrollTo(0, 0);
+}
+function goToList() { renderGrid(); updateHeader(); renderGoalUI(); showView('list'); }
+
+document.getElementById('header-logo').addEventListener('click', () => {
+  stopVoice(); clearInterval(timerInterval); timerRunning = false; goToList();
+});
+
+function showToast(msg, durationMs = 3500) {
+  let toast = document.getElementById('mks-toast');
+  if (!toast) { toast = document.createElement('div'); toast.id = 'mks-toast'; toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = msg; toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), durationMs);
+}
+
+(function handlePartParam() {
+  const params = new URLSearchParams(location.search);
+  const part = parseInt(params.get('part'));
+  if (part >= 1 && part <= 24) { history.replaceState(null, '', location.pathname); openExercise(part); }
+  else { renderGrid(); updateHeader(); renderGoalUI(); }
+})();
+</script>
+</body>
+</html>
