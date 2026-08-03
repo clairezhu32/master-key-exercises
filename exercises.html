@@ -2787,7 +2787,7 @@ async function speakExercise(ex) {
       if (idx >= buffers.length || !voicePlaying) { voicePlaying = false; setVoiceState('idle'); return; }
       const url = URL.createObjectURL(new Blob([buffers[idx]], { type: 'audio/wav' }));
       voiceAudio = new Audio(url);
-      voiceAudio.playbackRate = 0.75;
+      voiceAudio.playbackRate = 0.85;
       voiceAudio.addEventListener('ended', () => { URL.revokeObjectURL(url); idx++; playNext(); });
       voiceAudio.addEventListener('error', () => { URL.revokeObjectURL(url); showVoiceError('Playback error. Try again.'); voicePlaying = false; setVoiceState('idle'); });
       voiceAudio.play().catch(() => { showVoiceError('Playback error. Try again.'); voicePlaying = false; setVoiceState('idle'); });
