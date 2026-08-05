@@ -37,13 +37,15 @@
     .step-num { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
     .step-q { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; line-height: 1.25; color: var(--gold-light); margin-bottom: 10px; }
     .step-hint { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
-    textarea, input[type=text] {
+    textarea, input[type=text], select {
       width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
       color: var(--text); font-family: 'Inter', sans-serif; font-size: 16px;
       padding: 16px 18px; resize: none; outline: none; transition: border-color 0.2s;
     }
-    textarea:focus, input[type=text]:focus { border-color: var(--gold); }
+    textarea:focus, input[type=text]:focus, select:focus { border-color: var(--gold); }
     textarea { min-height: 120px; }
+    .start-week-field { margin-top: 24px; }
+    .start-week-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
     .hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .hours-btn {
       background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -371,6 +373,23 @@
           <button class="hours-btn" data-hours="5-10">5–10 hours</button>
           <button class="hours-btn" data-hours="10+">10+ hours</button>
         </div>
+        <div class="start-week-field">
+          <div class="start-week-label">Already partway through the course? Set which week this plan should start counting from.</div>
+          <select id="input-start-week">
+            <option value="1" selected>Week 1 — starting fresh</option>
+            <option value="2">Week 2</option>
+            <option value="3">Week 3</option>
+            <option value="4">Week 4</option>
+            <option value="5">Week 5</option>
+            <option value="6">Week 6</option>
+            <option value="7">Week 7</option>
+            <option value="8">Week 8</option>
+            <option value="9">Week 9</option>
+            <option value="10">Week 10</option>
+            <option value="11">Week 11</option>
+            <option value="12">Week 12</option>
+          </select>
+        </div>
       </div>
       <div class="step-nav">
         <button class="btn-back" onclick="goStep(4)">← Back</button>
@@ -655,13 +674,17 @@ document.querySelectorAll('.hours-btn').forEach(btn => {
 let lastGoalData = null;
 
 function collectGoalData() {
+  // Backdate createdAt so getCurrentWeek() immediately reflects the chosen
+  // starting week, for users who are already partway through the course.
+  const startWeek = parseInt(document.getElementById('input-start-week').value, 10) || 1;
+  const createdAt = Date.now() - (startWeek - 1) * 7 * 24 * 60 * 60 * 1000;
   return {
     goal: document.getElementById('input-goal').value.trim(),
     why: document.getElementById('input-why').value.trim(),
     vision: document.getElementById('input-vision').value.trim(),
     obstacle: document.getElementById('input-obstacle').value.trim(),
     hours: selectedHours,
-    createdAt: Date.now(),
+    createdAt,
   };
 }
 

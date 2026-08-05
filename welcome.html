@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome — The Master Key System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f1f;
+      --surface:   #161a33;
+      --card:      #1c2140;
+      --border:    #2b2f57;
+      --gold:      #c9a84c;
+      --gold-dim:  #8a6f2e;
+      --text:      #e6e3f2;
+      --text-dim:  #9a97b5;
+      --text-faint:#423f5c;
+      --radius:    12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text);
+      letter-spacing: 0.03em;
+    }
+    .header-subtitle {
+      font-size: 0.68rem;
+      color: var(--text-faint);
+      letter-spacing: 0.12em;
+      margin-top: 2px;
+    }
+    .header-nav { display: flex; align-items: center; gap: 20px; }
+    .header-nav-link {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .header-nav-link:hover { color: var(--text); }
+
+    /* ── Welcome flow ─────────────────────────── */
+    .welcome-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 72px 24px 80px;
+    }
+    .welcome-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .welcome-wrap h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .welcome-sub {
+      font-size: 0.92rem;
+      color: var(--text-dim);
+      text-align: center;
+      max-width: 400px;
+      margin: 0 auto 44px;
+      line-height: 1.7;
+    }
+
+    .welcome-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .field { margin-bottom: 22px; }
+    .field:last-of-type { margin-bottom: 0; }
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .field label span { color: var(--text-faint); font-size: 0.78rem; }
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      padding: 13px 16px;
+      outline: none;
+      resize: none;
+      transition: border-color 0.2s;
+    }
+    .field input:focus,
+    .field textarea:focus { border-color: var(--gold); }
+    .field textarea { min-height: 92px; }
+
+    .welcome-continue-btn {
+      width: 100%;
+      margin-top: 28px;
+      padding: 15px;
+      background: var(--gold);
+      color: #0e0d0b;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .welcome-continue-btn:hover:not(:disabled) { background: #d4b45e; }
+    .welcome-continue-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .welcome-skip {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: var(--text-faint);
+      text-decoration: none;
+    }
+    .welcome-skip:hover { color: var(--text-dim); }
+
+    /* ── Choice screen ────────────────────────── */
+    #view-form, #view-choice { display: none; }
+    #view-form.active, #view-choice.active { display: block; }
+
+    .choice-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .choice-card {
+      display: block;
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px 28px;
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .choice-card:hover { border-color: var(--gold-dim); transform: translateY(-1px); }
+    .choice-card .choice-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 10px;
+    }
+    .choice-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .choice-card p {
+      font-size: 0.86rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+    .choice-card.primary { border-color: rgba(201,168,76,0.4); }
+
+    @media (max-width: 560px) {
+      .header { padding: 16px; }
+      .welcome-wrap { padding: 48px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" style="text-decoration:none">
+    <div class="header-title">The Master Key System</div>
+    <div class="header-subtitle">Charles F. Haanel · 1919</div>
+  </a>
+  <div class="header-nav">
+    <a class="header-nav-link" href="index.html">Introduction</a>
+    <a class="header-nav-link" href="/exercises">Exercises</a>
+    <a class="header-nav-link" href="/goals">Master Plan</a>
+  </div>
+</header>
+
+<div class="welcome-wrap">
+
+  <div id="view-form" class="active">
+    <div class="welcome-eyebrow">Before you begin</div>
+    <h1>Let's set up your practice</h1>
+    <p class="welcome-sub">A minute of setup so every exercise speaks to what you're actually working toward — not generic advice.</p>
+
+    <div class="welcome-card">
+      <div class="field">
+        <label for="welcome-name-input">Your name <span>(optional)</span></label>
+        <input type="text" id="welcome-name-input" placeholder="How should we address you?" maxlength="60">
+      </div>
+      <div class="field">
+        <label for="welcome-goal-input">What do you want to create or achieve? <span>*</span></label>
+        <textarea id="welcome-goal-input" placeholder="e.g. Start my own business, get promoted to senior engineer, write my first book…" maxlength="200"></textarea>
+      </div>
+      <button class="welcome-continue-btn" id="welcome-continue-btn" disabled>Continue</button>
+    </div>
+    <a class="welcome-skip" href="/exercises">Skip setup and go straight to the exercises →</a>
+  </div>
+
+  <div id="view-choice">
+    <div class="welcome-eyebrow">You're all set</div>
+    <h1>What would you like to do first?</h1>
+    <p class="welcome-sub">You can always switch between these — nothing here is a one-way door.</p>
+
+    <div class="choice-row">
+      <a class="choice-card primary" href="/exercises">
+        <div class="choice-label">Start now · Free</div>
+        <h3>Practice the Exercises</h3>
+        <p>Begin Part 1 of the 24-part course. Every exercise's narration and affirmations are now shaped around your goal.</p>
+      </a>
+      <a class="choice-card" href="/goals">
+        <div class="choice-label">$19.99/month</div>
+        <h3>Build my 90-Day Master Plan</h3>
+        <p>Answer a few more questions and an AI strategist turns your goal into a concrete 90-day plan with milestones you can track.</p>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PROFILE_KEY = 'mks_profile_v1';
+
+function loadProfile() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveProfile(profile) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+}
+
+function show(view) {
+  ['view-form', 'view-choice'].forEach(v => {
+    document.getElementById(v).classList.toggle('active', v === view);
+  });
+}
+
+const nameInput = document.getElementById('welcome-name-input');
+const goalInput = document.getElementById('welcome-goal-input');
+const continueBtn = document.getElementById('welcome-continue-btn');
+
+// Pre-fill for anyone returning to this page with a profile already saved.
+const existing = loadProfile();
+nameInput.value = existing.name || '';
+goalInput.value = existing.goal || '';
+continueBtn.disabled = !(existing.goal || '').trim();
+
+goalInput.addEventListener('input', (e) => {
+  continueBtn.disabled = !e.target.value.trim();
+});
+
+continueBtn.addEventListener('click', () => {
+  const name = nameInput.value.trim();
+  const goal = goalInput.value.trim();
+  if (!goal) return;
+  saveProfile({ name, goal });
+  show('view-choice');
+});
+</script>
+
+</body>
+</html>
