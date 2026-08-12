@@ -512,13 +512,26 @@
 
 <script>
 // ── Storage ────────────────────────────────────
-const GOAL_KEY = 'mks_goal_v1';
+const GOAL_KEY = 'mks_goal_v1'; // pre-generation draft only — unscoped so it survives the sign-in redirect
 const PLAN_KEY = 'mks_goal_plan_v1';
 
 function saveGoal(data) { localStorage.setItem(GOAL_KEY, JSON.stringify(data)); }
 function loadGoal() { try { return JSON.parse(localStorage.getItem(GOAL_KEY)); } catch { return null; } }
-function savePlan(data) { localStorage.setItem(PLAN_KEY, JSON.stringify(data)); }
-function loadPlan() { try { return JSON.parse(localStorage.getItem(PLAN_KEY)); } catch { return null; } }
+
+// The generated plan is tagged with the id of the user who generated it, so
+// a different (or signed-out) visitor on the same browser never inherits
+// someone else's plan — loadPlan() only ever returns the current user's own.
+function savePlan(goalData, planJson) {
+  if (!currentUser) return;
+  localStorage.setItem(PLAN_KEY, JSON.stringify({ ...planJson, goal: goalData, ownerId: currentUser.id }));
+}
+function loadPlan() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(PLAN_KEY));
+    if (!stored || !currentUser || stored.ownerId !== currentUser.id) return null;
+    return stored;
+  } catch { return null; }
+}
 
 function todayKey() { return `mks_goal_actions_${new Date().toISOString().split('T')[0]}`; }
 function getCompletedToday() { return new Set(JSON.parse(localStorage.getItem(todayKey()) || '[]')); }
@@ -606,15 +619,34 @@ async function refreshSubscriptionBadge() {
   statusEl.textContent = (await checkSubscriptionStatus()) ? '✓ Subscribed' : 'Not subscribed';
 }
 
+// True once the very first auth event (the resolved persisted session, or
+// its absence) has been handled — guards performInitialRouting() so it
+// drives the initial view exactly once, never on later sign-in/out events.
+let didInitialRoute = false;
+
+async function performInitialRouting() {
+  if (didInitialRoute) return;
+  didInitialRoute = true;
+  const resumed = await tryResumeGeneration();
+  if (!resumed) routeInitialView();
+}
+
 sb.auth.onAuthStateChange(async (event, session) => {
   const wasSignedIn = !!currentUser;
   currentUser = session?.user ?? null;
   updateAuthUI();
   refreshSubscriptionBadge();
   if (currentUser && !wasSignedIn) {
+    // A live sign-in mid-session (e.g. from the paywall gate): resume
+    // whatever draft brought them here, independent of initial routing.
     closeAuthModal();
     await tryResumeGeneration();
   }
+  // Route the initial view only once, after currentUser is actually known —
+  // otherwise loadPlan()'s owner check always sees no one signed in yet,
+  // which used to make a new sign-in flash straight to whatever plan was
+  // last generated on this browser, regardless of who generated it.
+  await performInitialRouting();
 });
 
 document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
@@ -733,7 +765,7 @@ async function generatePlan(goalData) {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
-    savePlan({ ...json.plan, generatedAt: Date.now() });
+    savePlan(data, { ...json.plan, generatedAt: Date.now() });
     renderDashboard();
     show('view-dashboard');
   } catch (err) {
@@ -793,9 +825,7 @@ async function pollForActiveSubscription(maxTries = 6, delayMs = 1500) {
 }
 
 function routeInitialView() {
-  const existingPlan = loadPlan();
-  const existingGoal = loadGoal();
-  if (existingPlan && existingGoal) {
+  if (loadPlan()) {
     renderDashboard();
     show('view-dashboard');
   } else {
@@ -1060,9 +1090,9 @@ function renderFunnel(plan) {
 }
 
 function renderDashboard() {
-  const goal = loadGoal();
   const plan = loadPlan();
-  if (!goal || !plan) return;
+  if (!plan) return;
+  const goal = plan.goal;
 
   const weekNum = getCurrentWeek(goal.createdAt);
   const weekData = plan.weeks?.[weekNum - 1];
@@ -1149,7 +1179,7 @@ function renderActions(actions) {
       if (c.has(idx)) c.delete(idx); else c.add(idx);
       setCompletedToday(c);
       const plan = loadPlan();
-      const goal = loadGoal();
+      const goal = plan.goal;
       const weekNum = getCurrentWeek(goal.createdAt);
       renderActions(plan.weeks?.[weekNum - 1]?.actions || []);
       document.getElementById('d-streak').textContent = getStreak();
@@ -1182,10 +1212,18 @@ async function init() {
   if (checkoutStatus) window.history.replaceState({}, '', window.location.pathname);
 
   if (checkoutStatus === 'success') {
+    // handleCheckoutSuccess() drives its own view transitions once the
+    // subscription confirms — suppress the auth listener's one-time
+    // routing so it can't yank the user off the pending screen first.
+    didInitialRoute = true;
     await handleCheckoutSuccess();
     return;
   }
-  routeInitialView();
+  // Otherwise, the sb.auth.onAuthStateChange listener above fires once with
+  // the resolved session shortly after subscribing and calls
+  // performInitialRouting() from there — waiting for that (rather than
+  // routing here immediately) is what makes loadPlan()'s owner check see
+  // the correct currentUser on the very first render.
 }
 init();
 </script>
