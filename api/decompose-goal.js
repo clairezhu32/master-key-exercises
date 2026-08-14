@@ -1,3 +1,11 @@
+// A full 12-week, 7-stage funnel plan (maxOutputTokens: 8000) routinely takes
+// Gemini well past Vercel's old unconfigured default duration — without this,
+// the function gets killed mid-generation and the request just hangs from
+// the browser's perspective until it times out on its own.
+export const config = {
+  maxDuration: 60,
+};
+
 const rateLimitMap = new Map();
 const RATE_WINDOW_MS = 3_600_000;
 const RATE_MAX = 10;
@@ -286,6 +294,7 @@ async function callGemini(goalData) {
     throw err;
   }
 
+  const geminiStart = Date.now();
   const res = await fetch(GEMINI_API_URL, {
     method: 'POST',
     headers: {
@@ -302,6 +311,7 @@ async function callGemini(goalData) {
       },
     }),
   });
+  console.log(`Gemini responded in ${Date.now() - geminiStart}ms with status ${res.status}`);
 
   if (!res.ok) {
     const detail = await res.text().catch(() => '');
@@ -343,6 +353,7 @@ async function callGemini(goalData) {
 }
 
 export default async function handler(req, res) {
+  const requestStart = Date.now();
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
@@ -393,10 +404,12 @@ export default async function handler(req, res) {
 
   try {
     const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity });
+    console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     return res.status(200).json({ plan: { ...plan, intensity } });
   } catch (err) {
     await releaseGeneration(user.id, serviceRoleKey);
     const status = err.status || 500;
+    console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);
     return res.status(status).json({ error: err.message || 'Failed to generate plan' });
   }
 }
