@@ -44,14 +44,34 @@ async function getUserFromToken(authHeader, serviceRoleKey) {
   return res.json();
 }
 
-async function hasActiveSubscription(userId, serviceRoleKey) {
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/mks_subscriptions?user_id=eq.${userId}&select=status`,
-    { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
-  );
-  if (!res.ok) return false;
-  const rows = await res.json();
-  return rows[0]?.status === 'active';
+// Free tier: one plan per account. Claiming inserts the row *before* the
+// (paid) Gemini call — the unique constraint on mks_goal_generations means a
+// concurrent duplicate request loses the race here rather than both
+// requests spending an API call. Insert failing for any other reason (e.g.
+// a transient network error) is treated the same as "already used" here;
+// the caller can't distinguish, but that only costs the caller one retry.
+async function claimGeneration(userId, email, serviceRoleKey) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations`, {
+    method: 'POST',
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ user_id: userId, email }),
+  });
+  return res.status === 201;
+}
+
+// Best-effort: give back the free generation if the Gemini call that was
+// supposed to use it failed, so the user isn't permanently locked out by a
+// transient AI-provider error.
+async function releaseGeneration(userId, serviceRoleKey) {
+  await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
+    method: 'DELETE',
+    headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
+  }).catch(() => {});
 }
 
 const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing', 'core_prep', 'funnel_metrics', 'close'];
@@ -353,11 +373,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Sign in required' });
   }
 
-  const subscribed = await hasActiveSubscription(user.id, serviceRoleKey);
-  if (!subscribed) {
-    return res.status(402).json({ error: 'An active subscription is required to generate a plan' });
-  }
-
   let body;
   try {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
@@ -371,10 +386,16 @@ export default async function handler(req, res) {
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
   const intensity = hoursNum <= 2 ? 'light' : hoursNum <= 5 ? 'moderate' : 'intensive';
 
+  const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
+  if (!claimed) {
+    return res.status(403).json({ error: 'This account has already generated its one free plan' });
+  }
+
   try {
     const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity });
     return res.status(200).json({ plan: { ...plan, intensity } });
   } catch (err) {
+    await releaseGeneration(user.id, serviceRoleKey);
     const status = err.status || 500;
     return res.status(status).json({ error: err.message || 'Failed to generate plan' });
   }

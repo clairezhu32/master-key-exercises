@@ -38,7 +38,10 @@ CREATE POLICY "users insert own unlock"
   ON mks_unlocks FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- 3. Subscription status for /goals access (synced from Stripe via webhook)
+-- 3. [DEPRECATED] Subscription status for /goals access, synced from Stripe via
+-- webhook. /goals no longer gates on this table (see mks_goal_generations below) —
+-- left in place only because it holds historical rows; not read or written by
+-- any current code path.
 CREATE TABLE IF NOT EXISTS mks_subscriptions (
   id                      uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id                 uuid        REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
@@ -51,9 +54,24 @@ CREATE TABLE IF NOT EXISTS mks_subscriptions (
 
 ALTER TABLE mks_subscriptions ENABLE ROW LEVEL SECURITY;
 
--- Subscriptions: users can read their own row. No insert/update/delete policy for
--- anon/authenticated — only the service-role key (used by the Stripe webhook and
--- decompose-goal.js) writes this table, so client-side code can never self-grant access.
 CREATE POLICY "users read own subscription"
   ON mks_subscriptions FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- 4. Goal plan generation on /goals is free, limited to one per account.
+-- Uniqueness on both user_id and email means deleting and recreating an
+-- account with the same email doesn't grant a second free generation.
+CREATE TABLE IF NOT EXISTS mks_goal_generations (
+  id            uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id       uuid        REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  email         text        NOT NULL UNIQUE,
+  generated_at  timestamptz DEFAULT now() NOT NULL
+);
+
+ALTER TABLE mks_goal_generations ENABLE ROW LEVEL SECURITY;
+
+-- Only the service role (decompose-goal.js) writes this table, so client-side
+-- code can never self-grant another free generation.
+CREATE POLICY "users read own generation record"
+  ON mks_goal_generations FOR SELECT
   USING (auth.uid() = user_id);

@@ -251,26 +251,6 @@
     .google-btn:hover { background: #f0f0f0; }
     .google-btn:active { transform: scale(0.98); }
     .google-btn:disabled { opacity: 0.6; cursor: default; }
-
-    /* ── Paywall ── */
-    #view-paywall { display: none; padding: 52px 0; }
-    #view-paywall.active { display: block; }
-    .paywall-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 36px 32px; text-align: center; }
-    .paywall-eyebrow { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
-    .paywall-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 400; color: var(--gold-light); line-height: 1.25; margin-bottom: 14px; }
-    .paywall-sub { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
-    .paywall-price { font-family: 'Cormorant Garamond', serif; font-size: 44px; color: var(--text); margin-bottom: 4px; }
-    .paywall-price span { font-size: 15px; color: var(--muted); font-family: 'Inter', sans-serif; }
-    .paywall-note { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
-    .btn-subscribe {
-      width: 100%; background: var(--gold); color: var(--bg); font-family: 'Inter', sans-serif;
-      font-size: 15px; font-weight: 600; border: none; border-radius: 10px; padding: 15px 32px;
-      cursor: pointer; transition: opacity 0.2s;
-    }
-    .btn-subscribe:hover { opacity: 0.88; }
-    .btn-subscribe:disabled { opacity: 0.5; cursor: default; }
-    .paywall-error { margin-top: 14px; font-size: 13px; color: #e88; }
-    .paywall-pending { text-align: center; padding: 52px 0; color: var(--muted); font-size: 14px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
 </head>
@@ -469,28 +449,6 @@
     <a class="reset-link" onclick="confirmReset()">Start over with a new goal</a>
   </div>
 
-  <!-- ── Paywall ── -->
-  <div id="view-paywall">
-    <div class="paywall-card">
-      <div class="paywall-eyebrow">Your Strategic Funnel</div>
-      <div class="paywall-title">Subscribe to generate<br>your plan</div>
-      <p class="paywall-sub">Every plan is built fresh for your specific goal by an AI strategist — targets, outreach scripts, gap-closing resources, and a funnel to track and iterate on. That takes real computation per plan, which is why this part of Master Key is a subscription.</p>
-      <div class="paywall-price">$19.99<span>/month</span></div>
-      <div class="paywall-note">Cancel anytime. Have a promo code? You'll get a chance to enter it at checkout.</div>
-      <button class="btn-subscribe" id="paywall-subscribe-btn">Subscribe →</button>
-      <div class="paywall-error" id="paywall-error"></div>
-    </div>
-  </div>
-
-  <!-- ── Checkout pending ── -->
-  <div id="view-checkout-pending">
-    <div class="paywall-pending">
-      <div class="spinner" id="checkout-pending-spinner" style="margin: 0 auto 20px;"></div>
-      <div id="checkout-pending-text">Confirming your subscription…</div>
-      <button class="btn-retry" id="checkout-retry-btn" style="display:none; margin-top:16px;">Check again</button>
-    </div>
-  </div>
-
 </div>
 
 <!-- ── Auth Modal ───────────────────────────── -->
@@ -605,18 +563,18 @@ async function handleSignOut() {
   show('view-onboard');
 }
 
-async function checkSubscriptionStatus() {
+async function hasGeneratedPlan() {
   if (!currentUser) return false;
-  const { data, error } = await sb.from('mks_subscriptions').select('status').eq('user_id', currentUser.id).maybeSingle();
+  const { data, error } = await sb.from('mks_goal_generations').select('id').eq('user_id', currentUser.id).maybeSingle();
   if (error) return false;
-  return data?.status === 'active';
+  return !!data;
 }
 
-async function refreshSubscriptionBadge() {
+async function refreshGenerationBadge() {
   const statusEl = document.getElementById('auth-dropdown-status');
   if (!statusEl) return;
   if (!currentUser) { statusEl.textContent = ''; return; }
-  statusEl.textContent = (await checkSubscriptionStatus()) ? '✓ Subscribed' : 'Not subscribed';
+  statusEl.textContent = (await hasGeneratedPlan()) ? 'Free plan used' : 'Free plan available';
 }
 
 // True once the very first auth event (the resolved persisted session, or
@@ -635,10 +593,11 @@ sb.auth.onAuthStateChange(async (event, session) => {
   const wasSignedIn = !!currentUser;
   currentUser = session?.user ?? null;
   updateAuthUI();
-  refreshSubscriptionBadge();
+  refreshGenerationBadge();
   if (currentUser && !wasSignedIn) {
-    // A live sign-in mid-session (e.g. from the paywall gate): resume
-    // whatever draft brought them here, independent of initial routing.
+    // A live sign-in mid-session (e.g. from the goal-generation gate):
+    // resume whatever draft brought them here, independent of initial
+    // routing.
     closeAuthModal();
     await tryResumeGeneration();
   }
@@ -658,7 +617,7 @@ document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu)
 
 // ── View switching ──────────────────────────────
 function show(id) {
-  ['view-onboard','view-generating','view-error','view-dashboard','view-paywall','view-checkout-pending'].forEach(v => {
+  ['view-onboard','view-generating','view-error','view-dashboard'].forEach(v => {
     const el = document.getElementById(v);
     el.style.display = 'none';
     el.classList.remove('active');
@@ -720,27 +679,24 @@ function collectGoalData() {
   };
 }
 
-// Gate for the onboarding "Generate My Plan" button: requires sign-in and an
-// active subscription before ever calling the API. Saves the draft first so
-// it survives the full-page redirects sign-in and checkout both require.
+// Gate for the onboarding "Generate My Plan" button: requires sign-in before
+// ever calling the API (the server enforces the one-free-plan-per-account
+// limit and returns a clear error if it's already been used). Saves the
+// draft first so it survives the full-page redirect sign-in requires.
 async function handleGenerateClick() {
   const goalData = collectGoalData();
   saveGoal(goalData);
 
   if (!currentUser) { openAuthModal(); return; }
-  const subscribed = await checkSubscriptionStatus();
-  if (!subscribed) { show('view-paywall'); return; }
   await generatePlan(goalData);
 }
 
-// Called after returning from a sign-in or checkout redirect: if there's a
-// saved draft with no plan generated yet, pick up where the user left off.
+// Called after returning from a sign-in redirect: if there's a saved draft
+// with no plan generated yet, pick up where the user left off.
 async function tryResumeGeneration() {
   const draft = loadGoal();
   if (!draft || loadPlan()) return false;
   if (!currentUser) return false;
-  const subscribed = await checkSubscriptionStatus();
-  if (!subscribed) { show('view-paywall'); return false; }
   await generatePlan(draft);
   return true;
 }
@@ -783,47 +739,6 @@ function retryGenerate() {
   }
 }
 
-// ── Subscription checkout ──────────────────────
-async function startCheckout() {
-  const btn = document.getElementById('paywall-subscribe-btn');
-  const errEl = document.getElementById('paywall-error');
-  errEl.textContent = '';
-  btn.disabled = true;
-  btn.textContent = 'Redirecting…';
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const token = session?.access_token;
-    if (!token) throw new Error('Please sign in again.');
-    const res = await fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
-    window.location.href = json.url;
-  } catch (err) {
-    errEl.textContent = err.message;
-    btn.disabled = false;
-    btn.textContent = 'Subscribe →';
-  }
-}
-document.getElementById('paywall-subscribe-btn').addEventListener('click', startCheckout);
-
-// Stripe's webhook lands asynchronously, so poll briefly rather than trusting
-// an instant read right after the checkout redirect back.
-async function pollForActiveSubscription(maxTries = 6, delayMs = 1500) {
-  for (let i = 0; i < maxTries; i++) {
-    await new Promise(r => setTimeout(r, delayMs));
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
-      updateAuthUI();
-      if (await checkSubscriptionStatus()) return true;
-    }
-  }
-  return false;
-}
-
 function routeInitialView() {
   if (loadPlan()) {
     renderDashboard();
@@ -832,24 +747,6 @@ function routeInitialView() {
     show('view-onboard');
   }
 }
-
-async function handleCheckoutSuccess() {
-  show('view-checkout-pending');
-  document.getElementById('checkout-pending-text').textContent = 'Confirming your subscription…';
-  document.getElementById('checkout-pending-spinner').style.display = 'block';
-  document.getElementById('checkout-retry-btn').style.display = 'none';
-
-  const confirmed = await pollForActiveSubscription();
-  if (confirmed) {
-    const resumed = await tryResumeGeneration();
-    if (!resumed) routeInitialView();
-  } else {
-    document.getElementById('checkout-pending-spinner').style.display = 'none';
-    document.getElementById('checkout-pending-text').textContent = 'Still confirming — this can take a few seconds.';
-    document.getElementById('checkout-retry-btn').style.display = 'inline-block';
-  }
-}
-document.getElementById('checkout-retry-btn').addEventListener('click', handleCheckoutSuccess);
 
 function animateGenSteps() {
   const steps = ['gen-s1','gen-s2','gen-s3','gen-s4'];
@@ -1206,26 +1103,11 @@ function confirmReset() {
 }
 
 // ── Init ───────────────────────────────────────
-async function init() {
-  const params = new URLSearchParams(window.location.search);
-  const checkoutStatus = params.get('checkout');
-  if (checkoutStatus) window.history.replaceState({}, '', window.location.pathname);
-
-  if (checkoutStatus === 'success') {
-    // handleCheckoutSuccess() drives its own view transitions once the
-    // subscription confirms — suppress the auth listener's one-time
-    // routing so it can't yank the user off the pending screen first.
-    didInitialRoute = true;
-    await handleCheckoutSuccess();
-    return;
-  }
-  // Otherwise, the sb.auth.onAuthStateChange listener above fires once with
-  // the resolved session shortly after subscribing and calls
-  // performInitialRouting() from there — waiting for that (rather than
-  // routing here immediately) is what makes loadPlan()'s owner check see
-  // the correct currentUser on the very first render.
-}
-init();
+// The sb.auth.onAuthStateChange listener above fires once with the resolved
+// session shortly after subscribing and calls performInitialRouting() from
+// there — waiting for that (rather than routing here immediately) is what
+// makes loadPlan()'s owner check see the correct currentUser on the very
+// first render.
 </script>
 </body>
 </html>
