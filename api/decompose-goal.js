@@ -286,7 +286,13 @@ Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensit
 Build their strategic funnel plan now.`;
 }
 
-async function callGemini(goalData) {
+// Gemini returns 429/5xx on transient overload fairly often — a single retry
+// after a short backoff clears most of them without the user needing to
+// notice or manually hit "Try again". Content-policy blocks and malformed
+// responses are never retried; they'll fail the same way every time.
+const RETRIABLE_UPSTREAM_STATUSES = new Set([429, 500, 502, 503, 504]);
+
+async function callGeminiOnce(goalData) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     const err = new Error('AI planning is not configured');
@@ -318,6 +324,7 @@ async function callGemini(goalData) {
     console.error(`Gemini ${res.status}: ${detail}`);
     const err = new Error('The AI planner is temporarily unavailable');
     err.status = 502;
+    err.upstreamStatus = res.status;
     throw err;
   }
 
@@ -349,6 +356,17 @@ async function callGemini(goalData) {
     const err = new Error('The AI planner returned invalid JSON');
     err.status = 502;
     throw err;
+  }
+}
+
+async function callGemini(goalData) {
+  try {
+    return await callGeminiOnce(goalData);
+  } catch (err) {
+    if (!RETRIABLE_UPSTREAM_STATUSES.has(err.upstreamStatus)) throw err;
+    console.log(`Gemini attempt 1 failed with ${err.upstreamStatus}, retrying once`);
+    await new Promise((r) => setTimeout(r, 750));
+    return callGeminiOnce(goalData);
   }
 }
 

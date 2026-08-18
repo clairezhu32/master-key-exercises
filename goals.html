@@ -701,33 +701,45 @@ async function tryResumeGeneration() {
   return true;
 }
 
-async function generatePlan(goalData) {
-  const data = goalData || loadGoal();
-  if (!data) { show('view-onboard'); return; }
-  lastGoalData = data;
-  show('view-generating');
-  animateGenSteps();
+// Guards against overlapping calls (double-click on Generate/Try again, or a
+// resume-after-signin racing a manual retry) — without this, two in-flight
+// requests can both reach decompose-goal.js before either has released its
+// claim, and the second one gets wrongly told the free plan is already used.
+let generationInFlight = false;
 
+async function generatePlan(goalData) {
+  if (generationInFlight) return;
+  generationInFlight = true;
   try {
-    const { data: { session } } = await sb.auth.getSession();
-    const token = session?.access_token;
-    const res = await fetch('/api/decompose-goal', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
-    savePlan(data, { ...json.plan, generatedAt: Date.now() });
-    renderDashboard();
-    show('view-dashboard');
-  } catch (err) {
-    document.getElementById('error-msg').textContent = err.message;
-    document.getElementById('api-hint').style.display = 'none';
-    show('view-error');
+    const data = goalData || loadGoal();
+    if (!data) { show('view-onboard'); return; }
+    lastGoalData = data;
+    show('view-generating');
+    animateGenSteps();
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/decompose-goal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
+      savePlan(data, { ...json.plan, generatedAt: Date.now() });
+      renderDashboard();
+      show('view-dashboard');
+    } catch (err) {
+      document.getElementById('error-msg').textContent = err.message;
+      document.getElementById('api-hint').style.display = 'none';
+      show('view-error');
+    }
+  } finally {
+    generationInFlight = false;
   }
 }
 
