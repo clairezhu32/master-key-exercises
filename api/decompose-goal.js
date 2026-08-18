@@ -348,15 +348,21 @@ async function callGeminiOnce(goalData) {
 // 429 (quota exhausted) isn't worth retrying inline — Google's own suggested
 // retry delays run tens of seconds, far past what's reasonable to hold a
 // user's request open for. Fail fast with a distinct message instead.
-// 500/502/503/504 (transient overload) genuinely do clear on a short retry,
-// as observed in production: one of two concurrent attempts against the
-// same "high demand" 503 often succeeds seconds later.
+// 500/502/503/504 (transient overload) genuinely do clear on a retry, but
+// live production traffic has shown this isn't a rare blip — both attempts
+// in a fixed 3-try budget failed back to back more than once, each attempt
+// alone taking anywhere from 2-19s. Rather than guess a fixed attempt count,
+// keep retrying for as long as time budget actually allows: observed total
+// request times (~22s) leave plenty of the 60s maxDuration unused.
 const OVERLOAD_STATUSES = new Set([500, 502, 503, 504]);
-const OVERLOAD_BACKOFFS_MS = [750, 2000];
+const OVERLOAD_BACKOFFS_MS = [750, 1500, 2500, 4000];
+// Leaves headroom for auth/claim/response work outside callGemini itself,
+// so Vercel doesn't kill the function mid-attempt.
+const GEMINI_DEADLINE_SAFETY_MS = 8_000;
 
-async function callGemini(goalData) {
+async function callGemini(goalData, deadlineAt) {
   let lastErr;
-  for (let attempt = 0; attempt <= OVERLOAD_BACKOFFS_MS.length; attempt++) {
+  for (let attempt = 1; ; attempt++) {
     try {
       return await callGeminiOnce(goalData);
     } catch (err) {
@@ -365,13 +371,16 @@ async function callGemini(goalData) {
         err.message = 'The AI planner is rate-limited right now — please try again in a minute';
         throw err;
       }
-      if (!OVERLOAD_STATUSES.has(err.upstreamStatus) || attempt === OVERLOAD_BACKOFFS_MS.length) throw err;
-      const backoff = OVERLOAD_BACKOFFS_MS[attempt];
-      console.log(`Gemini attempt ${attempt + 1} failed with ${err.upstreamStatus}, retrying in ${backoff}ms`);
+      if (!OVERLOAD_STATUSES.has(err.upstreamStatus)) throw err;
+      const backoff = OVERLOAD_BACKOFFS_MS[Math.min(attempt - 1, OVERLOAD_BACKOFFS_MS.length - 1)];
+      if (Date.now() + backoff + GEMINI_DEADLINE_SAFETY_MS >= deadlineAt) {
+        console.log(`Gemini attempt ${attempt} failed with ${err.upstreamStatus}, out of time budget — giving up`);
+        throw err;
+      }
+      console.log(`Gemini attempt ${attempt} failed with ${err.upstreamStatus}, retrying in ${backoff}ms`);
       await new Promise((r) => setTimeout(r, backoff));
     }
   }
-  throw lastErr;
 }
 
 export default async function handler(req, res) {
@@ -419,8 +428,10 @@ export default async function handler(req, res) {
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
   const intensity = hoursNum <= 2 ? 'light' : hoursNum <= 5 ? 'moderate' : 'intensive';
 
+  const deadlineAt = requestStart + config.maxDuration * 1000;
+
   try {
-    const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity });
+    const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     await recordGeneration(user.id, user.email, serviceRoleKey);
     return res.status(200).json({ plan: { ...plan, intensity } });
