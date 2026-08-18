@@ -222,7 +222,6 @@
       font-size: 12px; color: var(--muted); margin-bottom: 10px; padding-bottom: 10px;
       border-bottom: 1px solid var(--border); word-break: break-all;
     }
-    .auth-dropdown-status { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
     .auth-dropdown button {
       font-family: inherit; font-size: 13px; color: var(--muted); background: none;
       border: none; cursor: pointer; padding: 0; transition: color 0.2s;
@@ -270,7 +269,6 @@
         <div class="auth-avatar" id="auth-avatar" title="Account"></div>
         <div class="auth-dropdown" id="auth-dropdown" style="display:none">
           <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
-          <div class="auth-dropdown-status" id="auth-dropdown-status"></div>
           <button id="auth-signout-btn">Sign out</button>
         </div>
       </div>
@@ -579,20 +577,6 @@ async function handleSignOut() {
   show('view-onboard');
 }
 
-async function hasGeneratedPlan() {
-  if (!currentUser) return false;
-  const { data, error } = await sb.from('mks_goal_generations').select('id').eq('user_id', currentUser.id).maybeSingle();
-  if (error) return false;
-  return !!data;
-}
-
-async function refreshGenerationBadge() {
-  const statusEl = document.getElementById('auth-dropdown-status');
-  if (!statusEl) return;
-  if (!currentUser) { statusEl.textContent = ''; return; }
-  statusEl.textContent = (await hasGeneratedPlan()) ? 'Free plan used' : 'Free plan available';
-}
-
 // True once the very first auth event (the resolved persisted session, or
 // its absence) has been handled — guards performInitialRouting() so it
 // drives the initial view exactly once, never on later sign-in/out events.
@@ -610,7 +594,6 @@ sb.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   currentAccessToken = session?.access_token ?? null;
   updateAuthUI();
-  refreshGenerationBadge();
   if (currentUser && !wasSignedIn) {
     // A live sign-in mid-session (e.g. from the goal-generation gate):
     // resume whatever draft brought them here, independent of initial

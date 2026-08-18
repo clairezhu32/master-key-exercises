@@ -52,34 +52,26 @@ async function getUserFromToken(authHeader, serviceRoleKey) {
   return res.json();
 }
 
-// Free tier: one plan per account. Claiming inserts the row *before* the
-// (paid) Gemini call — the unique constraint on mks_goal_generations means a
-// concurrent duplicate request loses the race here rather than both
-// requests spending an API call. Insert failing for any other reason (e.g.
-// a transient network error) is treated the same as "already used" here;
-// the caller can't distinguish, but that only costs the caller one retry.
-async function claimGeneration(userId, email, serviceRoleKey) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations`, {
+// Generation isn't limited to once per account — "Start over with a new
+// goal" replaces the account's plan rather than being permanently blocked
+// after the first generation. mks_goal_generations is now just a history/
+// tracking record (one row per account, most recent generation), useful for
+// support debugging; it doesn't gate anything. Actual abuse protection is
+// the existing per-IP rate limit above. Upsert failures are logged but
+// non-fatal — a tracking write failing shouldn't fail an otherwise-
+// successful generation the user is waiting on.
+async function recordGeneration(userId, email, serviceRoleKey) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?on_conflict=user_id`, {
     method: 'POST',
     headers: {
       apikey: serviceRoleKey,
       Authorization: `Bearer ${serviceRoleKey}`,
       'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
+      Prefer: 'resolution=merge-duplicates,return=minimal',
     },
-    body: JSON.stringify({ user_id: userId, email }),
+    body: JSON.stringify({ user_id: userId, email, generated_at: new Date().toISOString() }),
   });
-  return res.status === 201;
-}
-
-// Best-effort: give back the free generation if the Gemini call that was
-// supposed to use it failed, so the user isn't permanently locked out by a
-// transient AI-provider error.
-async function releaseGeneration(userId, serviceRoleKey) {
-  await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
-    method: 'DELETE',
-    headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
-  }).catch(() => {});
+  if (!res.ok) console.error(`Failed to record generation for user ${userId}: ${res.status}`);
 }
 
 const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing', 'core_prep', 'funnel_metrics', 'close'];
@@ -427,17 +419,12 @@ export default async function handler(req, res) {
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
   const intensity = hoursNum <= 2 ? 'light' : hoursNum <= 5 ? 'moderate' : 'intensive';
 
-  const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
-  if (!claimed) {
-    return res.status(403).json({ error: 'This account has already generated its one free plan' });
-  }
-
   try {
     const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity });
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
+    await recordGeneration(user.id, user.email, serviceRoleKey);
     return res.status(200).json({ plan: { ...plan, intensity } });
   } catch (err) {
-    await releaseGeneration(user.id, serviceRoleKey);
     const status = err.status || 500;
     console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);
     return res.status(status).json({ error: err.message || 'Failed to generate plan' });

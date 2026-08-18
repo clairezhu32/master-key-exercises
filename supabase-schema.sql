@@ -58,9 +58,11 @@ CREATE POLICY "users read own subscription"
   ON mks_subscriptions FOR SELECT
   USING (auth.uid() = user_id);
 
--- 4. Goal plan generation on /goals is free, limited to one per account.
--- Uniqueness on both user_id and email means deleting and recreating an
--- account with the same email doesn't grant a second free generation.
+-- 4. Goal plan generation on /goals is free and not limited to one per
+-- account — "Start over with a new goal" replaces the account's plan. This
+-- table is a history/tracking record only (one row per account, most recent
+-- generation), useful for support debugging; it doesn't gate generation.
+-- Actual abuse protection is the per-IP rate limit in decompose-goal.js.
 CREATE TABLE IF NOT EXISTS mks_goal_generations (
   id            uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id       uuid        REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
@@ -71,7 +73,7 @@ CREATE TABLE IF NOT EXISTS mks_goal_generations (
 ALTER TABLE mks_goal_generations ENABLE ROW LEVEL SECURITY;
 
 -- Only the service role (decompose-goal.js) writes this table, so client-side
--- code can never self-grant another free generation.
+-- code can never tamper with the generation history.
 CREATE POLICY "users read own generation record"
   ON mks_goal_generations FOR SELECT
   USING (auth.uid() = user_id);
