@@ -554,7 +554,14 @@ async function signInWithGoogle() {
 }
 
 async function handleSignOut() {
-  await sb.auth.signOut();
+  try {
+    await sb.auth.signOut();
+  } catch (err) {
+    // Even if the server-side revoke call fails (network error, expired
+    // refresh token, etc.), the user still wants to appear signed out on
+    // this device — don't let that failure block resetting local state.
+    console.error('sb.auth.signOut() failed, resetting local state anyway:', err);
+  }
   currentUser = null;
   updateAuthUI();
   document.getElementById('auth-dropdown').style.display = 'none';
