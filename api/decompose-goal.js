@@ -286,12 +286,6 @@ Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensit
 Build their strategic funnel plan now.`;
 }
 
-// Gemini returns 429/5xx on transient overload fairly often — a single retry
-// after a short backoff clears most of them without the user needing to
-// notice or manually hit "Try again". Content-policy blocks and malformed
-// responses are never retried; they'll fail the same way every time.
-const RETRIABLE_UPSTREAM_STATUSES = new Set([429, 500, 502, 503, 504]);
-
 async function callGeminiOnce(goalData) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -359,15 +353,33 @@ async function callGeminiOnce(goalData) {
   }
 }
 
+// 429 (quota exhausted) isn't worth retrying inline — Google's own suggested
+// retry delays run tens of seconds, far past what's reasonable to hold a
+// user's request open for. Fail fast with a distinct message instead.
+// 500/502/503/504 (transient overload) genuinely do clear on a short retry,
+// as observed in production: one of two concurrent attempts against the
+// same "high demand" 503 often succeeds seconds later.
+const OVERLOAD_STATUSES = new Set([500, 502, 503, 504]);
+const OVERLOAD_BACKOFFS_MS = [750, 2000];
+
 async function callGemini(goalData) {
-  try {
-    return await callGeminiOnce(goalData);
-  } catch (err) {
-    if (!RETRIABLE_UPSTREAM_STATUSES.has(err.upstreamStatus)) throw err;
-    console.log(`Gemini attempt 1 failed with ${err.upstreamStatus}, retrying once`);
-    await new Promise((r) => setTimeout(r, 750));
-    return callGeminiOnce(goalData);
+  let lastErr;
+  for (let attempt = 0; attempt <= OVERLOAD_BACKOFFS_MS.length; attempt++) {
+    try {
+      return await callGeminiOnce(goalData);
+    } catch (err) {
+      lastErr = err;
+      if (err.upstreamStatus === 429) {
+        err.message = 'The AI planner is rate-limited right now — please try again in a minute';
+        throw err;
+      }
+      if (!OVERLOAD_STATUSES.has(err.upstreamStatus) || attempt === OVERLOAD_BACKOFFS_MS.length) throw err;
+      const backoff = OVERLOAD_BACKOFFS_MS[attempt];
+      console.log(`Gemini attempt ${attempt + 1} failed with ${err.upstreamStatus}, retrying in ${backoff}ms`);
+      await new Promise((r) => setTimeout(r, backoff));
+    }
   }
+  throw lastErr;
 }
 
 export default async function handler(req, res) {
