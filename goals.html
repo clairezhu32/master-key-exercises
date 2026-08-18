@@ -507,6 +507,11 @@ const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
+// Cached alongside currentUser from onAuthStateChange, rather than fetched
+// fresh via sb.auth.getSession() at call time — that call can hang under
+// some cross-tab session-refresh conditions, which would silently strand a
+// user on the generating screen with the request never even sent.
+let currentAccessToken = null;
 
 function updateAuthUI() {
   const signinBtn = document.getElementById('auth-signin-btn');
@@ -557,12 +562,16 @@ async function handleSignOut() {
   try {
     await sb.auth.signOut();
   } catch (err) {
-    // Even if the server-side revoke call fails (network error, expired
-    // refresh token, etc.), the user still wants to appear signed out on
-    // this device — don't let that failure block resetting local state.
-    console.error('sb.auth.signOut() failed, resetting local state anyway:', err);
+    // The server-side revoke call failed (network error, expired refresh
+    // token, etc.) before it could clear the locally-stored session token
+    // itself. Fall back to a local-only signOut so the stale token can't
+    // resurrect this session on the next page load, then keep going —
+    // the user still wants to appear signed out on this device.
+    console.error('sb.auth.signOut() failed, falling back to local-only signOut:', err);
+    await sb.auth.signOut({ scope: 'local' }).catch(() => {});
   }
   currentUser = null;
+  currentAccessToken = null;
   updateAuthUI();
   document.getElementById('auth-dropdown').style.display = 'none';
   // /goals is account-gated — don't leave a previously-generated plan on
@@ -599,6 +608,7 @@ async function performInitialRouting() {
 sb.auth.onAuthStateChange(async (event, session) => {
   const wasSignedIn = !!currentUser;
   currentUser = session?.user ?? null;
+  currentAccessToken = session?.access_token ?? null;
   updateAuthUI();
   refreshGenerationBadge();
   if (currentUser && !wasSignedIn) {
@@ -725,8 +735,7 @@ async function generatePlan(goalData) {
     animateGenSteps();
 
     try {
-      const { data: { session } } = await sb.auth.getSession();
-      const token = session?.access_token;
+      const token = currentAccessToken;
       const res = await fetch('/api/decompose-goal', {
         method: 'POST',
         headers: {
