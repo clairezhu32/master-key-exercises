@@ -260,10 +260,6 @@
 <script>
 const PROFILE_KEY = 'mks_profile_v1';
 
-function loadProfile() {
-  try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
-  catch { return {}; }
-}
 function saveProfile(profile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 }
@@ -277,12 +273,6 @@ function show(view) {
 const nameInput = document.getElementById('welcome-name-input');
 const goalInput = document.getElementById('welcome-goal-input');
 const continueBtn = document.getElementById('welcome-continue-btn');
-
-// Pre-fill for anyone returning to this page with a profile already saved.
-const existing = loadProfile();
-nameInput.value = existing.name || '';
-goalInput.value = existing.goal || '';
-continueBtn.disabled = !(existing.goal || '').trim();
 
 goalInput.addEventListener('input', (e) => {
   continueBtn.disabled = !e.target.value.trim();
