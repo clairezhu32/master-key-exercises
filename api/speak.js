@@ -105,9 +105,14 @@ export default async function handler(req, res) {
   }
 
   // ── Gemini TTS request ──────────────────────
-  const upstream = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent`,
-    {
+  // 429 here is real quota exhaustion (free tier caps this model at 3
+  // requests/minute — Google's own suggested retry delay runs 50-60s, far
+  // too long to hold one narration segment's request open for) — fail
+  // immediately and let the client decide how to degrade. 5xx is worth one
+  // quick retry, since it's genuinely transient (observed live: a bare
+  // "500 INTERNAL" that a moment later succeeds).
+  async function callTts() {
+    return fetch(`https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -120,13 +125,23 @@ export default async function handler(req, res) {
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } },
         },
       }),
-    }
-  );
+    });
+  }
+
+  let upstream = await callTts();
+  if (!upstream.ok && upstream.status >= 500) {
+    await new Promise((r) => setTimeout(r, 750));
+    upstream = await callTts();
+  }
 
   if (!upstream.ok) {
     // Log detail server-side only; never leak upstream body to the client
     const detail = await upstream.text().catch(() => upstream.statusText);
     console.error(`Gemini TTS ${upstream.status}: ${detail}`);
+    if (upstream.status === 429) {
+      res.setHeader('Retry-After', '60');
+      return res.status(429).json({ error: 'Voice service is rate-limited right now' });
+    }
     const clientStatus = upstream.status >= 500 ? 502 : 400;
     return res.status(clientStatus).json({ error: 'Voice service unavailable' });
   }

@@ -2761,29 +2761,46 @@ async function speakExercise(ex) {
   try {
     const segments = buildNarrationSegments(ex, intention, previousIntention);
     const cached = await Promise.all(segments.map(s => getCachedAudio(s.key)));
-    // Fetch uncached segments concurrently (the API's rate limit is sized for
-    // this: RATE_MAX in api/speak.js explicitly budgets "up to 7 segments x 2").
-    // Sequential awaiting here previously meant playback waited on the sum of
-    // every segment's TTS latency instead of the slowest one.
-    const buffers = await Promise.all(segments.map(async (s, i) => {
-      if (cached[i]) return cached[i];
-      const res = await fetch('/api/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: s.text }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: res.statusText }));
-        throw new Error(err.error || `Error ${res.status}`);
+    // Google's free-tier TTS quota is a hard 3 requests/minute — far
+    // stricter than this feature was originally sized for (up to 7
+    // segments, fired concurrently). Fetch serially instead of all at once,
+    // and skip rather than abort on a segment that still fails, so one
+    // rate-limited segment doesn't take down the whole reading.
+    const buffers = [];
+    let failedCount = 0;
+    for (let i = 0; i < segments.length; i++) {
+      if (cached[i]) { buffers.push(cached[i]); continue; }
+      if (buffers.length > 0) await new Promise((r) => setTimeout(r, 400));
+      try {
+        const res = await fetch('/api/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: segments[i].text }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: res.statusText }));
+          throw new Error(err.error || `Error ${res.status}`);
+        }
+        const buf = await res.arrayBuffer();
+        setCachedAudio(segments[i].key, buf);
+        buffers.push(buf);
+      } catch (err) {
+        console.error(`Narration segment ${i} failed:`, err.message);
+        buffers.push(null);
+        failedCount++;
       }
-      const buf = await res.arrayBuffer();
-      setCachedAudio(s.key, buf);
-      return buf;
-    }));
+    }
+    if (buffers.every((b) => !b)) {
+      throw new Error('Voice service unavailable right now — please try again shortly.');
+    }
+    if (failedCount > 0) {
+      showVoiceError(`${failedCount} segment${failedCount > 1 ? 's' : ''} couldn't load (voice service is rate-limited) — playing the rest.`);
+    }
     voicePlaying = true;
     setVoiceState('playing');
     let idx = 0;
     function playNext() {
+      while (idx < buffers.length && !buffers[idx]) idx++;
       if (idx >= buffers.length || !voicePlaying) { voicePlaying = false; setVoiceState('idle'); return; }
       const url = URL.createObjectURL(new Blob([buffers[idx]], { type: 'audio/wav' }));
       voiceAudio = new Audio(url);
