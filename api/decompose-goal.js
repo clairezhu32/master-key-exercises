@@ -401,9 +401,15 @@ async function callGeminiOnce(goalData) {
 // request times (~22s) leave plenty of the 60s maxDuration unused.
 const OVERLOAD_STATUSES = new Set([500, 502, 503, 504]);
 const OVERLOAD_BACKOFFS_MS = [750, 1500, 2500, 4000];
-// Leaves headroom for auth/claim/response work outside callGemini itself,
-// so Vercel doesn't kill the function mid-attempt.
-const GEMINI_DEADLINE_SAFETY_MS = 8_000;
+// Must cover the worst-case duration of the NEXT attempt itself, not just
+// other handler overhead — live logs showed a single Gemini call taking
+// 26.4s, and an 8s margin let the retry loop start one more attempt than
+// it had time for, resulting in "Vercel Runtime Timeout Error: Task timed
+// out after 60 seconds" mid-retry. That's strictly worse than giving up
+// early: a hard kill sends the client no response at all (not even an
+// error), leaving them stuck on the generating screen indefinitely,
+// whereas giving up in time still returns a clean, visible error.
+const GEMINI_DEADLINE_SAFETY_MS = 30_000;
 
 async function callGemini(goalData, deadlineAt) {
   let lastErr;
