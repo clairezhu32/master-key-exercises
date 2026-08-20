@@ -493,11 +493,21 @@ function loadPlan() {
 // local cache once it has something newer.
 async function fetchServerGeneration() {
   if (!currentUser) return null;
+  // sb.from() relies on the Supabase client's own internal session state,
+  // not on our tracked currentAccessToken — if that's stale (e.g. a
+  // long-lived tab whose background token refresh got throttled, the same
+  // root cause fixed for generatePlan() via getFreshAccessToken()), the
+  // RLS check silently fails and this returns nothing, even though the
+  // account genuinely has a saved plan. Nudge a refresh first; the return
+  // value itself isn't needed here, only the side effect of the client's
+  // internal session being current before sb.from() reads it.
+  await getFreshAccessToken();
   const { data, error } = await sb
     .from('mks_goal_generations')
     .select('goal_data, plan, generated_at')
     .eq('user_id', currentUser.id)
     .maybeSingle();
+  if (error) console.error('fetchServerGeneration failed:', error.message || error);
   if (error || !data?.plan || !data?.goal_data) return null;
   return { goal: data.goal_data, plan: data.plan, generatedAtMs: new Date(data.generated_at).getTime() };
 }
