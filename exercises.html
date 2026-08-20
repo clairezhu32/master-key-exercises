@@ -1603,6 +1603,15 @@ sb.auth.onAuthStateChange(async (event, session) => {
     renderGrid();
     updateHeader();
   }
+
+  // Goal personalization is gated on sign-in state (see
+  // loadProfileForPersonalization), and renderGoalUI()/populateJourneySection()
+  // already ran once synchronously at page load before this async auth
+  // check resolved — re-run them on every auth change so a signed-in
+  // user's content actually personalizes, and a sign-out reverts to general
+  // content instead of leaving the previous state stuck on screen.
+  renderGoalUI();
+  if (currentPart) populateJourneySection(currentPart);
 });
 
 // Wire up auth button events
@@ -2181,12 +2190,22 @@ function saveProfile(profile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 }
 
+// Goal personalization is gated on being signed in. mks_profile_v1 is local,
+// unauthenticated storage — on a shared browser it could hold someone
+// else's (or stale test) data, which is exactly what caused exercise
+// content to reference an unrelated goal. Signed-out visitors always see
+// the general, non-personalized version of every exercise; whatever's
+// already saved locally applies as soon as they sign in.
+function loadProfileForPersonalization() {
+  return currentUser ? loadProfile() : {};
+}
+
 function applyGoalText(template, goal) {
   return template.replace(/\{goal\}/g, goal);
 }
 
 function renderGoalUI() {
-  const profile = loadProfile();
+  const profile = loadProfileForPersonalization();
   const goal = profile.goal || '';
   const setupBanner = document.getElementById('goal-setup-banner');
   const goalDisplay = document.getElementById('goal-display');
@@ -2233,7 +2252,7 @@ document.getElementById('goal-setup-btn').addEventListener('click', openProfileM
 document.getElementById('goal-display-edit').addEventListener('click', openProfileModal);
 
 function populateJourneySection(part) {
-  const profile = loadProfile();
+  const profile = loadProfileForPersonalization();
   const goal = profile.goal || '';
   const section = document.getElementById('journey-section');
   const card = document.getElementById('journey-card');
@@ -2648,7 +2667,7 @@ async function setCachedAudio(key, buffer) {
 }
 
 function buildNarrationSegments(ex, intention, previousIntention) {
-  const profile = loadProfile();
+  const profile = loadProfileForPersonalization();
   const goal = profile.goal || '';
   const name = profile.name || '';
   const segments = [];
