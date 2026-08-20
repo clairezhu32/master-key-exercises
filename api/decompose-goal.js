@@ -53,23 +53,33 @@ async function getUserFromToken(authHeader, serviceRoleKey) {
 }
 
 // One goal per account, permanently — no regenerating with a second goal
-// once a plan has successfully been generated. Claiming inserts the row
-// *before* the (paid) Gemini call — the unique constraint on user_id means
-// a concurrent duplicate request loses the race here rather than both
-// spending an API call, and it also means someone whose account already
-// has a plan is rejected immediately without wasting a Gemini call.
+// once a plan has successfully been generated. "Already has a goal" is
+// defined by having actual recoverable plan content, not just a row: rows
+// created before server-side plan persistence was added (or from any
+// generation that was claimed but never completed) have no plan/goal_data,
+// and blocking those accounts forever with nothing to show for it is a
+// dead end — the account is stuck unable to generate and unable to see any
+// plan. Treat a contentless row as reclaimable rather than a real claim.
 async function claimGeneration(userId, email, serviceRoleKey) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations`, {
+  const existing = await fetch(
+    `${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}&select=plan`,
+    { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
+  );
+  if (existing.ok) {
+    const rows = await existing.json();
+    if (rows[0]?.plan) return false; // genuinely already has a plan
+  }
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?on_conflict=user_id`, {
     method: 'POST',
     headers: {
       apikey: serviceRoleKey,
       Authorization: `Bearer ${serviceRoleKey}`,
       'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
+      Prefer: 'resolution=merge-duplicates,return=minimal',
     },
     body: JSON.stringify({ user_id: userId, email }),
   });
-  return res.status === 201;
+  return res.ok;
 }
 
 // mks_goal_generations is also the durable copy of the plan itself:
