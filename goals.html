@@ -522,11 +522,29 @@ const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
-// Cached alongside currentUser from onAuthStateChange, rather than fetched
-// fresh via sb.auth.getSession() at call time — that call can hang under
-// some cross-tab session-refresh conditions, which would silently strand a
-// user on the generating screen with the request never even sent.
+// Cached alongside currentUser from onAuthStateChange, and used as a
+// fallback in getFreshAccessToken() below. sb.auth.getSession() can hang
+// under some cross-tab session-refresh conditions (which would silently
+// strand a user on the generating screen with the request never even
+// sent), but relying on this cached value alone goes stale once the
+// session outlives the ~1hr access token lifetime — confirmed live: a
+// user still on the page 68 minutes after signing in got "Sign in
+// required" because the cached token had expired with nothing refreshing
+// it. getFreshAccessToken() tries the real (possibly auto-refreshed)
+// session first, with this as the bounded-wait fallback, not the default.
 let currentAccessToken = null;
+
+async function getFreshAccessToken() {
+  try {
+    const { data } = await Promise.race([
+      sb.auth.getSession(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timed out')), 4000)),
+    ]);
+    return data?.session?.access_token ?? currentAccessToken;
+  } catch {
+    return currentAccessToken;
+  }
+}
 
 function updateAuthUI() {
   const signinBtn = document.getElementById('auth-signin-btn');
@@ -735,7 +753,7 @@ async function generatePlan(goalData) {
     animateGenSteps();
 
     try {
-      const token = currentAccessToken;
+      const token = await getFreshAccessToken();
       const res = await fetch('/api/decompose-goal', {
         method: 'POST',
         headers: {
