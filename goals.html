@@ -489,6 +489,23 @@ function loadPlan() {
   } catch { return null; }
 }
 
+// decompose-goal.js also persists the plan server-side (mks_goal_generations)
+// so a generation that succeeds but never gets applied client-side — e.g.
+// the tab reloads or navigates away during the 40-50s+ this can now take
+// under sustained Gemini overload — isn't silently lost. Called on every
+// initial route so the server (source of truth) always wins over a stale
+// local cache once it has something newer.
+async function fetchServerGeneration() {
+  if (!currentUser) return null;
+  const { data, error } = await sb
+    .from('mks_goal_generations')
+    .select('goal_data, plan, generated_at')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+  if (error || !data?.plan || !data?.goal_data) return null;
+  return { goal: data.goal_data, plan: data.plan, generatedAtMs: new Date(data.generated_at).getTime() };
+}
+
 function todayKey() { return `mks_goal_actions_${new Date().toISOString().split('T')[0]}`; }
 function getCompletedToday() { return new Set(JSON.parse(localStorage.getItem(todayKey()) || '[]')); }
 function setCompletedToday(set) { localStorage.setItem(todayKey(), JSON.stringify([...set])); }
@@ -586,7 +603,7 @@ async function performInitialRouting() {
   if (didInitialRoute) return;
   didInitialRoute = true;
   const resumed = await tryResumeGeneration();
-  if (!resumed) routeInitialView();
+  if (!resumed) await routeInitialView();
 }
 
 sb.auth.onAuthStateChange(async (event, session) => {
@@ -750,7 +767,12 @@ function retryGenerate() {
   }
 }
 
-function routeInitialView() {
+async function routeInitialView() {
+  const local = loadPlan();
+  const server = await fetchServerGeneration();
+  if (server && server.generatedAtMs > (local?.generatedAt ?? 0)) {
+    savePlan(server.goal, { ...server.plan, generatedAt: server.generatedAtMs });
+  }
   if (loadPlan()) {
     renderDashboard();
     show('view-dashboard');

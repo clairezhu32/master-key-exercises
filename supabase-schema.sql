@@ -60,13 +60,18 @@ CREATE POLICY "users read own subscription"
 
 -- 4. Goal plan generation on /goals is free and not limited to one per
 -- account — "Start over with a new goal" replaces the account's plan. This
--- table is a history/tracking record only (one row per account, most recent
--- generation), useful for support debugging; it doesn't gate generation.
--- Actual abuse protection is the per-IP rate limit in decompose-goal.js.
+-- table is also the durable copy of the plan itself (goal_data + plan):
+-- generation can take 40-50s+ under sustained Gemini overload, and without
+-- a server-side copy, a page reload/navigation mid-request used to silently
+-- lose a plan that had actually succeeded, since it previously only ever
+-- lived in the browser's localStorage. Actual abuse protection is the
+-- per-IP rate limit in decompose-goal.js, not this table.
 CREATE TABLE IF NOT EXISTS mks_goal_generations (
   id            uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id       uuid        REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
   email         text        NOT NULL UNIQUE,
+  goal_data     jsonb,
+  plan          jsonb,
   generated_at  timestamptz DEFAULT now() NOT NULL
 );
 
