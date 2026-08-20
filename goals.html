@@ -193,9 +193,6 @@
     .week-dot.current { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.1); font-weight: 600; }
     .week-dot.past { background: rgba(201,169,110,0.08); color: rgba(201,169,110,0.5); border-color: rgba(201,169,110,0.2); }
 
-    /* Reset */
-    .reset-link { display: block; text-align: center; margin-top: 40px; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: none; }
-    .reset-link:hover { color: var(--text); }
 
     /* ── Auth ── */
     .auth-area { display: flex; align-items: center; gap: 14px; }
@@ -444,7 +441,6 @@
     <div class="section-title">90-Day Roadmap</div>
     <div class="weeks-grid" id="d-weeks-grid"></div>
 
-    <a class="reset-link" onclick="confirmReset()">Start over with a new goal</a>
   </div>
 
 </div>
@@ -1141,16 +1137,6 @@ function showWeekDetail(w, plan) {
   if (!weekData) return;
   const stage = FUNNEL_STAGE_LABELS[weekData.funnel_stage] ? ` (${FUNNEL_STAGE_LABELS[weekData.funnel_stage]})` : '';
   alert(`Week ${w}: ${weekData.theme}${stage}\n\n${weekData.target}\n\n• ${weekData.actions.join('\n• ')}`);
-}
-
-function confirmReset() {
-  if (confirm('This will clear your current plan and goal. Are you sure?')) {
-    localStorage.removeItem(GOAL_KEY);
-    localStorage.removeItem(PLAN_KEY);
-    localStorage.removeItem(FUNNEL_DONE_KEY);
-    localStorage.removeItem(FUNNEL_METRICS_KEY);
-    location.reload();
-  }
 }
 
 // ── Init ───────────────────────────────────────

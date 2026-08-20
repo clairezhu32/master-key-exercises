@@ -52,29 +52,55 @@ async function getUserFromToken(authHeader, serviceRoleKey) {
   return res.json();
 }
 
-// Generation isn't limited to once per account — "Start over with a new
-// goal" replaces the account's plan rather than being permanently blocked
-// after the first generation. mks_goal_generations is also the durable copy
-// of the plan itself: generation now routinely takes 40-50s+ under sustained
-// Gemini overload, and a client-side page reload/navigation mid-request used
-// to silently lose a plan that had actually succeeded, since it previously
-// only ever lived in the browser's localStorage. Storing it here lets the
-// client recover the latest successful generation on next load regardless
-// of what happened to the original request. Upsert failures are logged but
-// non-fatal to the response — a tracking write failing shouldn't fail an
-// otherwise-successful generation the user is waiting on.
-async function recordGeneration(userId, email, goalData, plan, serviceRoleKey) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?on_conflict=user_id`, {
+// One goal per account, permanently — no regenerating with a second goal
+// once a plan has successfully been generated. Claiming inserts the row
+// *before* the (paid) Gemini call — the unique constraint on user_id means
+// a concurrent duplicate request loses the race here rather than both
+// spending an API call, and it also means someone whose account already
+// has a plan is rejected immediately without wasting a Gemini call.
+async function claimGeneration(userId, email, serviceRoleKey) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations`, {
     method: 'POST',
     headers: {
       apikey: serviceRoleKey,
       Authorization: `Bearer ${serviceRoleKey}`,
       'Content-Type': 'application/json',
-      Prefer: 'resolution=merge-duplicates,return=minimal',
+      Prefer: 'return=minimal',
     },
-    body: JSON.stringify({ user_id: userId, email, goal_data: goalData, plan, generated_at: new Date().toISOString() }),
+    body: JSON.stringify({ user_id: userId, email }),
   });
-  if (!res.ok) console.error(`Failed to record generation for user ${userId}: ${res.status}`);
+  return res.status === 201;
+}
+
+// mks_goal_generations is also the durable copy of the plan itself:
+// generation can take 40-50s+ under sustained Gemini overload, and a
+// client-side page reload/navigation mid-request could otherwise silently
+// lose a plan that had actually succeeded, since it previously only ever
+// lived in the browser's localStorage. Write failures are logged but
+// non-fatal to the response — shouldn't fail an otherwise-successful
+// generation the user is waiting on.
+async function saveGenerationResult(userId, goalData, plan, serviceRoleKey) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
+    method: 'PATCH',
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ goal_data: goalData, plan, generated_at: new Date().toISOString() }),
+  });
+  if (!res.ok) console.error(`Failed to save generation result for user ${userId}: ${res.status}`);
+}
+
+// Best-effort: give back the one allowed goal if the Gemini call that was
+// supposed to use it failed, so a transient AI-provider error doesn't
+// permanently lock someone out before they've ever gotten a plan.
+async function releaseGeneration(userId, serviceRoleKey) {
+  await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
+    method: 'DELETE',
+    headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
+  }).catch(() => {});
 }
 
 const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing', 'core_prep', 'funnel_metrics', 'close'];
@@ -441,12 +467,18 @@ export default async function handler(req, res) {
 
   const deadlineAt = requestStart + config.maxDuration * 1000;
 
+  const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
+  if (!claimed) {
+    return res.status(403).json({ error: 'This account already has a goal — only one goal is allowed per account' });
+  }
+
   try {
     const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
-    await recordGeneration(user.id, user.email, body, { ...plan, intensity }, serviceRoleKey);
+    await saveGenerationResult(user.id, body, { ...plan, intensity }, serviceRoleKey);
     return res.status(200).json({ plan: { ...plan, intensity } });
   } catch (err) {
+    await releaseGeneration(user.id, serviceRoleKey);
     const status = err.status || 500;
     console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);
     return res.status(status).json({ error: err.message || 'Failed to generate plan' });

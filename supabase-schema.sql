@@ -58,14 +58,17 @@ CREATE POLICY "users read own subscription"
   ON mks_subscriptions FOR SELECT
   USING (auth.uid() = user_id);
 
--- 4. Goal plan generation on /goals is free and not limited to one per
--- account — "Start over with a new goal" replaces the account's plan. This
--- table is also the durable copy of the plan itself (goal_data + plan):
--- generation can take 40-50s+ under sustained Gemini overload, and without
--- a server-side copy, a page reload/navigation mid-request used to silently
--- lose a plan that had actually succeeded, since it previously only ever
--- lived in the browser's localStorage. Actual abuse protection is the
--- per-IP rate limit in decompose-goal.js, not this table.
+-- 4. Goal plan generation on /goals is free, but strictly one goal per
+-- account, permanently — the unique constraint on user_id is what enforces
+-- that (see claimGeneration/releaseGeneration in decompose-goal.js: the
+-- claim is inserted before the Gemini call and only released if that
+-- specific attempt fails, so a failed attempt can retry but a successful
+-- one can never be replaced by a second goal). This table is also the
+-- durable copy of the plan itself (goal_data + plan): generation can take
+-- 40-50s+ under sustained Gemini overload, and without a server-side copy,
+-- a page reload/navigation mid-request used to silently lose a plan that
+-- had actually succeeded, since it previously only ever lived in the
+-- browser's localStorage.
 CREATE TABLE IF NOT EXISTS mks_goal_generations (
   id            uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id       uuid        REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
