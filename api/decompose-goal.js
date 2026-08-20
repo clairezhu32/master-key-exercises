@@ -10,9 +10,15 @@ const rateLimitMap = new Map();
 const RATE_WINDOW_MS = 3_600_000;
 const RATE_MAX = 10;
 
-// Use Google's "-latest" alias rather than a pinned version — pinned model IDs
-// can lose availability for newer API keys/projects even while still listed
-// in the models catalog. Override via env var if needed.
+// Defaults to the "-latest" alias, but production is pinned to a specific
+// version via the GEMINI_MODEL env var (currently gemini-2.5-flash) as of
+// 2026-08-20: the alias kept silently drifting to whatever newer model
+// Google was rolling out, and those newer models were seeing sustained
+// "high demand" 503s (confirmed in live logs: 100% failure rate across
+// every attempt for one account, individual calls up to 35s) — a genuine
+// capacity issue that persisted even after enabling billing, since billing
+// fixes quota ceilings, not model-level congestion. Pinning at least stops
+// it from silently moving to whatever's currently overloaded next.
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
