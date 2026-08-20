@@ -493,23 +493,35 @@ function loadPlan() {
 // local cache once it has something newer.
 async function fetchServerGeneration() {
   if (!currentUser) return null;
-  // sb.from() relies on the Supabase client's own internal session state,
-  // not on our tracked currentAccessToken — if that's stale (e.g. a
-  // long-lived tab whose background token refresh got throttled, the same
-  // root cause fixed for generatePlan() via getFreshAccessToken()), the
-  // RLS check silently fails and this returns nothing, even though the
-  // account genuinely has a saved plan. Nudge a refresh first; the return
-  // value itself isn't needed here, only the side effect of the client's
-  // internal session being current before sb.from() reads it.
-  await getFreshAccessToken();
-  const { data, error } = await sb
-    .from('mks_goal_generations')
-    .select('goal_data, plan, generated_at')
-    .eq('user_id', currentUser.id)
-    .maybeSingle();
-  if (error) console.error('fetchServerGeneration failed:', error.message || error);
-  if (error || !data?.plan || !data?.goal_data) return null;
-  return { goal: data.goal_data, plan: data.plan, generatedAtMs: new Date(data.generated_at).getTime() };
+  // Deliberately bypasses sb.from(), which relies on the Supabase client's
+  // own internal session state. Nudging a refresh via getFreshAccessToken()
+  // isn't enough on its own: if the underlying sb.auth.getSession() call
+  // genuinely hangs (not just slow — e.g. a stuck cross-tab session lock)
+  // rather than resolving late, our timeout stops *us* from hanging, but
+  // the abandoned getSession() call never actually updates the client's
+  // internal session, so sb.from() would still silently fail its RLS
+  // check afterward. A direct authenticated REST call with an explicit
+  // bearer token — the same pattern generatePlan() already uses
+  // successfully — sidesteps that internal state entirely.
+  const token = await getFreshAccessToken();
+  if (!token) return null;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${currentUser.id}&select=goal_data,plan,generated_at`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) {
+      console.error(`fetchServerGeneration failed: HTTP ${res.status}`);
+      return null;
+    }
+    const rows = await res.json();
+    const data = rows[0];
+    if (!data?.plan || !data?.goal_data) return null;
+    return { goal: data.goal_data, plan: data.plan, generatedAtMs: new Date(data.generated_at).getTime() };
+  } catch (err) {
+    console.error('fetchServerGeneration failed:', err.message || err);
+    return null;
+  }
 }
 
 function todayKey() { return `mks_goal_actions_${new Date().toISOString().split('T')[0]}`; }
