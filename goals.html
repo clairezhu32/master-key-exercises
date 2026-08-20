@@ -611,14 +611,25 @@ async function signInWithGoogle() {
 
 async function handleSignOut() {
   try {
-    await sb.auth.signOut();
+    // sb.auth.signOut() can genuinely hang, not just fail — the same
+    // Supabase-internal-session issue found (and fixed with the same
+    // Promise.race pattern) in getFreshAccessToken() and
+    // fetchServerGeneration(). A plain try/catch doesn't help against a
+    // hang: it never rejects, so the catch block never runs and the
+    // whole function — and the sign-out button — stalls forever.
+    await Promise.race([
+      sb.auth.signOut(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('signOut timed out')), 4000)),
+    ]);
   } catch (err) {
-    // The server-side revoke call failed (network error, expired refresh
-    // token, etc.) before it could clear the locally-stored session token
-    // itself. Fall back to a local-only signOut so the stale token can't
-    // resurrect this session on the next page load, then keep going —
-    // the user still wants to appear signed out on this device.
-    console.error('sb.auth.signOut() failed, falling back to local-only signOut:', err);
+    // Either the server-side revoke call failed (network error, expired
+    // refresh token, etc.) before it could clear the locally-stored
+    // session token, or it hung and we gave up waiting. Fall back to a
+    // local-only signOut so a stale token can't resurrect this session on
+    // the next page load, then keep going — the user still wants to
+    // appear signed out on this device regardless of what the original
+    // call is still doing in the background.
+    console.error('sb.auth.signOut() failed or hung, falling back to local-only signOut:', err);
     await sb.auth.signOut({ scope: 'local' }).catch(() => {});
   }
   currentUser = null;

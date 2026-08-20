@@ -1540,7 +1540,19 @@ async function signInWithGoogle() {
 }
 
 async function handleSignOut() {
-  await sb.auth.signOut();
+  try {
+    // sb.auth.signOut() can genuinely hang, not just fail (a Supabase-
+    // internal-session issue also found in goals.html's auth flows). Race
+    // it against a timeout so a hang can't stall the sign-out button
+    // forever with the account still showing as signed in.
+    await Promise.race([
+      sb.auth.signOut(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('signOut timed out')), 4000)),
+    ]);
+  } catch (err) {
+    console.error('sb.auth.signOut() failed or hung, falling back to local-only signOut:', err);
+    await sb.auth.signOut({ scope: 'local' }).catch(() => {});
+  }
   currentUser = null;
   updateAuthUI();
   document.getElementById('auth-dropdown').style.display = 'none';
