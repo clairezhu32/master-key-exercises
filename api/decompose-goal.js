@@ -314,6 +314,12 @@ async function callGeminiOnce(goalData) {
     const err = new Error('The AI planner is temporarily unavailable');
     err.status = 502;
     err.upstreamStatus = res.status;
+    // Free-tier quota errors come in two shapes with very different real
+    // wait times: per-minute (clears in seconds) vs per-day (a fixed daily
+    // request cap, already exhausted — doesn't clear until Google's daily
+    // reset, not "in a minute"). Telling a user to retry shortly when the
+    // real constraint is a day-long cap is actively misleading.
+    err.isDailyQuota = res.status === 429 && detail.includes('PerDay');
     throw err;
   }
 
@@ -371,7 +377,9 @@ async function callGemini(goalData, deadlineAt) {
     } catch (err) {
       lastErr = err;
       if (err.upstreamStatus === 429) {
-        err.message = 'The AI planner is rate-limited right now — please try again in a minute';
+        err.message = err.isDailyQuota
+          ? "The AI planner has hit its daily limit — it won't be available again until that resets. Please try again later."
+          : 'The AI planner is rate-limited right now — please try again in a minute';
         throw err;
       }
       if (!OVERLOAD_STATUSES.has(err.upstreamStatus)) throw err;
