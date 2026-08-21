@@ -792,7 +792,22 @@ async function generatePlan(goalData) {
         body: JSON.stringify(data),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
+      if (!res.ok) {
+        // "Already has a goal" (403) means exactly that — there's a real
+        // plan to show, just not a new one from this submission. Load and
+        // display it directly instead of leaving the user stuck on a bare
+        // error screen for a goal they already have.
+        if (res.status === 403) {
+          const server = await fetchServerGeneration();
+          if (server) {
+            savePlan(server.goal, { ...server.plan, generatedAt: server.generatedAtMs });
+            renderDashboard();
+            show('view-dashboard');
+            return;
+          }
+        }
+        throw new Error(json.error || `Error ${res.status}`);
+      }
       savePlan(data, { ...json.plan, generatedAt: Date.now() });
       renderDashboard();
       show('view-dashboard');
