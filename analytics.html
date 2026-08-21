@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics — Master Key</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f1f;
+      --surface: #161a33;
+      --border: rgba(198,187,255,0.12);
+      --gold: #c9a96e;
+      --gold-light: #e8d5b0;
+      --text: #e6e3f2;
+      --muted: rgba(230,227,242,0.55);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+    .page { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
+
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 0; border-bottom: 1px solid var(--border); margin-bottom: 40px;
+    }
+    .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--gold-light); }
+    .back-link { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .back-link:hover { color: var(--text); }
+
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--gold-light); margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 40px; }
+
+    .center-state { text-align: center; padding: 80px 0; color: var(--muted); font-size: 14px; }
+    .google-btn {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 20px;
+      padding: 13px 20px; background: #fff; color: #1a1a1a; border: none; border-radius: 10px;
+      font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .stat-tile {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; margin-bottom: 24px;
+    }
+    .stat-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--gold-light); line-height: 1; }
+
+    .chart-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; margin-bottom: 24px;
+    }
+    .chart-title { font-size: 13px; color: var(--text); margin-bottom: 20px; }
+    .bar-chart-svg { width: 100%; height: auto; display: block; }
+    .bar-rect { fill: var(--gold); }
+    .bar-rect:hover { fill: var(--gold-light); }
+    .bar-axis-label { fill: var(--muted); font-size: 9px; font-family: 'Inter', sans-serif; }
+    .bar-gridline { stroke: var(--border); stroke-width: 1; }
+    .bar-rect > title { pointer-events: none; }
+
+    .table-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    .cell-muted { color: var(--muted); }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <span class="wordmark">Master Key</span>
+    <a class="back-link" href="/">← Back to site</a>
+  </div>
+
+  <h1>Analytics</h1>
+  <div class="subtitle">Internal dashboard — not linked from the public site.</div>
+
+  <div id="view-signin" class="center-state">
+    <div>Sign in to view analytics.</div>
+    <button class="google-btn" id="google-sign-in-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+  </div>
+
+  <div id="view-loading" class="center-state" style="display:none">Loading…</div>
+  <div id="view-denied" class="center-state" style="display:none">This account isn't authorized to view analytics.</div>
+  <div id="view-error" class="center-state" style="display:none"></div>
+
+  <div id="view-dashboard" style="display:none">
+    <div class="stat-tile">
+      <div class="stat-label">Total registrations</div>
+      <div class="stat-value" id="stat-total">0</div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Registrations — last 30 days</div>
+      <div id="bar-chart-container"></div>
+    </div>
+
+    <div class="table-card">
+      <div class="chart-title">Recent sign-ups</div>
+      <table>
+        <thead>
+          <tr><th>Email</th><th>Provider</th><th>When</th></tr>
+        </thead>
+        <tbody id="recent-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+let currentAccessToken = null;
+
+// Same bounded-wait pattern used on goals.html/exercises.html — a plain
+// sb.auth.getSession() can genuinely hang under some cross-tab session-
+// refresh conditions, so this falls back to the last-known token rather
+// than stalling the whole page.
+async function getFreshAccessToken() {
+  try {
+    const { data } = await Promise.race([
+      sb.auth.getSession(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timed out')), 4000)),
+    ]);
+    return data?.session?.access_token ?? currentAccessToken;
+  } catch {
+    return currentAccessToken;
+  }
+}
+
+function show(id) {
+  ['view-signin', 'view-loading', 'view-denied', 'view-error', 'view-dashboard'].forEach((v) => {
+    document.getElementById(v).style.display = v === id ? 'block' : 'none';
+  });
+}
+
+document.getElementById('google-sign-in-btn').addEventListener('click', async (e) => {
+  e.target.disabled = true;
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/analytics' },
+  });
+});
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function renderBarChart(daily) {
+  const width = 680, barGap = 2;
+  const barWidth = (width / daily.length) - barGap;
+  const max = Math.max(1, ...daily.map((d) => d.count));
+  const chartHeight = 120;
+
+  const svg = svgEl('svg', {
+    class: 'bar-chart-svg',
+    viewBox: `0 0 ${width} ${chartHeight + 24}`,
+  });
+
+  svg.appendChild(svgEl('line', {
+    class: 'bar-gridline', x1: 0, y1: chartHeight, x2: width, y2: chartHeight,
+  }));
+
+  daily.forEach((d, i) => {
+    const barHeight = Math.round((d.count / max) * chartHeight);
+    const x = i * (barWidth + barGap);
+    const r = Math.min(4, barWidth / 2, barHeight);
+    // Rounded top only, and a 1px sliver for a zero-count day so the axis
+    // still reads as a continuous baseline rather than a gap.
+    const rectY = barHeight > 0 ? chartHeight - barHeight : chartHeight - 1;
+    const rectH = barHeight > 0 ? barHeight : 1;
+    const rect = svgEl('rect', {
+      class: 'bar-rect', x, y: rectY, width: barWidth, height: rectH, rx: r,
+    });
+    const title = document.createElementNS(SVG_NS, 'title');
+    title.textContent = `${formatDate(d.date + 'T00:00:00Z')}: ${d.count} registration${d.count === 1 ? '' : 's'}`;
+    rect.appendChild(title);
+    svg.appendChild(rect);
+
+    if (i % 5 === 0) {
+      const label = svgEl('text', {
+        class: 'bar-axis-label', x, y: chartHeight + 16,
+      });
+      label.textContent = formatDate(d.date + 'T00:00:00Z');
+      svg.appendChild(label);
+    }
+  });
+
+  const container = document.getElementById('bar-chart-container');
+  container.replaceChildren(svg);
+}
+
+function renderRecentTable(recent) {
+  const tbody = document.getElementById('recent-table-body');
+  tbody.replaceChildren();
+  if (recent.length === 0) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 3;
+    cell.className = 'cell-muted';
+    cell.textContent = 'No registrations yet.';
+    row.appendChild(cell);
+    tbody.appendChild(row);
+    return;
+  }
+  recent.forEach((r) => {
+    const row = document.createElement('tr');
+    const emailCell = document.createElement('td');
+    emailCell.textContent = r.email || '—';
+    const providerCell = document.createElement('td');
+    providerCell.className = 'cell-muted';
+    providerCell.textContent = r.properties?.provider || '—';
+    const whenCell = document.createElement('td');
+    whenCell.className = 'cell-muted';
+    whenCell.textContent = new Date(r.created_at).toLocaleString();
+    row.appendChild(emailCell);
+    row.appendChild(providerCell);
+    row.appendChild(whenCell);
+    tbody.appendChild(row);
+  });
+}
+
+async function loadDashboard() {
+  show('view-loading');
+  try {
+    const token = await getFreshAccessToken();
+    const res = await fetch('/api/analytics', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (res.status === 403) { show('view-denied'); return; }
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    const data = await res.json();
+    document.getElementById('stat-total').textContent = data.totalRegistrations;
+    renderBarChart(data.daily);
+    renderRecentTable(data.recent);
+    show('view-dashboard');
+  } catch (err) {
+    document.getElementById('view-error').textContent = `Couldn't load analytics: ${err.message}`;
+    show('view-error');
+  }
+}
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  currentUser = session?.user ?? null;
+  currentAccessToken = session?.access_token ?? null;
+  if (currentUser) {
+    await loadDashboard();
+  } else {
+    show('view-signin');
+  }
+});
+</script>
+</body>
+</html>
