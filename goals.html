@@ -1190,7 +1190,7 @@ function renderWeekCard(w, plan) {
   // Actions are only checkable for the actual current week — "completing"
   // an action from a future week's preview would mark it done today for a
   // week that hasn't started yet, corrupting real progress tracking.
-  renderActions(weekData.actions || [], isCurrentWeek);
+  renderActions(weekData.actions || [], w, isCurrentWeek);
 }
 
 function navigateWeekForward() {
@@ -1208,13 +1208,16 @@ function backToCurrentWeek() {
 document.getElementById('d-week-badge').addEventListener('click', navigateWeekForward);
 document.getElementById('d-week-back-current').addEventListener('click', backToCurrentWeek);
 
-function renderActions(actions, interactive = true) {
+function renderActions(actions, weekNum, interactive = true) {
   const completed = getCompletedToday();
   const container = document.getElementById('d-actions');
   container.replaceChildren();
   actions.forEach((action, idx) => {
+    // Keyed by week + index, not just index — action 0 in week 1 and action
+    // 0 in week 5 are different actions and must track "done" separately.
+    const key = `${weekNum}-${idx}`;
     const item = document.createElement('div');
-    item.className = 'action-item' + (completed.has(idx) ? ' done' : '') + (interactive ? '' : ' readonly');
+    item.className = 'action-item' + (completed.has(key) ? ' done' : '') + (interactive ? '' : ' readonly');
     const check = document.createElement('div');
     check.className = 'action-check';
     const text = document.createElement('div');
@@ -1225,11 +1228,11 @@ function renderActions(actions, interactive = true) {
     if (interactive) {
       item.addEventListener('click', () => {
         const c = getCompletedToday();
-        if (c.has(idx)) c.delete(idx); else c.add(idx);
+        if (c.has(key)) c.delete(key); else c.add(key);
         setCompletedToday(c);
         const plan = loadPlan();
-        const weekNum = getCurrentWeek(plan.goal.createdAt);
-        renderActions(plan.weeks?.[weekNum - 1]?.actions || []);
+        const wn = getCurrentWeek(plan.goal.createdAt);
+        renderActions(plan.weeks?.[wn - 1]?.actions || [], wn);
         document.getElementById('d-streak').textContent = getStreak();
       });
     }
