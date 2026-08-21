@@ -101,7 +101,15 @@
     /* Week card */
     .week-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
     .week-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-    .week-badge { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+    .week-badge { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .week-badge:hover { color: var(--gold-light); }
+    .week-badge .week-badge-arrow { font-size: 12px; }
+    .week-back-current {
+      display: none; font-size: 11px; letter-spacing: 0.04em; color: var(--muted);
+      cursor: pointer; margin-top: 6px; text-decoration: underline; text-underline-offset: 2px;
+    }
+    .week-back-current:hover { color: var(--text); }
+    .week-back-current.visible { display: inline-block; }
     .week-progress { font-size: 12px; color: var(--muted); }
     .week-theme { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; }
     .week-target { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
@@ -116,6 +124,7 @@
     }
     .action-item:last-child { border-bottom: none; }
     .action-item.done { opacity: 0.45; }
+    .action-item.readonly { cursor: default; opacity: 0.7; }
     .action-check {
       width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(201,169,110,0.4);
       flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
@@ -188,10 +197,11 @@
     .week-dot {
       width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
       display: flex; align-items: center; justify-content: center; font-size: 11px;
-      color: var(--muted); transition: all 0.2s;
+      color: var(--muted); transition: all 0.2s; cursor: pointer;
     }
     .week-dot.current { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.1); font-weight: 600; }
     .week-dot.past { background: rgba(201,169,110,0.08); color: rgba(201,169,110,0.5); border-color: rgba(201,169,110,0.2); }
+    .week-dot.viewing { outline: 2px solid var(--gold); outline-offset: 1px; }
 
 
     /* ── Auth ── */
@@ -420,6 +430,7 @@
       <div class="week-header">
         <div>
           <div class="week-badge" id="d-week-badge"></div>
+          <span class="week-back-current" id="d-week-back-current">← Back to current week</span>
           <div class="week-stage-tag" id="d-week-stage"></div>
           <div class="week-theme" id="d-week-theme"></div>
           <div class="week-target" id="d-week-target"></div>
@@ -1081,14 +1092,19 @@ function renderFunnel(plan) {
   });
 }
 
+// Which week's card is currently displayed — defaults to the actual current
+// week on every renderDashboard(), but the badge/dots let you browse ahead
+// (or back) to preview other weeks without changing which week you're
+// actually on.
+let viewedWeek = null;
+
 function renderDashboard() {
   const plan = loadPlan();
   if (!plan) return;
   const goal = plan.goal;
 
   const weekNum = getCurrentWeek(goal.createdAt);
-  const weekData = plan.weeks?.[weekNum - 1];
-  if (!weekData) return;
+  if (!plan.weeks?.[weekNum - 1]) return;
 
   // Hero
   document.getElementById('d-domain-label').textContent = plan.domain_label || 'Your Goal';
@@ -1100,16 +1116,8 @@ function renderDashboard() {
   // Strategic funnel
   renderFunnel(plan);
 
-  // Week card
-  document.getElementById('d-week-badge').textContent = `Week ${weekNum} of 12`;
-  document.getElementById('d-week-stage').textContent = FUNNEL_STAGE_LABELS[weekData.funnel_stage] || '';
-  document.getElementById('d-week-theme').textContent = weekData.theme || '';
-  document.getElementById('d-week-target').textContent = weekData.target || '';
-  document.getElementById('d-week-progress').textContent = `${weekNum}/12`;
-  document.getElementById('d-progress-fill').style.width = `${Math.round((weekNum / 12) * 100)}%`;
-
-  // Actions
-  renderActions(weekData.actions || []);
+  // Week card (starts on the actual current week)
+  renderWeekCard(weekNum, plan);
 
   // Streak
   document.getElementById('d-streak').textContent = getStreak();
@@ -1147,18 +1155,66 @@ function renderDashboard() {
     dot.className = 'week-dot' + (w === weekNum ? ' current' : w < weekNum ? ' past' : '');
     dot.textContent = w;
     dot.title = plan.weeks?.[w - 1]?.theme || `Week ${w}`;
-    dot.addEventListener('click', () => showWeekDetail(w, plan));
+    dot.addEventListener('click', () => renderWeekCard(w, plan));
     grid.appendChild(dot);
   }
 }
 
-function renderActions(actions) {
+// Renders week w's theme/target/actions into the week card without
+// touching the rest of the dashboard — this is what both the clickable
+// week badge (advance one week) and the roadmap dots (jump to any week)
+// call to browse the plan ahead of or behind the actual current week.
+function renderWeekCard(w, plan) {
+  const weekData = plan.weeks?.[w - 1];
+  if (!weekData) return;
+  viewedWeek = w;
+  const actualCurrentWeek = getCurrentWeek(plan.goal.createdAt);
+  const isCurrentWeek = w === actualCurrentWeek;
+
+  const badgeEl = document.getElementById('d-week-badge');
+  badgeEl.replaceChildren(document.createTextNode(`Week ${w} of 12 `));
+  const badgeArrow = document.createElement('span');
+  badgeArrow.className = 'week-badge-arrow';
+  badgeArrow.textContent = '→';
+  badgeEl.appendChild(badgeArrow);
+  document.getElementById('d-week-stage').textContent = FUNNEL_STAGE_LABELS[weekData.funnel_stage] || '';
+  document.getElementById('d-week-theme').textContent = weekData.theme || '';
+  document.getElementById('d-week-target').textContent = weekData.target || '';
+  document.getElementById('d-week-progress').textContent = `${w}/12`;
+  document.getElementById('d-progress-fill').style.width = `${Math.round((w / 12) * 100)}%`;
+  document.getElementById('d-week-back-current').classList.toggle('visible', !isCurrentWeek);
+  document.querySelectorAll('.week-dot').forEach((dot) => {
+    dot.classList.toggle('viewing', Number(dot.textContent) === w);
+  });
+
+  // Actions are only checkable for the actual current week — "completing"
+  // an action from a future week's preview would mark it done today for a
+  // week that hasn't started yet, corrupting real progress tracking.
+  renderActions(weekData.actions || [], isCurrentWeek);
+}
+
+function navigateWeekForward() {
+  const plan = loadPlan();
+  if (!plan || viewedWeek === null) return;
+  renderWeekCard(Math.min(12, viewedWeek + 1), plan);
+}
+
+function backToCurrentWeek() {
+  const plan = loadPlan();
+  if (!plan) return;
+  renderWeekCard(getCurrentWeek(plan.goal.createdAt), plan);
+}
+
+document.getElementById('d-week-badge').addEventListener('click', navigateWeekForward);
+document.getElementById('d-week-back-current').addEventListener('click', backToCurrentWeek);
+
+function renderActions(actions, interactive = true) {
   const completed = getCompletedToday();
   const container = document.getElementById('d-actions');
   container.replaceChildren();
   actions.forEach((action, idx) => {
     const item = document.createElement('div');
-    item.className = 'action-item' + (completed.has(idx) ? ' done' : '');
+    item.className = 'action-item' + (completed.has(idx) ? ' done' : '') + (interactive ? '' : ' readonly');
     const check = document.createElement('div');
     check.className = 'action-check';
     const text = document.createElement('div');
@@ -1166,25 +1222,19 @@ function renderActions(actions) {
     text.textContent = action;
     item.appendChild(check);
     item.appendChild(text);
-    item.addEventListener('click', () => {
-      const c = getCompletedToday();
-      if (c.has(idx)) c.delete(idx); else c.add(idx);
-      setCompletedToday(c);
-      const plan = loadPlan();
-      const goal = plan.goal;
-      const weekNum = getCurrentWeek(goal.createdAt);
-      renderActions(plan.weeks?.[weekNum - 1]?.actions || []);
-      document.getElementById('d-streak').textContent = getStreak();
-    });
+    if (interactive) {
+      item.addEventListener('click', () => {
+        const c = getCompletedToday();
+        if (c.has(idx)) c.delete(idx); else c.add(idx);
+        setCompletedToday(c);
+        const plan = loadPlan();
+        const weekNum = getCurrentWeek(plan.goal.createdAt);
+        renderActions(plan.weeks?.[weekNum - 1]?.actions || []);
+        document.getElementById('d-streak').textContent = getStreak();
+      });
+    }
     container.appendChild(item);
   });
-}
-
-function showWeekDetail(w, plan) {
-  const weekData = plan.weeks?.[w - 1];
-  if (!weekData) return;
-  const stage = FUNNEL_STAGE_LABELS[weekData.funnel_stage] ? ` (${FUNNEL_STAGE_LABELS[weekData.funnel_stage]})` : '';
-  alert(`Week ${w}: ${weekData.theme}${stage}\n\n${weekData.target}\n\n• ${weekData.actions.join('\n• ')}`);
 }
 
 // ── Init ───────────────────────────────────────
