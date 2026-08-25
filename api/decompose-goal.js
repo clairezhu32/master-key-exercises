@@ -316,12 +316,14 @@ ${partList}
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
-function buildUserPrompt({ goal, why, vision, obstacle, hours, intensity }) {
-  return `Goal: ${goal}
+function buildUserPrompt({ goal, why, progress, obstacle, hours, intensity, category, belief_score }) {
+  return `Goal category: ${category || '(not specified)'}
+Goal: ${goal}
 Why it matters to them: ${why || '(not specified)'}
-What meaningful progress looks like in 90 days: ${vision || '(not specified)'}
+What meaningful progress looks like in 90 days: ${progress || '(not specified)'}
 Their biggest obstacle right now: ${obstacle || '(not specified)'}
 Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensity)
+Self-rated belief they'll achieve this (1-10): ${belief_score ?? '(not specified)'}
 
 Build their strategic funnel plan now.`;
 }
@@ -484,7 +486,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { goal, why, vision, obstacle, hours } = body ?? {};
+  const { goal, why, progress, obstacle, hours, category, belief_score } = body ?? {};
   if (!goal?.trim()) return res.status(400).json({ error: 'Goal is required' });
 
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
@@ -498,7 +500,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const plan = await callGemini({ goal, why, vision, obstacle, hours, intensity }, deadlineAt);
+    const plan = await callGemini({ goal, why, progress, obstacle, hours, intensity, category, belief_score }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     await saveGenerationResult(user.id, body, { ...plan, intensity }, serviceRoleKey);
     return res.status(200).json({ plan: { ...plan, intensity } });

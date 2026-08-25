@@ -52,6 +52,32 @@
       color: var(--muted); font-size: 14px; padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center;
     }
     .hours-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+    .category-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .category-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--muted); font-size: 15px; padding: 16px 18px; cursor: pointer; transition: all 0.2s; text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .category-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+    .obstacle-detail-field { margin-top: 14px; }
+    .belief-slider-row { display: flex; align-items: center; gap: 18px; }
+    .belief-slider-row input[type=range] {
+      flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+      background: var(--border); outline: none;
+    }
+    .belief-slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--gold); cursor: pointer; border: 2px solid var(--bg);
+    }
+    .belief-slider-row input[type=range]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--gold); cursor: pointer; border: 2px solid var(--bg);
+    }
+    .belief-value {
+      font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--gold-light);
+      min-width: 40px; text-align: center;
+    }
+    .step8-generate-btn { margin-top: 4px; }
+    #step8-google-btn { margin-top: 4px; }
     .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
     .btn-back { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 8px 0; }
     .btn-back:hover { color: var(--text); }
@@ -286,30 +312,37 @@
   <div id="view-onboard">
     <div id="step-1" class="step active">
       <div class="step-hero">
-        <div class="step-num">Step 1 of 5</div>
-        <div class="step-q">What is your most important goal right now?</div>
-        <div class="step-hint">Be specific. "Get promoted to senior engineer at my company" beats "advance my career."</div>
-        <input type="text" id="input-goal" placeholder="My goal is to…" maxlength="200" autocomplete="off">
+        <div class="step-num">Step 1 of 8</div>
+        <div class="step-q">What area of your life is this goal in?</div>
+        <div class="step-hint">This shapes the kind of playbook the plan builds — a career funnel looks different from a health or relationship one.</div>
+        <div class="category-grid">
+          <button class="category-btn" data-category="Career breakthrough">Career breakthrough</button>
+          <button class="category-btn" data-category="Financial abundance">Financial abundance</button>
+          <button class="category-btn" data-category="Relationship &amp; connection">Relationship &amp; connection</button>
+          <button class="category-btn" data-category="Health &amp; energy">Health &amp; energy</button>
+          <button class="category-btn" data-category="Launching something of my own">Launching something of my own</button>
+          <button class="category-btn" data-category="Inner peace">Inner peace</button>
+        </div>
       </div>
       <div class="step-nav">
         <div class="dots">
-          <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
-        <button class="btn-next" id="btn-1">Continue →</button>
+        <button class="btn-next" id="btn-1" disabled>Continue →</button>
       </div>
     </div>
 
     <div id="step-2" class="step">
       <div class="step-hero">
-        <div class="step-num">Step 2 of 5</div>
-        <div class="step-q">Why does achieving this matter to you?</div>
-        <div class="step-hint">The deeper the reason, the stronger the motivation. What's really at stake?</div>
-        <textarea id="input-why" placeholder="It matters because…" maxlength="500"></textarea>
+        <div class="step-num">Step 2 of 8</div>
+        <div class="step-q">What is your goal? Write it as if it's already true.</div>
+        <div class="step-hint">"I am a senior engineer leading a high-impact team" — not "I want to get promoted." State it as a completed fact, the way Haanel taught: the mind moves toward the image it holds.</div>
+        <input type="text" id="input-goal" placeholder="I am…" maxlength="200" autocomplete="off">
       </div>
       <div class="step-nav">
         <button class="btn-back" onclick="goStep(1)">← Back</button>
         <div class="dots">
-          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
         <button class="btn-next" id="btn-2">Continue →</button>
       </div>
@@ -317,15 +350,15 @@
 
     <div id="step-3" class="step">
       <div class="step-hero">
-        <div class="step-num">Step 3 of 5</div>
-        <div class="step-q">In 90 days, what would meaningful progress look like?</div>
-        <div class="step-hint">Describe the concrete outcome you're aiming for — not perfection, just real progress.</div>
-        <textarea id="input-vision" placeholder="In 90 days, I will have…" maxlength="500"></textarea>
+        <div class="step-num">Step 3 of 8</div>
+        <div class="step-q">Why does achieving this matter to you?</div>
+        <div class="step-hint">The deeper the reason, the stronger the motivation. What's really at stake?</div>
+        <textarea id="input-why" placeholder="It matters because…" maxlength="500"></textarea>
       </div>
       <div class="step-nav">
         <button class="btn-back" onclick="goStep(2)">← Back</button>
         <div class="dots">
-          <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
         <button class="btn-next" id="btn-3">Continue →</button>
       </div>
@@ -333,15 +366,15 @@
 
     <div id="step-4" class="step">
       <div class="step-hero">
-        <div class="step-num">Step 4 of 5</div>
-        <div class="step-q">What's your biggest obstacle right now?</div>
-        <div class="step-hint">Honest obstacles lead to honest plans. What's actually in the way?</div>
-        <textarea id="input-obstacle" placeholder="The main thing stopping me is…" maxlength="500"></textarea>
+        <div class="step-num">Step 4 of 8</div>
+        <div class="step-q">In 90 days, what would meaningful progress look like?</div>
+        <div class="step-hint">Describe the concrete outcome you're aiming for — not perfection, just real progress.</div>
+        <textarea id="input-progress" placeholder="In 90 days, I will have…" maxlength="500"></textarea>
       </div>
       <div class="step-nav">
         <button class="btn-back" onclick="goStep(3)">← Back</button>
         <div class="dots">
-          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
         <button class="btn-next" id="btn-4">Continue →</button>
       </div>
@@ -349,7 +382,33 @@
 
     <div id="step-5" class="step">
       <div class="step-hero">
-        <div class="step-num">Step 5 of 5</div>
+        <div class="step-num">Step 5 of 8</div>
+        <div class="step-q">What's your biggest obstacle right now?</div>
+        <div class="step-hint">Pick what's closest, then add detail below if it helps.</div>
+        <select id="input-obstacle-reason">
+          <option value="" selected disabled>Choose the closest fit…</option>
+          <option value="Fear & self-doubt">Fear &amp; self-doubt</option>
+          <option value="Lack of clarity">Lack of clarity</option>
+          <option value="Inconsistency">Inconsistency</option>
+          <option value="My environment">My environment</option>
+          <option value="Low energy">Low energy</option>
+        </select>
+        <div class="obstacle-detail-field">
+          <textarea id="input-obstacle-detail" placeholder="Any more detail? (optional)" maxlength="500"></textarea>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(4)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-5" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-6" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 6 of 8</div>
         <div class="step-q">How many hours per week can you commit?</div>
         <div class="step-hint">Be honest — a realistic plan beats an ambitious plan you won't follow.</div>
         <div class="hours-grid">
@@ -377,11 +436,54 @@
         </div>
       </div>
       <div class="step-nav">
-        <button class="btn-back" onclick="goStep(4)">← Back</button>
+        <button class="btn-back" onclick="goStep(5)">← Back</button>
         <div class="dots">
-          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
         </div>
-        <button class="btn-next" id="btn-5" disabled>Generate My Plan →</button>
+        <button class="btn-next" id="btn-6" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-7" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 7 of 8</div>
+        <div class="step-q">How much do you believe you'll achieve this?</div>
+        <div class="step-hint">Be honest — this isn't a test, just a starting point.</div>
+        <div class="belief-slider-row">
+          <input type="range" id="input-belief" min="1" max="10" value="7">
+          <div class="belief-value" id="belief-value">7</div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(6)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-7">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-8" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 8 of 8</div>
+        <div class="step-q" id="step8-heading">Sign in to generate your plan</div>
+        <div class="step-hint" id="step8-hint">Your plan is generated for your account, so you can come back to it from any device.</div>
+        <button class="google-btn" id="step8-google-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+        <button class="btn-next step8-generate-btn" id="btn-8-generate" style="display:none">Generate My Plan →</button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(7)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -611,9 +713,13 @@ document.addEventListener('click', e => {
 });
 
 async function signInWithGoogle() {
-  const btn = document.getElementById('google-sign-in-btn');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to Google…';
+  // Shared by the header auth modal's button and the onboarding step-8
+  // button — both carry the .google-btn class, so this disables/relabels
+  // whichever one is currently visible rather than a single hardcoded ID.
+  document.querySelectorAll('.google-btn').forEach(btn => {
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to Google…';
+  });
   await sb.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.origin + '/goals' },
@@ -669,6 +775,9 @@ sb.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   currentAccessToken = session?.access_token ?? null;
   updateAuthUI();
+  // Covers signing in via the header while already on step 8 of the wizard
+  // (redirect flow lands back on /goals with currentStep still 8).
+  if (currentStep === 8) updateStep8UI();
   if (currentUser && !wasSignedIn) {
     // A live sign-in mid-session (e.g. from the goal-generation gate):
     // resume whatever draft brought them here, independent of initial
@@ -705,34 +814,58 @@ function show(id) {
 // ── Onboarding steps ───────────────────────────
 let currentStep = 1;
 let selectedHours = null;
+let selectedCategory = null;
 
 function goStep(n) {
   document.getElementById(`step-${currentStep}`).classList.remove('active');
   currentStep = n;
   document.getElementById(`step-${n}`).classList.add('active');
+  if (n === 8) updateStep8UI();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Validate and advance
-document.getElementById('btn-1').addEventListener('click', () => {
-  if (!document.getElementById('input-goal').value.trim()) return;
-  goStep(2);
+// Category selection (step 1)
+document.querySelectorAll('.category-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedCategory = btn.dataset.category;
+    document.getElementById('btn-1').disabled = false;
+  });
 });
-document.getElementById('btn-2').addEventListener('click', () => { goStep(3); });
+
+// Obstacle reason selection (step 5)
+document.getElementById('input-obstacle-reason').addEventListener('change', e => {
+  document.getElementById('btn-5').disabled = !e.target.value;
+});
+
+// Belief slider (step 7)
+document.getElementById('input-belief').addEventListener('input', e => {
+  document.getElementById('belief-value').textContent = e.target.value;
+});
+
+// Validate and advance
+document.getElementById('btn-1').addEventListener('click', () => { goStep(2); });
+document.getElementById('btn-2').addEventListener('click', () => {
+  if (!document.getElementById('input-goal').value.trim()) return;
+  goStep(3);
+});
 document.getElementById('btn-3').addEventListener('click', () => { goStep(4); });
 document.getElementById('btn-4').addEventListener('click', () => { goStep(5); });
-document.getElementById('btn-5').addEventListener('click', handleGenerateClick);
+document.getElementById('btn-5').addEventListener('click', () => { goStep(6); });
+document.getElementById('btn-6').addEventListener('click', () => { goStep(7); });
+document.getElementById('btn-7').addEventListener('click', () => { goStep(8); });
 
-// Enter key to advance on text inputs
-document.getElementById('input-goal').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-1').click(); } });
+// Enter key to advance on the goal text input (step 2)
+document.getElementById('input-goal').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-2').click(); } });
 
-// Hours selection
+// Hours selection (step 6)
 document.querySelectorAll('.hours-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.hours-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     selectedHours = btn.dataset.hours;
-    document.getElementById('btn-5').disabled = false;
+    document.getElementById('btn-6').disabled = false;
   });
 });
 
@@ -744,27 +877,50 @@ function collectGoalData() {
   // starting week, for users who are already partway through the course.
   const startWeek = parseInt(document.getElementById('input-start-week').value, 10) || 1;
   const createdAt = Date.now() - (startWeek - 1) * 7 * 24 * 60 * 60 * 1000;
+  const obstacleReason = document.getElementById('input-obstacle-reason').value;
+  const obstacleDetail = document.getElementById('input-obstacle-detail').value.trim();
   return {
+    category: selectedCategory,
     goal: document.getElementById('input-goal').value.trim(),
     why: document.getElementById('input-why').value.trim(),
-    vision: document.getElementById('input-vision').value.trim(),
-    obstacle: document.getElementById('input-obstacle').value.trim(),
+    progress: document.getElementById('input-progress').value.trim(),
+    obstacle: obstacleDetail ? `${obstacleReason} — ${obstacleDetail}` : obstacleReason,
     hours: selectedHours,
+    start_week: startWeek,
+    belief_score: Number(document.getElementById('input-belief').value),
+    email: currentUser?.email ?? null,
     createdAt,
   };
 }
 
-// Gate for the onboarding "Generate My Plan" button: requires sign-in before
-// ever calling the API (the server enforces the one-free-plan-per-account
-// limit and returns a clear error if it's already been used). Saves the
-// draft first so it survives the full-page redirect sign-in requires.
-async function handleGenerateClick() {
+// Step 8 shows either the sign-in button or the generate button, depending
+// on whether the account gate (moved to the end of the wizard) has already
+// been cleared — including if the user signed in earlier via the header
+// button while mid-wizard, before ever reaching this step.
+function updateStep8UI() {
+  const signedIn = !!currentUser;
+  document.getElementById('step8-google-btn').style.display = signedIn ? 'none' : 'flex';
+  document.getElementById('btn-8-generate').style.display = signedIn ? 'block' : 'none';
+  document.getElementById('step8-heading').textContent = signedIn
+    ? 'Ready to generate your plan'
+    : 'Sign in to generate your plan';
+  document.getElementById('step8-hint').textContent = signedIn
+    ? `Signed in as ${currentUser.email}.`
+    : 'Your plan is generated for your account, so you can come back to it from any device.';
+}
+
+// Saves the draft first so it survives the full-page redirect sign-in
+// requires; tryResumeGeneration() picks it back up once the user returns.
+document.getElementById('step8-google-btn').addEventListener('click', async () => {
+  saveGoal(collectGoalData());
+  await signInWithGoogle();
+});
+
+document.getElementById('btn-8-generate').addEventListener('click', async () => {
   const goalData = collectGoalData();
   saveGoal(goalData);
-
-  if (!currentUser) { openAuthModal(); return; }
   await generatePlan(goalData);
-}
+});
 
 // Called after returning from a sign-in redirect: if there's a saved draft
 // with no plan generated yet, pick up where the user left off.
