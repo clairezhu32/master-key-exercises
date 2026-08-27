@@ -3,438 +3,365 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Master Key System — Introduction</title>
+  <meta name="description" content="Turn one meaningful goal into a personalized 90-day plan, supported by guided mental-training exercises and daily action.">
+  <title>Master Key — Your Personalized 90-Day Goal Plan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0d0f1f;
-      --surface:   #161a33;
-      --card:      #1c2140;
-      --border:    #2b2f57;
-      --gold:      #c9a84c;
-      --gold-dim:  #8a6f2e;
-      --gold-glow: rgba(201,168,76,0.12);
-      --text:      #e6e3f2;
-      --text-dim:  #9a97b5;
-      --text-faint:#423f5c;
-      --green:     #4caf7a;
-      --radius:    12px;
+      --night: #080b17;
+      --navy: #0e1327;
+      --panel: #131a33;
+      --panel-2: #19213d;
+      --line: rgba(255,255,255,.1);
+      --text: #f7f5ff;
+      --muted: #a8adc2;
+      --violet: #9d8cff;
+      --violet-2: #725cff;
+      --mint: #71e5c1;
+      --warm: #ffd9a2;
+      --max: 1180px;
     }
 
     html { scroll-behavior: smooth; }
-
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 82% 5%, rgba(114,92,255,.18), transparent 30rem),
+        radial-gradient(circle at 8% 36%, rgba(113,229,193,.08), transparent 28rem),
+        var(--night);
+      font-family: "DM Sans", sans-serif;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
 
-    /* ── Header ─────────────────────────────── */
-    .header {
-      border-bottom: 1px solid var(--border);
-      padding: 20px 32px;
+    .nav {
+      width: min(var(--max), calc(100% - 40px));
+      height: 78px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 100;
+      border-bottom: 1px solid var(--line);
     }
-    .header-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
-      font-weight: 400;
-      color: var(--text);
-      letter-spacing: 0.03em;
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: -.02em; }
+    .brand-mark {
+      width: 30px; height: 30px; display: grid; place-items: center;
+      border-radius: 9px; color: var(--night); background: linear-gradient(135deg, var(--mint), var(--violet));
+      font-family: "Playfair Display", serif; font-size: 17px; font-weight: 600;
+      box-shadow: 0 0 28px rgba(157,140,255,.25);
     }
-    .header-subtitle {
-      font-size: 0.68rem;
-      color: var(--text-faint);
-      letter-spacing: 0.12em;
-      margin-top: 2px;
+    .nav-links { display: flex; align-items: center; gap: 28px; color: var(--muted); font-size: 13px; font-weight: 500; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 10px 16px; color: var(--text) !important; border: 1px solid rgba(157,140,255,.45);
+      border-radius: 9px; background: rgba(157,140,255,.08);
     }
 
-    /* ── Header nav ─────────────────────────── */
-    .header-nav {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .header-nav-link {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-family: inherit;
-      letter-spacing: 0.06em;
-      padding: 4px 0;
-      transition: color 0.2s;
-      text-decoration: none;
-    }
-    .header-nav-link:hover { color: var(--text); }
-    .header-nav-link.active { color: var(--gold); }
-
-    /* ── Intro page ──────────────────────────── */
-    .intro-hero {
-      max-width: 760px;
-      margin: 72px auto 56px;
-      padding: 0 32px;
-      text-align: center;
-    }
-    .intro-eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 20px;
-    }
-    .intro-hero h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 300;
-      line-height: 1.1;
-      color: var(--text);
-      margin-bottom: 24px;
-    }
-    .intro-hero h1 em { color: var(--gold); font-style: italic; }
-    .intro-tagline {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem;
-      font-style: italic;
-      color: var(--text-dim);
-      max-width: 560px;
-      margin: 0 auto 40px;
-      line-height: 1.7;
-    }
-    .intro-begin-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 36px;
-      background: var(--gold);
-      color: #0e0d0b;
-      border: none;
-      border-radius: 100px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      letter-spacing: 0.02em;
-      text-decoration: none;
-    }
-    .intro-begin-btn:hover { background: #d4b45e; transform: translateY(-1px); }
-    .intro-begin-btn svg { width: 14px; height: 14px; }
-
-    .intro-videos {
-      max-width: 1040px;
-      margin: 0 auto 72px;
-      padding: 0 24px;
+    .hero {
+      width: min(var(--max), calc(100% - 40px));
+      min-height: 690px;
+      margin: 0 auto;
+      padding: 90px 0 86px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+      gap: 80px;
+      align-items: center;
     }
-    .intro-video-block {}
-    .intro-video-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-faint);
-      margin-bottom: 10px;
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 9px; margin-bottom: 24px; padding: 7px 12px;
+      color: #c5bbff; border: 1px solid rgba(157,140,255,.22); border-radius: 999px;
+      background: rgba(157,140,255,.08); font-size: 11px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase;
     }
-    .intro-video-wrap {
-      position: relative;
-      padding-bottom: 56.25%;
-      border-radius: var(--radius);
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 12px var(--mint); }
+    .hero h1 {
+      max-width: 700px;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(48px, 6.3vw, 78px);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+      font-weight: 600;
     }
-    .intro-video-wrap iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .intro-body {
-      max-width: 720px;
-      margin: 0 auto 80px;
-      padding: 0 32px;
-    }
-    .intro-section { margin-bottom: 56px; }
-    .intro-section-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 20px;
-    }
-    .intro-section h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.9rem;
-      font-weight: 300;
-      color: var(--text);
-      margin-bottom: 20px;
-      line-height: 1.25;
-    }
-    .intro-section p {
-      color: var(--text-dim);
-      font-size: 0.95rem;
-      line-height: 1.8;
-      margin-bottom: 16px;
-    }
-    .intro-section p:last-child { margin-bottom: 0; }
-
-    .how-steps {
-      list-style: none;
-      margin-top: 8px;
-    }
-    .how-steps li {
-      display: flex;
-      gap: 20px;
-      padding: 20px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .how-steps li:last-child { border-bottom: none; }
-    .how-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 300;
-      color: var(--text-faint);
-      line-height: 1;
-      min-width: 32px;
-      padding-top: 2px;
-    }
-    .how-content strong {
-      display: block;
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 500;
-      margin-bottom: 6px;
-    }
-    .how-content span {
-      color: var(--text-dim);
-      font-size: 0.88rem;
-      line-height: 1.65;
-    }
-
-    .intro-quote {
-      border-left: 2px solid var(--gold-dim);
-      padding: 4px 0 4px 24px;
-      margin: 32px 0;
-    }
-    .intro-quote blockquote {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem;
+    .hero h1 em {
+      color: transparent;
+      background: linear-gradient(100deg, var(--mint), #b6aaff 55%, var(--warm));
+      -webkit-background-clip: text; background-clip: text;
       font-style: italic;
-      font-weight: 300;
-      color: var(--text-dim);
-      line-height: 1.7;
     }
-    .intro-quote cite {
-      display: block;
-      margin-top: 8px;
-      font-size: 0.75rem;
-      color: var(--text-faint);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-style: normal;
+    .hero-copy > p {
+      max-width: 650px; margin-top: 28px; color: var(--muted); font-size: 18px; line-height: 1.75;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 14px; margin-top: 36px; }
+    .button {
+      min-height: 52px; padding: 0 21px; display: inline-flex; align-items: center; justify-content: center;
+      gap: 24px; border-radius: 10px; font-size: 14px; font-weight: 700; transition: .2s ease;
+    }
+    .button-primary {
+      color: #0a0d18; background: linear-gradient(100deg, var(--mint), #a99bff);
+      box-shadow: 0 12px 32px rgba(113,229,193,.13);
+    }
+    .button-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 38px rgba(113,229,193,.2); }
+    .button-secondary { color: var(--text); border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .button-secondary:hover { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.06); }
+    .hero-note { display: flex; gap: 18px; margin-top: 22px; color: #777f9b; font-size: 11px; }
+    .hero-note span { display: flex; align-items: center; gap: 7px; }
+    .hero-note span::before { content: "✓"; color: var(--mint); }
+
+    .preview-wrap { position: relative; }
+    .preview-glow {
+      position: absolute; inset: 10% 5%; background: rgba(114,92,255,.28); filter: blur(75px);
+      border-radius: 50%; pointer-events: none;
+    }
+    .app-preview {
+      position: relative; overflow: hidden; padding: 20px; border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px; background: rgba(19,26,51,.86); box-shadow: 0 35px 90px rgba(0,0,0,.38);
+      backdrop-filter: blur(18px); transform: rotate(1.2deg);
+    }
+    .preview-top { display: flex; align-items: center; justify-content: space-between; padding: 1px 2px 17px; }
+    .preview-title { font-size: 12px; font-weight: 700; }
+    .preview-week { color: var(--violet); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .goal-card { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, rgba(157,140,255,.13), rgba(255,255,255,.025)); }
+    .mini-label { color: #8f97b3; font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    .goal-card h3 { margin-top: 9px; font-family: "Playfair Display", serif; font-size: 22px; line-height: 1.28; font-weight: 600; }
+    .progress-row { margin-top: 18px; display: flex; align-items: center; gap: 11px; color: var(--muted); font-size: 10px; }
+    .progress { height: 5px; flex: 1; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.09); }
+    .progress > span { display: block; width: 38%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), var(--violet)); }
+    .today-card { margin-top: 13px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(8,11,23,.62); }
+    .task { display: flex; align-items: flex-start; gap: 11px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.07); color: #dce0f0; font-size: 12px; line-height: 1.5; }
+    .task:last-child { border-bottom: 0; padding-bottom: 0; }
+    .task-check { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 1px; border: 1px solid rgba(113,229,193,.48); border-radius: 50%; }
+    .task.done { color: #77809b; text-decoration: line-through; }
+    .task.done .task-check { display: grid; place-items: center; color: var(--night); background: var(--mint); }
+    .task.done .task-check::after { content: "✓"; font-size: 10px; font-weight: 800; }
+    .insight-card {
+      margin-top: 13px; padding: 16px 18px; display: grid; grid-template-columns: 30px 1fr; gap: 12px;
+      border: 1px solid rgba(255,217,162,.14); border-radius: 14px; background: rgba(255,217,162,.055);
+    }
+    .insight-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: rgba(255,217,162,.1); }
+    .insight-card p { margin-top: 3px; color: #c4c8d8; font-size: 10px; line-height: 1.55; }
+
+    .proof {
+      border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.018);
+    }
+    .proof-inner {
+      width: min(var(--max), calc(100% - 40px)); min-height: 120px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+    }
+    .proof-item { padding: 29px 36px; display: flex; align-items: center; gap: 18px; border-right: 1px solid var(--line); }
+    .proof-item:first-child { padding-left: 0; }
+    .proof-item:last-child { border-right: 0; }
+    .proof-item strong { color: var(--text); font-family: "Playfair Display", serif; font-size: 34px; font-weight: 600; }
+    .proof-item span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .section { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 120px 0; }
+    .section-heading { max-width: 720px; margin-bottom: 54px; }
+    .section-kicker { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    .section h2 { margin-top: 13px; font-family: "Playfair Display", serif; font-size: clamp(36px, 4.8vw, 56px); line-height: 1.1; letter-spacing: -.035em; }
+    .section-heading > p { margin-top: 18px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .step-card {
+      min-height: 285px; padding: 28px; border: 1px solid var(--line); border-radius: 16px;
+      background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+    }
+    .step-number { color: #78809c; font-family: "Playfair Display", serif; font-size: 32px; }
+    .step-card h3 { margin-top: 52px; font-size: 20px; line-height: 1.3; }
+    .step-card p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .step-card:nth-child(2) { border-color: rgba(157,140,255,.3); background: linear-gradient(145deg, rgba(157,140,255,.105), rgba(255,255,255,.02)); }
+
+    .experience {
+      width: min(var(--max), calc(100% - 40px)); margin: 0 auto 120px; overflow: hidden;
+      display: grid; grid-template-columns: .9fr 1.1fr; border: 1px solid var(--line); border-radius: 22px;
+      background: var(--navy);
+    }
+    .experience-copy { padding: 68px 58px; }
+    .experience-copy h2 { margin-top: 14px; font-family: "Playfair Display", serif; font-size: 44px; line-height: 1.1; letter-spacing: -.035em; }
+    .experience-copy > p { margin-top: 20px; color: var(--muted); line-height: 1.75; }
+    .experience-copy .button { margin-top: 30px; }
+    .feature-list { padding: 38px; display: grid; gap: 12px; background: rgba(255,255,255,.02); border-left: 1px solid var(--line); }
+    .feature {
+      padding: 22px; display: grid; grid-template-columns: 38px 1fr; gap: 15px; border: 1px solid var(--line);
+      border-radius: 13px; background: rgba(8,11,23,.5);
+    }
+    .feature-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; color: var(--mint); background: rgba(113,229,193,.08); }
+    .feature h3 { font-size: 15px; }
+    .feature p { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+
+    .origin { padding: 110px 20px; text-align: center; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(157,140,255,.045), transparent); }
+    .origin-inner { max-width: 800px; margin: 0 auto; }
+    .origin h2 { margin-top: 15px; font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 52px); line-height: 1.12; letter-spacing: -.035em; }
+    .origin p { margin: 22px auto 0; max-width: 700px; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .quote { margin-top: 34px; padding-top: 30px; border-top: 1px solid var(--line); color: #d7d3e5; font-family: "Playfair Display", serif; font-size: 20px !important; font-style: italic; }
+    .quote cite { display: block; margin-top: 10px; color: #737b96; font-family: "DM Sans", sans-serif; font-size: 10px; font-style: normal; letter-spacing: .1em; text-transform: uppercase; }
+
+    .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 110px; padding: 74px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
+    .final-cta h2 { font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 50px); line-height: 1.1; letter-spacing: -.035em; }
+    .final-cta p { margin: 17px auto 27px; max-width: 600px; color: var(--muted); }
+    .footer { width: min(var(--max), calc(100% - 40px)); min-height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: #747d98; font-size: 11px; }
+    .footer-links { display: flex; gap: 22px; }
+
+    @media (max-width: 900px) {
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 60px; padding-top: 70px; }
+      .hero-copy { text-align: center; }
+      .hero-copy > p { margin-left: auto; margin-right: auto; }
+      .hero-actions, .hero-note { justify-content: center; }
+      .preview-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
+      .proof-inner, .steps { grid-template-columns: 1fr; }
+      .proof-item { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .proof-item:last-child { border-bottom: 0; }
+      .experience { grid-template-columns: 1fr; }
+      .feature-list { border-left: 0; border-top: 1px solid var(--line); }
     }
 
-    .intro-cta-row {
-      text-align: center;
-      padding: 48px 0 0;
-      border-top: 1px solid var(--border);
-    }
-    .intro-cta-row p {
-      color: var(--text-dim);
-      font-size: 0.88rem;
-      margin-bottom: 20px;
-    }
-
-    /* ── Scrollbar ───────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    @media (max-width: 700px) {
-      .header { padding: 16px; }
-      .intro-hero { padding: 0 20px; margin-top: 48px; }
-      .intro-videos { grid-template-columns: 1fr; }
-      .intro-body { padding: 0 20px; }
+    @media (max-width: 600px) {
+      .nav { width: calc(100% - 28px); }
+      .nav-cta { padding: 9px 12px; }
+      .hero { width: calc(100% - 32px); min-height: auto; padding: 58px 0 70px; }
+      .hero h1 { font-size: 43px; }
+      .hero-copy > p { font-size: 16px; }
+      .hero-actions { align-items: stretch; flex-direction: column; }
+      .hero-note { align-items: center; flex-direction: column; gap: 6px; }
+      .app-preview { padding: 13px; transform: none; }
+      .goal-card { padding: 18px; }
+      .section { width: calc(100% - 32px); padding: 85px 0; }
+      .step-card { min-height: 250px; }
+      .experience { width: calc(100% - 32px); margin-bottom: 85px; }
+      .experience-copy { padding: 45px 25px; }
+      .experience-copy h2 { font-size: 36px; }
+      .feature-list { padding: 20px; }
+      .feature { padding: 18px; }
+      .origin { padding: 85px 20px; }
+      .final-cta { width: calc(100% - 32px); margin-bottom: 80px; padding: 54px 22px; }
+      .footer { width: calc(100% - 32px); padding: 28px 0; flex-direction: column; gap: 15px; text-align: center; }
     }
   </style>
 </head>
 <body>
-
-<!-- ── Header ───────────────────────────────── -->
-<header class="header">
-  <a href="index.html" style="text-decoration:none">
-    <div class="header-title">The Master Key System</div>
-    <div class="header-subtitle">Charles F. Haanel · 1919</div>
-  </a>
-  <div class="header-nav">
-    <a class="header-nav-link active" href="index.html">Introduction</a>
-    <a class="header-nav-link" href="/exercises">Exercises</a>
-    <a class="header-nav-link" href="/goals">Master Plan</a>
-  </div>
-</header>
-
-<!-- ── Intro ────────────────────────────────── -->
-<div class="intro-hero">
-  <div class="intro-eyebrow">A 12-Week Mental Training Course</div>
-  <h1>The <em>Master Key</em><br>to Your Inner Power</h1>
-  <p class="intro-tagline">"This little book is a master key which can unlock the chambers of success — and bids those enter and partake who are wise enough to understand."</p>
-  <a class="intro-begin-btn" href="/welcome">
-    Begin the Course
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
-</div>
-
-<div class="intro-videos">
-  <div class="intro-video-block">
-    <div class="intro-video-label">10-Minute Summary</div>
-    <div class="intro-video-wrap">
-      <iframe src="https://www.youtube.com/embed/wy7FX7z1SlI"
-        title="The Master Key System — Summary"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen loading="lazy"></iframe>
-    </div>
-  </div>
-  <div class="intro-video-block">
-    <div class="intro-video-label">Full Audiobook — All 24 Parts</div>
-    <div class="intro-video-wrap">
-      <iframe src="https://www.youtube.com/embed/kTnvPxyECS8"
-        title="The Master Key System — Full Audiobook"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen loading="lazy"></iframe>
-    </div>
-  </div>
-</div>
-
-<div class="intro-body">
-
-  <div class="intro-section">
-    <div class="intro-section-label">What is this?</div>
-    <h2>A System for Training the Mind</h2>
-    <p>In 1912, Charles F. Haanel — a successful St. Louis businessman — began distributing a correspondence course unlike anything else of its era. Rather than offering advice or motivation, it offered a <em>system</em>: a precise, progressive training of the mind based on what he called the laws governing mental action.</p>
-    <p>The original correspondence course ran for 24 weeks, with students receiving one lesson to read and one exercise to practice daily each week. This app keeps every lesson and exercise intact but paces the course across 12 weeks, two parts at a time. By Part 24, students had moved from simply sitting still, all the way to a working recognition of their connection with universal creative power.</p>
-    <p>Napoleon Hill studied it and credited it as a primary source for what became <em>Think and Grow Rich</em>. The book has been in continuous publication — in various forms — for over a century.</p>
-
-    <div class="intro-quote">
-      <blockquote>"With the realization that mind is the great creative power, what does not become possible? With Desire as the great creative energy, can we not see why Desire should be cultivated, controlled and directed in our lives and destinies?"</blockquote>
-      <cite>— Charles F. Haanel, The Master Key System (1919)</cite>
-    </div>
-  </div>
-
-  <div class="intro-section">
-    <div class="intro-section-label">Getting started</div>
-    <h2>Three Ways to Use This Site</h2>
-    <p>This site has three parts that build on each other: the exercises train your mind, your goal personalizes that training, and your Master Plan turns it into a concrete roadmap.</p>
-    <ol class="how-steps">
-      <li>
-        <div class="how-num">1</div>
-        <div class="how-content">
-          <strong>Practice the Exercises</strong>
-          <span>Head to the <em>Exercises</em> tab and work through Haanel's 24 parts, two per week. Each one is a short guided sitting practice — see "How the exercises work" below for the full rhythm.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">2</div>
-        <div class="how-content">
-          <strong>Set your goal</strong>
-          <span>On the Exercises page, click "Edit" next to "Your Goal" and describe what you're working toward — starting a business, getting promoted, whatever it is. This is free and takes seconds. Once it's set, the narration and affirmations in every exercise are rewritten around your specific goal instead of generic language.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">3</div>
-        <div class="how-content">
-          <strong>Build your Master Plan</strong>
-          <span>Head to the <em>Master Plan</em> tab and answer five short questions: your goal, why it matters, what real progress in 90 days looks like, your biggest obstacle, and how many hours a week you can commit. An AI strategist turns your answers into a 90-day plan — a "strategic funnel" broken into stages, with specific action items you check off and metrics you track as you go. Because each plan is generated fresh for your goal, this part of the site is a $19.99/month subscription.</span>
-        </div>
-      </li>
-    </ol>
-  </div>
-
-  <div class="intro-section">
-    <div class="intro-section-label">How the exercises work</div>
-    <h2>One Practice. Two a Week. Twelve Weeks.</h2>
-    <ol class="how-steps">
-      <li>
-        <div class="how-num">1</div>
-        <div class="how-content">
-          <strong>Two exercises per week</strong>
-          <span>This course paces two parts per week — roughly one every three or four days. Each exercise builds on the previous one — rushing ahead skips the foundation. Spend real time with each practice before moving on.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">2</div>
-        <div class="how-content">
-          <strong>Find a quiet place and sit</strong>
-          <span>Every exercise is a sitting practice — 15 to 30 minutes in a chair, spine upright, eyes closed. You don't need a meditation cushion or special room. A quiet chair where you won't be disturbed is all that's required.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">3</div>
-        <div class="how-content">
-          <strong>Use the timer and the Read Aloud feature</strong>
-          <span>Set your preferred duration (10–30 min) and press Begin. Before you close your eyes, tap "Read aloud" — a calm voice will guide you through the full exercise instructions, then fall silent while you practice.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">4</div>
-        <div class="how-content">
-          <strong>Practice daily, not just once</strong>
-          <span>The original course expected students to practice each exercise every day for seven days. Even one or two sessions a week will produce results — but daily practice is where the real change happens.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">5</div>
-        <div class="how-content">
-          <strong>Write in your journal after each session</strong>
-          <span>Each exercise page has a notes field. Use it. Writing after a sitting session captures insights that evaporate quickly — and reveals patterns across weeks you wouldn't otherwise notice.</span>
-        </div>
-      </li>
-      <li>
-        <div class="how-num">6</div>
-        <div class="how-content">
-          <strong>Mark the session complete, then return when ready</strong>
-          <span>When you're done, mark the session complete to log it. Your progress is saved locally in your browser. This course paces two parts per week — stay with each one until it feels effortless before moving to the next. That's the intended pace, though you're free to follow your own rhythm.</span>
-        </div>
-      </li>
-    </ol>
-  </div>
-
-  <div class="intro-section">
-    <div class="intro-section-label">The progression</div>
-    <h2>Where the 12 Weeks Take You</h2>
-    <p>The course moves through three broad phases:</p>
-    <p><strong style="color:var(--text)">Parts 1–4, Weeks 1–2 — Physical and mental control.</strong> You learn to sit still, quiet the mind, fully relax the body, and recognize the difference between your body/mind (instruments) and the "I" that directs them.</p>
-    <p><strong style="color:var(--text)">Parts 5–14, Weeks 3–7 — Mental creation and the laws of mind.</strong> You build vivid mental images, concentrate on single ideas, work with affirmations, explore the law of attraction, and begin consciously directing thought as a creative force.</p>
-    <p><strong style="color:var(--text)">Parts 15–24, Weeks 8–12 — Universal principles and integration.</strong> You work with growth, vibration, insight, truth, inspiration, health, and money consciousness — arriving finally at the recognition that the same intelligence animating the cosmos is available to you.</p>
-  </div>
-
-  <div class="intro-cta-row">
-    <p>Ready to begin? Part 1 takes 15 minutes. All you need is a quiet chair.</p>
-    <a class="intro-begin-btn" href="/welcome">
-      Begin the Course
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+  <header class="nav">
+    <a class="brand" href="/">
+      <span class="brand-mark">M</span>
+      <span>Master Key</span>
     </a>
-  </div>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#how">How it works</a>
+      <a href="/exercises">Exercises</a>
+      <a href="/goals">Master Plan</a>
+      <a class="nav-cta" href="/goals">Build my plan →</a>
+    </nav>
+  </header>
 
-</div>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Personalized mental training</div>
+        <h1>Turn one meaningful goal into a <em>90-day plan.</em></h1>
+        <p>Master Key combines a clear, AI-personalized roadmap with guided mental-training exercises—so you know what to do next and build the discipline to follow through.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/goals">Create my Master Plan <span>→</span></a>
+          <a class="button button-secondary" href="/exercises">Explore the exercises</a>
+        </div>
+        <div class="hero-note"><span>2-minute setup</span><span>Built around your goal</span><span>Progress saved</span></div>
+      </div>
+
+      <div class="preview-wrap" aria-label="Master Plan preview">
+        <div class="preview-glow"></div>
+        <div class="app-preview">
+          <div class="preview-top"><span class="preview-title">Your Master Plan</span><span class="preview-week">Week 1 of 12</span></div>
+          <div class="goal-card">
+            <div class="mini-label">Your 90-day goal</div>
+            <h3>I am leading a high-impact team in a role that reflects my strengths.</h3>
+            <div class="progress-row"><div class="progress"><span></span></div><span>38%</span></div>
+          </div>
+          <div class="today-card">
+            <div class="mini-label">Today’s focused actions</div>
+            <div class="task done"><span class="task-check"></span><span>Define the three outcomes that prove meaningful progress</span></div>
+            <div class="task"><span class="task-check"></span><span>Reach out to two people who can open the right conversation</span></div>
+            <div class="task"><span class="task-check"></span><span>Complete the 15-minute visualization exercise</span></div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon">✦</div>
+            <div><div class="mini-label">Coach’s insight</div><p>Your obstacle is not a lack of ambition—it’s turning a broad goal into a repeatable weekly rhythm.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof" aria-label="Product details">
+      <div class="proof-inner">
+        <div class="proof-item"><strong>24</strong><span>guided exercises<br>in mental mastery</span></div>
+        <div class="proof-item"><strong>12</strong><span>weeks of structured<br>progress and practice</span></div>
+        <div class="proof-item"><strong>1</strong><span>roadmap built around<br>your specific goal</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="section-heading">
+        <div class="section-kicker">From intention to execution</div>
+        <h2>A plan for your goal. A practice for your mind.</h2>
+        <p>Most plans tell you what to do. Master Key also helps you develop the focus, consistency, and inner clarity required to keep doing it.</p>
+      </div>
+      <div class="steps">
+        <article class="step-card">
+          <div class="step-number">01</div>
+          <h3>Define what matters</h3>
+          <p>Clarify the outcome you want, why it matters, what is getting in the way, and how much time you can realistically commit.</p>
+        </article>
+        <article class="step-card">
+          <div class="step-number">02</div>
+          <h3>Receive your roadmap</h3>
+          <p>Your answers become a focused 90-day strategy with weekly milestones, daily actions, measurable progress, and relevant exercises.</p>
+        </article>
+        <article class="step-card">
+          <div class="step-number">03</div>
+          <h3>Build the follow-through</h3>
+          <p>Practice, reflect, check off actions, and return each week. Your plan gives direction; the mental training builds consistency.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="experience">
+      <div class="experience-copy">
+        <div class="section-kicker">Your daily experience</div>
+        <h2>Everything you need to keep moving.</h2>
+        <p>No generic motivational feed. Your dashboard stays focused on the specific goal you chose and the actions that matter this week.</p>
+        <a class="button button-primary" href="/goals">Build my 90-day plan →</a>
+      </div>
+      <div class="feature-list">
+        <article class="feature"><div class="feature-icon">⌁</div><div><h3>Strategic weekly milestones</h3><p>See the next stage without being overwhelmed by the entire journey.</p></div></article>
+        <article class="feature"><div class="feature-icon">✓</div><div><h3>Clear daily actions</h3><p>Translate intention into concrete, checkable steps for today.</p></div></article>
+        <article class="feature"><div class="feature-icon">◷</div><div><h3>Guided 15-minute practice</h3><p>Use timers, read-aloud guidance, affirmations, and personal notes.</p></div></article>
+        <article class="feature"><div class="feature-icon">↗</div><div><h3>Visible progress</h3><p>Track your plan, action completion, practice sessions, and streak.</p></div></article>
+      </div>
+    </section>
+
+    <section class="origin">
+      <div class="origin-inner">
+        <div class="section-kicker">A classic system, reimagined</div>
+        <h2>Century-old principles. Modern, personalized action.</h2>
+        <p>Charles F. Haanel’s original Master Key System was delivered as 24 progressive lessons in mental discipline. This experience preserves the course’s core exercises while making them easier to practice—and relevant to the goal you are working toward now.</p>
+        <p class="quote">“The mind moves toward the image it holds.”<cite>Inspired by The Master Key System · Charles F. Haanel</cite></p>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <h2>Your next 90 days can have a clear direction.</h2>
+      <p>Start with one goal. Master Key will help you turn it into a practical roadmap and a daily practice.</p>
+      <a class="button button-primary" href="/goals">Create my Master Plan <span>→</span></a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="brand" href="/"><span class="brand-mark">M</span><span>Master Key</span></a>
+    <span>Based on The Master Key System by Charles F. Haanel</span>
+    <div class="footer-links"><a href="/exercises">Exercises</a><a href="/goals">Master Plan</a></div>
+  </footer>
 </body>
 </html>
