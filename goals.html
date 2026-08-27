@@ -153,22 +153,33 @@
 
     /* Actions */
     .actions-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .actions-helper { margin: -4px 0 12px; color: #7d85a0; font-size: 11px; line-height: 1.55; }
     .action-item {
       display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
-      border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.2s;
+      border-bottom: 1px solid var(--border); transition: opacity 0.2s;
     }
     .action-item:last-child { border-bottom: none; }
-    .action-item.done { opacity: 0.45; }
+    .action-item.done { opacity: 0.72; }
     .action-item.readonly { cursor: default; opacity: 0.7; }
     .action-check {
       width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(201,169,110,0.4);
       flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
+      transition: all 0.2s; background: none; cursor: pointer;
     }
     .action-item.done .action-check { background: var(--gold); border-color: var(--gold); }
     .action-item.done .action-check::after { content: '✓'; font-size: 10px; color: #0c0c0c; }
+    .action-main { min-width: 0; flex: 1; }
     .action-text { font-size: 14px; color: var(--text); line-height: 1.5; }
     .action-item.done .action-text { text-decoration: line-through; }
+    .action-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
+    .action-btn { min-height: 32px; padding: 0 11px; border-radius: 7px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; transition: .2s; }
+    .action-focus-btn { color: var(--gold-light); border: 1px solid rgba(157,140,255,.35); background: rgba(157,140,255,.09); }
+    .action-focus-btn:hover { border-color: var(--gold); background: rgba(157,140,255,.15); }
+    .action-focus-btn.focused { color: var(--accent); border-color: rgba(113,229,193,.3); background: rgba(113,229,193,.07); }
+    .action-complete-btn { color: #07140f; border: 0; background: var(--accent); }
+    .action-complete-btn:hover { transform: translateY(-1px); }
+    .action-complete-note { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: var(--accent); font-size: 11px; }
+    .action-complete-note::before { content: '✓'; }
 
     /* Streak */
     .streak-row { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -292,6 +303,35 @@
     .google-btn:hover { background: #f0f0f0; }
     .google-btn:active { transform: scale(0.98); }
     .google-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* ── Action focus session ── */
+    .execution-overlay { position: fixed; inset: 0; z-index: 500; display: none; background: rgba(4,6,14,.78); backdrop-filter: blur(8px); }
+    .execution-modal {
+      position: fixed; z-index: 501; top: 50%; left: 50%; width: min(520px, calc(100vw - 32px));
+      transform: translate(-50%, -50%); display: none; overflow: hidden; border: 1px solid rgba(157,140,255,.25);
+      border-radius: 22px; background: linear-gradient(155deg, #171e39, #0d1123); box-shadow: 0 35px 100px rgba(0,0,0,.55);
+    }
+    .execution-modal-inner { padding: 34px; }
+    .execution-close { position: absolute; top: 14px; right: 15px; width: 32px; height: 32px; border: 0; border-radius: 50%; color: var(--muted); background: rgba(255,255,255,.05); cursor: pointer; }
+    .execution-kicker { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    .execution-modal h3 { margin-top: 11px; font-family: 'Playfair Display', serif; font-size: 32px; line-height: 1.15; }
+    .execution-action { margin-top: 18px; padding: 14px 16px; border-left: 2px solid var(--gold); color: #dfe2ef; background: rgba(157,140,255,.07); font-size: 13px; line-height: 1.55; }
+    .execution-copy { margin-top: 20px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .focus-breath { margin: 26px auto 22px; width: 112px; height: 112px; display: grid; place-items: center; border-radius: 50%; color: var(--text); background: radial-gradient(circle, rgba(113,229,193,.22), rgba(157,140,255,.08) 60%, transparent 61%); border: 1px solid rgba(113,229,193,.2); }
+    .execution-modal.running .focus-breath { animation: breathe 8s ease-in-out infinite; }
+    .focus-count { font-family: 'Playfair Display', serif; font-size: 30px; }
+    .focus-label { margin-top: -13px; color: #7d86a2; font-size: 10px; text-align: center; }
+    @keyframes breathe { 0%,100% { transform: scale(.88); box-shadow: 0 0 0 0 rgba(113,229,193,.05); } 50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(113,229,193,.14); } }
+    .execution-actions { display: grid; gap: 10px; margin-top: 24px; }
+    .execution-primary { min-height: 48px; border: 0; border-radius: 9px; color: #07140f; background: linear-gradient(100deg, var(--accent), #ab9eff); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .execution-secondary { border: 0; color: var(--muted); background: none; font-family: inherit; font-size: 12px; cursor: pointer; }
+    .execution-secondary:hover { color: var(--text); }
+
+    @media (max-width: 520px) {
+      .execution-modal-inner { padding: 28px 22px 24px; }
+      .execution-modal h3 { font-size: 27px; }
+      .focus-breath { width: 96px; height: 96px; }
+    }
 
     /* ── Product framing ── */
     #view-onboard { display: grid; grid-template-columns: minmax(290px, .78fr) minmax(0, 1.22fr); gap: 70px; align-items: start; padding: 64px 0 90px; }
@@ -612,7 +652,8 @@
         <div class="week-progress" id="d-week-progress"></div>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="d-progress-fill"></div></div>
-      <div class="actions-title">Today's Actions</div>
+      <div class="actions-title">Today's execution</div>
+      <div class="actions-helper">Use a short focus session before you begin. When you finish, mark the action complete to reinforce your progress.</div>
       <div id="d-actions"></div>
       <div class="streak-row">
         <div class="streak-num" id="d-streak">0</div>
@@ -628,6 +669,24 @@
 
   </div>
 
+</div>
+
+<!-- ── Action Focus Session ─────────────────── -->
+<div class="execution-overlay" id="execution-overlay"></div>
+<div class="execution-modal" id="execution-modal" role="dialog" aria-modal="true" aria-labelledby="execution-title">
+  <button class="execution-close" id="execution-close" aria-label="Close focus session">✕</button>
+  <div class="execution-modal-inner">
+    <div class="execution-kicker" id="execution-kicker">Before you begin</div>
+    <h3 id="execution-title">Get focused for this action</h3>
+    <div class="execution-action" id="execution-action"></div>
+    <p class="execution-copy" id="execution-copy"></p>
+    <div class="focus-breath" id="focus-breath"><span class="focus-count" id="focus-count">60</span></div>
+    <div class="focus-label" id="focus-label">One slow breath at a time</div>
+    <div class="execution-actions">
+      <button class="execution-primary" id="execution-primary">Begin 60-second focus</button>
+      <button class="execution-secondary" id="execution-secondary">Skip and start the action</button>
+    </div>
+  </div>
 </div>
 
 <!-- ── Auth Modal ───────────────────────────── -->
@@ -712,6 +771,9 @@ async function fetchServerGeneration() {
 function todayKey() { return `mks_goal_actions_${new Date().toISOString().split('T')[0]}`; }
 function getCompletedToday() { return new Set(JSON.parse(localStorage.getItem(todayKey()) || '[]')); }
 function setCompletedToday(set) { localStorage.setItem(todayKey(), JSON.stringify([...set])); }
+function focusedTodayKey() { return `mks_goal_focused_${new Date().toISOString().split('T')[0]}`; }
+function getFocusedToday() { return new Set(JSON.parse(localStorage.getItem(focusedTodayKey()) || '[]')); }
+function setFocusedToday(set) { localStorage.setItem(focusedTodayKey(), JSON.stringify([...set])); }
 
 const FUNNEL_DONE_KEY = 'mks_funnel_done_v1';
 const FUNNEL_METRICS_KEY = 'mks_funnel_metrics_v1';
@@ -1437,8 +1499,118 @@ function backToCurrentWeek() {
 document.getElementById('d-week-badge').addEventListener('click', navigateWeekForward);
 document.getElementById('d-week-back-current').addEventListener('click', backToCurrentWeek);
 
+// ── Action focus + encouragement ───────────────
+let executionMode = null;
+let executionTimer = null;
+let executionContext = null;
+
+function getFocusEncouragement(plan, action) {
+  const obstacle = (plan.goal?.obstacle || '').toLowerCase();
+  let reassurance = 'You do not need to complete the whole journey right now. You only need to begin this one clear step.';
+  if (obstacle.includes('fear') || obstacle.includes('doubt')) reassurance = 'Confidence is not required before action. Let this small step create the evidence that you can trust yourself.';
+  else if (obstacle.includes('clarity')) reassurance = 'You do not need the entire path to be clear. Completing this action will reveal information that thinking alone cannot.';
+  else if (obstacle.includes('inconsistency')) reassurance = 'Consistency is built by returning, not by being perfect. Today’s action is one vote for the person you are becoming.';
+  else if (obstacle.includes('environment')) reassurance = 'For the next few minutes, your environment does not get to decide your direction. Protect this small block of focused action.';
+  else if (obstacle.includes('energy')) reassurance = 'You do not need maximum energy. Begin gently, make the step smaller if needed, and let momentum meet you after you start.';
+  return `Take one slow breath. Picture yourself completing this specific action: “${action}” ${reassurance}`;
+}
+
+function getCompletionEncouragement(plan) {
+  const goal = plan.goal?.goal || 'your goal';
+  return `You followed through. That matters more than waiting to feel perfectly ready. This completed action is evidence that you are becoming the person who can achieve: “${goal}” Carry that evidence into the next step.`;
+}
+
+function showExecutionModal() {
+  document.getElementById('execution-overlay').style.display = 'block';
+  document.getElementById('execution-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExecutionModal() {
+  if (executionTimer) clearInterval(executionTimer);
+  executionTimer = null;
+  executionMode = null;
+  executionContext = null;
+  document.getElementById('execution-modal').classList.remove('running');
+  document.getElementById('execution-overlay').style.display = 'none';
+  document.getElementById('execution-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function openFocusSession(action, key) {
+  const plan = loadPlan();
+  if (!plan) return;
+  executionMode = 'focus-ready';
+  executionContext = { action, key };
+  document.getElementById('execution-kicker').textContent = 'Before you begin';
+  document.getElementById('execution-title').textContent = 'Get focused for this action';
+  document.getElementById('execution-action').textContent = action;
+  document.getElementById('execution-copy').textContent = getFocusEncouragement(plan, action);
+  document.getElementById('focus-breath').style.display = 'grid';
+  document.getElementById('focus-label').style.display = 'block';
+  document.getElementById('focus-count').textContent = '60';
+  document.getElementById('execution-primary').textContent = 'Begin 60-second focus';
+  document.getElementById('execution-secondary').style.display = 'block';
+  document.getElementById('execution-secondary').textContent = 'Skip and start the action';
+  showExecutionModal();
+}
+
+function beginFocusCountdown() {
+  executionMode = 'focus-running';
+  document.getElementById('execution-modal').classList.add('running');
+  document.getElementById('execution-primary').textContent = 'I’m ready — start the action';
+  document.getElementById('execution-secondary').style.display = 'none';
+  let seconds = 60;
+  executionTimer = setInterval(() => {
+    seconds -= 1;
+    document.getElementById('focus-count').textContent = String(seconds);
+    if (seconds <= 0) finishFocusSession();
+  }, 1000);
+}
+
+function finishFocusSession() {
+  if (!executionContext) return;
+  if (executionTimer) clearInterval(executionTimer);
+  executionTimer = null;
+  const focused = getFocusedToday();
+  focused.add(executionContext.key);
+  setFocusedToday(focused);
+  closeExecutionModal();
+  const plan = loadPlan();
+  if (!plan) return;
+  const weekNum = getCurrentWeek(plan.goal.createdAt);
+  renderActions(plan.weeks?.[weekNum - 1]?.actions || [], weekNum);
+}
+
+function openCompletionEncouragement(action) {
+  const plan = loadPlan();
+  if (!plan) return;
+  executionMode = 'complete';
+  executionContext = { action };
+  document.getElementById('execution-kicker').textContent = 'Action complete';
+  document.getElementById('execution-title').textContent = 'You followed through.';
+  document.getElementById('execution-action').textContent = action;
+  document.getElementById('execution-copy').textContent = getCompletionEncouragement(plan);
+  document.getElementById('focus-breath').style.display = 'none';
+  document.getElementById('focus-label').style.display = 'none';
+  document.getElementById('execution-primary').textContent = 'Carry this momentum forward';
+  document.getElementById('execution-secondary').style.display = 'none';
+  showExecutionModal();
+}
+
+document.getElementById('execution-primary').addEventListener('click', () => {
+  if (executionMode === 'focus-ready') beginFocusCountdown();
+  else if (executionMode === 'focus-running') finishFocusSession();
+  else closeExecutionModal();
+});
+document.getElementById('execution-secondary').addEventListener('click', finishFocusSession);
+document.getElementById('execution-close').addEventListener('click', closeExecutionModal);
+document.getElementById('execution-overlay').addEventListener('click', closeExecutionModal);
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && executionMode) closeExecutionModal(); });
+
 function renderActions(actions, weekNum, interactive = true) {
   const completed = getCompletedToday();
+  const focused = getFocusedToday();
   const container = document.getElementById('d-actions');
   container.replaceChildren();
   actions.forEach((action, idx) => {
@@ -1447,22 +1619,72 @@ function renderActions(actions, weekNum, interactive = true) {
     const key = `${weekNum}-${idx}`;
     const item = document.createElement('div');
     item.className = 'action-item' + (completed.has(key) ? ' done' : '') + (interactive ? '' : ' readonly');
-    const check = document.createElement('div');
+    const check = document.createElement('button');
+    check.type = 'button';
     check.className = 'action-check';
+    check.setAttribute('aria-label', completed.has(key) ? `Mark incomplete: ${action}` : `Mark complete: ${action}`);
+    check.disabled = !interactive;
+    const main = document.createElement('div');
+    main.className = 'action-main';
     const text = document.createElement('div');
     text.className = 'action-text';
     text.textContent = action;
+    main.appendChild(text);
     item.appendChild(check);
-    item.appendChild(text);
+    item.appendChild(main);
     if (interactive) {
-      item.addEventListener('click', () => {
+      if (completed.has(key)) {
+        const note = document.createElement('div');
+        note.className = 'action-complete-note';
+        note.textContent = 'Completed today';
+        const replay = document.createElement('button');
+        replay.type = 'button';
+        replay.className = 'action-btn action-focus-btn';
+        replay.textContent = 'View encouragement';
+        replay.addEventListener('click', () => openCompletionEncouragement(action));
+        const controls = document.createElement('div');
+        controls.className = 'action-controls';
+        controls.appendChild(replay);
+        main.appendChild(note);
+        main.appendChild(controls);
+      } else {
+        const controls = document.createElement('div');
+        controls.className = 'action-controls';
+        const focusBtn = document.createElement('button');
+        focusBtn.type = 'button';
+        focusBtn.className = 'action-btn action-focus-btn' + (focused.has(key) ? ' focused' : '');
+        focusBtn.textContent = focused.has(key) ? 'Focused ✓' : '✦ Get focused';
+        focusBtn.addEventListener('click', () => openFocusSession(action, key));
+        const completeBtn = document.createElement('button');
+        completeBtn.type = 'button';
+        completeBtn.className = 'action-btn action-complete-btn';
+        completeBtn.textContent = 'Mark complete';
+        completeBtn.addEventListener('click', () => {
+          const c = getCompletedToday();
+          c.add(key);
+          setCompletedToday(c);
+          renderActions(actions, weekNum, interactive);
+          document.getElementById('d-streak').textContent = getStreak();
+          openCompletionEncouragement(action);
+        });
+        controls.appendChild(focusBtn);
+        controls.appendChild(completeBtn);
+        main.appendChild(controls);
+      }
+      check.addEventListener('click', () => {
         const c = getCompletedToday();
-        if (c.has(key)) c.delete(key); else c.add(key);
+        if (c.has(key)) {
+          c.delete(key);
+          setCompletedToday(c);
+          renderActions(actions, weekNum, interactive);
+          document.getElementById('d-streak').textContent = getStreak();
+          return;
+        }
+        c.add(key);
         setCompletedToday(c);
-        const plan = loadPlan();
-        const wn = getCurrentWeek(plan.goal.createdAt);
-        renderActions(plan.weeks?.[wn - 1]?.actions || [], wn);
+        renderActions(actions, weekNum, interactive);
         document.getElementById('d-streak').textContent = getStreak();
+        openCompletionEncouragement(action);
       });
     }
     container.appendChild(item);
