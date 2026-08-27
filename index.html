@@ -166,15 +166,29 @@
     .section-kicker { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
     .section h2 { margin-top: 13px; font-family: "Playfair Display", serif; font-size: clamp(36px, 4.8vw, 56px); line-height: 1.1; letter-spacing: -.035em; }
     .section-heading > p { margin-top: 18px; color: var(--muted); font-size: 16px; line-height: 1.7; }
-    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .steps { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .steps::before {
+      content: ""; position: absolute; top: 43px; left: 16%; right: 16%; height: 1px;
+      background: linear-gradient(90deg, var(--mint), var(--violet), var(--warm)); opacity: .45;
+    }
     .step-card {
-      min-height: 285px; padding: 28px; border: 1px solid var(--line); border-radius: 16px;
+      position: relative; min-height: 300px; padding: 28px; border: 1px solid var(--line); border-radius: 16px;
       background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
     }
-    .step-number { color: #78809c; font-family: "Playfair Display", serif; font-size: 32px; }
-    .step-card h3 { margin-top: 52px; font-size: 20px; line-height: 1.3; }
+    .step-number {
+      position: relative; z-index: 1; width: 32px; height: 32px; display: grid; place-items: center;
+      color: var(--night); border-radius: 50%; background: var(--mint); font-size: 12px; font-weight: 800;
+      box-shadow: 0 0 0 8px var(--night);
+    }
+    .step-card:nth-child(2) .step-number { background: var(--violet); color: #fff; }
+    .step-card:nth-child(3) .step-number { background: var(--warm); }
+    .step-card h3 { margin-top: 58px; font-size: 20px; line-height: 1.3; }
     .step-card p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
     .step-card:nth-child(2) { border-color: rgba(157,140,255,.3); background: linear-gradient(145deg, rgba(157,140,255,.105), rgba(255,255,255,.02)); }
+    .step-output { display: block; margin-top: 20px; color: #8e96b1; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .journey-cta { margin-top: 34px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 23px 26px; border: 1px solid rgba(113,229,193,.2); border-radius: 14px; background: rgba(113,229,193,.055); }
+    .journey-cta p { color: var(--muted); font-size: 13px; }
+    .journey-cta strong { color: var(--text); }
 
     .experience {
       width: min(var(--max), calc(100% - 40px)); margin: 0 auto 120px; overflow: hidden;
@@ -215,6 +229,7 @@
       .hero-actions, .hero-note { justify-content: center; }
       .preview-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
       .proof-inner, .steps { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
       .proof-item { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
       .proof-item:last-child { border-bottom: 0; }
       .experience { grid-template-columns: 1fr; }
@@ -233,6 +248,7 @@
       .goal-card { padding: 18px; }
       .section { width: calc(100% - 32px); padding: 85px 0; }
       .step-card { min-height: 250px; }
+      .journey-cta { align-items: stretch; flex-direction: column; }
       .experience { width: calc(100% - 32px); margin-bottom: 85px; }
       .experience-copy { padding: 45px 25px; }
       .experience-copy h2 { font-size: 36px; }
@@ -265,10 +281,10 @@
         <h1>Turn one meaningful goal into a <em>90-day plan.</em></h1>
         <p>Master Key combines a clear, AI-personalized roadmap with guided mental-training exercises—so you know what to do next and build the discipline to follow through.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="/goals">Create my Master Plan <span>→</span></a>
-          <a class="button button-secondary" href="/exercises">Explore the exercises</a>
+          <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
+          <a class="button button-secondary" href="#how">See how it works</a>
         </div>
-        <div class="hero-note"><span>2-minute setup</span><span>Built around your goal</span><span>Progress saved</span></div>
+        <div class="hero-note"><span>8 focused questions</span><span>Built around your goal</span><span>Progress saved</span></div>
       </div>
 
       <div class="preview-wrap" aria-label="Master Plan preview">
@@ -304,26 +320,33 @@
 
     <section class="section" id="how">
       <div class="section-heading">
-        <div class="section-kicker">From intention to execution</div>
-        <h2>A plan for your goal. A practice for your mind.</h2>
-        <p>Most plans tell you what to do. Master Key also helps you develop the focus, consistency, and inner clarity required to keep doing it.</p>
+        <div class="section-kicker">One connected system</div>
+        <h2>Your answers become your plan—and your daily practice.</h2>
+        <p>The plan builder is not a separate assessment. Every answer shapes the dashboard, actions, and exercises you use for the next 90 days.</p>
       </div>
       <div class="steps">
         <article class="step-card">
-          <div class="step-number">01</div>
-          <h3>Define what matters</h3>
-          <p>Clarify the outcome you want, why it matters, what is getting in the way, and how much time you can realistically commit.</p>
+          <div class="step-number">1</div>
+          <h3>Tell us what matters</h3>
+          <p>Answer eight focused questions about your goal, motivation, obstacles, available time, and belief in the outcome.</p>
+          <span class="step-output">Input · About 2 minutes</span>
         </article>
         <article class="step-card">
-          <div class="step-number">02</div>
-          <h3>Receive your roadmap</h3>
-          <p>Your answers become a focused 90-day strategy with weekly milestones, daily actions, measurable progress, and relevant exercises.</p>
+          <div class="step-number">2</div>
+          <h3>Get your 90-day roadmap</h3>
+          <p>Your answers become weekly milestones, clear next actions, measurable progress, and a strategy fitted to your real schedule.</p>
+          <span class="step-output">Output · Your Master Plan</span>
         </article>
         <article class="step-card">
-          <div class="step-number">03</div>
-          <h3>Build the follow-through</h3>
-          <p>Practice, reflect, check off actions, and return each week. Your plan gives direction; the mental training builds consistency.</p>
+          <div class="step-number">3</div>
+          <h3>Train the follow-through</h3>
+          <p>Use the exercises matched to your obstacle, complete your actions, and return each week to keep the plan moving.</p>
+          <span class="step-output">Practice · Plan + exercises</span>
         </article>
+      </div>
+      <div class="journey-cta">
+        <p><strong>Ready for step one?</strong> The builder shows you exactly how your answers shape the plan.</p>
+        <a class="button button-primary" href="/goals">Start building my plan →</a>
       </div>
     </section>
 
