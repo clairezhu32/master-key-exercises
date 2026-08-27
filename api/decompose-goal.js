@@ -136,7 +136,7 @@ const PLAN_SCHEMA = {
     milestone_90day: { type: 'STRING', description: 'The single concrete, measurable outcome that defines success at day 90.' },
     funnel: {
       type: 'OBJECT',
-      description: 'A 7-stage strategic funnel adapted to this specific goal domain, modeled on: targets -> access points -> outreach -> gap-closing -> core preparation -> funnel metrics/iteration -> close.',
+      description: 'A 7-stage execution journey adapted to this goal domain. Use a literal opportunity funnel for external goals and a behavior-change pathway for internal goals.',
       properties: {
         targets: {
           type: 'OBJECT',
@@ -144,11 +144,11 @@ const PLAN_SCHEMA = {
             description: { type: 'STRING', description: 'What "targets" means for this specific goal and how to build the list.' },
             items: {
               type: 'ARRAY',
-              description: 'Provide 5 to 12 specific targets.',
+              description: 'Provide 3 to 10 specific external targets, target behaviors, or measurable outcome components—whichever fits this domain.',
               items: {
                 type: 'OBJECT',
                 properties: {
-                  name: { type: 'STRING', description: 'A specific target or a specific, well-defined target archetype (e.g. a real well-known company/organization if genuinely relevant, or a precise criteria-based category — never a fabricated specific entity presented as real).' },
+                  name: { type: 'STRING', description: 'A specific target, behavior, milestone component, or well-defined target archetype—never a fabricated entity presented as real.' },
                   why_it_fits: { type: 'STRING' },
                 },
                 required: ['name', 'why_it_fits'],
@@ -167,8 +167,8 @@ const PLAN_SCHEMA = {
               items: {
                 type: 'OBJECT',
                 properties: {
-                  role_to_reach: { type: 'STRING', description: "The type of person/channel to reach, e.g. 'Hiring manager for the team', 'Recruiter for the function', never a fabricated named individual." },
-                  how_to_find_them: { type: 'STRING', description: 'A concrete, actionable method to identify a real person or channel in this role.' },
+                  role_to_reach: { type: 'STRING', description: "For external goals, the person or channel to reach. For internal goals, the support person, environmental trigger, tool, place, or routine entry point to use." },
+                  how_to_find_them: { type: 'STRING', description: 'A concrete method to identify, create, schedule, or activate this access point.' },
                 },
                 required: ['role_to_reach', 'how_to_find_them'],
               },
@@ -180,9 +180,9 @@ const PLAN_SCHEMA = {
           type: 'OBJECT',
           properties: {
             description: { type: 'STRING' },
-            first_message_script: { type: 'STRING', description: 'A ready-to-send outreach message template, personalized with [bracketed placeholders] for the person to fill in.' },
-            follow_up_script: { type: 'STRING', description: 'A ready-to-send follow-up template for no response.' },
-            cadence: { type: 'STRING', description: 'How often and in what pattern to send outreach and follow-ups.' },
+            first_message_script: { type: 'STRING', description: 'For external goals, a ready-to-send message. For internal goals, a short accountability request, implementation intention, or self-instruction to begin the behavior.' },
+            follow_up_script: { type: 'STRING', description: 'For external goals, a follow-up message. For internal goals, a recovery script for returning after a missed action.' },
+            cadence: { type: 'STRING', description: 'The realistic communication, practice, accountability, or recovery cadence.' },
           },
           required: ['description', 'first_message_script', 'follow_up_script', 'cadence'],
         },
@@ -210,7 +210,7 @@ const PLAN_SCHEMA = {
         core_prep: {
           type: 'OBJECT',
           properties: {
-            description: { type: 'STRING', description: "What the 'make-or-break moment' is for this goal (interview, pitch, audition, negotiation, launch, race day, etc.) and how prep breaks down." },
+            description: { type: 'STRING', description: "The core performance moment or repeatable routine that most directly produces this goal, and how preparation breaks down." },
             tasks: {
               type: 'ARRAY',
               description: 'Provide 4 to 8 tasks.',
@@ -229,7 +229,7 @@ const PLAN_SCHEMA = {
             description: { type: 'STRING' },
             steps: {
               type: 'ARRAY',
-              description: 'The ordered conversion funnel for this goal, e.g. outreach sent -> replies -> meetings -> next-round -> close. Provide 3 to 6 steps.',
+              description: 'The ordered leading indicators for this goal. Use conversion steps for external goals or behavior/outcome measures for internal goals. Provide 3 to 6 steps.',
               items: {
                 type: 'OBJECT',
                 properties: {
@@ -260,7 +260,7 @@ const PLAN_SCHEMA = {
     },
     weeks: {
       type: 'ARRAY',
-      description: 'Exactly 12 weeks — a full execution cadence. Front-load early weeks on targets/access/outreach and later weeks on prep/close, matching how this specific goal actually plays out over 90 days.',
+      description: 'Exactly 12 weeks forming a credible bridge from the stated baseline to the measurable outcome. Week 1 must deliver the user-defined first-week success test; later weeks should follow the category-appropriate execution journey.',
       items: {
         type: 'OBJECT',
         properties: {
@@ -295,7 +295,9 @@ const PLAN_SCHEMA = {
 
 function buildSystemPrompt() {
   const partList = PART_THEMES.map((t, i) => `${i + 1}. ${t}`).join('\n');
-  return `You are a strategic execution coach. You turn a person's goal into a hyper-specific 90-day plan by adapting a proven 7-stage growth-funnel framework to whatever domain the goal is in (career, business, health, financial, creative, learning, relationships, or anything else).
+  return `You are a strategic execution coach. You turn a person's measurable goal into a hyper-specific 90-day plan grounded in their current baseline, previous attempts, available resources, real schedule, obstacle, and desired first-week proof of momentum.
+
+Adapt the planning logic to the goal category. For business, career, audience, or acquisition goals, use the stages as a literal opportunity and conversion funnel. For health, relationships, learning, creative practice, or inner-peace goals, translate them into a behavior-change journey: the right target behavior, environmental access points and triggers, support or accountability, gaps to close, core routines, leading measures, and a sustainable finish. Never prescribe cold outreach, conversion tactics, or business language when it does not fit the person's domain.
 
 The 7 stages, in order:
 1. targets — the specific list of what/who to go after
@@ -306,7 +308,7 @@ The 7 stages, in order:
 6. funnel_metrics — the conversion funnel for this goal with realistic benchmarks, plus how to review and iterate on the weakest step
 7. close — the specific checklist to actually land the outcome
 
-Ground everything in the person's actual stated goal, reason, 90-day vision, and obstacle — never output advice generic enough to apply to any goal in the category. Reference specifics from their own wording wherever possible.
+Ground everything in the person's stated outcome, baseline, reason, previous attempts, resources, obstacle, availability, and first-week success test — never output advice generic enough to apply to any goal in the category. Use their current numbers and assets when setting weekly milestones. Do not recommend an approach they already tried unsuccessfully unless you explicitly change the method based on what they learned.
 
 Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
 
@@ -316,16 +318,19 @@ ${partList}
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
-function buildUserPrompt({ goal, why, progress, obstacle, hours, intensity, category, belief_score }) {
+function buildUserPrompt({ goal, baseline, why, tried, resources, obstacle, hours, schedule, first_week, intensity, category }) {
   return `Goal category: ${category || '(not specified)'}
-Goal: ${goal}
+Measurable 90-day outcome: ${goal}
+Current baseline: ${baseline || '(not specified)'}
 Why it matters to them: ${why || '(not specified)'}
-What meaningful progress looks like in 90 days: ${progress || '(not specified)'}
+What they already tried and what happened: ${tried || '(nothing specified)'}
+Resources and advantages already available: ${resources || '(none specified)'}
 Their biggest obstacle right now: ${obstacle || '(not specified)'}
 Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensity)
-Self-rated belief they'll achieve this (1-10): ${belief_score ?? '(not specified)'}
+Realistic days or time blocks: ${schedule || '(not specified)'}
+What would make the first seven days successful: ${first_week || '(not specified)'}
 
-Build their strategic funnel plan now.`;
+Build their category-appropriate strategic plan now. Make week 1 directly deliver the first-week success test, and make every later week credibly bridge the stated baseline to the measurable 90-day outcome within the available time.`;
 }
 
 async function callGeminiOnce(goalData) {
@@ -486,7 +491,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { goal, why, progress, obstacle, hours, category, belief_score } = body ?? {};
+  const { goal, baseline, why, tried, resources, obstacle, hours, schedule, first_week, category } = body ?? {};
   if (!goal?.trim()) return res.status(400).json({ error: 'Goal is required' });
 
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
@@ -500,7 +505,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const plan = await callGemini({ goal, why, progress, obstacle, hours, intensity, category, belief_score }, deadlineAt);
+    const plan = await callGemini({ goal, baseline, why, tried, resources, obstacle, hours, schedule, first_week, intensity, category }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     await saveGenerationResult(user.id, body, { ...plan, intensity }, serviceRoleKey);
     return res.status(200).json({ plan: { ...plan, intensity } });
