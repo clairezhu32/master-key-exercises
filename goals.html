@@ -1,1 +1,2074 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Master Key — 90-Day Master Plan</title><style>body{margin:0;background:#080b17;color:#f7f5ff;font-family:Arial,sans-serif}.wrap{max-width:860px;margin:0 auto;padding:40px 24px 80px}.card{background:#131a33;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:34px}.step{display:none}.step.active{display:block}.num{font-size:12px;letter-spacing:2px;color:#a8adc2;text-transform:uppercase;margin-bottom:18px}.q{font-family:Georgia,serif;font-size:38px;line-height:1.2;margin-bottom:12px}.hint{color:#a8adc2;line-height:1.6;margin-bottom:28px}textarea,input,select{width:100%;box-sizing:border-box;background:#0f152b;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#f7f5ff;padding:16px;font:16px Arial;margin-bottom:12px}textarea{min-height:140px}.cats,.hours{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{padding:15px 22px;border:0;border-radius:9px;background:#71e5c1;color:#07140f;font-weight:700;cursor:pointer}.choice{padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#0f152b;color:#a8adc2;text-align:left;cursor:pointer}.choice.selected{border-color:#9d8cff;color:#fff}.nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px}.back{background:none;border:0;color:#a8adc2;cursor:pointer}.dots{font-size:11px;color:#717996}@media(max-width:600px){.q{font-size:30px}.cats,.hours{grid-template-columns:1fr}}</style></head><body><div class="wrap"><div class="card"><div id="step1" class="step active"><div class="num">Step 1 of 8</div><div class="q">What area of your life are you ready to transform?</div><div class="hint">Choose the area where a meaningful 90-day breakthrough would matter most.</div><div class="cats"><button class="choice" data-v="Career breakthrough">Career breakthrough</button><button class="choice" data-v="Financial abundance">Financial abundance</button><button class="choice" data-v="Relationship & connection">Relationship & connection</button><button class="choice" data-v="Health & energy">Health & energy</button><button class="choice" data-v="Launching something of my own">Launching something of my own</button><button class="choice" data-v="Inner peace">Inner peace</button></div><div class="nav"><span class="dots">1 / 8</span><button id="n1" class="btn" disabled>Continue →</button></div></div><div id="step2" class="step"><div class="num">Step 2 of 8</div><div class="q">What would a meaningful win look like 90 days from now?</div><div class="hint">Make it concrete. What would be visibly different if these 90 days went exceptionally well?</div><textarea id="win" placeholder="In 90 days, I would have…"></textarea><div class="nav"><button class="back" onclick="go(1)">← Back</button><span class="dots">2 / 8</span><button class="btn" id="n2">Continue →</button></div></div><div id="step3" class="step"><div class="num">Step 3 of 8</div><div class="q">Where are you today?</div><div class="hint">Tell the truth about your starting point — what is already working, what is unfinished, and what is currently true.</div><textarea id="reality" placeholder="Today, my situation is…"></textarea><div class="nav"><button class="back" onclick="go(2)">← Back</button><span class="dots">3 / 8</span><button class="btn" id="n3">Continue →</button></div></div><div id="step4" class="step"><div class="num">Step 4 of 8</div><div class="q">What needs to change to get from here to there?</div><div class="hint">Think about the real gap: skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div><textarea id="gap" placeholder="The biggest changes I need are…"></textarea><div class="nav"><button class="back" onclick="go(3)">← Back</button><span class="dots">4 / 8</span><button class="btn" id="n4">Continue →</button></div></div><div id="step5" class="step"><div class="num">Step 5 of 8</div><div class="q">What have you already tried — and what happened?</div><div class="hint">This keeps your Master Plan from repeating strategies that have already failed or been exhausted.</div><textarea id="tried" placeholder="I have tried… The result was…"></textarea><div class="nav"><button class="back" onclick="go(4)">← Back</button><span class="dots">5 / 8</span><button class="btn" id="n5">Continue →</button></div></div><div id="step6" class="step"><div class="num">Step 6 of 8</div><div class="q">What strengths, resources, relationships, or opportunities can you leverage?</div><div class="hint">A Master Plan should build from what you already have — not assume you are starting from zero.</div><textarea id="leverage" placeholder="I can leverage…"></textarea><div class="hint">How much time can you realistically commit each week?</div><div class="hours"><button class="choice" data-hours="1-2">1–2 hours</button><button class="choice" data-hours="3-5">3–5 hours</button><button class="choice" data-hours="5-10">5–10 hours</button><button class="choice" data-hours="10+">10+ hours</button></div><select id="startWeek"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select><div class="nav"><button class="back" onclick="go(5)">← Back</button><span class="dots">6 / 8</span><button class="btn" id="n6" disabled>Continue →</button></div></div><div id="step7" class="step"><div class="num">Step 7 of 8</div><div class="q">What can you realistically commit — and what must you protect?</div><div class="hint">Name the constraints the plan must respect: family, health, money, work, relationships, weekends, or anything else non-negotiable.</div><textarea id="constraints" placeholder="I can commit to… I need to protect…"></textarea><div class="nav"><button class="back" onclick="go(6)">← Back</button><span class="dots">7 / 8</span><button class="btn" id="n7">Continue →</button></div></div><div id="step8" class="step"><div class="num">Step 8 of 8</div><div class="q">Why does this matter — and what could realistically derail you?</div><div class="hint">Connect the goal to what matters most, then name the failure modes the plan should help you anticipate.</div><textarea id="why" placeholder="This matters because…"></textarea><textarea id="derail" placeholder="What could derail me is…"></textarea><div class="nav"><button class="back" onclick="go(7)">← Back</button><span class="dots">8 / 8</span><button class="btn" id="finish">Continue →</button></div></div></div></div><script>let step=1,cat='',hours='';const $=id=>document.getElementById(id);function go(n){$('step'+step).classList.remove('active');step=n;$('step'+step).classList.add('active')}document.querySelectorAll('.cats .choice').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cats .choice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');cat=b.dataset.v;$('n1').disabled=false});document.querySelectorAll('.hours .choice').forEach(b=>b.onclick=()=>{document.querySelectorAll('.hours .choice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');hours=b.dataset.hours;$('n6').disabled=false});for(let i=1;i<7;i++)$('n'+i)?.addEventListener('click',()=>go(i+1));$('n7').onclick=()=>go(8);$('finish').onclick=()=>{const data={category:cat,goal:$('win').value.trim(),why:'WHY: '+$('why').value.trim()+'\\n\\nCURRENT REALITY: '+$('reality').value.trim(),progress:'90-DAY WIN: '+$('win').value.trim()+'\\n\\nGAP TO CLOSE: '+$('gap').value.trim(),obstacle:'ALREADY TRIED: '+$('tried').value.trim()+'\\n\\nLEVERAGE: '+$('leverage').value.trim()+'\\n\\nCONSTRAINTS: '+$('constraints').value.trim()+'\\n\\nDERAILERS: '+$('derail').value.trim(),hours,start_week:Number($('startWeek').value)||1,belief_score:7,createdAt:Date.now()};sessionStorage.setItem('mks_goal_draft_v2',JSON.stringify(data));alert('Your Master Plan answers are saved.');};</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create a personalized 90-day goal plan with clear weekly milestones, focused actions, and guided mental-training exercises.">
+  <title>Build Your 90-Day Master Plan — Master Key</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b17;
+      --surface: #131a33;
+      --border: rgba(255,255,255,0.10);
+      --gold: #9d8cff;
+      --gold-light: #f7f5ff;
+      --text: #f7f5ff;
+      --muted: #a8adc2;
+      --accent: #71e5c1;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body {
+      background:
+        radial-gradient(circle at 82% 4%, rgba(114,92,255,.2), transparent 28rem),
+        radial-gradient(circle at 5% 55%, rgba(113,229,193,.08), transparent 26rem),
+        var(--bg);
+      color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+    .page-header { padding: 24px 0 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .page-header a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .page-header a:hover { color: var(--gold); }
+    .header-nav { display: flex; align-items: center; gap: 18px; }
+    .header-nav-link.active { color: var(--gold); }
+    .page-header .wordmark { display: flex; align-items: center; gap: 9px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+    .wordmark-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: var(--bg); background: linear-gradient(135deg, var(--accent), var(--gold)); font-family: 'Playfair Display', serif; font-size: 15px; }
+
+    /* ── Onboarding ── */
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-hero { margin-top: 0; padding: 34px; background: rgba(19,26,51,.88); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 24px 70px rgba(0,0,0,.24); backdrop-filter: blur(16px); }
+    .step-num { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .step-q { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; line-height: 1.18; letter-spacing: -.5px; color: var(--gold-light); margin-bottom: 12px; }
+    .step-hint { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+    textarea, input[type=text], select {
+      width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px;
+      padding: 16px 18px; resize: none; outline: none; transition: border-color 0.2s;
+    }
+    textarea:focus, input[type=text]:focus, select:focus { border-color: var(--gold); }
+    textarea { min-height: 120px; }
+    .start-week-field { margin-top: 24px; }
+    .start-week-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hours-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--muted); font-size: 14px; padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .hours-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+    .category-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .category-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--muted); font-size: 15px; padding: 16px 18px; cursor: pointer; transition: all 0.2s; text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .category-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+    .obstacle-detail-field { margin-top: 14px; }
+    .belief-slider-row { display: flex; align-items: center; gap: 18px; }
+    .belief-slider-row input[type=range] {
+      flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+      background: var(--border); outline: none;
+    }
+    .belief-slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--gold); cursor: pointer; border: 2px solid var(--bg);
+    }
+    .belief-slider-row input[type=range]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--gold); cursor: pointer; border: 2px solid var(--bg);
+    }
+    .belief-value {
+      font-family: 'Playfair Display', serif; font-size: 32px; color: var(--gold-light);
+      min-width: 40px; text-align: center;
+    }
+    .ready-generate-btn { margin-top: 4px; }
+    #step10-google-btn { margin-top: 4px; }
+    .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+    .btn-back { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 8px 0; }
+    .btn-back:hover { color: var(--text); }
+    .btn-next {
+      background: linear-gradient(135deg, var(--accent), #a8f0db); color: #07140f; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600; border: none; border-radius: 8px;
+      padding: 14px 28px; cursor: pointer; transition: transform 0.2s, box-shadow .2s, opacity 0.2s; letter-spacing: 0;
+    }
+    .btn-next:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(113,229,193,.18); }
+    .btn-next:disabled { opacity: 0.35; cursor: default; }
+    .dots { display: flex; gap: 6px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
+    .dot.active { background: var(--gold); }
+    .dot.done { background: rgba(201,169,110,0.4); }
+
+    /* ── Generating ── */
+    #view-generating { display: none; max-width: 680px; margin: 0 auto; text-align: center; padding: 80px 0; }
+    #view-generating.active { display: block; }
+    .spinner { width: 48px; height: 48px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 24px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gen-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--gold-light); margin-bottom: 10px; }
+    .gen-sub { font-size: 14px; color: var(--muted); }
+    .gen-steps { margin: 32px auto 0; max-width: 280px; text-align: left; }
+    .gen-step { font-size: 13px; color: var(--muted); padding: 6px 0; display: flex; align-items: center; gap: 10px; }
+    .gen-step.done { color: var(--gold); }
+    .gen-step .check { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 9px; }
+
+    /* ── Error ── */
+    #view-error { display: none; max-width: 680px; margin: 0 auto; padding: 52px 0; }
+    #view-error.active { display: block; }
+    .error-card { background: rgba(180,60,60,0.1); border: 1px solid rgba(180,60,60,0.3); border-radius: 14px; padding: 24px; }
+    .error-card h3 { font-size: 18px; color: #e88; margin-bottom: 8px; }
+    .error-card p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .error-card .api-hint { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px; color: var(--gold); margin-bottom: 16px; }
+    .btn-retry { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 22px; font-size: 14px; cursor: pointer; }
+    .btn-retry:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Dashboard ── */
+    #view-dashboard { display: none; max-width: 680px; margin: 0 auto; }
+    #view-dashboard.active { display: block; }
+    .dash-hero { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .dash-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .dash-goal { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: var(--gold-light); line-height: 1.25; margin-bottom: 10px; }
+    .dash-summary { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .milestone-tag { display: inline-block; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); border-radius: 20px; font-size: 12px; color: var(--gold); padding: 4px 12px; margin-top: 12px; }
+
+    /* Week card */
+    .week-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .week-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .week-badge { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .week-badge:hover { color: var(--gold-light); }
+    .week-badge .week-badge-arrow { font-size: 12px; }
+    .week-back-current {
+      display: none; font-size: 11px; letter-spacing: 0.04em; color: var(--muted);
+      cursor: pointer; margin-top: 6px; text-decoration: underline; text-underline-offset: 2px;
+    }
+    .week-back-current:hover { color: var(--text); }
+    .week-back-current.visible { display: inline-block; }
+    .week-progress { font-size: 12px; color: var(--muted); }
+    .week-theme { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; }
+    .week-target { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+    .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 20px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 2px; transition: width 0.5s; }
+
+    /* Actions */
+    .actions-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .actions-helper { margin: -4px 0 12px; color: #7d85a0; font-size: 11px; line-height: 1.55; }
+    .action-item {
+      display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid var(--border); transition: opacity 0.2s;
+    }
+    .action-item:last-child { border-bottom: none; }
+    .action-item.done { opacity: 0.72; }
+    .action-item.readonly { cursor: default; opacity: 0.7; }
+    .action-check {
+      width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(201,169,110,0.4);
+      flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; background: none; cursor: pointer;
+    }
+    .action-item.done .action-check { background: var(--gold); border-color: var(--gold); }
+    .action-item.done .action-check::after { content: '✓'; font-size: 10px; color: #0c0c0c; }
+    .action-main { min-width: 0; flex: 1; }
+    .action-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .action-item.done .action-text { text-decoration: line-through; }
+    .action-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
+    .action-btn { min-height: 32px; padding: 0 11px; border-radius: 7px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; transition: .2s; }
+    .action-focus-btn { color: var(--gold-light); border: 1px solid rgba(157,140,255,.35); background: rgba(157,140,255,.09); }
+    .action-focus-btn:hover { border-color: var(--gold); background: rgba(157,140,255,.15); }
+    .action-focus-btn.focused { color: var(--accent); border-color: rgba(113,229,193,.3); background: rgba(113,229,193,.07); }
+    .action-complete-btn { color: #07140f; border: 0; background: var(--accent); }
+    .action-complete-btn:hover { transform: translateY(-1px); }
+    .action-complete-note { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: var(--accent); font-size: 11px; }
+    .action-complete-note::before { content: '✓'; }
+    .action-result-note { margin-top: 8px; color: #9ca5c1; font-size: 11px; line-height: 1.5; }
+    .action-result-note.partial { color: var(--gold-light); }
+    .action-result-note.skipped { color: #8790aa; }
+
+    /* Daily execution roll-up */
+    .weekly-review-card { background: linear-gradient(155deg, rgba(25,32,61,.9), rgba(14,18,37,.95)); border: 1px solid rgba(157,140,255,.2); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .review-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 18px; }
+    .review-eyebrow { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 7px; }
+    .review-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); }
+    .review-status { flex-shrink: 0; border: 1px solid rgba(113,229,193,.25); border-radius: 999px; padding: 6px 10px; color: var(--accent); background: rgba(113,229,193,.06); font-size: 10px; font-weight: 700; }
+    .review-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .review-metric { padding: 14px; border: 1px solid var(--border); border-radius: 11px; background: rgba(255,255,255,.025); }
+    .review-metric strong { display: block; color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 25px; }
+    .review-metric span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .review-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-top: 16px; }
+    .review-day { padding: 9px 3px; border: 1px solid var(--border); border-radius: 8px; color: #737c98; text-align: center; font-size: 9px; }
+    .review-day::after { content: ''; display: block; width: 6px; height: 6px; margin: 6px auto 0; border-radius: 50%; background: #353c57; }
+    .review-day.focused::after { background: var(--gold); }
+    .review-day.acted::after { background: var(--accent); box-shadow: 0 0 0 3px rgba(113,229,193,.08); }
+    .review-coach { margin-top: 16px; padding: 13px 15px; border-left: 2px solid var(--gold); background: rgba(157,140,255,.06); color: #aeb6ce; font-size: 12px; line-height: 1.65; }
+    .review-reflection { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .review-field { display: grid; gap: 6px; }
+    .review-field:last-child { grid-column: 1 / -1; }
+    .review-field label { color: #858eaa; font-size: 10px; }
+    .review-field input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 11px; color: var(--text); background: rgba(0,0,0,.16); font: 12px 'DM Sans', sans-serif; }
+    .review-field input:focus { outline: none; border-color: rgba(157,140,255,.55); }
+    .review-save { grid-column: 1 / -1; justify-self: start; border: 1px solid rgba(157,140,255,.3); border-radius: 7px; padding: 8px 12px; color: var(--gold-light); background: rgba(157,140,255,.08); font: 600 11px 'DM Sans', sans-serif; cursor: pointer; }
+    .review-save.saved { color: var(--accent); border-color: rgba(113,229,193,.25); }
+
+    /* Streak */
+    .streak-row { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
+    .streak-num { font-size: 20px; font-weight: 600; color: var(--gold); }
+    .streak-label { font-size: 12px; color: var(--muted); }
+
+    /* Insight */
+    .insight-card { background: rgba(201,169,110,0.05); border: 1px solid rgba(201,169,110,0.15); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .insight-card .insight-label { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
+    .insight-card p { font-size: 14px; color: var(--muted); line-height: 1.65; font-style: italic; }
+
+    /* Funnel */
+    .funnel-stage { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+    .funnel-stage-header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; cursor: pointer; }
+    .funnel-stage-num { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .funnel-stage-label { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold-light); flex: 1; }
+    .funnel-stage-toggle { color: var(--muted); font-size: 11px; transition: transform 0.2s; }
+    .funnel-stage.expanded .funnel-stage-toggle { transform: rotate(180deg); }
+    .funnel-stage-body { display: none; padding: 0 18px 18px; }
+    .funnel-stage.expanded .funnel-stage-body { display: block; }
+    .funnel-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+
+    .funnel-list-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .funnel-list-item:last-child { border-bottom: none; }
+    .funnel-item-check { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(201,169,110,0.4); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .funnel-item-check.done { background: var(--gold); border-color: var(--gold); }
+    .funnel-item-check.done::after { content: '✓'; font-size: 9px; color: #0c0c0c; }
+    .funnel-item-main { flex: 1; }
+    .funnel-item-title { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .funnel-item-sub { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 3px; }
+    .funnel-item-title.done, .funnel-item-sub.done { text-decoration: line-through; opacity: 0.5; }
+
+    .script-box { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; margin-bottom: 10px; }
+    .script-label { font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+    .btn-copy { display: block; background: none; border: 1px solid rgba(157,140,255,0.3); color: var(--gold); font-size: 11px; font-family: 'DM Sans', sans-serif; border-radius: 6px; padding: 5px 10px; cursor: pointer; margin-top: 10px; }
+    .btn-copy:hover { background: rgba(201,169,110,0.1); }
+    .cadence-note { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; line-height: 1.5; }
+
+    .funnel-metrics-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .funnel-metrics-row:last-child { border-bottom: none; }
+    .fm-step { flex: 1; }
+    .fm-step-name { font-size: 13px; color: var(--text); }
+    .fm-benchmark { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .fm-input { width: 56px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--gold); font-size: 13px; padding: 6px 8px; text-align: center; font-family: 'DM Sans', sans-serif; }
+    .fm-rate { font-size: 11px; color: var(--gold); width: 44px; text-align: right; flex-shrink: 0; }
+    .iteration-note { background: rgba(201,169,110,0.05); border: 1px solid rgba(201,169,110,0.15); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 12px; }
+
+    .week-stage-tag { display: inline-block; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; padding: 2px 8px; margin-bottom: 8px; }
+
+    /* Exercises */
+    .section-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin: 28px 0 14px; }
+    .exercise-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .exercise-card .ex-info { flex: 1; }
+    .exercise-card .ex-part { font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+    .exercise-card .ex-reason { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .ex-link { background: none; border: 1px solid rgba(157,140,255,0.3); color: var(--gold); font-size: 12px; font-family: 'DM Sans', sans-serif; border-radius: 6px; padding: 7px 14px; cursor: pointer; white-space: nowrap; text-decoration: none; transition: all 0.2s; }
+    .ex-link:hover { background: rgba(201,169,110,0.1); }
+
+    /* Week dots */
+    .weeks-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .week-dot {
+      width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+      color: var(--muted); transition: all 0.2s; cursor: pointer;
+    }
+    .week-dot.current { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.1); font-weight: 600; }
+    .week-dot.past { background: rgba(201,169,110,0.08); color: rgba(201,169,110,0.5); border-color: rgba(201,169,110,0.2); }
+    .week-dot.viewing { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+
+    /* ── Auth ── */
+    .auth-area { display: flex; align-items: center; gap: 14px; }
+    .auth-signin-btn {
+      font-family: inherit; font-size: 13px; color: var(--muted); background: none;
+      border: 1px solid var(--border); border-radius: 100px; padding: 6px 16px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .auth-signin-btn:hover { border-color: var(--gold); color: var(--text); }
+    .auth-user-area { display: flex; align-items: center; position: relative; }
+    .auth-avatar {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--gold);
+      color: var(--bg); font-size: 13px; font-weight: 600; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; user-select: none;
+      transition: opacity 0.2s;
+    }
+    .auth-avatar:hover { opacity: 0.85; }
+    .auth-dropdown {
+      position: absolute; top: calc(100% + 10px); right: 0; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 200px;
+      z-index: 300; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .auth-dropdown-email {
+      font-size: 12px; color: var(--muted); margin-bottom: 10px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border); word-break: break-all;
+    }
+    .auth-dropdown button {
+      font-family: inherit; font-size: 13px; color: var(--muted); background: none;
+      border: none; cursor: pointer; padding: 0; transition: color 0.2s;
+    }
+    .auth-dropdown button:hover { color: var(--text); }
+
+    .auth-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; backdrop-filter: blur(4px); }
+    .auth-modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 401;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 40px 36px; width: min(420px, calc(100vw - 40px)); text-align: center;
+    }
+    .auth-modal-close {
+      position: absolute; top: 14px; right: 16px; background: none; border: none;
+      color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 8px; transition: color 0.2s;
+    }
+    .auth-modal-close:hover { color: var(--text); }
+    .auth-modal h3 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: var(--gold-light); margin-bottom: 12px; }
+    .auth-modal p { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+      padding: 13px 20px; background: #fff; color: #1a1a1a; border: none; border-radius: 10px;
+      font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-btn:active { transform: scale(0.98); }
+    .google-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* ── Action focus session ── */
+    .execution-overlay { position: fixed; inset: 0; z-index: 500; display: none; background: rgba(4,6,14,.78); backdrop-filter: blur(8px); }
+    .execution-modal {
+      position: fixed; z-index: 501; top: 50%; left: 50%; width: min(520px, calc(100vw - 32px));
+      transform: translate(-50%, -50%); display: none; overflow: hidden; border: 1px solid rgba(157,140,255,.25);
+      border-radius: 22px; background: linear-gradient(155deg, #171e39, #0d1123); box-shadow: 0 35px 100px rgba(0,0,0,.55);
+    }
+    .execution-modal-inner { padding: 34px; }
+    .execution-close { position: absolute; top: 14px; right: 15px; width: 32px; height: 32px; border: 0; border-radius: 50%; color: var(--muted); background: rgba(255,255,255,.05); cursor: pointer; }
+    .execution-kicker { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    .execution-modal h3 { margin-top: 11px; font-family: 'Playfair Display', serif; font-size: 32px; line-height: 1.15; }
+    .execution-action { margin-top: 18px; padding: 14px 16px; border-left: 2px solid var(--gold); color: #dfe2ef; background: rgba(157,140,255,.07); font-size: 13px; line-height: 1.55; }
+    .execution-copy { margin-top: 20px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .focus-breath { margin: 26px auto 22px; width: 112px; height: 112px; display: grid; place-items: center; border-radius: 50%; color: var(--text); background: radial-gradient(circle, rgba(113,229,193,.22), rgba(157,140,255,.08) 60%, transparent 61%); border: 1px solid rgba(113,229,193,.2); }
+    .execution-modal.running .focus-breath { animation: breathe 8s ease-in-out infinite; }
+    .focus-count { font-family: 'Playfair Display', serif; font-size: 30px; }
+    .focus-label { margin-top: -13px; color: #7d86a2; font-size: 10px; text-align: center; }
+    @keyframes breathe { 0%,100% { transform: scale(.88); box-shadow: 0 0 0 0 rgba(113,229,193,.05); } 50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(113,229,193,.14); } }
+    .execution-actions { display: grid; gap: 10px; margin-top: 24px; }
+    .execution-primary { min-height: 48px; border: 0; border-radius: 9px; color: #07140f; background: linear-gradient(100deg, var(--accent), #ab9eff); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .execution-secondary { border: 0; color: var(--muted); background: none; font-family: inherit; font-size: 12px; cursor: pointer; }
+    .execution-secondary:hover { color: var(--text); }
+
+    /* Daily result modal */
+    .progress-overlay { position: fixed; inset: 0; z-index: 510; display: none; background: rgba(4,6,14,.8); backdrop-filter: blur(8px); }
+    .progress-modal { position: fixed; z-index: 511; top: 50%; left: 50%; width: min(500px, calc(100vw - 32px)); transform: translate(-50%, -50%); display: none; border: 1px solid rgba(157,140,255,.25); border-radius: 20px; padding: 30px; background: linear-gradient(155deg, #171e39, #0d1123); box-shadow: 0 35px 100px rgba(0,0,0,.55); }
+    .progress-modal h3 { margin: 10px 34px 0 0; font-family: 'Playfair Display', serif; font-size: 29px; }
+    .progress-modal-action { margin-top: 14px; color: #aeb5cb; font-size: 13px; line-height: 1.55; }
+    .progress-statuses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+    .progress-status { min-height: 42px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); background: rgba(255,255,255,.025); font: 600 11px 'DM Sans', sans-serif; cursor: pointer; }
+    .progress-status.selected { border-color: var(--gold); color: var(--text); background: rgba(157,140,255,.13); }
+    .progress-note-label { display: block; margin-top: 18px; color: #858eaa; font-size: 10px; }
+    .progress-note { width: 100%; min-height: 86px; resize: vertical; margin-top: 7px; border: 1px solid var(--border); border-radius: 9px; padding: 11px; color: var(--text); background: rgba(0,0,0,.18); font: 12px/1.55 'DM Sans', sans-serif; }
+    .progress-note:focus { outline: none; border-color: rgba(157,140,255,.55); }
+    .progress-save { width: 100%; min-height: 46px; margin-top: 15px; border: 0; border-radius: 9px; color: #07140f; background: linear-gradient(100deg, var(--accent), #ab9eff); font: 700 13px 'DM Sans', sans-serif; cursor: pointer; }
+
+    @media (max-width: 520px) {
+      .execution-modal-inner { padding: 28px 22px 24px; }
+      .execution-modal h3 { font-size: 27px; }
+      .focus-breath { width: 96px; height: 96px; }
+      .weekly-review-card { padding: 20px 16px; }
+      .review-metrics { grid-template-columns: 1fr; }
+      .review-metric { display: flex; align-items: baseline; gap: 9px; }
+      .review-metric span { margin-top: 0; }
+      .review-reflection { grid-template-columns: 1fr; }
+      .review-field:last-child, .review-save { grid-column: 1; }
+      .progress-modal { padding: 26px 20px 22px; }
+      .progress-statuses { grid-template-columns: 1fr; }
+    }
+
+    /* ── Product framing ── */
+    #view-onboard { display: grid; grid-template-columns: minmax(290px, .78fr) minmax(0, 1.22fr); gap: 70px; align-items: start; padding: 64px 0 90px; }
+    .onboard-intro { position: sticky; top: 28px; padding: 26px 0; text-align: left; }
+    .onboard-kicker { color: var(--accent); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+    .onboard-intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(38px, 4.5vw, 56px); line-height: 1.04; letter-spacing: -1.5px; margin-bottom: 18px; }
+    .onboard-intro > p { max-width: 470px; color: var(--muted); font-size: 15px; line-height: 1.75; }
+    .builder-back { margin-bottom: 32px; }
+    .builder-back a { color: var(--muted); font-size: 12px; text-decoration: none; }
+    .builder-back a:hover { color: var(--text); }
+    .builder-flow { margin-top: 30px; display: grid; gap: 0; }
+    .flow-item { position: relative; min-height: 62px; display: grid; grid-template-columns: 30px 1fr; gap: 13px; align-items: start; color: #737b96; }
+    .flow-item:not(:last-child)::after { content: ''; position: absolute; top: 29px; bottom: 0; left: 14px; width: 1px; background: var(--border); }
+    .flow-item > span { position: relative; z-index: 1; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--bg); font-size: 11px; font-weight: 700; }
+    .flow-item strong { display: block; color: #c3c8da; font-size: 13px; }
+    .flow-item small { display: block; margin-top: 2px; color: #6f7690; font-size: 11px; }
+    .flow-item.active > span { color: var(--bg); border-color: var(--accent); background: var(--accent); }
+    .flow-item.active strong { color: var(--text); }
+    .plan-includes { margin-top: 10px; padding: 18px; border: 1px solid var(--border); border-radius: 13px; background: rgba(255,255,255,.025); }
+    .plan-includes-label { margin-bottom: 11px; color: #737b96; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .plan-includes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 12px; }
+    .plan-includes-grid span { color: #b8bed2; font-size: 11px; }
+    .plan-includes-grid span::before { content: '✓'; color: var(--accent); margin-right: 6px; }
+    .onboard-meta { display: flex; gap: 18px; margin-top: 18px; color: var(--muted); font-size: 12px; }
+    .onboard-meta span::before { content: '✓'; color: var(--accent); margin-right: 7px; }
+    .category-btn:hover, .hours-btn:hover { border-color: rgba(157,140,255,.65); color: var(--text); transform: translateY(-1px); }
+    .category-btn.selected, .hours-btn.selected { border-color: var(--gold); color: var(--text); background: linear-gradient(135deg, rgba(157,140,255,.16), rgba(113,229,193,.06)); box-shadow: inset 0 0 0 1px rgba(157,140,255,.08); }
+    .week-card, .funnel-stage, .exercise-card, .auth-modal { box-shadow: 0 18px 50px rgba(0,0,0,.16); }
+
+    @media (max-width: 820px) {
+      #view-onboard { grid-template-columns: 1fr; gap: 28px; padding-top: 36px; }
+      .onboard-intro { position: static; padding: 0; }
+      #view-onboard.is-progressing .onboard-intro { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page { padding-inline: 16px; }
+      .page-header { padding-top: 18px; }
+      .header-nav { display: none; }
+      .onboard-intro h1 { font-size: 38px; }
+      .onboard-meta { gap: 12px; }
+      .step-hero { padding: 24px; border-radius: 16px; }
+      .step-q { font-size: 27px; }
+      .step-nav { gap: 12px; }
+      .dots { gap: 4px; }
+      .btn-next { padding-inline: 20px; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <a class="wordmark" href="/"><span class="wordmark-mark">M</span><span>Master Key</span></a>
+    <div class="header-nav">
+      <a class="header-nav-link" href="/">Overview</a>
+      <a class="header-nav-link" href="/exercises">Exercises</a>
+      <a class="header-nav-link active" href="/goals">Master Plan</a>
+    </div>
+    <div class="auth-area">
+      <button class="auth-signin-btn" id="auth-signin-btn">Sign in</button>
+      <div class="auth-user-area" id="auth-user-area" style="display:none">
+        <div class="auth-avatar" id="auth-avatar" title="Account"></div>
+        <div class="auth-dropdown" id="auth-dropdown" style="display:none">
+          <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
+          <button id="auth-signout-btn">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Onboarding ── -->
+  <div id="view-onboard">
+    <div class="onboard-intro" id="onboard-intro">
+      <div class="builder-back"><a href="/">← Back to the overview</a></div>
+      <div class="onboard-kicker">90-day plan builder</div>
+      <h1>Let’s build the plan you just saw.</h1>
+      <p>The dashboard on the homepage starts here. Your answers directly shape the milestones, next actions, and mental-training exercises in your Master Plan.</p>
+      <div class="builder-flow" aria-label="Master Plan journey">
+        <div class="flow-item active"><span>1</span><div><strong>Define your direction</strong><small>Answer 9 planning questions</small></div></div>
+        <div class="flow-item"><span>2</span><div><strong>Generate your roadmap</strong><small>Receive milestones and next actions</small></div></div>
+        <div class="flow-item"><span>3</span><div><strong>Practice and progress</strong><small>Use your plan with matched exercises</small></div></div>
+      </div>
+      <div class="plan-includes">
+        <div class="plan-includes-label">Your plan will include</div>
+        <div class="plan-includes-grid"><span>Weekly milestones</span><span>Next actions</span><span>Matched exercises</span><span>Progress tracking</span></div>
+      </div>
+      <div class="onboard-meta"><span>About 3 minutes</span><span>9 planning questions</span></div>
+    </div>
+    <div id="step-1" class="step active">
+      <div class="step-hero">
+        <div class="step-num">Question 1 of 9</div>
+        <div class="step-q">What area of your life is this goal in?</div>
+        <div class="step-hint">This shapes the kind of playbook the plan builds — a career funnel looks different from a health or relationship one.</div>
+        <div class="category-grid">
+          <button class="category-btn" data-category="Career breakthrough">Career breakthrough</button>
+          <button class="category-btn" data-category="Financial abundance">Financial abundance</button>
+          <button class="category-btn" data-category="Relationship &amp; connection">Relationship &amp; connection</button>
+          <button class="category-btn" data-category="Health &amp; energy">Health &amp; energy</button>
+          <button class="category-btn" data-category="Launching something of my own">Launching something of my own</button>
+          <button class="category-btn" data-category="Inner peace">Inner peace</button>
+          <button class="category-btn" data-category="Something else">Something else</button>
+        </div>
+      </div>
+      <div class="step-nav">
+        <div class="dots">
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-1" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-2" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 2 of 9</div>
+        <div class="step-q">What measurable result do you want by the end of 90 days?</div>
+        <div class="step-hint">Name the number, observable result, or clear evidence that will show you made meaningful progress.</div>
+        <input type="text" id="input-goal" placeholder="Recruit 100 users, including 30 who return weekly…" maxlength="240" autocomplete="off">
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-2" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-3" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 3 of 9</div>
+        <div class="step-q">Where are you today compared with that result?</div>
+        <div class="step-hint">Give the current number, situation, habit, experience, or evidence. This baseline determines the real distance your plan must cover.</div>
+        <textarea id="input-baseline" placeholder="I have 12 users, 3 return weekly, and I do not yet have a repeatable acquisition channel…" maxlength="600"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-3" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-4" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 4 of 9</div>
+        <div class="step-q">Why does achieving this matter to you?</div>
+        <div class="step-hint">What would change in your life—and what is really at stake if nothing changes?</div>
+        <textarea id="input-why" placeholder="It matters because…" maxlength="500"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(3)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-4">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-5" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 5 of 9</div>
+        <div class="step-q">What have you already tried, and what happened?</div>
+        <div class="step-hint">This helps the plan build on what worked and avoid repeating approaches that did not.</div>
+        <textarea id="input-tried" placeholder="I tried posting in two communities; one produced conversations but the other produced no sign-ups…" maxlength="700"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(4)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-5">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-6" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 6 of 9</div>
+        <div class="step-q">What resources or advantages do you already have?</div>
+        <div class="step-hint">Include useful skills, relationships, audiences, tools, budget, experience, or access. “None yet” is also a valid answer.</div>
+        <textarea id="input-resources" placeholder="I have an email list of 300 people, access to two tennis communities, product analytics experience, and a $500 test budget…" maxlength="700"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(5)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-6">Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-7" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 7 of 9</div>
+        <div class="step-q">What is most likely to prevent execution?</div>
+        <div class="step-hint">Choose the closest fit, then describe how it shows up for you.</div>
+        <select id="input-obstacle-reason">
+          <option value="" selected disabled>Choose the closest fit…</option>
+          <option value="Fear & self-doubt">Fear &amp; self-doubt</option>
+          <option value="Lack of clarity">Lack of clarity</option>
+          <option value="Inconsistency or accountability">Inconsistency or accountability</option>
+          <option value="Not enough time">Not enough time</option>
+          <option value="Skill or knowledge gap">Skill or knowledge gap</option>
+          <option value="Money or resources">Money or resources</option>
+          <option value="Low energy or health">Low energy or health</option>
+          <option value="Environment or external dependency">Environment or external dependency</option>
+          <option value="Something else">Something else</option>
+        </select>
+        <div class="obstacle-detail-field">
+          <textarea id="input-obstacle-detail" placeholder="When does this usually get in the way?" maxlength="600"></textarea>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(6)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-7" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-8" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 8 of 9</div>
+        <div class="step-q">How much time can you reliably protect—and when?</div>
+        <div class="step-hint">A plan should fit your real calendar. Choose a weekly amount, then name the days or time blocks you can usually use.</div>
+        <div class="hours-grid">
+          <button class="hours-btn" data-hours="1-2">1–2 hours</button>
+          <button class="hours-btn" data-hours="3-5">3–5 hours</button>
+          <button class="hours-btn" data-hours="5-10">5–10 hours</button>
+          <button class="hours-btn" data-hours="10+">10+ hours</button>
+        </div>
+        <div class="start-week-field">
+          <input type="text" id="input-schedule" placeholder="Tuesday and Thursday evenings; Saturday morning…" maxlength="300" autocomplete="off">
+        </div>
+        <div class="start-week-field">
+          <div class="start-week-label">Already partway through the course? Choose the week where this plan should begin.</div>
+          <select id="input-start-week">
+            <option value="1" selected>Week 1 — starting fresh</option>
+            <option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
+            <option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option>
+            <option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option>
+            <option value="11">Week 11</option><option value="12">Week 12</option>
+          </select>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(7)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+        </div>
+        <button class="btn-next" id="btn-8" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-9" class="step">
+      <div class="step-hero">
+        <div class="step-num">Question 9 of 9</div>
+        <div class="step-q">What would make the first seven days a success?</div>
+        <div class="step-hint">Choose a small, observable proof of momentum—not the whole 90-day outcome.</div>
+        <textarea id="input-first-week" placeholder="Interview five target users and learn the two problems they are most willing to solve…" maxlength="600"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(8)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+        </div>
+        <button class="btn-next" id="btn-9" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <div id="step-10" class="step">
+      <div class="step-hero">
+        <div class="step-num">Ready to build</div>
+        <div class="step-q" id="step10-heading">Sign in to generate your plan</div>
+        <div class="step-hint" id="step10-hint">Your answers will become a personalized 90-day roadmap, weekly actions, and daily focus practice.</div>
+        <button class="google-btn" id="step10-google-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+        <button class="btn-next ready-generate-btn" id="btn-10-generate" style="display:none">Generate My Plan →</button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(9)">← Back</button>
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Generating ── -->
+  <div id="view-generating">
+    <div class="spinner"></div>
+    <div class="gen-title">Building your plan…</div>
+    <div class="gen-sub">This takes just a moment</div>
+    <div class="gen-steps">
+      <div class="gen-step" id="gen-s1"><div class="check">·</div> Reading your goal</div>
+      <div class="gen-step" id="gen-s2"><div class="check">·</div> Mapping your execution path</div>
+      <div class="gen-step" id="gen-s3"><div class="check">·</div> Selecting exercises for your obstacle</div>
+      <div class="gen-step" id="gen-s4"><div class="check">·</div> Finalizing your roadmap</div>
+    </div>
+  </div>
+
+  <!-- ── Error ── -->
+  <div id="view-error">
+    <div class="error-card">
+      <h3>Couldn't generate your plan</h3>
+      <p id="error-msg">Something went wrong. Please try again.</p>
+      <div class="api-hint" id="api-hint" style="display:none">Check that the API server is reachable and try again.</div>
+      <button class="btn-retry" onclick="retryGenerate()">Try again</button>
+    </div>
+  </div>
+
+  <!-- ── Dashboard ── -->
+  <div id="view-dashboard">
+    <div class="dash-hero">
+      <div class="dash-label" id="d-domain-label">Your Goal</div>
+      <div class="dash-goal" id="d-goal"></div>
+      <div class="dash-summary" id="d-summary"></div>
+      <div class="milestone-tag" id="d-milestone"></div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-label">Coach's Insight</div>
+      <p id="d-insight"></p>
+    </div>
+
+    <div class="section-title">Your Execution Path</div>
+    <div id="d-funnel"></div>
+
+    <div class="week-card">
+      <div class="week-header">
+        <div>
+          <div class="week-badge" id="d-week-badge"></div>
+          <span class="week-back-current" id="d-week-back-current">← Back to current week</span>
+          <div class="week-stage-tag" id="d-week-stage"></div>
+          <div class="week-theme" id="d-week-theme"></div>
+          <div class="week-target" id="d-week-target"></div>
+        </div>
+        <div class="week-progress" id="d-week-progress"></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="d-progress-fill"></div></div>
+      <div class="actions-title">This week’s actions</div>
+      <div class="actions-helper">Choose one step for today. Focus, execute, then log the result—your daily effort will roll up into the weekly review.</div>
+      <div id="d-actions"></div>
+      <div class="streak-row">
+        <div class="streak-num" id="d-streak">0</div>
+        <div class="streak-label">day execution streak</div>
+      </div>
+    </div>
+
+    <div class="weekly-review-card" id="d-weekly-review"></div>
+
+    <div class="section-title">Recommended Exercises</div>
+    <div id="d-exercises"></div>
+
+    <div class="section-title">90-Day Roadmap</div>
+    <div class="weeks-grid" id="d-weeks-grid"></div>
+
+  </div>
+
+</div>
+
+<!-- ── Action Focus Session ─────────────────── -->
+<div class="execution-overlay" id="execution-overlay"></div>
+<div class="execution-modal" id="execution-modal" role="dialog" aria-modal="true" aria-labelledby="execution-title">
+  <button class="execution-close" id="execution-close" aria-label="Close focus session">✕</button>
+  <div class="execution-modal-inner">
+    <div class="execution-kicker" id="execution-kicker">Before you begin</div>
+    <h3 id="execution-title">Get focused for this action</h3>
+    <div class="execution-action" id="execution-action"></div>
+    <p class="execution-copy" id="execution-copy"></p>
+    <div class="focus-breath" id="focus-breath"><span class="focus-count" id="focus-count">60</span></div>
+    <div class="focus-label" id="focus-label">One slow breath at a time</div>
+    <div class="execution-actions">
+      <button class="execution-primary" id="execution-primary">Begin 60-second focus</button>
+      <button class="execution-secondary" id="execution-secondary">Skip and start the action</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Daily progress log ───────────────────── -->
+<div class="progress-overlay" id="progress-overlay"></div>
+<div class="progress-modal" id="progress-modal" role="dialog" aria-modal="true" aria-labelledby="progress-title">
+  <button class="execution-close" id="progress-close" aria-label="Close progress log">✕</button>
+  <div class="execution-kicker">Daily execution log</div>
+  <h3 id="progress-title">How did it go?</h3>
+  <div class="progress-modal-action" id="progress-action"></div>
+  <div class="progress-statuses" role="group" aria-label="Action result">
+    <button class="progress-status" type="button" data-status="completed">Completed</button>
+    <button class="progress-status" type="button" data-status="partial">Made progress</button>
+    <button class="progress-status" type="button" data-status="skipped">Skipped today</button>
+  </div>
+  <label class="progress-note-label" for="progress-note">Evidence or note (optional)</label>
+  <textarea class="progress-note" id="progress-note" maxlength="500" placeholder="What happened? What did you learn?"></textarea>
+  <button class="progress-save" id="progress-save" type="button">Save today’s result</button>
+</div>
+
+<!-- ── Auth Modal ───────────────────────────── -->
+<div class="auth-modal-overlay" id="auth-modal-overlay" style="display:none"></div>
+<div class="auth-modal" id="auth-modal" style="display:none">
+  <button class="auth-modal-close" id="auth-modal-close">✕</button>
+  <h3>Sign In to Continue</h3>
+  <p>Your strategic funnel plan is generated for your account, so you can come back to it from any device.</p>
+  <button class="google-btn" id="google-sign-in-btn">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+    Continue with Google
+  </button>
+</div>
+
+<script>
+// ── Storage ────────────────────────────────────
+const GOAL_KEY = 'mks_goal_v1'; // pre-generation draft only — unscoped so it survives the sign-in redirect
+const PLAN_KEY = 'mks_goal_plan_v1';
+
+function saveGoal(data) { localStorage.setItem(GOAL_KEY, JSON.stringify(data)); }
+function loadGoal() { try { return JSON.parse(localStorage.getItem(GOAL_KEY)); } catch { return null; } }
+
+// The generated plan is tagged with the id of the user who generated it, so
+// a different (or signed-out) visitor on the same browser never inherits
+// someone else's plan — loadPlan() only ever returns the current user's own.
+function savePlan(goalData, planJson) {
+  if (!currentUser) return;
+  localStorage.setItem(PLAN_KEY, JSON.stringify({ ...planJson, goal: goalData, ownerId: currentUser.id }));
+}
+function loadPlan() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(PLAN_KEY));
+    if (!stored || !currentUser || stored.ownerId !== currentUser.id) return null;
+    return stored;
+  } catch { return null; }
+}
+
+// decompose-goal.js also persists the plan server-side (mks_goal_generations)
+// so a generation that succeeds but never gets applied client-side — e.g.
+// the tab reloads or navigates away during the 40-50s+ this can now take
+// under sustained Gemini overload — isn't silently lost. Called on every
+// initial route so the server (source of truth) always wins over a stale
+// local cache once it has something newer.
+async function fetchServerGeneration() {
+  if (!currentUser) return null;
+  // Deliberately bypasses sb.from(), which relies on the Supabase client's
+  // own internal session state. Nudging a refresh via getFreshAccessToken()
+  // isn't enough on its own: if the underlying sb.auth.getSession() call
+  // genuinely hangs (not just slow — e.g. a stuck cross-tab session lock)
+  // rather than resolving late, our timeout stops *us* from hanging, but
+  // the abandoned getSession() call never actually updates the client's
+  // internal session, so sb.from() would still silently fail its RLS
+  // check afterward. A direct authenticated REST call with an explicit
+  // bearer token — the same pattern generatePlan() already uses
+  // successfully — sidesteps that internal state entirely.
+  const token = await getFreshAccessToken();
+  if (!token) return null;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${currentUser.id}&select=goal_data,plan,generated_at`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) {
+      console.error(`fetchServerGeneration failed: HTTP ${res.status}`);
+      return null;
+    }
+    const rows = await res.json();
+    const data = rows[0];
+    if (!data?.plan || !data?.goal_data) return null;
+    return { goal: data.goal_data, plan: data.plan, generatedAtMs: new Date(data.generated_at).getTime() };
+  } catch (err) {
+    console.error('fetchServerGeneration failed:', err.message || err);
+    return null;
+  }
+}
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function todayKey() { return `mks_goal_actions_${localDateKey()}`; }
+function focusedTodayKey() { return `mks_goal_focused_${localDateKey()}`; }
+function executionLogKey() { return `mks_execution_log_v2_${currentUser?.id || 'local'}`; }
+function weeklyReflectionKey() { return `mks_weekly_reflections_v1_${currentUser?.id || 'local'}`; }
+
+function getExecutionLog() {
+  try { return JSON.parse(localStorage.getItem(executionLogKey()) || '{}'); }
+  catch { return {}; }
+}
+
+function setExecutionLog(log) { localStorage.setItem(executionLogKey(), JSON.stringify(log)); }
+
+function getDayLog(dateKey = localDateKey()) {
+  const log = getExecutionLog();
+  const day = log[dateKey] || { focused: {}, results: {} };
+  day.focused ||= {};
+  day.results ||= {};
+
+  // Preserve progress recorded before the consolidated log was introduced.
+  if (dateKey === localDateKey()) {
+    try {
+      JSON.parse(localStorage.getItem(todayKey()) || '[]').forEach((key) => {
+        day.results[key] ||= { status: 'completed', action: '', updatedAt: new Date().toISOString() };
+      });
+      JSON.parse(localStorage.getItem(focusedTodayKey()) || '[]').forEach((key) => {
+        day.focused[key] ||= { at: new Date().toISOString() };
+      });
+    } catch { /* Ignore malformed legacy entries. */ }
+  }
+  return day;
+}
+
+function saveDayLog(day, dateKey = localDateKey()) {
+  const log = getExecutionLog();
+  log[dateKey] = day;
+  setExecutionLog(log);
+}
+
+function recordFocus(action, key, weekNum) {
+  const day = getDayLog();
+  day.focused[key] = { action, week: weekNum, at: new Date().toISOString() };
+  saveDayLog(day);
+}
+
+function recordDailyResult(action, key, weekNum, status, note = '') {
+  const day = getDayLog();
+  day.results[key] = { action, week: weekNum, status, note: note.trim(), updatedAt: new Date().toISOString() };
+  saveDayLog(day);
+}
+
+function getWeeklyCompleted(weekNum) {
+  const completed = new Set();
+  Object.values(getExecutionLog()).forEach((day) => {
+    Object.entries(day?.results || {}).forEach(([key, result]) => {
+      if (Number(result.week || key.split('-')[0]) === weekNum && result.status === 'completed') completed.add(key);
+    });
+  });
+  return completed;
+}
+
+function getFocusedToday() { return new Set(Object.keys(getDayLog().focused)); }
+function getResultToday(key) { return getDayLog().results[key] || null; }
+
+function getWeeklyReflections() {
+  try { return JSON.parse(localStorage.getItem(weeklyReflectionKey()) || '{}'); }
+  catch { return {}; }
+}
+
+function saveWeeklyReflection(weekNum, reflection) {
+  const reflections = getWeeklyReflections();
+  reflections[weekNum] = reflection;
+  localStorage.setItem(weeklyReflectionKey(), JSON.stringify(reflections));
+}
+
+const FUNNEL_DONE_KEY = 'mks_funnel_done_v1';
+const FUNNEL_METRICS_KEY = 'mks_funnel_metrics_v1';
+function getFunnelDone() { try { return new Set(JSON.parse(localStorage.getItem(FUNNEL_DONE_KEY) || '[]')); } catch { return new Set(); } }
+function setFunnelDone(set) { localStorage.setItem(FUNNEL_DONE_KEY, JSON.stringify([...set])); }
+function getFunnelMetrics() { try { return JSON.parse(localStorage.getItem(FUNNEL_METRICS_KEY) || '{}'); } catch { return {}; } }
+function setFunnelMetrics(obj) { localStorage.setItem(FUNNEL_METRICS_KEY, JSON.stringify(obj)); }
+
+// ── Auth ─────────────────────────────────────────
+const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+// Cached alongside currentUser from onAuthStateChange, and used as a
+// fallback in getFreshAccessToken() below. sb.auth.getSession() can hang
+// under some cross-tab session-refresh conditions (which would silently
+// strand a user on the generating screen with the request never even
+// sent), but relying on this cached value alone goes stale once the
+// session outlives the ~1hr access token lifetime — confirmed live: a
+// user still on the page 68 minutes after signing in got "Sign in
+// required" because the cached token had expired with nothing refreshing
+// it. getFreshAccessToken() tries the real (possibly auto-refreshed)
+// session first, with this as the bounded-wait fallback, not the default.
+let currentAccessToken = null;
+
+async function getFreshAccessToken() {
+  try {
+    const { data } = await Promise.race([
+      sb.auth.getSession(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timed out')), 4000)),
+    ]);
+    return data?.session?.access_token ?? currentAccessToken;
+  } catch {
+    return currentAccessToken;
+  }
+}
+
+function updateAuthUI() {
+  const signinBtn = document.getElementById('auth-signin-btn');
+  const userArea  = document.getElementById('auth-user-area');
+  const avatar    = document.getElementById('auth-avatar');
+  const emailEl   = document.getElementById('auth-dropdown-email');
+  if (currentUser) {
+    signinBtn.style.display = 'none';
+    userArea.style.display  = 'flex';
+    const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email || '?';
+    avatar.textContent = name[0].toUpperCase();
+    if (emailEl) emailEl.textContent = currentUser.email || '';
+  } else {
+    signinBtn.style.display = 'block';
+    userArea.style.display  = 'none';
+  }
+}
+
+function openAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'block';
+  document.getElementById('auth-modal').style.display         = 'block';
+}
+function closeAuthModal() {
+  document.getElementById('auth-modal-overlay').style.display = 'none';
+  document.getElementById('auth-modal').style.display         = 'none';
+}
+function toggleUserMenu() {
+  const dd = document.getElementById('auth-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  const userArea = document.getElementById('auth-user-area');
+  const dd = document.getElementById('auth-dropdown');
+  if (dd && userArea && !userArea.contains(e.target)) dd.style.display = 'none';
+});
+
+async function signInWithGoogle() {
+  // Shared by the header auth modal's button and the onboarding ready screen
+  // button — both carry the .google-btn class, so this disables/relabels
+  // whichever one is currently visible rather than a single hardcoded ID.
+  document.querySelectorAll('.google-btn').forEach(btn => {
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to Google…';
+  });
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/goals' },
+  });
+}
+
+async function handleSignOut() {
+  try {
+    // sb.auth.signOut() can genuinely hang, not just fail — the same
+    // Supabase-internal-session issue found (and fixed with the same
+    // Promise.race pattern) in getFreshAccessToken() and
+    // fetchServerGeneration(). A plain try/catch doesn't help against a
+    // hang: it never rejects, so the catch block never runs and the
+    // whole function — and the sign-out button — stalls forever.
+    await Promise.race([
+      sb.auth.signOut(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('signOut timed out')), 4000)),
+    ]);
+  } catch (err) {
+    // Either the server-side revoke call failed (network error, expired
+    // refresh token, etc.) before it could clear the locally-stored
+    // session token, or it hung and we gave up waiting. Fall back to a
+    // local-only signOut so a stale token can't resurrect this session on
+    // the next page load, then keep going — the user still wants to
+    // appear signed out on this device regardless of what the original
+    // call is still doing in the background.
+    console.error('sb.auth.signOut() failed or hung, falling back to local-only signOut:', err);
+    await sb.auth.signOut({ scope: 'local' }).catch(() => {});
+  }
+  currentUser = null;
+  currentAccessToken = null;
+  updateAuthUI();
+  document.getElementById('auth-dropdown').style.display = 'none';
+  // /goals is account-gated — don't leave a previously-generated plan on
+  // screen for whoever uses this browser next.
+  show('view-onboard');
+}
+
+// True once the very first auth event (the resolved persisted session, or
+// its absence) has been handled — guards performInitialRouting() so it
+// drives the initial view exactly once, never on later sign-in/out events.
+let didInitialRoute = false;
+
+async function performInitialRouting() {
+  if (didInitialRoute) return;
+  didInitialRoute = true;
+  const resumed = await tryResumeGeneration();
+  if (!resumed) await routeInitialView();
+}
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  const wasSignedIn = !!currentUser;
+  currentUser = session?.user ?? null;
+  currentAccessToken = session?.access_token ?? null;
+  updateAuthUI();
+  // Covers signing in via the header while already on the ready screen.
+  if (currentStep === 10) updateStep10UI();
+  if (currentUser && !wasSignedIn) {
+    // A live sign-in mid-session (e.g. from the goal-generation gate):
+    // resume whatever draft brought them here, independent of initial
+    // routing.
+    closeAuthModal();
+    await tryResumeGeneration();
+  }
+  // Route the initial view only once, after currentUser is actually known —
+  // otherwise loadPlan()'s owner check always sees no one signed in yet,
+  // which used to make a new sign-in flash straight to whatever plan was
+  // last generated on this browser, regardless of who generated it.
+  await performInitialRouting();
+});
+
+document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
+document.getElementById('auth-modal-overlay').addEventListener('click', closeAuthModal);
+document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
+document.getElementById('auth-signout-btn').addEventListener('click', handleSignOut);
+document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu);
+
+// ── View switching ──────────────────────────────
+function show(id) {
+  ['view-onboard','view-generating','view-error','view-dashboard'].forEach(v => {
+    const el = document.getElementById(v);
+    el.style.display = 'none';
+    el.classList.remove('active');
+  });
+  const target = document.getElementById(id);
+  target.style.display = id === 'view-onboard' ? 'grid' : 'block';
+  target.classList.add('active');
+}
+
+// ── Onboarding steps ───────────────────────────
+let currentStep = 1;
+let selectedHours = null;
+let selectedCategory = null;
+
+function goStep(n) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`step-${n}`).classList.add('active');
+  document.getElementById('view-onboard').classList.toggle('is-progressing', n !== 1);
+  if (n === 10) updateStep10UI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Category selection (step 1)
+document.querySelectorAll('.category-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedCategory = btn.dataset.category;
+    document.getElementById('btn-1').disabled = false;
+  });
+});
+
+// Obstacle reason selection (question 7)
+document.getElementById('input-obstacle-reason').addEventListener('change', e => {
+  document.getElementById('btn-7').disabled = !e.target.value;
+});
+
+// Validate and advance
+document.getElementById('btn-1').addEventListener('click', () => { goStep(2); });
+document.getElementById('btn-2').addEventListener('click', () => {
+  if (!document.getElementById('input-goal').value.trim()) return;
+  goStep(3);
+});
+document.getElementById('btn-3').addEventListener('click', () => {
+  if (!document.getElementById('input-baseline').value.trim()) return;
+  goStep(4);
+});
+document.getElementById('btn-4').addEventListener('click', () => { goStep(5); });
+document.getElementById('btn-5').addEventListener('click', () => { goStep(6); });
+document.getElementById('btn-6').addEventListener('click', () => { goStep(7); });
+document.getElementById('btn-7').addEventListener('click', () => { goStep(8); });
+document.getElementById('btn-8').addEventListener('click', () => { goStep(9); });
+document.getElementById('btn-9').addEventListener('click', () => {
+  if (!document.getElementById('input-first-week').value.trim()) return;
+  goStep(10);
+});
+
+// Enter key to advance on the goal text input (step 2)
+document.getElementById('input-goal').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-2').click(); } });
+document.getElementById('input-goal').addEventListener('input', e => {
+  document.getElementById('btn-2').disabled = !e.target.value.trim();
+});
+document.getElementById('input-baseline').addEventListener('input', e => {
+  document.getElementById('btn-3').disabled = !e.target.value.trim();
+});
+document.getElementById('input-first-week').addEventListener('input', e => {
+  document.getElementById('btn-9').disabled = !e.target.value.trim();
+});
+
+// Hours selection (question 8)
+document.querySelectorAll('.hours-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hours-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedHours = btn.dataset.hours;
+    document.getElementById('btn-8').disabled = false;
+  });
+});
+
+// ── Generate plan ──────────────────────────────
+let lastGoalData = null;
+
+function collectGoalData() {
+  // Backdate createdAt so getCurrentWeek() immediately reflects the chosen
+  // starting week, for users who are already partway through the course.
+  const startWeek = parseInt(document.getElementById('input-start-week').value, 10) || 1;
+  const createdAt = Date.now() - (startWeek - 1) * 7 * 24 * 60 * 60 * 1000;
+  const obstacleReason = document.getElementById('input-obstacle-reason').value;
+  const obstacleDetail = document.getElementById('input-obstacle-detail').value.trim();
+  return {
+    category: selectedCategory,
+    goal: document.getElementById('input-goal').value.trim(),
+    baseline: document.getElementById('input-baseline').value.trim(),
+    why: document.getElementById('input-why').value.trim(),
+    tried: document.getElementById('input-tried').value.trim(),
+    resources: document.getElementById('input-resources').value.trim(),
+    obstacle: obstacleDetail ? `${obstacleReason} — ${obstacleDetail}` : obstacleReason,
+    hours: selectedHours,
+    schedule: document.getElementById('input-schedule').value.trim(),
+    first_week: document.getElementById('input-first-week').value.trim(),
+    start_week: startWeek,
+    email: currentUser?.email ?? null,
+    createdAt,
+  };
+}
+
+// The ready screen shows either the sign-in button or the generate button, depending
+// on whether the account gate (moved to the end of the wizard) has already
+// been cleared — including if the user signed in earlier via the header
+// button while mid-wizard, before ever reaching this step.
+function updateStep10UI() {
+  const signedIn = !!currentUser;
+  document.getElementById('step10-google-btn').style.display = signedIn ? 'none' : 'flex';
+  document.getElementById('btn-10-generate').style.display = signedIn ? 'block' : 'none';
+  document.getElementById('step10-heading').textContent = signedIn
+    ? 'Ready to generate your plan'
+    : 'Sign in to generate your plan';
+  document.getElementById('step10-hint').textContent = signedIn
+    ? `Signed in as ${currentUser.email}.`
+    : 'Your answers will become a personalized 90-day roadmap, weekly actions, and daily focus practice.';
+}
+
+// Saves the draft first so it survives the full-page redirect sign-in
+// requires; tryResumeGeneration() picks it back up once the user returns.
+document.getElementById('step10-google-btn').addEventListener('click', async () => {
+  saveGoal(collectGoalData());
+  await signInWithGoogle();
+});
+
+document.getElementById('btn-10-generate').addEventListener('click', async () => {
+  const goalData = collectGoalData();
+  saveGoal(goalData);
+  await generatePlan(goalData);
+});
+
+// Called after returning from a sign-in redirect: if there's a saved draft
+// with no plan generated yet, pick up where the user left off.
+async function tryResumeGeneration() {
+  const draft = loadGoal();
+  if (!draft || loadPlan()) return false;
+  if (!currentUser) return false;
+  await generatePlan(draft);
+  return true;
+}
+
+// Guards against overlapping calls (double-click on Generate/Try again, or a
+// resume-after-signin racing a manual retry) — without this, two in-flight
+// requests can both reach decompose-goal.js before either has released its
+// claim, and the second one gets wrongly told the free plan is already used.
+let generationInFlight = false;
+
+async function generatePlan(goalData) {
+  if (generationInFlight) return;
+  generationInFlight = true;
+  try {
+    const data = goalData || loadGoal();
+    if (!data) { show('view-onboard'); return; }
+    lastGoalData = data;
+    show('view-generating');
+    animateGenSteps();
+
+    try {
+      const token = await getFreshAccessToken();
+      const res = await fetch('/api/decompose-goal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        // "Already has a goal" (403) means exactly that — there's a real
+        // plan to show, just not a new one from this submission. Load and
+        // display it directly instead of leaving the user stuck on a bare
+        // error screen for a goal they already have.
+        if (res.status === 403) {
+          const server = await fetchServerGeneration();
+          if (server) {
+            savePlan(server.goal, { ...server.plan, generatedAt: server.generatedAtMs });
+            renderDashboard();
+            show('view-dashboard');
+            return;
+          }
+        }
+        throw new Error(json.error || `Error ${res.status}`);
+      }
+      savePlan(data, { ...json.plan, generatedAt: Date.now() });
+      renderDashboard();
+      show('view-dashboard');
+    } catch (err) {
+      document.getElementById('error-msg').textContent = err.message;
+      document.getElementById('api-hint').style.display = 'none';
+      show('view-error');
+    }
+  } finally {
+    generationInFlight = false;
+  }
+}
+
+function retryGenerate() {
+  if (lastGoalData) {
+    generatePlan(lastGoalData);
+  } else {
+    show('view-onboard');
+  }
+}
+
+async function routeInitialView() {
+  const local = loadPlan();
+  const server = await fetchServerGeneration();
+  if (server && server.generatedAtMs > (local?.generatedAt ?? 0)) {
+    savePlan(server.goal, { ...server.plan, generatedAt: server.generatedAtMs });
+  }
+  if (loadPlan()) {
+    renderDashboard();
+    show('view-dashboard');
+  } else {
+    show('view-onboard');
+  }
+}
+
+function animateGenSteps() {
+  const steps = ['gen-s1','gen-s2','gen-s3','gen-s4'];
+  steps.forEach(s => { document.getElementById(s).classList.remove('done'); document.getElementById(s).querySelector('.check').textContent = '·'; });
+  steps.forEach((s, i) => {
+    setTimeout(() => {
+      document.getElementById(s).classList.add('done');
+      document.getElementById(s).querySelector('.check').textContent = '✓';
+    }, 200 + i * 300);
+  });
+}
+
+// ── Dashboard ──────────────────────────────────
+function getCurrentWeek(createdAt) {
+  const daysSince = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
+  return Math.min(12, Math.max(1, Math.ceil((daysSince + 1) / 7)));
+}
+
+function getStreak() {
+  let streak = 0;
+  const d = new Date();
+  const log = getExecutionLog();
+  for (let i = 0; i < 90; i++) {
+    const dateKey = localDateKey(d);
+    const dayResults = Object.values(log[dateKey]?.results || {});
+    let acted = dayResults.some((result) => result.status === 'completed' || result.status === 'partial');
+    if (!acted) {
+      try { acted = JSON.parse(localStorage.getItem(`mks_goal_actions_${dateKey}`) || '[]').length > 0; }
+      catch { acted = false; }
+    }
+    if (!acted && i > 0) break;
+    if (acted) streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+// ── Strategic funnel ───────────────────────────
+const FUNNEL_STAGES = [
+  { key: 'targets', label: 'Targets', build: buildTargetsBody },
+  { key: 'access_points', label: 'Access Points', build: buildAccessBody },
+  { key: 'outreach', label: 'Outreach & Script', build: buildOutreachBody },
+  { key: 'gap_closing', label: 'Close the Gap', build: buildGapBody },
+  { key: 'core_prep', label: 'Core Preparation', build: buildPrepBody },
+  { key: 'funnel_metrics', label: 'Funnel & Iteration', build: buildMetricsBody },
+  { key: 'close', label: 'Close & Land', build: buildCloseBody },
+];
+const FUNNEL_STAGE_LABELS = Object.fromEntries(FUNNEL_STAGES.map(s => [s.key, s.label]));
+
+function makeChecklistItem(id, title, sub) {
+  const done = getFunnelDone().has(id);
+  const item = document.createElement('div');
+  item.className = 'funnel-list-item';
+  const check = document.createElement('div');
+  check.className = 'funnel-item-check' + (done ? ' done' : '');
+  const main = document.createElement('div');
+  main.className = 'funnel-item-main';
+  const t = document.createElement('div');
+  t.className = 'funnel-item-title' + (done ? ' done' : '');
+  t.textContent = title;
+  main.appendChild(t);
+  let s;
+  if (sub) {
+    s = document.createElement('div');
+    s.className = 'funnel-item-sub' + (done ? ' done' : '');
+    s.textContent = sub;
+    main.appendChild(s);
+  }
+  item.appendChild(check);
+  item.appendChild(main);
+  item.addEventListener('click', () => {
+    const set = getFunnelDone();
+    if (set.has(id)) set.delete(id); else set.add(id);
+    setFunnelDone(set);
+    const nowDone = set.has(id);
+    check.classList.toggle('done', nowDone);
+    t.classList.toggle('done', nowDone);
+    if (s) s.classList.toggle('done', nowDone);
+  });
+  return item;
+}
+
+function buildScriptBox(label, text) {
+  const box = document.createElement('div');
+  box.className = 'script-box';
+  const l = document.createElement('div');
+  l.className = 'script-label';
+  l.textContent = label;
+  const body = document.createElement('div');
+  body.textContent = text || '';
+  const btn = document.createElement('button');
+  btn.className = 'btn-copy';
+  btn.type = 'button';
+  btn.textContent = 'Copy';
+  btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(text || '').then(() => {
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    });
+  });
+  box.appendChild(l);
+  box.appendChild(body);
+  box.appendChild(btn);
+  return box;
+}
+
+function buildTargetsBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.items || []).forEach((it, i) => wrap.appendChild(makeChecklistItem(`targets-${i}`, it.name, it.why_it_fits)));
+  return wrap;
+}
+
+function buildAccessBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.items || []).forEach((it, i) => wrap.appendChild(makeChecklistItem(`access-${i}`, it.role_to_reach, it.how_to_find_them)));
+  return wrap;
+}
+
+function buildOutreachBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  wrap.appendChild(buildScriptBox('First Message', f.first_message_script));
+  wrap.appendChild(buildScriptBox('Follow-Up', f.follow_up_script));
+  if (f.cadence) {
+    const c = document.createElement('div');
+    c.className = 'cadence-note';
+    c.textContent = f.cadence;
+    wrap.appendChild(c);
+  }
+  return wrap;
+}
+
+function buildGapBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.gaps || []).forEach((g, i) => wrap.appendChild(makeChecklistItem(`gap-${i}`, g.gap, `${g.why_it_matters} — Resource: ${g.resource}. Next: ${g.action}`)));
+  return wrap;
+}
+
+function buildPrepBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.tasks || []).forEach((t, i) => wrap.appendChild(makeChecklistItem(`prep-${i}`, t.task, t.detail)));
+  return wrap;
+}
+
+function buildMetricsBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  const steps = f.steps || [];
+  const rateEls = [];
+  const metrics = getFunnelMetrics();
+  steps.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'funnel-metrics-row';
+    const info = document.createElement('div');
+    info.className = 'fm-step';
+    const name = document.createElement('div');
+    name.className = 'fm-step-name';
+    name.textContent = s.step_name;
+    const bench = document.createElement('div');
+    bench.className = 'fm-benchmark';
+    bench.textContent = `Target: ${s.benchmark}`;
+    info.appendChild(name);
+    info.appendChild(bench);
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.className = 'fm-input';
+    input.placeholder = '0';
+    input.value = metrics[i] ?? '';
+    const rate = document.createElement('div');
+    rate.className = 'fm-rate';
+    rateEls.push(rate);
+    input.addEventListener('input', () => {
+      const m = getFunnelMetrics();
+      m[i] = input.value === '' ? undefined : Number(input.value);
+      setFunnelMetrics(m);
+      updateRates();
+    });
+    row.appendChild(info);
+    row.appendChild(input);
+    row.appendChild(rate);
+    wrap.appendChild(row);
+  });
+  function updateRates() {
+    const m = getFunnelMetrics();
+    rateEls.forEach((rateEl, i) => {
+      if (i === 0 || !m[i - 1] || m[i] == null) { rateEl.textContent = ''; return; }
+      rateEl.textContent = `${Math.round((m[i] / m[i - 1]) * 100)}%`;
+    });
+  }
+  updateRates();
+  if (f.iteration_plan) {
+    const note = document.createElement('div');
+    note.className = 'iteration-note';
+    note.textContent = f.iteration_plan;
+    wrap.appendChild(note);
+  }
+  return wrap;
+}
+
+function buildCloseBody(f) {
+  const wrap = document.createElement('div');
+  const desc = document.createElement('div'); desc.className = 'funnel-desc'; desc.textContent = f.description || '';
+  wrap.appendChild(desc);
+  (f.checklist || []).forEach((c, i) => wrap.appendChild(makeChecklistItem(`close-${i}`, c)));
+  return wrap;
+}
+
+function renderFunnel(plan) {
+  const container = document.getElementById('d-funnel');
+  container.replaceChildren();
+  const funnel = plan.funnel || {};
+  FUNNEL_STAGES.forEach((stage, i) => {
+    const data = funnel[stage.key];
+    if (!data) return;
+    const card = document.createElement('div');
+    card.className = 'funnel-stage' + (i === 0 ? ' expanded' : '');
+    const header = document.createElement('div');
+    header.className = 'funnel-stage-header';
+    const num = document.createElement('div'); num.className = 'funnel-stage-num'; num.textContent = i + 1;
+    const label = document.createElement('div'); label.className = 'funnel-stage-label'; label.textContent = stage.label;
+    const toggle = document.createElement('div'); toggle.className = 'funnel-stage-toggle'; toggle.textContent = '▾';
+    header.appendChild(num);
+    header.appendChild(label);
+    header.appendChild(toggle);
+    header.addEventListener('click', () => card.classList.toggle('expanded'));
+    const body = document.createElement('div');
+    body.className = 'funnel-stage-body';
+    body.appendChild(stage.build(data));
+    card.appendChild(header);
+    card.appendChild(body);
+    container.appendChild(card);
+  });
+}
+
+// Which week's card is currently displayed — defaults to the actual current
+// week on every renderDashboard(), but the badge/dots let you browse ahead
+// (or back) to preview other weeks without changing which week you're
+// actually on.
+let viewedWeek = null;
+
+function renderDashboard() {
+  const plan = loadPlan();
+  if (!plan) return;
+  const goal = plan.goal;
+
+  const weekNum = getCurrentWeek(goal.createdAt);
+  if (!plan.weeks?.[weekNum - 1]) return;
+
+  // Hero
+  document.getElementById('d-domain-label').textContent = plan.domain_label || 'Your Goal';
+  document.getElementById('d-goal').textContent = goal.goal;
+  document.getElementById('d-summary').textContent = plan.summary || '';
+  document.getElementById('d-milestone').textContent = '🎯 ' + (plan.milestone_90day || '');
+  document.getElementById('d-insight').textContent = plan.insight || '';
+
+  // Strategic funnel
+  renderFunnel(plan);
+
+  // Week card (starts on the actual current week)
+  renderWeekCard(weekNum, plan);
+
+  // Streak
+  document.getElementById('d-streak').textContent = getStreak();
+
+  // Exercises
+  const exContainer = document.getElementById('d-exercises');
+  exContainer.replaceChildren();
+  (plan.exercises || []).forEach(ex => {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+    const info = document.createElement('div');
+    info.className = 'ex-info';
+    const part = document.createElement('div');
+    part.className = 'ex-part';
+    part.textContent = `Part ${Number(ex.part)}`;
+    const reason = document.createElement('div');
+    reason.className = 'ex-reason';
+    reason.textContent = ex.reason;
+    info.appendChild(part);
+    info.appendChild(reason);
+    const link = document.createElement('a');
+    link.className = 'ex-link';
+    link.href = '/exercises';
+    link.textContent = 'Go →';
+    card.appendChild(info);
+    card.appendChild(link);
+    exContainer.appendChild(card);
+  });
+
+  // Weeks grid
+  const grid = document.getElementById('d-weeks-grid');
+  grid.replaceChildren();
+  for (let w = 1; w <= 12; w++) {
+    const dot = document.createElement('div');
+    dot.className = 'week-dot' + (w === weekNum ? ' current' : w < weekNum ? ' past' : '');
+    dot.textContent = w;
+    dot.title = plan.weeks?.[w - 1]?.theme || `Week ${w}`;
+    dot.addEventListener('click', () => renderWeekCard(w, plan));
+    grid.appendChild(dot);
+  }
+}
+
+// Renders week w's theme/target/actions into the week card without
+// touching the rest of the dashboard — this is what both the clickable
+// week badge (advance one week) and the roadmap dots (jump to any week)
+// call to browse the plan ahead of or behind the actual current week.
+function renderWeekCard(w, plan) {
+  const weekData = plan.weeks?.[w - 1];
+  if (!weekData) return;
+  viewedWeek = w;
+  const actualCurrentWeek = getCurrentWeek(plan.goal.createdAt);
+  const isCurrentWeek = w === actualCurrentWeek;
+
+  const badgeEl = document.getElementById('d-week-badge');
+  badgeEl.replaceChildren(document.createTextNode(`Week ${w} of 12 `));
+  const badgeArrow = document.createElement('span');
+  badgeArrow.className = 'week-badge-arrow';
+  badgeArrow.textContent = '→';
+  badgeEl.appendChild(badgeArrow);
+  document.getElementById('d-week-stage').textContent = FUNNEL_STAGE_LABELS[weekData.funnel_stage] || '';
+  document.getElementById('d-week-theme').textContent = weekData.theme || '';
+  document.getElementById('d-week-target').textContent = weekData.target || '';
+  document.getElementById('d-week-progress').textContent = `${w}/12`;
+  document.getElementById('d-progress-fill').style.width = `${Math.round((w / 12) * 100)}%`;
+  document.getElementById('d-week-back-current').classList.toggle('visible', !isCurrentWeek);
+  document.querySelectorAll('.week-dot').forEach((dot) => {
+    dot.classList.toggle('viewing', Number(dot.textContent) === w);
+  });
+
+  // Actions are only checkable for the actual current week — "completing"
+  // an action from a future week's preview would mark it done today for a
+  // week that hasn't started yet, corrupting real progress tracking.
+  renderActions(weekData.actions || [], w, isCurrentWeek);
+  renderWeeklyReview(w, plan);
+}
+
+function getWeekDates(createdAt, weekNum) {
+  const start = new Date(createdAt || Date.now());
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() + ((weekNum - 1) * 7));
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return date;
+  });
+}
+
+function getWeeklyStats(plan, weekNum) {
+  const dates = getWeekDates(plan.goal?.createdAt, weekNum);
+  const log = getExecutionLog();
+  let actionDays = 0;
+  let focusSessions = 0;
+  const dayStates = dates.map((date) => {
+    const day = log[localDateKey(date)] || { focused: {}, results: {} };
+    const results = Object.values(day.results || {}).filter((result) => Number(result.week) === weekNum);
+    const acted = results.some((result) => result.status === 'completed' || result.status === 'partial');
+    const focusedEntries = Object.values(day.focused || {}).filter((entry) => Number(entry?.week) === weekNum);
+    const focused = focusedEntries.length > 0;
+    if (acted) actionDays += 1;
+    focusSessions += focusedEntries.length;
+    return { date, acted, focused };
+  });
+  const plannedActions = plan.weeks?.[weekNum - 1]?.actions?.length || 0;
+  const completedActions = getWeeklyCompleted(weekNum).size;
+  return { dayStates, actionDays, focusSessions, plannedActions, completedActions };
+}
+
+function getWeeklyCoaching(stats, weekNum, currentWeek) {
+  if (weekNum > currentWeek) return 'This week is a preview. Your daily execution log will open when the week begins.';
+  if (stats.completedActions === stats.plannedActions && stats.plannedActions > 0) return 'Weekly outcome achieved. Capture what worked below so you can repeat it next week.';
+  if (stats.actionDays === 0) return 'Choose one weekly action, use the focus exercise, and make the first step small enough to begin today.';
+  if (stats.focusSessions === 0) return 'You are taking action. Try the 60-second focus before the next step and notice whether starting feels easier.';
+  if (stats.actionDays >= 4) return 'You are building reliable execution. Protect the pattern and finish the highest-impact remaining weekly action.';
+  return 'Momentum is forming. Your next best move is one focused session followed immediately by one concrete action.';
+}
+
+function renderWeeklyReview(weekNum, plan) {
+  const container = document.getElementById('d-weekly-review');
+  if (!container) return;
+  const currentWeek = getCurrentWeek(plan.goal.createdAt);
+  const stats = getWeeklyStats(plan, weekNum);
+  const completionRate = stats.plannedActions ? Math.round((stats.completedActions / stats.plannedActions) * 100) : 0;
+  const status = weekNum > currentWeek ? 'Upcoming' : completionRate === 100 ? 'Complete' : stats.actionDays ? 'In progress' : weekNum < currentWeek ? 'Needs review' : 'Ready to begin';
+  const reflection = getWeeklyReflections()[weekNum] || {};
+
+  container.replaceChildren();
+  const header = document.createElement('div');
+  header.className = 'review-header';
+  const heading = document.createElement('div');
+  const eyebrow = document.createElement('div');
+  eyebrow.className = 'review-eyebrow';
+  eyebrow.textContent = `Week ${weekNum} consolidation`;
+  const title = document.createElement('div');
+  title.className = 'review-title';
+  title.textContent = 'Daily effort, one weekly picture';
+  heading.append(eyebrow, title);
+  const statusEl = document.createElement('div');
+  statusEl.className = 'review-status';
+  statusEl.textContent = status;
+  header.append(heading, statusEl);
+
+  const metrics = document.createElement('div');
+  metrics.className = 'review-metrics';
+  [
+    [`${stats.actionDays}/7`, 'days taking action'],
+    [`${stats.completedActions}/${stats.plannedActions}`, 'weekly actions completed'],
+    [String(stats.focusSessions), 'focus exercises used'],
+  ].forEach(([value, label]) => {
+    const metric = document.createElement('div');
+    metric.className = 'review-metric';
+    const strong = document.createElement('strong');
+    strong.textContent = value;
+    const span = document.createElement('span');
+    span.textContent = label;
+    metric.append(strong, span);
+    metrics.appendChild(metric);
+  });
+
+  const days = document.createElement('div');
+  days.className = 'review-days';
+  stats.dayStates.forEach(({ date, acted, focused }) => {
+    const day = document.createElement('div');
+    day.className = `review-day${acted ? ' acted' : focused ? ' focused' : ''}`;
+    day.textContent = date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2);
+    day.title = `${date.toLocaleDateString()}: ${acted ? 'action logged' : focused ? 'focus completed' : 'no entry'}`;
+    days.appendChild(day);
+  });
+
+  const coach = document.createElement('div');
+  coach.className = 'review-coach';
+  coach.textContent = getWeeklyCoaching(stats, weekNum, currentWeek);
+  container.append(header, metrics, days, coach);
+
+  if (weekNum <= currentWeek) {
+    const form = document.createElement('div');
+    form.className = 'review-reflection';
+    const fields = [
+      ['win', 'Biggest win', 'What moved forward?'],
+      ['obstacle', 'Main obstacle', 'What made execution harder?'],
+      ['adjustment', 'Next-week adjustment', 'What will you change or repeat?'],
+    ];
+    const inputs = {};
+    fields.forEach(([key, labelText, placeholder]) => {
+      const field = document.createElement('div');
+      field.className = 'review-field';
+      const label = document.createElement('label');
+      label.textContent = labelText;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.maxLength = 240;
+      input.placeholder = placeholder;
+      input.value = reflection[key] || '';
+      inputs[key] = input;
+      field.append(label, input);
+      form.appendChild(field);
+    });
+    const save = document.createElement('button');
+    save.type = 'button';
+    save.className = 'review-save';
+    save.textContent = 'Save weekly reflection';
+    save.addEventListener('click', () => {
+      saveWeeklyReflection(weekNum, { win: inputs.win.value.trim(), obstacle: inputs.obstacle.value.trim(), adjustment: inputs.adjustment.value.trim(), updatedAt: new Date().toISOString() });
+      save.textContent = 'Saved ✓';
+      save.classList.add('saved');
+    });
+    form.appendChild(save);
+    container.appendChild(form);
+  }
+}
+
+function navigateWeekForward() {
+  const plan = loadPlan();
+  if (!plan || viewedWeek === null) return;
+  renderWeekCard(Math.min(12, viewedWeek + 1), plan);
+}
+
+function backToCurrentWeek() {
+  const plan = loadPlan();
+  if (!plan) return;
+  renderWeekCard(getCurrentWeek(plan.goal.createdAt), plan);
+}
+
+document.getElementById('d-week-badge').addEventListener('click', navigateWeekForward);
+document.getElementById('d-week-back-current').addEventListener('click', backToCurrentWeek);
+
+// ── Action focus + encouragement ───────────────
+let executionMode = null;
+let executionTimer = null;
+let executionContext = null;
+
+function getFocusEncouragement(plan, action) {
+  const obstacle = (plan.goal?.obstacle || '').toLowerCase();
+  let reassurance = 'You do not need to complete the whole journey right now. You only need to begin this one clear step.';
+  if (obstacle.includes('fear') || obstacle.includes('doubt')) reassurance = 'Confidence is not required before action. Let this small step create the evidence that you can trust yourself.';
+  else if (obstacle.includes('clarity')) reassurance = 'You do not need the entire path to be clear. Completing this action will reveal information that thinking alone cannot.';
+  else if (obstacle.includes('inconsistency')) reassurance = 'Consistency is built by returning, not by being perfect. Today’s action is one vote for the person you are becoming.';
+  else if (obstacle.includes('environment')) reassurance = 'For the next few minutes, your environment does not get to decide your direction. Protect this small block of focused action.';
+  else if (obstacle.includes('energy')) reassurance = 'You do not need maximum energy. Begin gently, make the step smaller if needed, and let momentum meet you after you start.';
+  return `Take one slow breath. Picture yourself completing this specific action: “${action}” ${reassurance}`;
+}
+
+function getCompletionEncouragement(plan) {
+  const goal = plan.goal?.goal || 'your goal';
+  return `You followed through. That matters more than waiting to feel perfectly ready. This completed action is evidence that you are becoming the person who can achieve: “${goal}” Carry that evidence into the next step.`;
+}
+
+function showExecutionModal() {
+  document.getElementById('execution-overlay').style.display = 'block';
+  document.getElementById('execution-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExecutionModal() {
+  if (executionTimer) clearInterval(executionTimer);
+  executionTimer = null;
+  executionMode = null;
+  executionContext = null;
+  document.getElementById('execution-modal').classList.remove('running');
+  document.getElementById('execution-overlay').style.display = 'none';
+  document.getElementById('execution-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function openFocusSession(action, key, weekNum) {
+  const plan = loadPlan();
+  if (!plan) return;
+  executionMode = 'focus-ready';
+  executionContext = { action, key, weekNum };
+  document.getElementById('execution-kicker').textContent = 'Before you begin';
+  document.getElementById('execution-title').textContent = 'Get focused for this action';
+  document.getElementById('execution-action').textContent = action;
+  document.getElementById('execution-copy').textContent = getFocusEncouragement(plan, action);
+  document.getElementById('focus-breath').style.display = 'grid';
+  document.getElementById('focus-label').style.display = 'block';
+  document.getElementById('focus-count').textContent = '60';
+  document.getElementById('execution-primary').textContent = 'Begin 60-second focus';
+  document.getElementById('execution-secondary').style.display = 'block';
+  document.getElementById('execution-secondary').textContent = 'Skip and start the action';
+  showExecutionModal();
+}
+
+function beginFocusCountdown() {
+  executionMode = 'focus-running';
+  document.getElementById('execution-modal').classList.add('running');
+  document.getElementById('execution-primary').textContent = 'I’m ready — start the action';
+  document.getElementById('execution-secondary').style.display = 'none';
+  let seconds = 60;
+  executionTimer = setInterval(() => {
+    seconds -= 1;
+    document.getElementById('focus-count').textContent = String(seconds);
+    if (seconds <= 0) finishFocusSession();
+  }, 1000);
+}
+
+function finishFocusSession() {
+  if (!executionContext) return;
+  if (executionTimer) clearInterval(executionTimer);
+  executionTimer = null;
+  recordFocus(executionContext.action, executionContext.key, executionContext.weekNum);
+  closeExecutionModal();
+  const plan = loadPlan();
+  if (!plan) return;
+  const weekNum = getCurrentWeek(plan.goal.createdAt);
+  renderActions(plan.weeks?.[weekNum - 1]?.actions || [], weekNum);
+  renderWeeklyReview(weekNum, plan);
+}
+
+function skipFocusSession() {
+  closeExecutionModal();
+}
+
+function openCompletionEncouragement(action) {
+  const plan = loadPlan();
+  if (!plan) return;
+  executionMode = 'complete';
+  executionContext = { action };
+  document.getElementById('execution-kicker').textContent = 'Action complete';
+  document.getElementById('execution-title').textContent = 'You followed through.';
+  document.getElementById('execution-action').textContent = action;
+  document.getElementById('execution-copy').textContent = getCompletionEncouragement(plan);
+  document.getElementById('focus-breath').style.display = 'none';
+  document.getElementById('focus-label').style.display = 'none';
+  document.getElementById('execution-primary').textContent = 'Carry this momentum forward';
+  document.getElementById('execution-secondary').style.display = 'none';
+  showExecutionModal();
+}
+
+document.getElementById('execution-primary').addEventListener('click', () => {
+  if (executionMode === 'focus-ready') beginFocusCountdown();
+  else if (executionMode === 'focus-running') finishFocusSession();
+  else closeExecutionModal();
+});
+document.getElementById('execution-secondary').addEventListener('click', skipFocusSession);
+document.getElementById('execution-close').addEventListener('click', closeExecutionModal);
+document.getElementById('execution-overlay').addEventListener('click', closeExecutionModal);
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && executionMode) closeExecutionModal(); });
+
+// ── Daily result log ───────────────────────────
+let progressContext = null;
+let selectedProgressStatus = 'completed';
+
+function selectProgressStatus(status) {
+  selectedProgressStatus = status;
+  document.querySelectorAll('.progress-status').forEach((button) => {
+    button.classList.toggle('selected', button.dataset.status === status);
+  });
+}
+
+function openProgressLog(action, key, weekNum) {
+  const existing = getResultToday(key);
+  progressContext = { action, key, weekNum };
+  document.getElementById('progress-action').textContent = action;
+  document.getElementById('progress-note').value = existing?.note || '';
+  selectProgressStatus(existing?.status || 'completed');
+  document.getElementById('progress-overlay').style.display = 'block';
+  document.getElementById('progress-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProgressLog() {
+  progressContext = null;
+  document.getElementById('progress-overlay').style.display = 'none';
+  document.getElementById('progress-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.progress-status').forEach((button) => {
+  button.addEventListener('click', () => selectProgressStatus(button.dataset.status));
+});
+document.getElementById('progress-close').addEventListener('click', closeProgressLog);
+document.getElementById('progress-overlay').addEventListener('click', closeProgressLog);
+document.getElementById('progress-save').addEventListener('click', () => {
+  if (!progressContext) return;
+  const { action, key, weekNum } = progressContext;
+  const savedStatus = selectedProgressStatus;
+  recordDailyResult(action, key, weekNum, savedStatus, document.getElementById('progress-note').value);
+  closeProgressLog();
+  const plan = loadPlan();
+  if (!plan) return;
+  renderActions(plan.weeks?.[weekNum - 1]?.actions || [], weekNum, true);
+  renderWeeklyReview(weekNum, plan);
+  document.getElementById('d-streak').textContent = getStreak();
+  if (savedStatus === 'completed') openCompletionEncouragement(action);
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && progressContext) closeProgressLog();
+});
+
+function renderActions(actions, weekNum, interactive = true) {
+  const completed = getWeeklyCompleted(weekNum);
+  const focused = getFocusedToday();
+  const container = document.getElementById('d-actions');
+  container.replaceChildren();
+  actions.forEach((action, idx) => {
+    // Keyed by week + index, not just index — action 0 in week 1 and action
+    // 0 in week 5 are different actions and must track "done" separately.
+    const key = `${weekNum}-${idx}`;
+    const item = document.createElement('div');
+    item.className = 'action-item' + (completed.has(key) ? ' done' : '') + (interactive ? '' : ' readonly');
+    const check = document.createElement('button');
+    check.type = 'button';
+    check.className = 'action-check';
+    check.setAttribute('aria-label', completed.has(key) ? `Update progress for: ${action}` : `Log progress for: ${action}`);
+    check.disabled = !interactive;
+    const main = document.createElement('div');
+    main.className = 'action-main';
+    const text = document.createElement('div');
+    text.className = 'action-text';
+    text.textContent = action;
+    main.appendChild(text);
+    item.appendChild(check);
+    item.appendChild(main);
+    if (interactive) {
+      if (completed.has(key)) {
+        const note = document.createElement('div');
+        note.className = 'action-complete-note';
+        note.textContent = getResultToday(key)?.status === 'completed' ? 'Completed today' : 'Completed this week';
+        const replay = document.createElement('button');
+        replay.type = 'button';
+        replay.className = 'action-btn action-focus-btn';
+        replay.textContent = 'View encouragement';
+        replay.addEventListener('click', () => openCompletionEncouragement(action));
+        const logButton = document.createElement('button');
+        logButton.type = 'button';
+        logButton.className = 'action-btn action-focus-btn';
+        logButton.textContent = 'Add today’s note';
+        logButton.addEventListener('click', () => openProgressLog(action, key, weekNum));
+        const controls = document.createElement('div');
+        controls.className = 'action-controls';
+        controls.append(replay, logButton);
+        main.appendChild(note);
+        main.appendChild(controls);
+      } else {
+        const controls = document.createElement('div');
+        controls.className = 'action-controls';
+        const focusBtn = document.createElement('button');
+        focusBtn.type = 'button';
+        focusBtn.className = 'action-btn action-focus-btn' + (focused.has(key) ? ' focused' : '');
+        focusBtn.textContent = focused.has(key) ? 'Focused ✓' : '✦ Get focused';
+        focusBtn.addEventListener('click', () => openFocusSession(action, key, weekNum));
+        const completeBtn = document.createElement('button');
+        completeBtn.type = 'button';
+        completeBtn.className = 'action-btn action-complete-btn';
+        completeBtn.textContent = 'Log progress';
+        completeBtn.addEventListener('click', () => openProgressLog(action, key, weekNum));
+        controls.appendChild(focusBtn);
+        controls.appendChild(completeBtn);
+        main.appendChild(controls);
+      }
+      check.addEventListener('click', () => openProgressLog(action, key, weekNum));
+    }
+    const todayResult = getResultToday(key);
+    if (interactive && !completed.has(key) && todayResult) {
+      const result = document.createElement('div');
+      result.className = `action-result-note ${todayResult.status}`;
+      result.textContent = todayResult.status === 'partial' ? 'Progress logged today — continue when ready.' : 'Skipped today — this action stays available tomorrow.';
+      main.appendChild(result);
+    }
+    container.appendChild(item);
+  });
+}
+
+// ── Init ───────────────────────────────────────
+// The sb.auth.onAuthStateChange listener above fires once with the resolved
+// session shortly after subscribing and calls performInitialRouting() from
+// there — waiting for that (rather than routing here immediately) is what
+// makes loadPlan()'s owner check see the correct currentUser on the very
+// first render.
+</script>
+</body>
+</html>
