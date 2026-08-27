@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Your 90-Day Master Plan — Master Key</title>
+  <style>body{background:#080b17;color:#f7f5ff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}.loading{color:#a8adc2;font-size:14px}</style>
+</head>
+<body>
+  <div class="loading">Loading your Master Plan builder…</div>
+  <script>
+    (async function () {
+      try {
+        const response = await fetch('/goals.html', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Could not load the Master Plan builder.');
+        let html = await response.text();
+
+        // Keep the existing dashboard, authentication, generation, and progress
+        // system intact; only replace the intake copy/fields and the payload
+        // collector used by the generator.
+        const replaceStep = (stepNumber, nextBoundary, replacement) => {
+          const re = new RegExp('(<div id="step-' + stepNumber + '"[\\s\\S]*?)(?=<div id="step-' + nextBoundary + '")', 'm');
+          html = html.replace(re, replacement + '\n    ');
+        };
+
+        replaceStep(1, 2, `    <div id="step-1" class="step active">
+      <div class="step-hero">
+        <div class="step-num">Step 1 of 8</div>
+        <div class="step-q">What area of your life are you ready to transform?</div>
+        <div class="step-hint">Choose the area where a meaningful 90-day breakthrough would matter most.</div>
+        <div class="category-grid">
+          <button class="category-btn" data-category="Career breakthrough">Career breakthrough</button>
+          <button class="category-btn" data-category="Financial abundance">Financial abundance</button>
+          <button class="category-btn" data-category="Relationship &amp; connection">Relationship &amp; connection</button>
+          <button class="category-btn" data-category="Health &amp; energy">Health &amp; energy</button>
+          <button class="category-btn" data-category="Launching something of my own">Launching something of my own</button>
+          <button class="category-btn" data-category="Inner peace">Inner peace</button>
+        </div>
+      </div>
+      <div class="step-nav">
+        <div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-1" disabled>Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(2, 3, `    <div id="step-2" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 2 of 8</div>
+        <div class="step-q">What would a meaningful win look like 90 days from now?</div>
+        <div class="step-hint">Make it concrete. What would be visibly different in your life if these 90 days went exceptionally well?</div>
+        <textarea id="input-goal" placeholder="In 90 days, I would have…" maxlength="500"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-2">Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(3, 4, `    <div id="step-3" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 3 of 8</div>
+        <div class="step-q">Where are you today?</div>
+        <div class="step-hint">Tell the truth about your starting point — what is already working, what is unfinished, and what is currently true.</div>
+        <textarea id="input-why" placeholder="Today, my situation is…" maxlength="700"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-3">Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(4, 5, `    <div id="step-4" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 4 of 8</div>
+        <div class="step-q">What needs to change to get from here to there?</div>
+        <div class="step-hint">Think about the real gap: skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div>
+        <textarea id="input-progress" placeholder="The biggest changes I need are…" maxlength="700"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(3)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-4">Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(5, 6, `    <div id="step-5" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 5 of 8</div>
+        <div class="step-q">What have you already tried — and what happened?</div>
+        <div class="step-hint">This keeps your Master Plan from repeating strategies that have already failed or been exhausted.</div>
+        <select id="input-obstacle-reason" style="display:none" aria-hidden="true"><option value="What I have already tried" selected>What I have already tried</option></select>
+        <textarea id="input-obstacle-detail" placeholder="I have tried… The result was…" maxlength="800"></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(4)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-5">Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(6, 7, `    <div id="step-6" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 6 of 8</div>
+        <div class="step-q">What strengths, resources, relationships, or opportunities can you leverage?</div>
+        <div class="step-hint">A Master Plan should build from what you already have — not assume you are starting from zero.</div>
+        <textarea id="input-leverage" placeholder="I can leverage…" maxlength="700"></textarea>
+        <div class="start-week-field">
+          <div class="start-week-label">How much time can you realistically commit each week?</div>
+          <div class="hours-grid">
+            <button class="hours-btn" data-hours="1-2">1–2 hours</button>
+            <button class="hours-btn" data-hours="3-5">3–5 hours</button>
+            <button class="hours-btn" data-hours="5-10">5–10 hours</button>
+            <button class="hours-btn" data-hours="10+">10+ hours</button>
+          </div>
+        </div>
+        <div class="start-week-field">
+          <div class="start-week-label">Already partway through the course? Set which week this plan should start counting from.</div>
+          <select id="input-start-week">
+            <option value="1" selected>Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option>
+          </select>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(5)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-6" disabled>Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(7, 8, `    <div id="step-7" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 7 of 8</div>
+        <div class="step-q">What can you realistically commit — and what must you protect?</div>
+        <div class="step-hint">Name the constraints that the plan must respect: family, health, money, work, relationships, weekends, or anything else non-negotiable.</div>
+        <textarea id="input-constraints" placeholder="I can commit to… I need to protect…" maxlength="700"></textarea>
+        <input type="range" id="input-belief" min="1" max="10" value="7" style="display:none" aria-hidden="true">
+        <div class="belief-value" id="belief-value" style="display:none">7</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(6)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
+        <button class="btn-next" id="btn-7">Continue →</button>
+      </div>
+    </div>`);
+
+        replaceStep(8, 9, `    <div id="step-8" class="step">
+      <div class="step-hero">
+        <div class="step-num">Step 8 of 8</div>
+        <div class="step-q">Why does this matter — and what could realistically derail you?</div>
+        <div class="step-hint">Connect the goal to what matters most, then name the failure modes the plan should help you anticipate.</div>
+        <textarea id="input-why-final" placeholder="This matters because…" maxlength="500"></textarea>
+        <div class="obstacle-detail-field">
+          <textarea id="input-derail" placeholder="What could derail me is…" maxlength="500"></textarea>
+        </div>
+        <input type="hidden" id="input-why-final-hidden" value="">
+        <button class="google-btn" id="step8-google-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <button class="btn-next step8-generate-btn" id="btn-8-generate" style="display:none">Generate My Plan →</button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(7)">← Back</button>
+        <div class="dots"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
+      </div>
+    </div>`);
+
+        html = html.replace('Reading your goal', 'Reading your goal and current reality');
+        html = html.replace('Selecting exercises for your obstacle', 'Selecting exercises for your highest-leverage gap');
+        html = html.replace('Finalizing your roadmap', 'Finalizing your 90-day strategy');
+        html = html.replace('Answer 8 focused questions', 'Answer 8 strategic questions');
+
+        const overrideScript = `
+<script>
+// Updated Master Plan intake payload. The existing generator/dashboard remains
+// unchanged, but the richer answers are packed into the existing API fields so
+// the current backend can use them without breaking old saved plans.
+function collectGoalData() {
+  const startWeek = parseInt(document.getElementById('input-start-week').value, 10) || 1;
+  const createdAt = Date.now() - (startWeek - 1) * 7 * 24 * 60 * 60 * 1000;
+  const win = document.getElementById('input-goal').value.trim();
+  const reality = document.getElementById('input-why').value.trim();
+  const gap = document.getElementById('input-progress').value.trim();
+  const tried = document.getElementById('input-obstacle-detail').value.trim();
+  const leverage = document.getElementById('input-leverage').value.trim();
+  const constraints = document.getElementById('input-constraints').value.trim();
+  const why = document.getElementById('input-why-final').value.trim();
+  const derail = document.getElementById('input-derail').value.trim();
+  return {
+    category: selectedCategory,
+    goal: win,
+    why: [why ? 'WHY: ' + why : '', reality ? 'CURRENT REALITY: ' + reality : ''].filter(Boolean).join('\\n\\n'),
+    progress: ['90-DAY WIN: ' + win, gap ? 'GAP TO CLOSE: ' + gap : ''].filter(Boolean).join('\\n\\n'),
+    obstacle: [tried ? 'ALREADY TRIED: ' + tried : '', leverage ? 'LEVERAGE: ' + leverage : '', constraints ? 'CONSTRAINTS: ' + constraints : '', derail ? 'DERAILERS: ' + derail : ''].filter(Boolean).join('\\n\\n'),
+    hours: selectedHours,
+    start_week: startWeek,
+    belief_score: 7,
+    email: currentUser?.email ?? null,
+    createdAt,
+  };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const select = document.getElementById('input-obstacle-reason');
+  if (select) select.value = 'What I have already tried';
+  const btn5 = document.getElementById('btn-5');
+  if (btn5) btn5.disabled = false;
+});
+</script>`;
+        html = html.replace('</body>', overrideScript + '\n</body>');
+        document.open();
+        document.write(html);
+        document.close();
+      } catch (error) {
+        document.body.innerHTML = '<div style="color:#f7f5ff;font:14px Arial">Could not load the Master Plan builder. Please refresh and try again.</div>';
+        console.error(error);
+      }
+    })();
+  </script>
+</body>
+</html>
