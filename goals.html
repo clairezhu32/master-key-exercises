@@ -180,6 +180,34 @@
     .action-complete-btn:hover { transform: translateY(-1px); }
     .action-complete-note { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: var(--accent); font-size: 11px; }
     .action-complete-note::before { content: '✓'; }
+    .action-result-note { margin-top: 8px; color: #9ca5c1; font-size: 11px; line-height: 1.5; }
+    .action-result-note.partial { color: var(--gold-light); }
+    .action-result-note.skipped { color: #8790aa; }
+
+    /* Daily execution roll-up */
+    .weekly-review-card { background: linear-gradient(155deg, rgba(25,32,61,.9), rgba(14,18,37,.95)); border: 1px solid rgba(157,140,255,.2); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .review-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 18px; }
+    .review-eyebrow { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 7px; }
+    .review-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); }
+    .review-status { flex-shrink: 0; border: 1px solid rgba(113,229,193,.25); border-radius: 999px; padding: 6px 10px; color: var(--accent); background: rgba(113,229,193,.06); font-size: 10px; font-weight: 700; }
+    .review-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .review-metric { padding: 14px; border: 1px solid var(--border); border-radius: 11px; background: rgba(255,255,255,.025); }
+    .review-metric strong { display: block; color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 25px; }
+    .review-metric span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .review-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-top: 16px; }
+    .review-day { padding: 9px 3px; border: 1px solid var(--border); border-radius: 8px; color: #737c98; text-align: center; font-size: 9px; }
+    .review-day::after { content: ''; display: block; width: 6px; height: 6px; margin: 6px auto 0; border-radius: 50%; background: #353c57; }
+    .review-day.focused::after { background: var(--gold); }
+    .review-day.acted::after { background: var(--accent); box-shadow: 0 0 0 3px rgba(113,229,193,.08); }
+    .review-coach { margin-top: 16px; padding: 13px 15px; border-left: 2px solid var(--gold); background: rgba(157,140,255,.06); color: #aeb6ce; font-size: 12px; line-height: 1.65; }
+    .review-reflection { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .review-field { display: grid; gap: 6px; }
+    .review-field:last-child { grid-column: 1 / -1; }
+    .review-field label { color: #858eaa; font-size: 10px; }
+    .review-field input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 11px; color: var(--text); background: rgba(0,0,0,.16); font: 12px 'DM Sans', sans-serif; }
+    .review-field input:focus { outline: none; border-color: rgba(157,140,255,.55); }
+    .review-save { grid-column: 1 / -1; justify-self: start; border: 1px solid rgba(157,140,255,.3); border-radius: 7px; padding: 8px 12px; color: var(--gold-light); background: rgba(157,140,255,.08); font: 600 11px 'DM Sans', sans-serif; cursor: pointer; }
+    .review-save.saved { color: var(--accent); border-color: rgba(113,229,193,.25); }
 
     /* Streak */
     .streak-row { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -327,10 +355,31 @@
     .execution-secondary { border: 0; color: var(--muted); background: none; font-family: inherit; font-size: 12px; cursor: pointer; }
     .execution-secondary:hover { color: var(--text); }
 
+    /* Daily result modal */
+    .progress-overlay { position: fixed; inset: 0; z-index: 510; display: none; background: rgba(4,6,14,.8); backdrop-filter: blur(8px); }
+    .progress-modal { position: fixed; z-index: 511; top: 50%; left: 50%; width: min(500px, calc(100vw - 32px)); transform: translate(-50%, -50%); display: none; border: 1px solid rgba(157,140,255,.25); border-radius: 20px; padding: 30px; background: linear-gradient(155deg, #171e39, #0d1123); box-shadow: 0 35px 100px rgba(0,0,0,.55); }
+    .progress-modal h3 { margin: 10px 34px 0 0; font-family: 'Playfair Display', serif; font-size: 29px; }
+    .progress-modal-action { margin-top: 14px; color: #aeb5cb; font-size: 13px; line-height: 1.55; }
+    .progress-statuses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+    .progress-status { min-height: 42px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); background: rgba(255,255,255,.025); font: 600 11px 'DM Sans', sans-serif; cursor: pointer; }
+    .progress-status.selected { border-color: var(--gold); color: var(--text); background: rgba(157,140,255,.13); }
+    .progress-note-label { display: block; margin-top: 18px; color: #858eaa; font-size: 10px; }
+    .progress-note { width: 100%; min-height: 86px; resize: vertical; margin-top: 7px; border: 1px solid var(--border); border-radius: 9px; padding: 11px; color: var(--text); background: rgba(0,0,0,.18); font: 12px/1.55 'DM Sans', sans-serif; }
+    .progress-note:focus { outline: none; border-color: rgba(157,140,255,.55); }
+    .progress-save { width: 100%; min-height: 46px; margin-top: 15px; border: 0; border-radius: 9px; color: #07140f; background: linear-gradient(100deg, var(--accent), #ab9eff); font: 700 13px 'DM Sans', sans-serif; cursor: pointer; }
+
     @media (max-width: 520px) {
       .execution-modal-inner { padding: 28px 22px 24px; }
       .execution-modal h3 { font-size: 27px; }
       .focus-breath { width: 96px; height: 96px; }
+      .weekly-review-card { padding: 20px 16px; }
+      .review-metrics { grid-template-columns: 1fr; }
+      .review-metric { display: flex; align-items: baseline; gap: 9px; }
+      .review-metric span { margin-top: 0; }
+      .review-reflection { grid-template-columns: 1fr; }
+      .review-field:last-child, .review-save { grid-column: 1; }
+      .progress-modal { padding: 26px 20px 22px; }
+      .progress-statuses { grid-template-columns: 1fr; }
     }
 
     /* ── Product framing ── */
@@ -652,14 +701,16 @@
         <div class="week-progress" id="d-week-progress"></div>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="d-progress-fill"></div></div>
-      <div class="actions-title">Today's execution</div>
-      <div class="actions-helper">Use a short focus session before you begin. When you finish, mark the action complete to reinforce your progress.</div>
+      <div class="actions-title">This week’s actions</div>
+      <div class="actions-helper">Choose one step for today. Focus, execute, then log the result—your daily effort will roll up into the weekly review.</div>
       <div id="d-actions"></div>
       <div class="streak-row">
         <div class="streak-num" id="d-streak">0</div>
-        <div class="streak-label">day streak</div>
+        <div class="streak-label">day execution streak</div>
       </div>
     </div>
+
+    <div class="weekly-review-card" id="d-weekly-review"></div>
 
     <div class="section-title">Recommended Exercises</div>
     <div id="d-exercises"></div>
@@ -687,6 +738,23 @@
       <button class="execution-secondary" id="execution-secondary">Skip and start the action</button>
     </div>
   </div>
+</div>
+
+<!-- ── Daily progress log ───────────────────── -->
+<div class="progress-overlay" id="progress-overlay"></div>
+<div class="progress-modal" id="progress-modal" role="dialog" aria-modal="true" aria-labelledby="progress-title">
+  <button class="execution-close" id="progress-close" aria-label="Close progress log">✕</button>
+  <div class="execution-kicker">Daily execution log</div>
+  <h3 id="progress-title">How did it go?</h3>
+  <div class="progress-modal-action" id="progress-action"></div>
+  <div class="progress-statuses" role="group" aria-label="Action result">
+    <button class="progress-status" type="button" data-status="completed">Completed</button>
+    <button class="progress-status" type="button" data-status="partial">Made progress</button>
+    <button class="progress-status" type="button" data-status="skipped">Skipped today</button>
+  </div>
+  <label class="progress-note-label" for="progress-note">Evidence or note (optional)</label>
+  <textarea class="progress-note" id="progress-note" maxlength="500" placeholder="What happened? What did you learn?"></textarea>
+  <button class="progress-save" id="progress-save" type="button">Save today’s result</button>
 </div>
 
 <!-- ── Auth Modal ───────────────────────────── -->
@@ -768,12 +836,86 @@ async function fetchServerGeneration() {
   }
 }
 
-function todayKey() { return `mks_goal_actions_${new Date().toISOString().split('T')[0]}`; }
-function getCompletedToday() { return new Set(JSON.parse(localStorage.getItem(todayKey()) || '[]')); }
-function setCompletedToday(set) { localStorage.setItem(todayKey(), JSON.stringify([...set])); }
-function focusedTodayKey() { return `mks_goal_focused_${new Date().toISOString().split('T')[0]}`; }
-function getFocusedToday() { return new Set(JSON.parse(localStorage.getItem(focusedTodayKey()) || '[]')); }
-function setFocusedToday(set) { localStorage.setItem(focusedTodayKey(), JSON.stringify([...set])); }
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function todayKey() { return `mks_goal_actions_${localDateKey()}`; }
+function focusedTodayKey() { return `mks_goal_focused_${localDateKey()}`; }
+function executionLogKey() { return `mks_execution_log_v2_${currentUser?.id || 'local'}`; }
+function weeklyReflectionKey() { return `mks_weekly_reflections_v1_${currentUser?.id || 'local'}`; }
+
+function getExecutionLog() {
+  try { return JSON.parse(localStorage.getItem(executionLogKey()) || '{}'); }
+  catch { return {}; }
+}
+
+function setExecutionLog(log) { localStorage.setItem(executionLogKey(), JSON.stringify(log)); }
+
+function getDayLog(dateKey = localDateKey()) {
+  const log = getExecutionLog();
+  const day = log[dateKey] || { focused: {}, results: {} };
+  day.focused ||= {};
+  day.results ||= {};
+
+  // Preserve progress recorded before the consolidated log was introduced.
+  if (dateKey === localDateKey()) {
+    try {
+      JSON.parse(localStorage.getItem(todayKey()) || '[]').forEach((key) => {
+        day.results[key] ||= { status: 'completed', action: '', updatedAt: new Date().toISOString() };
+      });
+      JSON.parse(localStorage.getItem(focusedTodayKey()) || '[]').forEach((key) => {
+        day.focused[key] ||= { at: new Date().toISOString() };
+      });
+    } catch { /* Ignore malformed legacy entries. */ }
+  }
+  return day;
+}
+
+function saveDayLog(day, dateKey = localDateKey()) {
+  const log = getExecutionLog();
+  log[dateKey] = day;
+  setExecutionLog(log);
+}
+
+function recordFocus(action, key, weekNum) {
+  const day = getDayLog();
+  day.focused[key] = { action, week: weekNum, at: new Date().toISOString() };
+  saveDayLog(day);
+}
+
+function recordDailyResult(action, key, weekNum, status, note = '') {
+  const day = getDayLog();
+  day.results[key] = { action, week: weekNum, status, note: note.trim(), updatedAt: new Date().toISOString() };
+  saveDayLog(day);
+}
+
+function getWeeklyCompleted(weekNum) {
+  const completed = new Set();
+  Object.values(getExecutionLog()).forEach((day) => {
+    Object.entries(day?.results || {}).forEach(([key, result]) => {
+      if (Number(result.week || key.split('-')[0]) === weekNum && result.status === 'completed') completed.add(key);
+    });
+  });
+  return completed;
+}
+
+function getFocusedToday() { return new Set(Object.keys(getDayLog().focused)); }
+function getResultToday(key) { return getDayLog().results[key] || null; }
+
+function getWeeklyReflections() {
+  try { return JSON.parse(localStorage.getItem(weeklyReflectionKey()) || '{}'); }
+  catch { return {}; }
+}
+
+function saveWeeklyReflection(weekNum, reflection) {
+  const reflections = getWeeklyReflections();
+  reflections[weekNum] = reflection;
+  localStorage.setItem(weeklyReflectionKey(), JSON.stringify(reflections));
+}
 
 const FUNNEL_DONE_KEY = 'mks_funnel_done_v1';
 const FUNNEL_METRICS_KEY = 'mks_funnel_metrics_v1';
@@ -1165,11 +1307,17 @@ function getCurrentWeek(createdAt) {
 function getStreak() {
   let streak = 0;
   const d = new Date();
+  const log = getExecutionLog();
   for (let i = 0; i < 90; i++) {
-    const key = `mks_goal_actions_${d.toISOString().split('T')[0]}`;
-    const actions = JSON.parse(localStorage.getItem(key) || '[]');
-    if (actions.length === 0 && i > 0) break;
-    if (actions.length > 0) streak++;
+    const dateKey = localDateKey(d);
+    const dayResults = Object.values(log[dateKey]?.results || {});
+    let acted = dayResults.some((result) => result.status === 'completed' || result.status === 'partial');
+    if (!acted) {
+      try { acted = JSON.parse(localStorage.getItem(`mks_goal_actions_${dateKey}`) || '[]').length > 0; }
+      catch { acted = false; }
+    }
+    if (!acted && i > 0) break;
+    if (acted) streak++;
     d.setDate(d.getDate() - 1);
   }
   return streak;
@@ -1482,6 +1630,141 @@ function renderWeekCard(w, plan) {
   // an action from a future week's preview would mark it done today for a
   // week that hasn't started yet, corrupting real progress tracking.
   renderActions(weekData.actions || [], w, isCurrentWeek);
+  renderWeeklyReview(w, plan);
+}
+
+function getWeekDates(createdAt, weekNum) {
+  const start = new Date(createdAt || Date.now());
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() + ((weekNum - 1) * 7));
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return date;
+  });
+}
+
+function getWeeklyStats(plan, weekNum) {
+  const dates = getWeekDates(plan.goal?.createdAt, weekNum);
+  const log = getExecutionLog();
+  let actionDays = 0;
+  let focusSessions = 0;
+  const dayStates = dates.map((date) => {
+    const day = log[localDateKey(date)] || { focused: {}, results: {} };
+    const results = Object.values(day.results || {}).filter((result) => Number(result.week) === weekNum);
+    const acted = results.some((result) => result.status === 'completed' || result.status === 'partial');
+    const focusedEntries = Object.values(day.focused || {}).filter((entry) => Number(entry?.week) === weekNum);
+    const focused = focusedEntries.length > 0;
+    if (acted) actionDays += 1;
+    focusSessions += focusedEntries.length;
+    return { date, acted, focused };
+  });
+  const plannedActions = plan.weeks?.[weekNum - 1]?.actions?.length || 0;
+  const completedActions = getWeeklyCompleted(weekNum).size;
+  return { dayStates, actionDays, focusSessions, plannedActions, completedActions };
+}
+
+function getWeeklyCoaching(stats, weekNum, currentWeek) {
+  if (weekNum > currentWeek) return 'This week is a preview. Your daily execution log will open when the week begins.';
+  if (stats.completedActions === stats.plannedActions && stats.plannedActions > 0) return 'Weekly outcome achieved. Capture what worked below so you can repeat it next week.';
+  if (stats.actionDays === 0) return 'Choose one weekly action, use the focus exercise, and make the first step small enough to begin today.';
+  if (stats.focusSessions === 0) return 'You are taking action. Try the 60-second focus before the next step and notice whether starting feels easier.';
+  if (stats.actionDays >= 4) return 'You are building reliable execution. Protect the pattern and finish the highest-impact remaining weekly action.';
+  return 'Momentum is forming. Your next best move is one focused session followed immediately by one concrete action.';
+}
+
+function renderWeeklyReview(weekNum, plan) {
+  const container = document.getElementById('d-weekly-review');
+  if (!container) return;
+  const currentWeek = getCurrentWeek(plan.goal.createdAt);
+  const stats = getWeeklyStats(plan, weekNum);
+  const completionRate = stats.plannedActions ? Math.round((stats.completedActions / stats.plannedActions) * 100) : 0;
+  const status = weekNum > currentWeek ? 'Upcoming' : completionRate === 100 ? 'Complete' : stats.actionDays ? 'In progress' : weekNum < currentWeek ? 'Needs review' : 'Ready to begin';
+  const reflection = getWeeklyReflections()[weekNum] || {};
+
+  container.replaceChildren();
+  const header = document.createElement('div');
+  header.className = 'review-header';
+  const heading = document.createElement('div');
+  const eyebrow = document.createElement('div');
+  eyebrow.className = 'review-eyebrow';
+  eyebrow.textContent = `Week ${weekNum} consolidation`;
+  const title = document.createElement('div');
+  title.className = 'review-title';
+  title.textContent = 'Daily effort, one weekly picture';
+  heading.append(eyebrow, title);
+  const statusEl = document.createElement('div');
+  statusEl.className = 'review-status';
+  statusEl.textContent = status;
+  header.append(heading, statusEl);
+
+  const metrics = document.createElement('div');
+  metrics.className = 'review-metrics';
+  [
+    [`${stats.actionDays}/7`, 'days taking action'],
+    [`${stats.completedActions}/${stats.plannedActions}`, 'weekly actions completed'],
+    [String(stats.focusSessions), 'focus exercises used'],
+  ].forEach(([value, label]) => {
+    const metric = document.createElement('div');
+    metric.className = 'review-metric';
+    const strong = document.createElement('strong');
+    strong.textContent = value;
+    const span = document.createElement('span');
+    span.textContent = label;
+    metric.append(strong, span);
+    metrics.appendChild(metric);
+  });
+
+  const days = document.createElement('div');
+  days.className = 'review-days';
+  stats.dayStates.forEach(({ date, acted, focused }) => {
+    const day = document.createElement('div');
+    day.className = `review-day${acted ? ' acted' : focused ? ' focused' : ''}`;
+    day.textContent = date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2);
+    day.title = `${date.toLocaleDateString()}: ${acted ? 'action logged' : focused ? 'focus completed' : 'no entry'}`;
+    days.appendChild(day);
+  });
+
+  const coach = document.createElement('div');
+  coach.className = 'review-coach';
+  coach.textContent = getWeeklyCoaching(stats, weekNum, currentWeek);
+  container.append(header, metrics, days, coach);
+
+  if (weekNum <= currentWeek) {
+    const form = document.createElement('div');
+    form.className = 'review-reflection';
+    const fields = [
+      ['win', 'Biggest win', 'What moved forward?'],
+      ['obstacle', 'Main obstacle', 'What made execution harder?'],
+      ['adjustment', 'Next-week adjustment', 'What will you change or repeat?'],
+    ];
+    const inputs = {};
+    fields.forEach(([key, labelText, placeholder]) => {
+      const field = document.createElement('div');
+      field.className = 'review-field';
+      const label = document.createElement('label');
+      label.textContent = labelText;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.maxLength = 240;
+      input.placeholder = placeholder;
+      input.value = reflection[key] || '';
+      inputs[key] = input;
+      field.append(label, input);
+      form.appendChild(field);
+    });
+    const save = document.createElement('button');
+    save.type = 'button';
+    save.className = 'review-save';
+    save.textContent = 'Save weekly reflection';
+    save.addEventListener('click', () => {
+      saveWeeklyReflection(weekNum, { win: inputs.win.value.trim(), obstacle: inputs.obstacle.value.trim(), adjustment: inputs.adjustment.value.trim(), updatedAt: new Date().toISOString() });
+      save.textContent = 'Saved ✓';
+      save.classList.add('saved');
+    });
+    form.appendChild(save);
+    container.appendChild(form);
+  }
 }
 
 function navigateWeekForward() {
@@ -1537,11 +1820,11 @@ function closeExecutionModal() {
   document.body.style.overflow = '';
 }
 
-function openFocusSession(action, key) {
+function openFocusSession(action, key, weekNum) {
   const plan = loadPlan();
   if (!plan) return;
   executionMode = 'focus-ready';
-  executionContext = { action, key };
+  executionContext = { action, key, weekNum };
   document.getElementById('execution-kicker').textContent = 'Before you begin';
   document.getElementById('execution-title').textContent = 'Get focused for this action';
   document.getElementById('execution-action').textContent = action;
@@ -1572,14 +1855,17 @@ function finishFocusSession() {
   if (!executionContext) return;
   if (executionTimer) clearInterval(executionTimer);
   executionTimer = null;
-  const focused = getFocusedToday();
-  focused.add(executionContext.key);
-  setFocusedToday(focused);
+  recordFocus(executionContext.action, executionContext.key, executionContext.weekNum);
   closeExecutionModal();
   const plan = loadPlan();
   if (!plan) return;
   const weekNum = getCurrentWeek(plan.goal.createdAt);
   renderActions(plan.weeks?.[weekNum - 1]?.actions || [], weekNum);
+  renderWeeklyReview(weekNum, plan);
+}
+
+function skipFocusSession() {
+  closeExecutionModal();
 }
 
 function openCompletionEncouragement(action) {
@@ -1603,13 +1889,64 @@ document.getElementById('execution-primary').addEventListener('click', () => {
   else if (executionMode === 'focus-running') finishFocusSession();
   else closeExecutionModal();
 });
-document.getElementById('execution-secondary').addEventListener('click', finishFocusSession);
+document.getElementById('execution-secondary').addEventListener('click', skipFocusSession);
 document.getElementById('execution-close').addEventListener('click', closeExecutionModal);
 document.getElementById('execution-overlay').addEventListener('click', closeExecutionModal);
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && executionMode) closeExecutionModal(); });
 
+// ── Daily result log ───────────────────────────
+let progressContext = null;
+let selectedProgressStatus = 'completed';
+
+function selectProgressStatus(status) {
+  selectedProgressStatus = status;
+  document.querySelectorAll('.progress-status').forEach((button) => {
+    button.classList.toggle('selected', button.dataset.status === status);
+  });
+}
+
+function openProgressLog(action, key, weekNum) {
+  const existing = getResultToday(key);
+  progressContext = { action, key, weekNum };
+  document.getElementById('progress-action').textContent = action;
+  document.getElementById('progress-note').value = existing?.note || '';
+  selectProgressStatus(existing?.status || 'completed');
+  document.getElementById('progress-overlay').style.display = 'block';
+  document.getElementById('progress-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProgressLog() {
+  progressContext = null;
+  document.getElementById('progress-overlay').style.display = 'none';
+  document.getElementById('progress-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.progress-status').forEach((button) => {
+  button.addEventListener('click', () => selectProgressStatus(button.dataset.status));
+});
+document.getElementById('progress-close').addEventListener('click', closeProgressLog);
+document.getElementById('progress-overlay').addEventListener('click', closeProgressLog);
+document.getElementById('progress-save').addEventListener('click', () => {
+  if (!progressContext) return;
+  const { action, key, weekNum } = progressContext;
+  const savedStatus = selectedProgressStatus;
+  recordDailyResult(action, key, weekNum, savedStatus, document.getElementById('progress-note').value);
+  closeProgressLog();
+  const plan = loadPlan();
+  if (!plan) return;
+  renderActions(plan.weeks?.[weekNum - 1]?.actions || [], weekNum, true);
+  renderWeeklyReview(weekNum, plan);
+  document.getElementById('d-streak').textContent = getStreak();
+  if (savedStatus === 'completed') openCompletionEncouragement(action);
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && progressContext) closeProgressLog();
+});
+
 function renderActions(actions, weekNum, interactive = true) {
-  const completed = getCompletedToday();
+  const completed = getWeeklyCompleted(weekNum);
   const focused = getFocusedToday();
   const container = document.getElementById('d-actions');
   container.replaceChildren();
@@ -1622,7 +1959,7 @@ function renderActions(actions, weekNum, interactive = true) {
     const check = document.createElement('button');
     check.type = 'button';
     check.className = 'action-check';
-    check.setAttribute('aria-label', completed.has(key) ? `Mark incomplete: ${action}` : `Mark complete: ${action}`);
+    check.setAttribute('aria-label', completed.has(key) ? `Update progress for: ${action}` : `Log progress for: ${action}`);
     check.disabled = !interactive;
     const main = document.createElement('div');
     main.className = 'action-main';
@@ -1636,15 +1973,20 @@ function renderActions(actions, weekNum, interactive = true) {
       if (completed.has(key)) {
         const note = document.createElement('div');
         note.className = 'action-complete-note';
-        note.textContent = 'Completed today';
+        note.textContent = getResultToday(key)?.status === 'completed' ? 'Completed today' : 'Completed this week';
         const replay = document.createElement('button');
         replay.type = 'button';
         replay.className = 'action-btn action-focus-btn';
         replay.textContent = 'View encouragement';
         replay.addEventListener('click', () => openCompletionEncouragement(action));
+        const logButton = document.createElement('button');
+        logButton.type = 'button';
+        logButton.className = 'action-btn action-focus-btn';
+        logButton.textContent = 'Add today’s note';
+        logButton.addEventListener('click', () => openProgressLog(action, key, weekNum));
         const controls = document.createElement('div');
         controls.className = 'action-controls';
-        controls.appendChild(replay);
+        controls.append(replay, logButton);
         main.appendChild(note);
         main.appendChild(controls);
       } else {
@@ -1654,38 +1996,24 @@ function renderActions(actions, weekNum, interactive = true) {
         focusBtn.type = 'button';
         focusBtn.className = 'action-btn action-focus-btn' + (focused.has(key) ? ' focused' : '');
         focusBtn.textContent = focused.has(key) ? 'Focused ✓' : '✦ Get focused';
-        focusBtn.addEventListener('click', () => openFocusSession(action, key));
+        focusBtn.addEventListener('click', () => openFocusSession(action, key, weekNum));
         const completeBtn = document.createElement('button');
         completeBtn.type = 'button';
         completeBtn.className = 'action-btn action-complete-btn';
-        completeBtn.textContent = 'Mark complete';
-        completeBtn.addEventListener('click', () => {
-          const c = getCompletedToday();
-          c.add(key);
-          setCompletedToday(c);
-          renderActions(actions, weekNum, interactive);
-          document.getElementById('d-streak').textContent = getStreak();
-          openCompletionEncouragement(action);
-        });
+        completeBtn.textContent = 'Log progress';
+        completeBtn.addEventListener('click', () => openProgressLog(action, key, weekNum));
         controls.appendChild(focusBtn);
         controls.appendChild(completeBtn);
         main.appendChild(controls);
       }
-      check.addEventListener('click', () => {
-        const c = getCompletedToday();
-        if (c.has(key)) {
-          c.delete(key);
-          setCompletedToday(c);
-          renderActions(actions, weekNum, interactive);
-          document.getElementById('d-streak').textContent = getStreak();
-          return;
-        }
-        c.add(key);
-        setCompletedToday(c);
-        renderActions(actions, weekNum, interactive);
-        document.getElementById('d-streak').textContent = getStreak();
-        openCompletionEncouragement(action);
-      });
+      check.addEventListener('click', () => openProgressLog(action, key, weekNum));
+    }
+    const todayResult = getResultToday(key);
+    if (interactive && !completed.has(key) && todayResult) {
+      const result = document.createElement('div');
+      result.className = `action-result-note ${todayResult.status}`;
+      result.textContent = todayResult.status === 'partial' ? 'Progress logged today — continue when ready.' : 'Skipped today — this action stays available tomorrow.';
+      main.appendChild(result);
     }
     container.appendChild(item);
   });
