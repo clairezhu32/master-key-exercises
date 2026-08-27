@@ -30,18 +30,19 @@
     }
 
     /* ── Layout ── */
-    .page { max-width: 680px; margin: 0 auto; padding: 0 24px 80px; }
+    .page { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
     .page-header { padding: 24px 0 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
     .page-header a { color: var(--muted); font-size: 13px; text-decoration: none; }
     .page-header a:hover { color: var(--gold); }
     .header-nav { display: flex; align-items: center; gap: 18px; }
     .header-nav-link.active { color: var(--gold); }
-    .wordmark { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+    .page-header .wordmark { display: flex; align-items: center; gap: 9px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+    .wordmark-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: var(--bg); background: linear-gradient(135deg, var(--accent), var(--gold)); font-family: 'Playfair Display', serif; font-size: 15px; }
 
     /* ── Onboarding ── */
     .step { display: none; }
     .step.active { display: block; }
-    .step-hero { margin-top: 28px; padding: 34px; background: rgba(19,26,51,.88); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 24px 70px rgba(0,0,0,.24); backdrop-filter: blur(16px); }
+    .step-hero { margin-top: 0; padding: 34px; background: rgba(19,26,51,.88); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 24px 70px rgba(0,0,0,.24); backdrop-filter: blur(16px); }
     .step-num { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
     .step-q { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; line-height: 1.18; letter-spacing: -.5px; color: var(--gold-light); margin-bottom: 12px; }
     .step-hint { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
@@ -102,7 +103,7 @@
     .dot.done { background: rgba(201,169,110,0.4); }
 
     /* ── Generating ── */
-    #view-generating { display: none; text-align: center; padding: 80px 0; }
+    #view-generating { display: none; max-width: 680px; margin: 0 auto; text-align: center; padding: 80px 0; }
     #view-generating.active { display: block; }
     .spinner { width: 48px; height: 48px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 24px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -114,7 +115,7 @@
     .gen-step .check { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 9px; }
 
     /* ── Error ── */
-    #view-error { display: none; padding: 52px 0; }
+    #view-error { display: none; max-width: 680px; margin: 0 auto; padding: 52px 0; }
     #view-error.active { display: block; }
     .error-card { background: rgba(180,60,60,0.1); border: 1px solid rgba(180,60,60,0.3); border-radius: 14px; padding: 24px; }
     .error-card h3 { font-size: 18px; color: #e88; margin-bottom: 8px; }
@@ -124,7 +125,7 @@
     .btn-retry:hover { border-color: var(--gold); color: var(--gold); }
 
     /* ── Dashboard ── */
-    #view-dashboard { display: none; }
+    #view-dashboard { display: none; max-width: 680px; margin: 0 auto; }
     #view-dashboard.active { display: block; }
     .dash-hero { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
     .dash-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
@@ -293,23 +294,45 @@
     .google-btn:disabled { opacity: 0.6; cursor: default; }
 
     /* ── Product framing ── */
-    .onboard-intro { padding: 54px 4px 8px; text-align: center; }
+    #view-onboard { display: grid; grid-template-columns: minmax(290px, .78fr) minmax(0, 1.22fr); gap: 70px; align-items: start; padding: 64px 0 90px; }
+    .onboard-intro { position: sticky; top: 28px; padding: 26px 0; text-align: left; }
     .onboard-kicker { color: var(--accent); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
-    .onboard-intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 7vw, 52px); line-height: 1.04; letter-spacing: -1.5px; margin-bottom: 16px; }
-    .onboard-intro p { max-width: 590px; margin: 0 auto; color: var(--muted); font-size: 15px; line-height: 1.7; }
-    .onboard-meta { display: flex; justify-content: center; gap: 18px; margin-top: 20px; color: var(--muted); font-size: 12px; }
+    .onboard-intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(38px, 4.5vw, 56px); line-height: 1.04; letter-spacing: -1.5px; margin-bottom: 18px; }
+    .onboard-intro > p { max-width: 470px; color: var(--muted); font-size: 15px; line-height: 1.75; }
+    .builder-back { margin-bottom: 32px; }
+    .builder-back a { color: var(--muted); font-size: 12px; text-decoration: none; }
+    .builder-back a:hover { color: var(--text); }
+    .builder-flow { margin-top: 30px; display: grid; gap: 0; }
+    .flow-item { position: relative; min-height: 62px; display: grid; grid-template-columns: 30px 1fr; gap: 13px; align-items: start; color: #737b96; }
+    .flow-item:not(:last-child)::after { content: ''; position: absolute; top: 29px; bottom: 0; left: 14px; width: 1px; background: var(--border); }
+    .flow-item > span { position: relative; z-index: 1; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--bg); font-size: 11px; font-weight: 700; }
+    .flow-item strong { display: block; color: #c3c8da; font-size: 13px; }
+    .flow-item small { display: block; margin-top: 2px; color: #6f7690; font-size: 11px; }
+    .flow-item.active > span { color: var(--bg); border-color: var(--accent); background: var(--accent); }
+    .flow-item.active strong { color: var(--text); }
+    .plan-includes { margin-top: 10px; padding: 18px; border: 1px solid var(--border); border-radius: 13px; background: rgba(255,255,255,.025); }
+    .plan-includes-label { margin-bottom: 11px; color: #737b96; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .plan-includes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 12px; }
+    .plan-includes-grid span { color: #b8bed2; font-size: 11px; }
+    .plan-includes-grid span::before { content: '✓'; color: var(--accent); margin-right: 6px; }
+    .onboard-meta { display: flex; gap: 18px; margin-top: 18px; color: var(--muted); font-size: 12px; }
     .onboard-meta span::before { content: '✓'; color: var(--accent); margin-right: 7px; }
     .category-btn:hover, .hours-btn:hover { border-color: rgba(157,140,255,.65); color: var(--text); transform: translateY(-1px); }
     .category-btn.selected, .hours-btn.selected { border-color: var(--gold); color: var(--text); background: linear-gradient(135deg, rgba(157,140,255,.16), rgba(113,229,193,.06)); box-shadow: inset 0 0 0 1px rgba(157,140,255,.08); }
     .week-card, .funnel-stage, .exercise-card, .auth-modal { box-shadow: 0 18px 50px rgba(0,0,0,.16); }
 
+    @media (max-width: 820px) {
+      #view-onboard { grid-template-columns: 1fr; gap: 28px; padding-top: 36px; }
+      .onboard-intro { position: static; padding: 0; }
+      #view-onboard.is-progressing .onboard-intro { display: none; }
+    }
+
     @media (max-width: 640px) {
       .page { padding-inline: 16px; }
       .page-header { padding-top: 18px; }
       .header-nav { display: none; }
-      .onboard-intro { padding-top: 40px; }
       .onboard-intro h1 { font-size: 38px; }
-      .onboard-meta { flex-direction: column; gap: 5px; }
+      .onboard-meta { gap: 12px; }
       .step-hero { padding: 24px; border-radius: 16px; }
       .step-q { font-size: 27px; }
       .step-nav { gap: 12px; }
@@ -323,9 +346,9 @@
 <div class="page">
 
   <div class="page-header">
-    <span class="wordmark">Master Key</span>
+    <a class="wordmark" href="/"><span class="wordmark-mark">M</span><span>Master Key</span></a>
     <div class="header-nav">
-      <a class="header-nav-link" href="/">Introduction</a>
+      <a class="header-nav-link" href="/">Overview</a>
       <a class="header-nav-link" href="/exercises">Exercises</a>
       <a class="header-nav-link active" href="/goals">Master Plan</a>
     </div>
@@ -344,9 +367,19 @@
   <!-- ── Onboarding ── -->
   <div id="view-onboard">
     <div class="onboard-intro" id="onboard-intro">
-      <div class="onboard-kicker">Your personalized roadmap</div>
-      <h1>Build your 90-day Master Plan</h1>
-      <p>Answer a few focused questions. Your answers become weekly milestones, clear next actions, and exercises matched to what is holding you back.</p>
+      <div class="builder-back"><a href="/">← Back to the overview</a></div>
+      <div class="onboard-kicker">90-day plan builder</div>
+      <h1>Let’s build the plan you just saw.</h1>
+      <p>The dashboard on the homepage starts here. Your answers directly shape the milestones, next actions, and mental-training exercises in your Master Plan.</p>
+      <div class="builder-flow" aria-label="Master Plan journey">
+        <div class="flow-item active"><span>1</span><div><strong>Define your direction</strong><small>Answer 8 focused questions</small></div></div>
+        <div class="flow-item"><span>2</span><div><strong>Generate your roadmap</strong><small>Receive milestones and next actions</small></div></div>
+        <div class="flow-item"><span>3</span><div><strong>Practice and progress</strong><small>Use your plan with matched exercises</small></div></div>
+      </div>
+      <div class="plan-includes">
+        <div class="plan-includes-label">Your plan will include</div>
+        <div class="plan-includes-grid"><span>Weekly milestones</span><span>Next actions</span><span>Matched exercises</span><span>Progress tracking</span></div>
+      </div>
       <div class="onboard-meta"><span>About 2 minutes</span><span>8 focused questions</span></div>
     </div>
     <div id="step-1" class="step active">
@@ -846,7 +879,7 @@ function show(id) {
     el.classList.remove('active');
   });
   const target = document.getElementById(id);
-  target.style.display = 'block';
+  target.style.display = id === 'view-onboard' ? 'grid' : 'block';
   target.classList.add('active');
 }
 
@@ -859,7 +892,7 @@ function goStep(n) {
   document.getElementById(`step-${currentStep}`).classList.remove('active');
   currentStep = n;
   document.getElementById(`step-${n}`).classList.add('active');
-  document.getElementById('onboard-intro').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('view-onboard').classList.toggle('is-progressing', n !== 1);
   if (n === 8) updateStep8UI();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
