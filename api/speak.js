@@ -13,7 +13,7 @@ function isAllowedOrigin(origin) {
   // Local dev
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
   // Any Vercel preview or production deployment for this project
-  if (/^https:\/\/master-key-exercises[^.]*\.vercel\.app$/.test(origin)) return true;
+  if (/^https:\/\/(master-key-exercises|lucky-action-plan)[^.]*\.vercel\.app$/.test(origin)) return true;
   // Optional custom domain via env var
   const custom = process.env.ALLOWED_ORIGIN;
   if (custom && origin === custom) return true;
