@@ -250,8 +250,10 @@ const PLAN_SCHEMA = {
             items: { type: 'STRING' },
             description: 'Exactly 3 concrete, doable-today actions for this week.',
           },
+          exercise_part: { type: 'INTEGER', description: 'The most relevant Master Key System exercise part for this specific week, from 1 through 24.' },
+          exercise_reason: { type: 'STRING', description: 'One concise sentence connecting this exercise to the week’s target, actions, or likely execution obstacle.' },
         },
-        required: ['week', 'funnel_stage', 'theme', 'target', 'actions'],
+        required: ['week', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
       },
     },
     exercises: {
@@ -287,7 +289,7 @@ Ground everything in the person's measurable outcome, baseline, reason, stated g
 
 Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
 
-The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks), and 3 Master Key System exercises chosen for genuine relevance to the person's stated obstacle. The 24 parts of the course are:
+The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Master Key System exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 24 parts of the course are:
 ${partList}
 
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
