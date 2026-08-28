@@ -58,12 +58,10 @@ CREATE POLICY "users read own subscription"
   ON mks_subscriptions FOR SELECT
   USING (auth.uid() = user_id);
 
--- 4. Goal plan generation on /goals is free, but strictly one goal per
--- account, permanently — the unique constraint on user_id is what enforces
--- that (see claimGeneration/releaseGeneration in decompose-goal.js: the
--- claim is inserted before the Gemini call and only released if that
--- specific attempt fails, so a failed attempt can retry but a successful
--- one can never be replaced by a second goal). This table is also the
+-- 4. Goal plan generation on /goals allows three successful plans per
+-- account: the original plus two revisions. The successful-use count is
+-- stored with goal_data and enforced by decompose-goal.js; failed AI attempts
+-- do not consume one of the three. This table is also the
 -- durable copy of the plan itself (goal_data + plan): generation can take
 -- 40-50s+ under sustained Gemini overload, and without a server-side copy,
 -- a page reload/navigation mid-request used to silently lose a plan that
