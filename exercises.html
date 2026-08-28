@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercises — Lucky</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js"
     integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p"
     crossorigin="anonymous"></script>
@@ -13,25 +13,25 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0d0f1f;
-      --surface:   #161a33;
-      --card:      #1c2140;
-      --border:    #2b2f57;
-      --gold:      #c9a84c;
-      --gold-dim:  #8a6f2e;
-      --gold-glow: rgba(201,168,76,0.12);
-      --text:      #e6e3f2;
-      --text-dim:  #9a97b5;
-      --text-faint:#423f5c;
-      --green:     #4caf7a;
-      --radius:    12px;
+      --bg:        #080b17;
+      --surface:   #0f152b;
+      --card:      #131a33;
+      --border:    rgba(255,255,255,0.11);
+      --gold:      #9d8cff;
+      --gold-dim:  #725cff;
+      --gold-glow: rgba(157,140,255,0.12);
+      --text:      #f7f5ff;
+      --text-dim:  #a8adc2;
+      --text-faint:#747d99;
+      --green:     #71e5c1;
+      --radius:    14px;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      background: radial-gradient(circle at 85% 4%,rgba(114,92,255,.2),transparent 30rem),radial-gradient(circle at 5% 60%,rgba(113,229,193,.08),transparent 28rem),var(--bg);
       color: var(--text);
       min-height: 100vh;
       line-height: 1.6;
@@ -46,7 +46,7 @@
       justify-content: space-between;
       position: sticky;
       top: 0;
-      background: var(--bg);
+      background: rgba(8,11,23,.88);
       z-index: 100;
       backdrop-filter: blur(8px);
     }
@@ -334,6 +334,7 @@
       font-size: 0.78rem;
       font-family: inherit;
       cursor: pointer;
+      text-decoration: none;
       letter-spacing: 0.05em;
       transition: background 0.2s;
     }
@@ -358,18 +359,6 @@
       font-style: italic;
       font-weight: 300;
     }
-    .goal-display-edit {
-      font-size: 0.72rem;
-      color: var(--text-faint);
-      cursor: pointer;
-      border: none;
-      background: none;
-      font-family: inherit;
-      padding: 0;
-      transition: color 0.2s;
-    }
-    .goal-display-edit:hover { color: var(--text-dim); }
-
     /* Journey card inside exercise */
     .journey-card {
       background: var(--gold-glow);
@@ -404,77 +393,6 @@
     .ex-affirmation.personalized {
       border: 1px solid rgba(201,168,76,0.4);
     }
-
-    /* Profile modal */
-    .profile-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      z-index: 400;
-      backdrop-filter: blur(4px);
-      display: none;
-    }
-    .profile-modal-overlay.open { display: block; }
-    .profile-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 401;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px 36px;
-      width: min(460px, calc(100vw - 40px));
-    }
-    .profile-modal-close {
-      position: absolute;
-      top: 14px; right: 16px;
-      background: none; border: none;
-      color: var(--text-faint);
-      font-size: 1rem; cursor: pointer;
-      padding: 4px 8px; transition: color 0.2s;
-    }
-    .profile-modal-close:hover { color: var(--text); }
-    .profile-modal h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem; font-weight: 300;
-      color: var(--text); margin-bottom: 8px;
-    }
-    .profile-modal p {
-      font-size: 0.85rem; color: var(--text-dim);
-      line-height: 1.6; margin-bottom: 28px;
-    }
-    .profile-field { margin-bottom: 20px; }
-    .profile-field label {
-      display: block;
-      font-size: 0.68rem; letter-spacing: 0.16em;
-      text-transform: uppercase; color: var(--text-faint);
-      margin-bottom: 8px;
-    }
-    .profile-field input,
-    .profile-field textarea {
-      width: 100%; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text); font-family: inherit;
-      font-size: 0.9rem; padding: 12px 14px;
-      outline: none; resize: none;
-      transition: border-color 0.2s;
-    }
-    .profile-field input:focus,
-    .profile-field textarea:focus { border-color: var(--gold-dim); }
-    .profile-field input::placeholder,
-    .profile-field textarea::placeholder { color: var(--text-faint); }
-    .profile-save-btn {
-      width: 100%; padding: 13px;
-      background: var(--gold); color: var(--bg);
-      border: none; border-radius: 8px;
-      font-family: inherit; font-size: 0.9rem;
-      font-weight: 500; cursor: pointer;
-      letter-spacing: 0.04em; transition: background 0.2s;
-    }
-    .profile-save-btn:hover { background: #debb6a; }
-    .profile-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* ── Intention ───────────────────────────────── */
     .intention-wrap {
@@ -1221,6 +1139,25 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+    /* Lucky brand alignment */
+    .header-title, .progress-count, .list-hero h1, .card-title, .ex-title,
+    .ex-lesson, .ex-affirmation, .goal-display-text, .journey-goal-text,
+    .timer-time, .intro-hero h1, .intro-tagline, .intro-section h2,
+    .how-num, .intro-quote blockquote, .auth-modal h3 {
+      font-family: 'Playfair Display', serif;
+    }
+    .header-title { color: var(--text); font-weight: 600; letter-spacing: -.02em; }
+    .header { box-shadow: 0 1px 0 rgba(255,255,255,.02); }
+    .exercise-card { border-radius: 16px; box-shadow: 0 16px 38px rgba(0,0,0,.16); }
+    .exercise-card:hover { border-color: rgba(157,140,255,.55); background: rgba(25,33,61,.96); }
+    .exercise-card.completed { border-color: rgba(113,229,193,.38); }
+    .exercise-card.completed::after, .progress-bar-fill { background: linear-gradient(90deg,var(--green),var(--gold)); }
+    .goal-banner, .journey-card, .intention-wrap { border-color: rgba(157,140,255,.25); }
+    .ex-affirmation.personalized { border-color: rgba(157,140,255,.45); }
+    .start-btn, .intro-cta { background: linear-gradient(110deg,var(--green),#ab9eff); color:#07140f; border-color:transparent; font-weight:700; }
+    .complete-btn { background: var(--green); border-color: var(--green); color:#07140f; }
+    button, input, textarea, select { font-family: 'DM Sans', sans-serif; }
+
     @media (max-width: 700px) {
       .header { padding: 16px; }
       .header-nav { display: none; }
@@ -1271,17 +1208,16 @@
 
 <!-- ── List View ─────────────────────────────── -->
 <div id="view-list" class="active">
-  <!-- Goal setup banner (shown when no goal is set) -->
+  <!-- Master Plan prompt (shown when no plan is available) -->
   <div class="goal-banner" id="goal-setup-banner" style="display:none">
-    <p>Set your goal to make all 24 exercises <strong>specific to your life</strong>.</p>
-    <button class="goal-banner-btn" id="goal-setup-btn">Set my goal →</button>
+    <p>Build your Master Plan to make all 24 exercises <strong>specific to your goal and obstacles</strong>.</p>
+    <a class="goal-banner-btn" href="/goals">Build my Master Plan →</a>
   </div>
 
-  <!-- Goal display (shown when goal is set) -->
+  <!-- Master Plan goal (shown when a plan is available) -->
   <div class="goal-display" id="goal-display">
-    <span class="goal-display-label">Your goal</span>
+    <span class="goal-display-label">Master Plan goal</span>
     <span class="goal-display-text" id="goal-display-text"></span>
-    <button class="goal-display-edit" id="goal-display-edit">Edit</button>
   </div>
 
   <div class="list-hero">
@@ -1459,24 +1395,6 @@
     Continue with Google
   </button>
   <p class="auth-modal-note">Or close to continue without an account — your progress stays saved in this browser.</p>
-</div>
-
-<!-- Profile modal -->
-<div class="profile-modal-overlay" id="profile-modal-overlay">
-  <div class="profile-modal" id="profile-modal">
-    <button class="profile-modal-close" id="profile-modal-close">✕</button>
-    <h3>Your Goal</h3>
-    <p>Tell us what you are working toward. Every exercise will be reframed around this — making each session speak directly to your life.</p>
-    <div class="profile-field">
-      <label for="profile-name-input">Your name (optional)</label>
-      <input type="text" id="profile-name-input" placeholder="How should we address you?" maxlength="60" />
-    </div>
-    <div class="profile-field">
-      <label for="profile-goal-input">What do you want to create or achieve? *</label>
-      <textarea id="profile-goal-input" rows="3" placeholder="e.g. Start my own business, get promoted to senior engineer, write my first book…" maxlength="200"></textarea>
-    </div>
-    <button class="profile-save-btn" id="profile-save-btn" disabled>Save my goal</button>
-  </div>
 </div>
 
 <script>
@@ -2190,26 +2108,31 @@ function getExData(part) {
   return store[part] || { sessions: [], note: '' };
 }
 
-// ── Profile helpers ───────────────────────────
+// ── Master Plan personalization ───────────────
 const PROFILE_KEY = 'mks_profile_v1';
+const MASTER_PLAN_KEY = 'lucky_builder_plan_v1';
 
 function loadProfile() {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
   catch { return {}; }
 }
 
-function saveProfile(profile) {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-}
-
-// Goal personalization is gated on being signed in. mks_profile_v1 is local,
-// unauthenticated storage — on a shared browser it could hold someone
-// else's (or stale test) data, which is exactly what caused exercise
-// content to reference an unrelated goal. Signed-out visitors always see
-// the general, non-personalized version of every exercise; whatever's
-// already saved locally applies as soon as they sign in.
 function loadProfileForPersonalization() {
-  return currentUser ? loadProfile() : {};
+  if (!currentUser) return {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(MASTER_PLAN_KEY)) || {};
+    if (saved.ownerId && saved.ownerId !== currentUser.id) return {};
+    const answers = saved.answers || {};
+    const profile = loadProfile();
+    return {
+      name: profile.name || '',
+      goal: answers.goal || saved.plan?.milestone_90day || '',
+      why: answers.why || '',
+      obstacle: answers.obstacle || '',
+      firstWeek: answers.first_week || '',
+      schedule: answers.schedule || '',
+    };
+  } catch { return {}; }
 }
 
 function applyGoalText(template, goal) {
@@ -2232,36 +2155,13 @@ function renderGoalUI() {
   }
 }
 
-function openProfileModal() {
-  const profile = loadProfile();
-  document.getElementById('profile-name-input').value = profile.name || '';
-  document.getElementById('profile-goal-input').value = profile.goal || '';
-  document.getElementById('profile-modal-overlay').classList.add('open');
-  document.getElementById('profile-save-btn').disabled = !(profile.goal || '').trim();
+function buildPlanCue(profile, part) {
+  if (part <= 8 && profile.obstacle) return `As you practice, notice how this helps you move through your stated obstacle: ${profile.obstacle}`;
+  if (part <= 16 && profile.why) return `Reconnect this exercise to why your goal matters: ${profile.why}`;
+  if (profile.firstWeek) return `Use this practice to support your first proof of momentum: ${profile.firstWeek}`;
+  if (profile.schedule) return `Carry this focus into the time you protected for action: ${profile.schedule}`;
+  return '';
 }
-
-function closeProfileModal() {
-  document.getElementById('profile-modal-overlay').classList.remove('open');
-}
-
-document.getElementById('profile-modal-close').addEventListener('click', closeProfileModal);
-document.getElementById('profile-modal-overlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('profile-modal-overlay')) closeProfileModal();
-});
-document.getElementById('profile-goal-input').addEventListener('input', (e) => {
-  document.getElementById('profile-save-btn').disabled = !e.target.value.trim();
-});
-document.getElementById('profile-save-btn').addEventListener('click', () => {
-  const name = document.getElementById('profile-name-input').value.trim();
-  const goal = document.getElementById('profile-goal-input').value.trim();
-  if (!goal) return;
-  saveProfile({ name, goal });
-  closeProfileModal();
-  renderGoalUI();
-  if (currentPart) populateJourneySection(currentPart);
-});
-document.getElementById('goal-setup-btn').addEventListener('click', openProfileModal);
-document.getElementById('goal-display-edit').addEventListener('click', openProfileModal);
 
 function populateJourneySection(part) {
   const profile = loadProfileForPersonalization();
@@ -2269,7 +2169,14 @@ function populateJourneySection(part) {
   const section = document.getElementById('journey-section');
   const card = document.getElementById('journey-card');
 
-  if (!goal) { section.style.display = 'none'; return; }
+  if (!goal) {
+    section.style.display = 'none';
+    const ex = EXERCISES[part - 1];
+    const affirmationEl = document.getElementById('ex-affirmation');
+    affirmationEl.textContent = `"${ex.affirmation}"`;
+    affirmationEl.classList.remove('personalized');
+    return;
+  }
 
   const p = PART_PERSONALIZATION[part - 1];
   const bridge = applyGoalText(p.bridge, goal);
@@ -2287,7 +2194,8 @@ function populateJourneySection(part) {
 
   const bridgeEl = document.createElement('div');
   bridgeEl.className = 'journey-bridge';
-  bridgeEl.textContent = bridge;
+  const planCue = buildPlanCue(profile, part);
+  bridgeEl.textContent = planCue ? `${bridge} ${planCue}` : bridge;
 
   card.appendChild(goalLabel);
   card.appendChild(goalText);
