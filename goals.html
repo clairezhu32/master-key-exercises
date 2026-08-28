@@ -1,1 +1,169 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lucky Builder — 90-Day Master Plan</title><style>body{margin:0;background:#080b17;color:#f7f5ff;font-family:Arial,sans-serif}.wrap{max-width:860px;margin:0 auto;padding:40px 24px 80px}.brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;color:#f7f5ff;text-decoration:none;font-weight:700;font-size:18px}.brand-mark{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,#71e5c1,#9d8cff);color:#080b17;font-family:Georgia,serif}.card{background:#131a33;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:34px}.step{display:none}.step.active{display:block}.num{font-size:12px;letter-spacing:2px;color:#a8adc2;text-transform:uppercase;margin-bottom:18px}.q{font-family:Georgia,serif;font-size:38px;line-height:1.2;margin-bottom:12px}.hint{color:#a8adc2;line-height:1.6;margin-bottom:28px}textarea,input,select{width:100%;box-sizing:border-box;background:#0f152b;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#f7f5ff;padding:16px;font:16px Arial;margin-bottom:12px}textarea{min-height:140px}.cats,.hours{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{padding:15px 22px;border:0;border-radius:9px;background:#71e5c1;color:#07140f;font-weight:700;cursor:pointer}.choice{padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#0f152b;color:#a8adc2;text-align:left;cursor:pointer}.choice.selected{border-color:#9d8cff;color:#fff}.nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px}.back{background:none;border:0;color:#a8adc2;cursor:pointer}.dots{font-size:11px;color:#717996}@media(max-width:600px){.q{font-size:30px}.cats,.hours{grid-template-columns:1fr}}</style></head><body><div class="wrap"><a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky Builder</span></a><div class="card"><div id="step1" class="step active"><div class="num">Question 1 of 9</div><div class="q">What area of your life are you ready to transform?</div><div class="hint">Choose the area where a meaningful 90-day breakthrough would matter most.</div><div class="cats"><button class="choice" data-v="Career breakthrough">Career breakthrough</button><button class="choice" data-v="Financial abundance">Financial abundance</button><button class="choice" data-v="Relationship & connection">Relationship & connection</button><button class="choice" data-v="Health & energy">Health & energy</button><button class="choice" data-v="Launching something of my own">Launching something of my own</button><button class="choice" data-v="Inner peace">Inner peace</button><button class="choice" data-v="Something else">Something else</button></div><div class="nav"><span class="dots">1 / 9</span><button id="n1" class="btn" disabled>Continue →</button></div></div><div id="step2" class="step"><div class="num">Question 2 of 9</div><div class="q">What measurable result do you want by the end of 90 days?</div><div class="hint">Name the number, observable result, or clear evidence that will show you made meaningful progress.</div><textarea id="win" placeholder="In 90 days, I would have…"></textarea><div class="nav"><button class="back" onclick="go(1)">← Back</button><span class="dots">2 / 9</span><button class="btn" id="n2">Continue →</button></div></div><div id="step3" class="step"><div class="num">Question 3 of 9</div><div class="q">Where are you today?</div><div class="hint">Tell the truth about your starting point — what is already working, what is unfinished, and what is currently true.</div><textarea id="reality" placeholder="Today, my situation is…"></textarea><div class="nav"><button class="back" onclick="go(2)">← Back</button><span class="dots">3 / 9</span><button class="btn" id="n3">Continue →</button></div></div><div id="step4" class="step"><div class="num">Question 4 of 9</div><div class="q">What needs to change to get from here to there?</div><div class="hint">Think about the real gap: skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div><textarea id="gap" placeholder="The biggest changes I need are…"></textarea><div class="nav"><button class="back" onclick="go(3)">← Back</button><span class="dots">4 / 9</span><button class="btn" id="n4">Continue →</button></div></div><div id="step5" class="step"><div class="num">Question 5 of 9</div><div class="q">What have you already tried — and what happened?</div><div class="hint">This keeps your Master Plan from repeating strategies that have already failed or been exhausted.</div><textarea id="tried" placeholder="I have tried… The result was…"></textarea><div class="nav"><button class="back" onclick="go(4)">← Back</button><span class="dots">5 / 9</span><button class="btn" id="n5">Continue →</button></div></div><div id="step6" class="step"><div class="num">Question 6 of 9</div><div class="q">What strengths, resources, relationships, or opportunities can you leverage?</div><div class="hint">A Master Plan should build from what you already have — not assume you are starting from zero.</div><textarea id="leverage" placeholder="I can leverage…"></textarea><div class="hint">How much time can you realistically commit each week?</div><div class="hours"><button class="choice" data-hours="1-2">1–2 hours</button><button class="choice" data-hours="3-5">3–5 hours</button><button class="choice" data-hours="5-10">5–10 hours</button><button class="choice" data-hours="10+">10+ hours</button></div><input id="schedule" placeholder="Which days or time blocks can you reliably protect?"><select id="startWeek"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select><div class="nav"><button class="back" onclick="go(5)">← Back</button><span class="dots">6 / 9</span><button class="btn" id="n6" disabled>Continue →</button></div></div><div id="step7" class="step"><div class="num">Question 7 of 9</div><div class="q">What can you realistically commit — and what must you protect?</div><div class="hint">Name the constraints the plan must respect: family, health, money, work, relationships, weekends, or anything else non-negotiable.</div><textarea id="constraints" placeholder="I can commit to… I need to protect…"></textarea><div class="nav"><button class="back" onclick="go(6)">← Back</button><span class="dots">7 / 9</span><button class="btn" id="n7">Continue →</button></div></div><div id="step8" class="step"><div class="num">Question 8 of 9</div><div class="q">Why does this matter — and what could realistically derail you?</div><div class="hint">Connect the goal to what matters most, then name the failure modes the plan should help you anticipate.</div><textarea id="why" placeholder="This matters because…"></textarea><textarea id="derail" placeholder="What could derail me is…"></textarea><div class="nav"><button class="back" onclick="go(7)">← Back</button><span class="dots">8 / 9</span><button class="btn" id="n8">Continue →</button></div></div><div id="step9" class="step"><div class="num">Question 9 of 9</div><div class="q">What would make the first seven days a success?</div><div class="hint">Choose a small, observable proof of momentum—not the whole 90-day result.</div><textarea id="firstWeek" placeholder="In the first seven days, I will…"></textarea><div class="nav"><button class="back" onclick="go(8)">← Back</button><span class="dots">9 / 9</span><button class="btn" id="finish">Build My Master Plan →</button></div></div></div></div><script>let step=1,cat='',hours='';const $=id=>document.getElementById(id);function go(n){$('step'+step).classList.remove('active');step=n;$('step'+step).classList.add('active')}document.querySelectorAll('.cats .choice').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cats .choice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');cat=b.dataset.v;$('n1').disabled=false});document.querySelectorAll('.hours .choice').forEach(b=>b.onclick=()=>{document.querySelectorAll('.hours .choice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');hours=b.dataset.hours;$('n6').disabled=false});for(let i=1;i<9;i++)$('n'+i)?.addEventListener('click',()=>go(i+1));$('finish').onclick=()=>{const data={category:cat,goal:$('win').value.trim(),baseline:$('reality').value.trim(),why:$('why').value.trim(),gap:$('gap').value.trim(),tried:$('tried').value.trim(),resources:$('leverage').value.trim(),constraints:$('constraints').value.trim(),obstacle:$('derail').value.trim(),hours,schedule:$('schedule').value.trim(),first_week:$('firstWeek').value.trim(),start_week:Number($('startWeek').value)||1,progress:'90-DAY WIN: '+$('win').value.trim()+'\\n\\nGAP TO CLOSE: '+$('gap').value.trim(),belief_score:7,createdAt:Date.now()};sessionStorage.setItem('mks_goal_draft_v2',JSON.stringify(data));alert('Your Master Plan answers are saved.');};</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Turn your answers into a personalized 90-day plan with weekly milestones and focused actions.">
+  <title>Lucky Builder — 90-Day Master Plan</title>
+  <style>
+    :root { --bg:#080b17; --panel:#131a33; --panel2:#0f152b; --line:rgba(255,255,255,.11); --text:#f7f5ff; --muted:#a8adc2; --violet:#9d8cff; --mint:#71e5c1; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { min-height:100vh; color:var(--text); background:radial-gradient(circle at 85% 4%,rgba(114,92,255,.2),transparent 30rem),radial-gradient(circle at 5% 60%,rgba(113,229,193,.08),transparent 28rem),var(--bg); font-family:Arial,sans-serif; }
+    button, input, textarea, select { font:inherit; }
+    button { cursor:pointer; }
+    .shell { width:min(900px,calc(100% - 32px)); margin:0 auto; padding:28px 0 80px; }
+    .brand { display:flex; align-items:center; gap:10px; width:max-content; margin-bottom:26px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
+    .brand-mark { width:32px; height:32px; display:grid; place-items:center; border-radius:9px; color:var(--bg); background:linear-gradient(135deg,var(--mint),var(--violet)); font-family:Georgia,serif; }
+    .card { padding:36px; border:1px solid var(--line); border-radius:22px; background:rgba(19,26,51,.92); box-shadow:0 30px 80px rgba(0,0,0,.28); }
+    .step { display:none; }
+    .step.active { display:block; }
+    .num, .eyebrow { margin-bottom:16px; color:var(--mint); font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
+    h1, .question { font-family:Georgia,serif; font-size:clamp(30px,5vw,42px); line-height:1.14; }
+    .hint { margin:13px 0 26px; color:var(--muted); line-height:1.65; }
+    textarea, input, select { width:100%; margin-bottom:13px; padding:16px; border:1px solid var(--line); border-radius:12px; outline:none; color:var(--text); background:var(--panel2); }
+    textarea { min-height:135px; resize:vertical; }
+    textarea:focus, input:focus, select:focus { border-color:var(--violet); }
+    .choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .choice { padding:15px; border:1px solid var(--line); border-radius:10px; color:var(--muted); background:var(--panel2); text-align:left; }
+    .choice.selected { border-color:var(--violet); color:var(--text); background:rgba(157,140,255,.12); }
+    .nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:24px; }
+    .back { border:0; color:var(--muted); background:none; }
+    .primary { min-height:46px; padding:0 22px; border:0; border-radius:9px; color:#07140f; background:linear-gradient(110deg,var(--mint),#ab9eff); font-weight:700; }
+    .primary:disabled { opacity:.38; cursor:default; }
+    .progress { color:#747d99; font-size:11px; }
+    .error-inline { min-height:18px; margin-top:13px; color:#ff9d9d; font-size:12px; }
+    #generating, #result, #error-view { display:none; }
+    .center { padding:65px 20px; text-align:center; }
+    .spinner { width:52px; height:52px; margin:0 auto 24px; border:3px solid var(--line); border-top-color:var(--mint); border-radius:50%; animation:spin .9s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .center h2 { margin-bottom:10px; font:32px Georgia,serif; }
+    .center p { color:var(--muted); line-height:1.6; }
+    .result-hero { padding-bottom:26px; border-bottom:1px solid var(--line); }
+    .result-hero h1 { color:#fff; }
+    .summary { margin-top:14px; color:var(--muted); line-height:1.65; }
+    .milestone { display:inline-block; margin-top:17px; padding:8px 13px; border:1px solid rgba(113,229,193,.25); border-radius:999px; color:var(--mint); background:rgba(113,229,193,.06); font-size:12px; }
+    .insight { margin:22px 0; padding:17px; border-left:2px solid var(--violet); color:#c5cbe0; background:rgba(157,140,255,.06); line-height:1.65; }
+    .section-title { margin:30px 0 14px; color:var(--muted); font-size:11px; letter-spacing:.15em; text-transform:uppercase; }
+    .weeks { display:grid; gap:12px; }
+    .week { padding:20px; border:1px solid var(--line); border-radius:14px; background:var(--panel2); }
+    .week-head { display:flex; justify-content:space-between; gap:14px; margin-bottom:8px; }
+    .week-label { color:var(--violet); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .week-theme { font:21px Georgia,serif; }
+    .week-target { margin:8px 0 13px; color:var(--muted); line-height:1.5; }
+    .week li { margin:8px 0 0 20px; color:#dce0ef; line-height:1.45; }
+    .exercise-links { display:flex; flex-wrap:wrap; gap:9px; }
+    .exercise-link { padding:10px 13px; border:1px solid rgba(157,140,255,.3); border-radius:8px; color:var(--text); background:rgba(157,140,255,.08); text-decoration:none; font-size:12px; }
+    .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+    .secondary { min-height:44px; padding:0 18px; border:1px solid var(--line); border-radius:9px; color:var(--text); background:transparent; }
+    .auth-overlay { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:20px; background:rgba(4,6,14,.82); backdrop-filter:blur(8px); }
+    .auth-modal { width:min(430px,100%); padding:32px; border:1px solid var(--line); border-radius:20px; background:var(--panel); text-align:center; }
+    .auth-modal h2 { font:29px Georgia,serif; }
+    .auth-modal p { margin:12px 0 22px; color:var(--muted); line-height:1.6; }
+    .google { width:100%; min-height:48px; border:0; border-radius:9px; color:#111; background:#fff; font-weight:700; }
+    .auth-close { float:right; margin:-18px -14px 0 0; border:0; color:var(--muted); background:none; font-size:18px; }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px} }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <main class="shell">
+    <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky Builder</span></a>
+
+    <section class="card" id="wizard">
+      <div class="step active" id="step-1">
+        <div class="num">Question 1 of 9</div><div class="question">What area of your life is this goal in?</div>
+        <div class="hint">Choose the area where a meaningful 90-day breakthrough would matter most.</div>
+        <div class="choices" id="category-choices">
+          <button class="choice" data-category="Career breakthrough">Career breakthrough</button><button class="choice" data-category="Financial abundance">Financial abundance</button>
+          <button class="choice" data-category="Relationship & connection">Relationship &amp; connection</button><button class="choice" data-category="Health & energy">Health &amp; energy</button>
+          <button class="choice" data-category="Launching something of my own">Launching something of my own</button><button class="choice" data-category="Inner peace">Inner peace</button>
+          <button class="choice" data-category="Something else">Something else</button>
+        </div>
+        <div class="nav"><span class="progress">1 / 9</span><button class="primary" id="next-1" disabled>Continue →</button></div>
+      </div>
+      <div class="step" id="step-2"><div class="num">Question 2 of 9</div><div class="question">What measurable result do you want by the end of 90 days?</div><div class="hint">Name the number, observable result, or clear evidence that will show meaningful progress.</div><textarea id="goal" placeholder="In 90 days, I will have…"></textarea><div class="nav"><button class="back" data-back="1">← Back</button><span class="progress">2 / 9</span><button class="primary" data-next="3" data-require="goal">Continue →</button></div><div class="error-inline"></div></div>
+      <div class="step" id="step-3"><div class="num">Question 3 of 9</div><div class="question">Where are you today?</div><div class="hint">Describe your starting point: what is working, what is unfinished, and what is currently true.</div><textarea id="baseline" placeholder="Today, my situation is…"></textarea><div class="nav"><button class="back" data-back="2">← Back</button><span class="progress">3 / 9</span><button class="primary" data-next="4" data-require="baseline">Continue →</button></div><div class="error-inline"></div></div>
+      <div class="step" id="step-4"><div class="num">Question 4 of 9</div><div class="question">What needs to change to get from here to there?</div><div class="hint">Consider the real gap: skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div><textarea id="gap" placeholder="The biggest changes I need are…"></textarea><div class="nav"><button class="back" data-back="3">← Back</button><span class="progress">4 / 9</span><button class="primary" data-next="5">Continue →</button></div></div>
+      <div class="step" id="step-5"><div class="num">Question 5 of 9</div><div class="question">What have you already tried—and what happened?</div><div class="hint">This keeps your plan from repeating strategies that have already failed or been exhausted.</div><textarea id="tried" placeholder="I tried… The result was…"></textarea><div class="nav"><button class="back" data-back="4">← Back</button><span class="progress">5 / 9</span><button class="primary" data-next="6">Continue →</button></div></div>
+      <div class="step" id="step-6"><div class="num">Question 6 of 9</div><div class="question">What strengths, resources, or opportunities can you leverage?</div><div class="hint">Build from what you already have, then choose a realistic weekly commitment.</div><textarea id="resources" placeholder="I can leverage…"></textarea><div class="choices" id="hour-choices"><button class="choice" data-hours="1-2">1–2 hours</button><button class="choice" data-hours="3-5">3–5 hours</button><button class="choice" data-hours="5-10">5–10 hours</button><button class="choice" data-hours="10+">10+ hours</button></div><input id="schedule" placeholder="Which days or time blocks can you protect?"><select id="start-week"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select><div class="nav"><button class="back" data-back="5">← Back</button><span class="progress">6 / 9</span><button class="primary" id="next-6" disabled>Continue →</button></div></div>
+      <div class="step" id="step-7"><div class="num">Question 7 of 9</div><div class="question">What can you realistically commit—and what must you protect?</div><div class="hint">Name the constraints the plan must respect: family, health, money, work, relationships, or other non-negotiables.</div><textarea id="constraints" placeholder="I can commit to… I need to protect…"></textarea><div class="nav"><button class="back" data-back="6">← Back</button><span class="progress">7 / 9</span><button class="primary" data-next="8">Continue →</button></div></div>
+      <div class="step" id="step-8"><div class="num">Question 8 of 9</div><div class="question">Why does this matter—and what could realistically derail you?</div><div class="hint">Connect the goal to what matters most, then name the failure modes the plan should anticipate.</div><textarea id="why" placeholder="This matters because…"></textarea><textarea id="obstacle" placeholder="What could derail me is…"></textarea><div class="nav"><button class="back" data-back="7">← Back</button><span class="progress">8 / 9</span><button class="primary" data-next="9">Continue →</button></div></div>
+      <div class="step" id="step-9"><div class="num">Question 9 of 9</div><div class="question">What would make the first seven days a success?</div><div class="hint">Choose a small, observable proof of momentum—not the whole 90-day result.</div><textarea id="first-week" placeholder="In the first seven days, I will…"></textarea><div class="nav"><button class="back" data-back="8">← Back</button><span class="progress">9 / 9</span><button class="primary" id="finish">Build My Master Plan →</button></div><div class="error-inline" id="finish-error"></div></div>
+    </section>
+
+    <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky Builder is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
+    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended focus exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin an exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
+    <section class="card center" id="error-view"><h2>We couldn’t build the plan yet.</h2><p id="error-message"></p><button class="primary" id="retry" style="margin-top:22px">Try again</button></section>
+  </main>
+
+  <div class="auth-overlay" id="auth-overlay"><div class="auth-modal"><button class="auth-close" id="auth-close">×</button><h2>Sign in to build your plan</h2><p>Your answers are saved. Sign in with Google and Lucky Builder will generate the roadmap when you return.</p><button class="google" id="google-sign-in">Continue with Google</button></div></div>
+
+  <script>
+    const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const DRAFT_KEY = 'lucky_builder_draft_v1';
+    const PLAN_KEY = 'lucky_builder_plan_v1';
+    const PENDING_KEY = 'lucky_builder_generation_pending';
+    let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false;
+
+    function showStep(number) { document.getElementById(`step-${currentStep}`).classList.remove('active'); currentStep = number; document.getElementById(`step-${number}`).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+    function showView(id) { ['wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
+    function value(id) { return document.getElementById(id).value.trim(); }
+    function collectAnswers() { const startWeek = Number(document.getElementById('start-week').value) || 1; return { category:selectedCategory, goal:value('goal'), baseline:value('baseline'), gap:value('gap'), tried:value('tried'), resources:value('resources'), constraints:value('constraints'), why:value('why'), obstacle:value('obstacle'), hours:selectedHours, schedule:value('schedule'), first_week:value('first-week'), start_week:startWeek, progress:`90-DAY OUTCOME: ${value('goal')}\n\nGAP TO CLOSE: ${value('gap')}`, createdAt:Date.now()-(startWeek-1)*7*86400000 }; }
+    function setInlineError(button, message) { const step = button.closest('.step'); const target = step.querySelector('.error-inline'); if(target) target.textContent = message; }
+
+    document.querySelectorAll('#category-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#category-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedCategory = button.dataset.category; document.getElementById('next-1').disabled = false; }));
+    document.querySelectorAll('#hour-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#hour-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedHours = button.dataset.hours; document.getElementById('next-6').disabled = false; }));
+    document.getElementById('next-1').addEventListener('click', () => showStep(2));
+    document.getElementById('next-6').addEventListener('click', () => showStep(7));
+    document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
+    document.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => { const required = button.dataset.require; if(required && !value(required)) { setInlineError(button,'Please answer this question so the plan has enough context.'); return; } showStep(Number(button.dataset.next)); }));
+
+    function openAuth() { document.getElementById('auth-overlay').style.display = 'grid'; }
+    function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
+    document.getElementById('auth-close').addEventListener('click', closeAuth);
+    document.getElementById('auth-overlay').addEventListener('click', event => { if(event.target.id === 'auth-overlay') closeAuth(); });
+    document.getElementById('google-sign-in').addEventListener('click', async () => { const button = document.getElementById('google-sign-in'); button.disabled = true; button.textContent = 'Redirecting…'; await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/goals'}}); });
+
+    document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { document.getElementById('finish-error').textContent = 'Define one concrete first-week result before generating the plan.'; return; } const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
+
+    async function generatePlan(answers) {
+      if(generationInFlight) return; generationInFlight = true; closeAuth(); showView('generating');
+      try {
+        const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session || currentSession;
+        const token = currentSession?.access_token; if(!token) { showView('wizard'); openAuth(); return; }
+        const response = await fetch('/api/decompose-goal',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(answers)});
+        const data = await response.json(); if(!response.ok) throw new Error(data.error || `Generation failed (${response.status})`);
+        const saved = {answers,plan:data.plan,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); renderPlan(saved);
+      } catch(error) { document.getElementById('error-message').textContent = `${error.message}. Your answers are still saved, so you can retry.`; showView('error-view'); }
+      finally { generationInFlight = false; }
+    }
+
+    function renderPlan(saved) {
+      const plan = saved.plan || {}, answers = saved.answers || {};
+      document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your Master Plan';
+      document.getElementById('result-goal').textContent = answers.goal || plan.milestone_90day || 'Your 90-day goal';
+      document.getElementById('result-summary').textContent = plan.summary || '';
+      document.getElementById('result-milestone').textContent = `90-day milestone: ${plan.milestone_90day || answers.goal || ''}`;
+      document.getElementById('result-insight').textContent = plan.insight || 'Begin with the first small action and let execution create clarity.';
+      const weeks = document.getElementById('result-weeks'); weeks.replaceChildren();
+      (plan.weeks || []).forEach((week,index) => { const card=document.createElement('article'); card.className='week'; const head=document.createElement('div'); head.className='week-head'; const label=document.createElement('div'); label.className='week-label'; label.textContent=`Week ${week.week || index+1}`; const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=week.theme || ''; head.append(label,theme); const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || ''; const list=document.createElement('ul'); (week.actions || []).forEach(action=>{const item=document.createElement('li'); item.textContent=action; list.appendChild(item)}); card.append(head,target,list); weeks.appendChild(card); });
+      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises#part-${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
+      showView('result'); window.scrollTo({top:0});
+    }
+
+    document.getElementById('retry').addEventListener('click', () => { const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(draft) generatePlan(draft); else showView('wizard'); });
+    document.getElementById('build-another').addEventListener('click', () => { localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
+
+    async function init() {
+      const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
+      const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+      if(currentSession && localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
+      const saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
+      if(saved && (!currentSession || saved.ownerId === currentSession.user.id)) renderPlan(saved);
+    }
+    init();
+  </script>
+</body>
+</html>
