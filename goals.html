@@ -190,7 +190,7 @@
         });
         const fallbackExercises=plan.exercises || []; const recommended=week.exercise_part ? {part:week.exercise_part,reason:week.exercise_reason} : fallbackExercises.length ? fallbackExercises[Math.min(Math.floor(index/4),fallbackExercises.length-1)] : null;
         const weekExercise=recommended ? document.createElement('a') : null;
-        if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises#part-${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Part ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
+        if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises?part=${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Part ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
         const feedback=document.createElement('div'); feedback.className='week-feedback';
         const feedbackLabel=document.createElement('span'); feedbackLabel.className='feedback-label'; feedbackLabel.textContent='Weekly reflection';
         const statuses=document.createElement('div'); statuses.className='feedback-status';
@@ -202,7 +202,7 @@
         feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
       });
       updateProgressSummary(saved);
-      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises#part-${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
+      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?part=${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
       showView('result'); window.scrollTo({top:0});
     }
 
