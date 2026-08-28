@@ -39,7 +39,7 @@ const PART_THEMES = [
 function isAllowedOrigin(origin) {
   if (!origin) return false;
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
-  if (/^https:\/\/master-key-exercises[^.]*\.vercel\.app$/.test(origin)) return true;
+  if (/^https:\/\/(master-key-exercises|lucky-action-plan)[^.]*\.vercel\.app$/.test(origin)) return true;
   const custom = process.env.ALLOWED_ORIGIN;
   if (custom && origin === custom) return true;
   return false;
