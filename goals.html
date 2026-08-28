@@ -60,6 +60,11 @@
     .task:hover { border-color:var(--line); background:rgba(255,255,255,.025); }
     .task input { width:18px; height:18px; flex:0 0 auto; margin:1px 0 0; accent-color:var(--mint); }
     .task.done span { color:#747d99; text-decoration:line-through; }
+    .week-exercise { display:flex; align-items:flex-start; gap:11px; margin-top:15px; padding:13px; border:1px solid rgba(113,229,193,.22); border-radius:10px; color:var(--text); background:rgba(113,229,193,.055); text-decoration:none; }
+    .week-exercise:hover { border-color:rgba(113,229,193,.5); background:rgba(113,229,193,.09); }
+    .exercise-part { flex:0 0 auto; padding:5px 8px; border-radius:7px; color:#07140f; background:var(--mint); font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .exercise-copy strong { display:block; margin-bottom:3px; font-size:12px; }
+    .exercise-copy span { display:block; color:var(--muted); font-size:12px; line-height:1.45; }
     .week-feedback { margin-top:15px; padding-top:15px; border-top:1px solid var(--line); }
     .feedback-label { display:block; margin-bottom:9px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
     .feedback-status { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:9px; }
@@ -183,6 +188,9 @@
           checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); });
           list.appendChild(item);
         });
+        const fallbackExercises=plan.exercises || []; const recommended=week.exercise_part ? {part:week.exercise_part,reason:week.exercise_reason} : fallbackExercises.length ? fallbackExercises[Math.min(Math.floor(index/4),fallbackExercises.length-1)] : null;
+        const weekExercise=recommended ? document.createElement('a') : null;
+        if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises#part-${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Part ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
         const feedback=document.createElement('div'); feedback.className='week-feedback';
         const feedbackLabel=document.createElement('span'); feedbackLabel.className='feedback-label'; feedbackLabel.textContent='Weekly reflection';
         const statuses=document.createElement('div'); statuses.className='feedback-status';
@@ -191,7 +199,7 @@
         const note=document.createElement('textarea'); note.className='feedback-note'; note.placeholder='What worked? What was difficult? What will you change next week?'; note.value=currentFeedback.note || '';
         const savedNote=document.createElement('div'); savedNote.className='save-note'; let noteTimer;
         note.addEventListener('input',()=>{ currentFeedback.note=note.value; saved.progress.feedback[weekKey]=currentFeedback; clearTimeout(noteTimer); noteTimer=setTimeout(()=>{ savePlanProgress(saved); savedNote.textContent='Reflection saved'; setTimeout(()=>savedNote.textContent='',1400); },350); });
-        feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list,feedback); weeks.appendChild(card);
+        feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
       });
       updateProgressSummary(saved);
       const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises#part-${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
