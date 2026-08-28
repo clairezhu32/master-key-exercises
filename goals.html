@@ -50,7 +50,23 @@
     .week-label { color:var(--violet); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
     .week-theme { font:21px Georgia,serif; }
     .week-target { margin:8px 0 13px; color:var(--muted); line-height:1.5; }
-    .week li { margin:8px 0 0 20px; color:#dce0ef; line-height:1.45; }
+    .plan-progress { margin:22px 0 4px; padding:16px; border:1px solid var(--line); border-radius:12px; background:rgba(113,229,193,.04); }
+    .plan-progress-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; color:var(--muted); font-size:12px; }
+    .plan-progress-head strong { color:var(--text); }
+    .progress-track { height:8px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.08); }
+    .progress-fill { width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--mint),var(--violet)); transition:width .25s ease; }
+    .task-list { display:grid; gap:9px; list-style:none; }
+    .task { display:flex; align-items:flex-start; gap:10px; padding:11px 12px; border:1px solid transparent; border-radius:10px; color:#dce0ef; line-height:1.45; cursor:pointer; transition:background .2s,border-color .2s; }
+    .task:hover { border-color:var(--line); background:rgba(255,255,255,.025); }
+    .task input { width:18px; height:18px; flex:0 0 auto; margin:1px 0 0; accent-color:var(--mint); }
+    .task.done span { color:#747d99; text-decoration:line-through; }
+    .week-feedback { margin-top:15px; padding-top:15px; border-top:1px solid var(--line); }
+    .feedback-label { display:block; margin-bottom:9px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .feedback-status { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:9px; }
+    .status-button { min-height:34px; padding:0 11px; border:1px solid var(--line); border-radius:8px; color:var(--muted); background:transparent; font-size:11px; }
+    .status-button.selected { border-color:var(--violet); color:var(--text); background:rgba(157,140,255,.12); }
+    .feedback-note { min-height:76px; margin:0; padding:12px; font-size:13px; }
+    .save-note { min-height:18px; margin-top:6px; color:var(--mint); font-size:11px; }
     .exercise-links { display:flex; flex-wrap:wrap; gap:9px; }
     .exercise-link { padding:10px 13px; border:1px solid rgba(157,140,255,.3); border-radius:8px; color:var(--text); background:rgba(157,140,255,.08); text-decoration:none; font-size:12px; }
     .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
@@ -92,7 +108,7 @@
     </section>
 
     <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
-    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended focus exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin an exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
+    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your execution progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended focus exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin an exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
     <section class="card center" id="error-view"><h2>We couldn’t build the plan yet.</h2><p id="error-message"></p><button class="primary" id="retry" style="margin-top:22px">Try again</button></section>
   </main>
 
@@ -140,15 +156,44 @@
       finally { generationInFlight = false; }
     }
 
+    function savePlanProgress(saved) { saved.progress = saved.progress || {completed:{},feedback:{}}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+    function updateProgressSummary(saved) { const actions=(saved.plan?.weeks || []).flatMap(week=>week.actions || []); const completed=Object.values(saved.progress?.completed || {}).filter(Boolean).length; document.getElementById('progress-count').textContent=`${completed} of ${actions.length} tasks complete`; document.getElementById('progress-fill').style.width=`${actions.length ? Math.round(completed/actions.length*100) : 0}%`; }
+
     function renderPlan(saved) {
       const plan = saved.plan || {}, answers = saved.answers || {};
+      saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {};
       document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your Master Plan';
       document.getElementById('result-goal').textContent = answers.goal || plan.milestone_90day || 'Your 90-day goal';
       document.getElementById('result-summary').textContent = plan.summary || '';
       document.getElementById('result-milestone').textContent = `90-day milestone: ${plan.milestone_90day || answers.goal || ''}`;
       document.getElementById('result-insight').textContent = plan.insight || 'Begin with the first small action and let execution create clarity.';
       const weeks = document.getElementById('result-weeks'); weeks.replaceChildren();
-      (plan.weeks || []).forEach((week,index) => { const card=document.createElement('article'); card.className='week'; const head=document.createElement('div'); head.className='week-head'; const label=document.createElement('div'); label.className='week-label'; label.textContent=`Week ${week.week || index+1}`; const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=week.theme || ''; head.append(label,theme); const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || ''; const list=document.createElement('ul'); (week.actions || []).forEach(action=>{const item=document.createElement('li'); item.textContent=action; list.appendChild(item)}); card.append(head,target,list); weeks.appendChild(card); });
+      (plan.weeks || []).forEach((week,index) => {
+        const weekNumber=week.week || index+1, weekKey=`week-${weekNumber}`;
+        const card=document.createElement('article'); card.className='week';
+        const head=document.createElement('div'); head.className='week-head';
+        const label=document.createElement('div'); label.className='week-label'; label.textContent=`Week ${weekNumber}`;
+        const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=week.theme || ''; head.append(label,theme);
+        const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || '';
+        const list=document.createElement('div'); list.className='task-list';
+        (week.actions || []).forEach((action,actionIndex)=>{
+          const taskKey=`${weekKey}-task-${actionIndex}`; const item=document.createElement('label'); item.className='task';
+          const checkbox=document.createElement('input'); checkbox.type='checkbox'; checkbox.checked=Boolean(saved.progress.completed[taskKey]);
+          const text=document.createElement('span'); text.textContent=action; item.append(checkbox,text); item.classList.toggle('done',checkbox.checked);
+          checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); });
+          list.appendChild(item);
+        });
+        const feedback=document.createElement('div'); feedback.className='week-feedback';
+        const feedbackLabel=document.createElement('span'); feedbackLabel.className='feedback-label'; feedbackLabel.textContent='Weekly reflection';
+        const statuses=document.createElement('div'); statuses.className='feedback-status';
+        const currentFeedback=saved.progress.feedback[weekKey] || {status:'',note:''};
+        ['On track','Need adjustment','Blocked'].forEach(status=>{ const button=document.createElement('button'); button.type='button'; button.className='status-button'; button.textContent=status; button.classList.toggle('selected',currentFeedback.status===status); button.addEventListener('click',()=>{ currentFeedback.status=status; saved.progress.feedback[weekKey]=currentFeedback; statuses.querySelectorAll('.status-button').forEach(item=>item.classList.toggle('selected',item===button)); savePlanProgress(saved); savedNote.textContent='Feedback saved'; }); statuses.appendChild(button); });
+        const note=document.createElement('textarea'); note.className='feedback-note'; note.placeholder='What worked? What was difficult? What will you change next week?'; note.value=currentFeedback.note || '';
+        const savedNote=document.createElement('div'); savedNote.className='save-note'; let noteTimer;
+        note.addEventListener('input',()=>{ currentFeedback.note=note.value; saved.progress.feedback[weekKey]=currentFeedback; clearTimeout(noteTimer); noteTimer=setTimeout(()=>{ savePlanProgress(saved); savedNote.textContent='Reflection saved'; setTimeout(()=>savedNote.textContent='',1400); },350); });
+        feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list,feedback); weeks.appendChild(card);
+      });
+      updateProgressSummary(saved);
       const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises#part-${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
       showView('result'); window.scrollTo({top:0});
     }
