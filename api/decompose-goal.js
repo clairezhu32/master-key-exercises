@@ -61,23 +61,10 @@ async function getUserFromToken(authHeader, serviceRoleKey) {
   return res.json();
 }
 
-// One goal per account, permanently — no regenerating with a second goal
-// once a plan has successfully been generated. "Already has a goal" is
-// defined by having actual recoverable plan content, not just a row: rows
-// created before server-side plan persistence was added (or from any
-// generation that was claimed but never completed) have no plan/goal_data,
-// and blocking those accounts forever with nothing to show for it is a
-// dead end — the account is stuck unable to generate and unable to see any
-// plan. Treat a contentless row as reclaimable rather than a real claim.
+// Ensure the account has a generation row. A successful new generation
+// replaces the previous plan, so completing a fresh intake is never blocked
+// by an older goal.
 async function claimGeneration(userId, email, serviceRoleKey) {
-  const existing = await fetch(
-    `${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}&select=plan`,
-    { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
-  );
-  if (existing.ok) {
-    const rows = await existing.json();
-    if (rows[0]?.plan) return false; // genuinely already has a plan
-  }
   const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?on_conflict=user_id`, {
     method: 'POST',
     headers: {
@@ -110,16 +97,6 @@ async function saveGenerationResult(userId, goalData, plan, serviceRoleKey) {
     body: JSON.stringify({ goal_data: goalData, plan, generated_at: new Date().toISOString() }),
   });
   if (!res.ok) console.error(`Failed to save generation result for user ${userId}: ${res.status}`);
-}
-
-// Best-effort: give back the one allowed goal if the Gemini call that was
-// supposed to use it failed, so a transient AI-provider error doesn't
-// permanently lock someone out before they've ever gotten a plan.
-async function releaseGeneration(userId, serviceRoleKey) {
-  await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
-    method: 'DELETE',
-    headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
-  }).catch(() => {});
 }
 
 const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing', 'core_prep', 'funnel_metrics', 'close'];
@@ -306,7 +283,7 @@ The 7 stages, in order:
 6. funnel_metrics — the conversion funnel for this goal with realistic benchmarks, plus how to review and iterate on the weakest step
 7. close — the specific checklist to actually land the outcome
 
-Ground everything in the person's actual stated goal, reason, 90-day vision, and obstacle — never output advice generic enough to apply to any goal in the category. Reference specifics from their own wording wherever possible.
+Ground everything in the person's measurable outcome, baseline, reason, stated gap, previous attempts, resources, constraints, obstacle, schedule, and first-week success test — never output advice generic enough to apply to any goal in the category. Reference their own numbers, assets, and wording wherever possible.
 
 Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
 
@@ -316,16 +293,21 @@ ${partList}
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
-function buildUserPrompt({ goal, why, progress, obstacle, hours, intensity, category, belief_score }) {
+function buildUserPrompt({ goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, intensity, category }) {
   return `Goal category: ${category || '(not specified)'}
-Goal: ${goal}
+Measurable 90-day outcome: ${goal}
+Current baseline: ${baseline || '(not specified)'}
 Why it matters to them: ${why || '(not specified)'}
-What meaningful progress looks like in 90 days: ${progress || '(not specified)'}
+The gap they believe must close: ${gap || '(not specified)'}
+What they already tried and what happened: ${tried || '(nothing specified)'}
+Resources and advantages already available: ${resources || '(none specified)'}
+Constraints the plan must protect: ${constraints || '(none specified)'}
 Their biggest obstacle right now: ${obstacle || '(not specified)'}
 Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensity)
-Self-rated belief they'll achieve this (1-10): ${belief_score ?? '(not specified)'}
+Realistic days or time blocks: ${schedule || '(not specified)'}
+What would make the first seven days successful: ${first_week || '(not specified)'}
 
-Build their strategic funnel plan now.`;
+Build their strategic plan now. Week 1 must directly deliver the first-week success test, and the later weeks must credibly bridge their baseline to the measurable 90-day outcome within the stated time and constraints.`;
 }
 
 async function callGeminiOnce(goalData) {
@@ -486,7 +468,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { goal, why, progress, obstacle, hours, category, belief_score } = body ?? {};
+  const { goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, category } = body ?? {};
   if (!goal?.trim()) return res.status(400).json({ error: 'Goal is required' });
 
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
@@ -495,17 +477,14 @@ export default async function handler(req, res) {
   const deadlineAt = requestStart + config.maxDuration * 1000;
 
   const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
-  if (!claimed) {
-    return res.status(403).json({ error: 'This account already has a goal — only one goal is allowed per account' });
-  }
+  if (!claimed) return res.status(500).json({ error: 'Could not prepare plan generation' });
 
   try {
-    const plan = await callGemini({ goal, why, progress, obstacle, hours, intensity, category, belief_score }, deadlineAt);
+    const plan = await callGemini({ goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, intensity, category }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     await saveGenerationResult(user.id, body, { ...plan, intensity }, serviceRoleKey);
     return res.status(200).json({ plan: { ...plan, intensity } });
   } catch (err) {
-    await releaseGeneration(user.id, serviceRoleKey);
     const status = err.status || 500;
     console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);
     return res.status(status).json({ error: err.message || 'Failed to generate plan' });
