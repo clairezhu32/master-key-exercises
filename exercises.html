@@ -1140,6 +1140,8 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
     /* Lucky brand alignment */
+    body, button, input, textarea, select { font-family: 'DM Sans', sans-serif; }
+    h1, h2, h3,
     .header-title, .progress-count, .list-hero h1, .card-title, .ex-title,
     .ex-lesson, .ex-affirmation, .goal-display-text, .journey-goal-text,
     .timer-time, .intro-hero h1, .intro-tagline, .intro-section h2,
@@ -1152,11 +1154,14 @@
     .exercise-card:hover { border-color: rgba(157,140,255,.55); background: rgba(25,33,61,.96); }
     .exercise-card.completed { border-color: rgba(113,229,193,.38); }
     .exercise-card.completed::after, .progress-bar-fill { background: linear-gradient(90deg,var(--green),var(--gold)); }
-    .goal-banner, .journey-card, .intention-wrap { border-color: rgba(157,140,255,.25); }
+    .goal-banner, .journey-card, .intention-wrap, .exercise-instructions,
+    .ex-affirmation, .intro-quote, .journal-entry { border-color: rgba(157,140,255,.25); }
+    .exercise-card, .goal-banner, .journey-card, .intention-wrap,
+    .exercise-instructions, .journal-entry { background-color: var(--card); }
     .ex-affirmation.personalized { border-color: rgba(157,140,255,.45); }
-    .start-btn, .intro-cta { background: linear-gradient(110deg,var(--green),#ab9eff); color:#07140f; border-color:transparent; font-weight:700; }
+    .start-btn, .intro-cta { background: linear-gradient(110deg,var(--green),var(--gold)); color:#07140f; border-color:transparent; font-weight:700; }
     .complete-btn { background: var(--green); border-color: var(--green); color:#07140f; }
-    button, input, textarea, select { font-family: 'DM Sans', sans-serif; }
+    .exercise-card, button, input, textarea, select { -webkit-tap-highlight-color: rgba(157,140,255,.15); }
 
     @media (max-width: 700px) {
       .header { padding: 16px; }
