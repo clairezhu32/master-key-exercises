@@ -75,6 +75,7 @@
     .exercise-links { display:flex; flex-wrap:wrap; gap:9px; }
     .exercise-link { padding:10px 13px; border:1px solid rgba(157,140,255,.3); border-radius:8px; color:var(--text); background:rgba(157,140,255,.08); text-decoration:none; font-size:12px; }
     .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+    .plan-allowance { width:100%; color:var(--muted); font-size:12px; }
     .secondary { min-height:44px; padding:0 18px; border:1px solid var(--line); border-radius:9px; color:var(--text); background:transparent; }
     .auth-overlay { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:20px; background:rgba(4,6,14,.82); backdrop-filter:blur(8px); }
     .auth-modal { width:min(430px,100%); padding:32px; border:1px solid var(--line); border-radius:20px; background:var(--panel); text-align:center; }
@@ -113,7 +114,7 @@
     </section>
 
     <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
-    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your execution progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended focus exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin an exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
+    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your execution progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended focus exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><div class="plan-allowance" id="plan-allowance"></div><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin an exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
     <section class="card center" id="error-view"><h2>We couldn’t build the plan yet.</h2><p id="error-message"></p><button class="primary" id="retry" style="margin-top:22px">Try again</button></section>
   </main>
 
@@ -156,7 +157,7 @@
         const token = currentSession?.access_token; if(!token) { showView('wizard'); openAuth(); return; }
         const response = await fetch('/api/decompose-goal',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(answers)});
         const data = await response.json(); if(!response.ok) throw new Error(data.error || `Generation failed (${response.status})`);
-        const saved = {answers,plan:data.plan,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); renderPlan(saved);
+        const saved = {answers,plan:data.plan,usage:data.usage,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); renderPlan(saved);
       } catch(error) { document.getElementById('error-message').textContent = `${error.message}. Your answers are still saved, so you can retry.`; showView('error-view'); }
       finally { generationInFlight = false; }
     }
@@ -203,17 +204,22 @@
       });
       updateProgressSummary(saved);
       const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?part=${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
+      const usage=saved.usage; const buildAnother=document.getElementById('build-another'); const allowance=document.getElementById('plan-allowance');
+      if(usage){ allowance.textContent=usage.remaining>0 ? `${usage.remaining} of ${usage.limit} Master Plan generations remaining` : 'You have used all 3 Master Plan generations for this account.'; buildAnother.disabled=usage.remaining<=0; buildAnother.textContent=usage.remaining>0 ? 'Build another plan' : 'Plan limit reached'; }
       showView('result'); window.scrollTo({top:0});
     }
 
     document.getElementById('retry').addEventListener('click', () => { const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(draft) generatePlan(draft); else showView('wizard'); });
-    document.getElementById('build-another').addEventListener('click', () => { localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
+    document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
+
+    async function fetchUsage() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/decompose-goal',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data.usage : null; } catch { return null; } }
 
     async function init() {
       const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
       if(currentSession && localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
       const saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
+      if(saved && currentSession){ const usage=await fetchUsage(); if(usage){ saved.usage=usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); } }
       if(saved && (!currentSession || saved.ownerId === currentSession.user.id)) renderPlan(saved);
     }
     init();
