@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Turn your answers into a personalized 90-day plan with weekly milestones and focused actions.">
-  <title>Lucky Builder — 90-Day Master Plan</title>
+  <title>Lucky — 90-Day Master Plan</title>
   <style>
     :root { --bg:#080b17; --panel:#131a33; --panel2:#0f152b; --line:rgba(255,255,255,.11); --text:#f7f5ff; --muted:#a8adc2; --violet:#9d8cff; --mint:#71e5c1; }
     * { box-sizing:border-box; margin:0; padding:0; }
@@ -67,7 +67,7 @@
 </head>
 <body>
   <main class="shell">
-    <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky Builder</span></a>
+    <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
 
     <section class="card" id="wizard">
       <div class="step active" id="step-1">
@@ -91,12 +91,12 @@
       <div class="step" id="step-9"><div class="num">Question 9 of 9</div><div class="question">What would make the first seven days a success?</div><div class="hint">Choose a small, observable proof of momentum—not the whole 90-day result.</div><textarea id="first-week" placeholder="In the first seven days, I will…"></textarea><div class="nav"><button class="back" data-back="8">← Back</button><span class="progress">9 / 9</span><button class="primary" id="finish">Build My Master Plan →</button></div><div class="error-inline" id="finish-error"></div></div>
     </section>
 
-    <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky Builder is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
+    <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
     <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended focus exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin an exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
     <section class="card center" id="error-view"><h2>We couldn’t build the plan yet.</h2><p id="error-message"></p><button class="primary" id="retry" style="margin-top:22px">Try again</button></section>
   </main>
 
-  <div class="auth-overlay" id="auth-overlay"><div class="auth-modal"><button class="auth-close" id="auth-close">×</button><h2>Sign in to build your plan</h2><p>Your answers are saved. Sign in with Google and Lucky Builder will generate the roadmap when you return.</p><button class="google" id="google-sign-in">Continue with Google</button></div></div>
+  <div class="auth-overlay" id="auth-overlay"><div class="auth-modal"><button class="auth-close" id="auth-close">×</button><h2>Sign in to build your plan</h2><p>Your answers are saved. Sign in with Google and Lucky will generate the roadmap when you return.</p><button class="google" id="google-sign-in">Continue with Google</button></div></div>
 
   <script>
     const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
