@@ -1,6 +1,6 @@
--- Replaces the Stripe subscription gate on /goals with a free one-plan-per-account
--- limit. Uniqueness on both user_id and email means deleting and recreating an
--- account with the same email doesn't grant a second free generation.
+-- Replaces the Stripe subscription gate on /goals. The application now allows
+-- three successful plans per account (the original plus two revisions), with
+-- usage stored in goal_data and enforced by the server.
 CREATE TABLE IF NOT EXISTS mks_goal_generations (
   id            uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id       uuid        REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
