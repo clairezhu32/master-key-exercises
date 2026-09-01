@@ -1179,9 +1179,10 @@
     .sound-options { display: flex; flex-wrap: wrap; gap: 8px; }
     .sound-btn { min-height: 38px; padding: 0 13px; border: 1px solid var(--border); border-radius: 9px; color: var(--text-dim); background: transparent; cursor: pointer; }
     .sound-btn:hover, .sound-btn.active { border-color: var(--gold); color: var(--text); background: var(--gold-glow); }
-    .sound-controls { display: flex; align-items: center; gap: 12px; }
+    .sound-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .sound-stop { padding: 7px 11px; border: 0; border-radius: 8px; color: #07140f; background: var(--green); font-weight: 700; cursor: pointer; }
     .sound-volume { width: min(190px,50vw); accent-color: var(--gold); }
+    .sound-duration { min-height: 36px; padding: 0 9px; border: 1px solid var(--border); border-radius: 8px; color: var(--text); background: var(--surface); }
     .sound-status { color: var(--text-faint); font-size: .75rem; }
 
     @media (max-width: 700px) {
@@ -1305,6 +1306,14 @@
         </div>
         <div class="sound-controls">
           <button class="sound-stop" id="sound-stop" type="button">Stop sound</button>
+          <select class="sound-duration" id="sound-duration" aria-label="Sound duration">
+            <option value="0">Play continuously</option>
+            <option value="5">5 minutes</option>
+            <option value="10" selected>10 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="30">30 minutes</option>
+          </select>
           <input class="sound-volume" id="sound-volume" type="range" min="0" max="100" value="28" aria-label="Sound volume">
           <span class="sound-status" id="sound-status">Sound off</span>
         </div>
@@ -2584,12 +2593,16 @@ let ambientContext = null;
 let ambientGain = null;
 let ambientNodes = [];
 let activeSound = '';
+let ambientBaseVolume = .035;
+let ambientStopTimer = null;
+let ambientCountdownTimer = null;
+let ambientEndsAt = 0;
 
 function ensureAmbientContext() {
   if (!ambientContext) {
     ambientContext = new (window.AudioContext || window.webkitAudioContext)();
     ambientGain = ambientContext.createGain();
-    ambientGain.gain.value = .035;
+    ambientGain.gain.value = ambientBaseVolume;
     ambientGain.connect(ambientContext.destination);
   }
   if (ambientContext.state === 'suspended') ambientContext.resume();
@@ -2604,12 +2617,40 @@ function updateSoundUI(type = '') {
   activeSound = type;
   document.querySelectorAll('.sound-btn').forEach(button => button.classList.toggle('active', button.dataset.sound === type));
   const names = {rain:'Soft rain playing', brown:'Brown noise playing', tones:'Gentle tones playing'};
-  document.getElementById('sound-status').textContent = names[type] || 'Sound off';
+  const remaining = ambientEndsAt ? Math.max(0, Math.ceil((ambientEndsAt - Date.now()) / 1000)) : 0;
+  const time = remaining ? ` · ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2,'0')}` : '';
+  document.getElementById('sound-status').textContent = type ? `${names[type]}${time}` : 'Sound off';
 }
 
 function stopAmbientSound() {
+  clearTimeout(ambientStopTimer);
+  clearInterval(ambientCountdownTimer);
+  ambientStopTimer = null;
+  ambientCountdownTimer = null;
+  ambientEndsAt = 0;
   clearAmbientNodes();
   updateSoundUI('');
+}
+
+function scheduleAmbientStop() {
+  clearTimeout(ambientStopTimer);
+  clearInterval(ambientCountdownTimer);
+  const minutes = Number(document.getElementById('sound-duration').value);
+  if (!activeSound || !minutes) {
+    ambientEndsAt = 0;
+    updateSoundUI(activeSound);
+    return;
+  }
+  ambientEndsAt = Date.now() + minutes * 60 * 1000;
+  ambientStopTimer = setTimeout(stopAmbientSound, minutes * 60 * 1000);
+  ambientCountdownTimer = setInterval(() => updateSoundUI(activeSound), 1000);
+  updateSoundUI(activeSound);
+}
+
+function setAmbientDucked(ducked) {
+  if (!ambientContext || !ambientGain) return;
+  const target = ducked && activeSound ? ambientBaseVolume * .35 : ambientBaseVolume;
+  ambientGain.gain.setTargetAtTime(target, ambientContext.currentTime, .12);
 }
 
 function createNoiseSource(kind) {
@@ -2659,6 +2700,7 @@ function playAmbientSound(type) {
   if (type === 'tones') createGentleTones();
   else createNoiseSource(type);
   updateSoundUI(type);
+  scheduleAmbientStop();
 }
 
 document.querySelectorAll('.sound-btn').forEach(button => button.addEventListener('click', () => {
@@ -2666,9 +2708,11 @@ document.querySelectorAll('.sound-btn').forEach(button => button.addEventListene
   else playAmbientSound(button.dataset.sound);
 }));
 document.getElementById('sound-stop').addEventListener('click', stopAmbientSound);
+document.getElementById('sound-duration').addEventListener('change', () => scheduleAmbientStop());
 document.getElementById('sound-volume').addEventListener('input', event => {
   ensureAmbientContext();
-  ambientGain.gain.setTargetAtTime((Number(event.target.value) / 100) * .12, ambientContext.currentTime, .05);
+  ambientBaseVolume = (Number(event.target.value) / 100) * .12;
+  ambientGain.gain.setTargetAtTime(ambientBaseVolume, ambientContext.currentTime, .05);
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopAmbientSound(); });
 
@@ -2831,8 +2875,6 @@ function renderSessions(part) {
 
 // ── Back button ───────────────────────────────
 document.getElementById('back-btn').addEventListener('click', () => {
-  clearInterval(timerInterval);
-  timerRunning = false;
   stopVoice();
   goToList();
 });
@@ -2891,9 +2933,8 @@ function buildNarrationSegments(ex, intention, previousIntention) {
   // B — goal opening (varies by part + goal + name)
   if (goal) {
     const greeting = name ? `${name}, you` : 'You';
-    const p = PART_PERSONALIZATION[ex.part - 1];
     const gk = audioHash(`${ex.part}|${goal}|${name}`);
-    segments.push({ key: `en-b-${gk}`, text: `${greeting} are here working toward ${goal}.\n${applyGoalText(p.bridge, goal)}` });
+    segments.push({ key: `en-b-${gk}`, text: `${greeting} are here working toward ${goal}.\n${applyGoalText(ex.goalBridge, goal)}` });
   }
 
   // C — lesson (stable per exercise)
@@ -2911,23 +2952,25 @@ function buildNarrationSegments(ex, intention, previousIntention) {
     segments.push({ key: `en-d-${audioHash(`${intention}|${previousIntention}`)}`, text: lines.join('\n\n') });
   }
 
-  // E — steps (stable per exercise)
-  segments.push({ key: `en-e-${ex.part}`, text: `Let us begin.\n\n${ex.steps.join('\n\n')}` });
+  // E — arrival + detailed practice (stable per exercise)
+  segments.push({ key: `en-e2-${ex.part}`, text: `Let us begin. Put both feet on the floor. Let your eyes rest on one point, or close them if comfortable. Take three easy breaths. Notice one body sensation and name your present emotion. You can be curious without judging what you find.\n\n${ex.steps.join('\n\n')}\n\nHere is an example. ${ex.example}\n\nIf you feel stuck: ${ex.stuck}` });
 
   // F — affirmation (varies by part + goal)
   if (goal) {
-    const p = PART_PERSONALIZATION[ex.part - 1];
-    segments.push({ key: `en-f-${audioHash(`${ex.part}|${goal}`)}`, text: `Hold this in mind: ${applyGoalText(p.affirmation, goal)}` });
+    segments.push({ key: `en-f2-${audioHash(`${ex.part}|${goal}`)}`, text: `Hold this in mind: ${applyGoalText(ex.goalCue, goal)}` });
   } else {
     segments.push({ key: `en-f-${ex.part}`, text: `Hold this in mind: ${ex.affirmation}` });
   }
 
-  // G — closing intention (varies by intention only)
+  // G — reflection + closing intention and action
+  segments.push({ key: `en-h-${ex.part}`, text: `Before you finish, reflect: ${ex.reflect}\n\nNow close with action. ${ex.act}` });
   if (intention) {
     segments.push({ key: `en-g-${audioHash(intention)}`, text: `Return now to your intention: ${intention}. Carry it with you as you close this session.` });
   }
 
-  return segments;
+  const fullText = segments.map(segment => segment.text).join('\n\n');
+  const narrationKey = audioHash(`v3|${ex.part}|${goal}|${name}|${intention}|${previousIntention}`);
+  return [{ key: `en-full-${narrationKey}`, text: fullText }];
 }
 
 function setVoiceState(state) {
@@ -2978,6 +3021,7 @@ function stopVoice() {
     voiceAudio = null;
   }
   voicePlaying = false;
+  setAmbientDucked(false);
   setVoiceState('idle');
 }
 
@@ -3029,21 +3073,23 @@ async function speakExercise(ex) {
       showVoiceError(`${failedCount} segment${failedCount > 1 ? 's' : ''} couldn't load (voice service is rate-limited) — playing the rest.`);
     }
     voicePlaying = true;
+    setAmbientDucked(true);
     setVoiceState('playing');
     let idx = 0;
     function playNext() {
       while (idx < buffers.length && !buffers[idx]) idx++;
-      if (idx >= buffers.length || !voicePlaying) { voicePlaying = false; setVoiceState('idle'); return; }
+      if (idx >= buffers.length || !voicePlaying) { voicePlaying = false; setAmbientDucked(false); setVoiceState('idle'); return; }
       const url = URL.createObjectURL(new Blob([buffers[idx]], { type: 'audio/wav' }));
       voiceAudio = new Audio(url);
       voiceAudio.playbackRate = 1;
       voiceAudio.addEventListener('ended', () => { URL.revokeObjectURL(url); idx++; playNext(); });
-      voiceAudio.addEventListener('error', () => { URL.revokeObjectURL(url); showVoiceError('Playback error. Try again.'); voicePlaying = false; setVoiceState('idle'); });
-      voiceAudio.play().catch(() => { showVoiceError('Playback error. Try again.'); voicePlaying = false; setVoiceState('idle'); });
+      voiceAudio.addEventListener('error', () => { URL.revokeObjectURL(url); showVoiceError('Playback error. Try again.'); voicePlaying = false; setAmbientDucked(false); setVoiceState('idle'); });
+      voiceAudio.play().catch(() => { showVoiceError('Playback error. Try again.'); voicePlaying = false; setAmbientDucked(false); setVoiceState('idle'); });
     }
     playNext();
   } catch (err) {
     voicePlaying = false;
+    setAmbientDucked(false);
     setVoiceState('idle');
     showVoiceError(
       err.message.includes('API key')
@@ -3071,8 +3117,6 @@ function goToList() {
 // Header logo → exercises list
 document.getElementById('header-logo').addEventListener('click', () => {
   stopVoice();
-  clearInterval(timerInterval);
-  timerRunning = false;
   goToList();
 });
 
