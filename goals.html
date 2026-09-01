@@ -145,7 +145,7 @@
     const DRAFT_KEY = 'lucky_builder_draft_v1';
     const PLAN_KEY = 'lucky_builder_plan_v1';
     const PENDING_KEY = 'lucky_builder_generation_pending';
-    const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp';
+    const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp' || new URLSearchParams(window.location.search).get('cohort') === 'bootcamp';
     let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null;
     if(cohortMode) { document.querySelector('.beta-note').style.display='flex'; document.title='Lucky — Job Search Founding Cohort'; }
 
