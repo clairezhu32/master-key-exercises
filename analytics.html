@@ -47,6 +47,9 @@
     }
     .stat-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
     .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--gold-light); line-height: 1; }
+    .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+    .stat-grid .stat-tile { margin:0; padding:22px; }
+    .stat-grid .stat-value { font-size:38px; }
 
     .chart-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
@@ -69,6 +72,12 @@
     td { padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text); }
     tr:last-child td { border-bottom: none; }
     .cell-muted { color: var(--muted); }
+    .feedback-list { display:grid; gap:12px; }
+    .feedback-item { padding:16px; border:1px solid var(--border); border-radius:11px; background:rgba(255,255,255,.018); }
+    .feedback-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin-bottom:11px; font-size:11px; color:var(--muted); }
+    .feedback-answer { margin-top:8px; font-size:12px; line-height:1.5; }
+    .feedback-answer strong { display:block; color:var(--gold-light); font-weight:500; }
+    @media(max-width:600px){ .stat-grid{grid-template-columns:1fr}.feedback-meta{display:block} }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
 </head>
@@ -101,9 +110,10 @@
   <div id="view-error" class="center-state" style="display:none"></div>
 
   <div id="view-dashboard" style="display:none">
-    <div class="stat-tile">
-      <div class="stat-label">Total registrations</div>
-      <div class="stat-value" id="stat-total">0</div>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="stat-label">Total registrations</div><div class="stat-value" id="stat-total">0</div></div>
+      <div class="stat-tile"><div class="stat-label">Beta members</div><div class="stat-value" id="stat-beta">0</div></div>
+      <div class="stat-tile"><div class="stat-label">Feedback responses</div><div class="stat-value" id="stat-feedback">0</div></div>
     </div>
 
     <div class="chart-card">
@@ -119,6 +129,10 @@
         </thead>
         <tbody id="recent-table-body"></tbody>
       </table>
+    </div>
+    <div class="table-card" style="margin-top:24px">
+      <div class="chart-title">Founding-member feedback</div>
+      <div class="feedback-list" id="feedback-list"></div>
     </div>
   </div>
 
@@ -246,6 +260,13 @@ function renderRecentTable(recent) {
   });
 }
 
+function labelize(value) { return value.replaceAll('_',' ').replace(/\b\w/g,letter=>letter.toUpperCase()); }
+function renderFeedback(feedback) {
+  const list=document.getElementById('feedback-list'); list.replaceChildren();
+  if(!feedback.length){ const empty=document.createElement('div'); empty.className='cell-muted'; empty.textContent='No beta feedback yet.'; list.appendChild(empty); return; }
+  feedback.forEach(item=>{ const card=document.createElement('article'); card.className='feedback-item'; const meta=document.createElement('div'); meta.className='feedback-meta'; const identity=document.createElement('span'); identity.textContent=`${item.email} · ${labelize(item.stage)}`; const when=document.createElement('span'); when.textContent=new Date(item.submitted_at).toLocaleString(); meta.append(identity,when); card.appendChild(meta); Object.entries(item.answers||{}).forEach(([question,answer])=>{ const row=document.createElement('div'); row.className='feedback-answer'; const label=document.createElement('strong'); label.textContent=labelize(question); const value=document.createElement('span'); value.textContent=answer||'—'; row.append(label,value); card.appendChild(row); }); list.appendChild(card); });
+}
+
 async function loadDashboard() {
   show('view-loading');
   try {
@@ -257,8 +278,11 @@ async function loadDashboard() {
     if (!res.ok) throw new Error(`Error ${res.status}`);
     const data = await res.json();
     document.getElementById('stat-total').textContent = data.totalRegistrations;
+    document.getElementById('stat-beta').textContent = data.beta?.members || 0;
+    document.getElementById('stat-feedback').textContent = data.beta?.feedbackSubmissions || 0;
     renderBarChart(data.daily);
     renderRecentTable(data.recent);
+    renderFeedback(data.beta?.feedback || []);
     show('view-dashboard');
   } catch (err) {
     document.getElementById('view-error').textContent = `Couldn't load analytics: ${err.message}`;

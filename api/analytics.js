@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   if (!isAdmin(user.email)) return res.status(403).json({ error: 'Not authorized' });
 
   try {
-    const [allRes, recentRes] = await Promise.all([
+    const [allRes, recentRes, betaRes] = await Promise.all([
       fetch(
         `${SUPABASE_URL}/rest/v1/mks_events?event_name=eq.user_registered&select=created_at&order=created_at.asc`,
         {
@@ -66,15 +66,28 @@ export default async function handler(req, res) {
         `${SUPABASE_URL}/rest/v1/mks_events?event_name=eq.user_registered&select=email,properties,created_at&order=created_at.desc&limit=20`,
         { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
       ),
+      fetch(
+        `${SUPABASE_URL}/rest/v1/mks_goal_generations?select=email,goal_data&order=generated_at.desc&limit=250`,
+        { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
+      ),
     ]);
 
-    if (!allRes.ok || !recentRes.ok) {
-      throw new Error(`mks_events query failed: ${allRes.status}/${recentRes.status}`);
+    if (!allRes.ok || !recentRes.ok || !betaRes.ok) {
+      throw new Error(`analytics query failed: ${allRes.status}/${recentRes.status}/${betaRes.status}`);
     }
 
     const totalRegistrations = Number(allRes.headers.get('content-range')?.split('/')[1] || 0);
     const allTimestamps = await allRes.json();
     const recent = await recentRes.json();
+    const betaRows = await betaRes.json();
+    const betaMembers = betaRows.filter((row) => row.goal_data?._beta_access);
+    const feedback = betaRows.flatMap((row) => Object.entries(row.goal_data?._beta_feedback || {}).map(([stage, entry]) => ({
+      email: row.email,
+      stage,
+      answers: entry.answers || {},
+      submitted_at: entry.submitted_at,
+      campaign: row.goal_data?._beta_access?.campaign || 'existing-user',
+    }))).sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at));
 
     // Bucket into the last 30 UTC days, including days with zero.
     const dayBuckets = new Map();
@@ -91,7 +104,7 @@ export default async function handler(req, res) {
     }
     const daily = [...dayBuckets.entries()].map(([date, count]) => ({ date, count }));
 
-    return res.status(200).json({ totalRegistrations, daily, recent });
+    return res.status(200).json({ totalRegistrations, daily, recent, beta: { members: betaMembers.length, feedbackSubmissions: feedback.length, feedback } });
   } catch (err) {
     console.error('analytics query failed:', err);
     return res.status(500).json({ error: 'Failed to load analytics' });

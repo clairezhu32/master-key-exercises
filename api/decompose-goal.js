@@ -85,7 +85,7 @@ async function claimGeneration(userId, email, serviceRoleKey) {
   const [record] = await stateRes.json();
   const storedCount = Number(record?.goal_data?._generation_count);
   const used = Number.isFinite(storedCount) ? storedCount : record?.plan ? 1 : 0;
-  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT };
+  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT, goalData: record?.goal_data || {}, hasPlan: Boolean(record?.plan) };
 }
 
 // mks_goal_generations is also the durable copy of the plan itself:
@@ -94,7 +94,7 @@ async function claimGeneration(userId, email, serviceRoleKey) {
 // lose a plan that had actually succeeded, since it previously only ever
 // lived in the browser's localStorage. This write also advances the account's
 // successful-generation count, so a failed write must not report success.
-async function saveGenerationResult(userId, goalData, plan, generationCount, serviceRoleKey) {
+async function saveGenerationResult(userId, goalData, plan, generationCount, serviceRoleKey, existingGoalData = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
     method: 'PATCH',
     headers: {
@@ -103,7 +103,7 @@ async function saveGenerationResult(userId, goalData, plan, generationCount, ser
       'Content-Type': 'application/json',
       Prefer: 'return=minimal',
     },
-    body: JSON.stringify({ goal_data: { ...goalData, _generation_count: generationCount }, plan, generated_at: new Date().toISOString() }),
+    body: JSON.stringify({ goal_data: { ...existingGoalData, ...goalData, _generation_count: generationCount }, plan, generated_at: new Date().toISOString() }),
   });
   if (!res.ok) console.error(`Failed to save generation result for user ${userId}: ${res.status}`);
   return res.ok;
@@ -496,13 +496,14 @@ export default async function handler(req, res) {
 
   const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
   if (!claimed) return res.status(500).json({ error: 'Could not prepare plan generation' });
+  if (!claimed.goalData?._beta_access && !claimed.hasPlan) return res.status(403).json({ error: 'Enter your Lucky beta invitation code before building a plan.', code: 'INVITE_REQUIRED' });
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {
     const plan = await callGemini({ goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, intensity, category }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
-    const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey);
+    const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);
     if (!saved) { const saveError = new Error('Your plan was created but could not be saved. Please try again.'); saveError.status = 500; throw saveError; }
     return res.status(200).json({ plan: { ...plan, intensity }, usage: { used: generationCount, remaining: PLAN_GENERATION_LIMIT - generationCount, limit: PLAN_GENERATION_LIMIT } });
   } catch (err) {
