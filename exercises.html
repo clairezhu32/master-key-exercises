@@ -1182,7 +1182,7 @@
 <header class="header">
   <div id="header-logo" style="cursor:pointer">
     <div class="header-title">Lucky</div>
-    <div class="header-subtitle">Charles F. Haanel · 1919</div>
+    <div class="header-subtitle">Rewire beliefs · Take action</div>
   </div>
   <div class="header-nav">
     <a class="header-nav-link" href="/">Introduction</a>
@@ -1226,8 +1226,8 @@
   </div>
 
   <div class="list-hero">
-    <h1>Twenty-Four <em>Exercises</em><br>in Mental Mastery</h1>
-    <p>Haanel designed this as a 24-week course — one part per week. This app paces it across 12 weeks instead, two parts at a time, while keeping his core instruction: don't move on until the current exercise feels effortless and automatic. That said, follow your own rhythm. Some people spend an extra week or two on a part; others move faster. What matters is that each layer is genuinely absorbed before the next is added.</p>
+    <h1>Twenty-Four <em>Rewiring Practices</em><br>for Real-World Action</h1>
+    <p>Short, goal-specific sessions to notice limiting beliefs, rehearse a more useful response, and take one concrete action. Practice two each week alongside your 90-day action plan. These are coaching and reflection exercises—not therapy or medical treatment.</p>
   </div>
   <div class="exercises-grid" id="exercises-grid"></div>
 </div>
@@ -1248,7 +1248,7 @@
 
     <!-- Lesson context -->
     <div class="ex-section">
-      <div class="ex-section-label">From the Lesson</div>
+        <div class="ex-section-label">Rewiring Prompt</div>
       <p class="ex-lesson" id="ex-lesson"></p>
     </div>
 
@@ -1284,7 +1284,7 @@
           </div>
         </div>
         <div class="timer-done-banner" id="timer-done-banner">
-          Session complete. Take a moment before opening your eyes.
+          Rewiring complete. Take your next action while the intention is fresh.
         </div>
         <div class="timer-controls">
           <button class="btn btn-primary" id="btn-start">Begin</button>
@@ -1322,7 +1322,7 @@
 
     <!-- Affirmation -->
     <div class="ex-section" id="affirmation-section">
-      <div class="ex-section-label">Affirmation / Focus</div>
+      <div class="ex-section-label">Identity Cue</div>
       <div class="ex-affirmation" id="ex-affirmation"></div>
     </div>
 
@@ -1342,7 +1342,7 @@
     <div class="ex-section journal-wrap">
       <div class="ex-section-label">Session Notes</div>
       <textarea class="journal-textarea" id="journal-textarea"
-        placeholder="What did you notice? What arose? What shifted? Write freely — this is only for you."></textarea>
+        placeholder="What belief did you notice? What new response will you practice? What action will you take now?"></textarea>
       <div class="journal-save-row">
         <button class="btn" id="btn-save-note">Save note</button>
         <span class="journal-saved-note" id="save-note-feedback">Saved</span>
@@ -1994,6 +1994,230 @@ const EXERCISES = [
   }
 ];
 
+// Lucky's practical rewiring curriculum. These original coaching exercises draw on
+// belief flexibility, focused suggestion, gratitude, courage and curiosity. Every
+// session ends with observable behavior so reflection supports execution.
+const REWIRING_EXERCISES = [
+  {
+    title: "Thoughts Are Not Facts", theme: "Separate belief from reality",
+    lesson: "A limiting thought can feel true without being a fact. Naming it as a thought creates enough distance to choose a better response.",
+    steps: ["Name the goal-related thought holding you back.", "Say: ‘I am noticing the thought that…’", "List one fact supporting it and two facts that do not.", "Choose a more accurate, useful belief.", "Take one two-minute action that the new belief makes possible."],
+    affirmation: "I can question a thought and choose my next action.",
+    insight: "The goal is not forced positivity. It is cognitive flexibility: treating an interpretation as testable rather than absolute.", defaultDuration: 10,
+    goalBridge: "Identify the thought that makes {goal} feel less possible. Test it, replace it with a more workable interpretation, and act once from that interpretation.",
+    goalCue: "I do not need certainty about {goal}. I need one useful thought and one next action."
+  },
+  {
+    title: "The Cost of Staying the Same", theme: "Turn avoidance into motivation",
+    lesson: "Avoidance feels safe today but quietly compounds. Looking honestly at its future cost can make a small action feel easier than continued delay.",
+    steps: ["Picture your current pattern continuing for one year.", "Notice the cost to your time, confidence, relationships, health or work.", "Now picture the same pattern continuing for five years.", "Name what you refuse to lose.", "Choose the smallest action that changes the direction today."],
+    affirmation: "Changing direction today is kinder than staying stuck.",
+    insight: "Use consequence awareness to clarify—not frighten or shame yourself. End with a manageable action.", defaultDuration: 10,
+    goalBridge: "Imagine postponing {goal} for one year, then five. Let the cost clarify why today’s smallest step matters.",
+    goalCue: "I choose one step toward {goal} today instead of another day of delay."
+  },
+  {
+    title: "Future Identity", theme: "Act from who you are becoming",
+    lesson: "Goals become easier to execute when the desired behavior fits your identity. Rehearse being the person who follows through, then prove it with evidence.",
+    steps: ["Imagine yourself 90 days from now after consistent effort.", "Notice how that version of you thinks, speaks and responds to friction.", "Complete: ‘I am becoming someone who…’", "Choose one behavior that proves this identity today.", "Do the first minute of it before leaving the exercise."],
+    affirmation: "I become this person through the actions I repeat.",
+    insight: "Identity is not a magical declaration; it becomes credible through accumulated behavioral evidence.", defaultDuration: 10,
+    goalBridge: "Meet the version of you who steadily pursued {goal}. Borrow one of that person’s behaviors for today.",
+    goalCue: "I am becoming the person who follows through on {goal}."
+  },
+  {
+    title: "Evidence for the New Story", theme: "Interrupt confirmation bias",
+    lesson: "The mind tends to collect proof for what it already believes. Deliberately search for evidence of capability, support and progress.",
+    steps: ["Write the limiting story you have been confirming.", "Recall three moments that contradict it—even small ones.", "Name one skill or resource each moment reveals.", "Write a balanced new story using that evidence.", "Use one revealed strength in today’s action."],
+    affirmation: "I notice evidence of my capacity and build on it.",
+    insight: "You are not ignoring problems. You are correcting an incomplete evidence set so your decisions become more accurate.", defaultDuration: 10,
+    goalBridge: "Find three pieces of evidence that you already have some capacity, support or momentum for {goal}.",
+    goalCue: "I already have evidence that I can move {goal} forward."
+  },
+  {
+    title: "Belief Flexibility", theme: "Trade certainty for possibility",
+    lesson: "Lucky people update beliefs when reality offers better information. Flexibility opens options that a rigid identity cannot see.",
+    steps: ["Name one belief about yourself or your situation that feels fixed.", "Ask: ‘When is this not true?’", "Imagine a wise person holding the opposite view.", "Write a possibility beginning with ‘What if…’", "Run one safe experiment to gather new evidence."],
+    affirmation: "I am allowed to update what I believe.",
+    insight: "This practice applies the Reddit ‘Pyramid of Luck’ theme of transforming beliefs through small intentional decisions.", defaultDuration: 10,
+    goalBridge: "Loosen one fixed belief that narrows your path to {goal}, then test a new possibility with a small experiment.",
+    goalCue: "I stay flexible enough to discover a new path to {goal}."
+  },
+  {
+    title: "Useful Gratitude", theme: "See resources already present",
+    lesson: "Gratitude is most useful when it sharpens perception. Notice what is working, then convert appreciation into stewardship and action.",
+    steps: ["Name three resources, people or opportunities you appreciate today.", "For each, write why it matters to your goal.", "Choose one resource you have underused.", "Decide how to use or reciprocate it responsibly.", "Take that action today."],
+    affirmation: "I notice what is available and use it well.",
+    insight: "Gratitude does not guarantee outcomes. It can widen attention beyond scarcity and reveal practical resources.", defaultDuration: 10,
+    goalBridge: "Identify what is already supporting {goal}. Turn gratitude into one responsible use of that support.",
+    goalCue: "I recognize the support around {goal}, and I put it to work."
+  },
+  {
+    title: "The Courage Step", theme: "Move before confidence arrives",
+    lesson: "Courage is not the absence of discomfort. It is choosing a worthwhile action while discomfort is present.",
+    steps: ["Name the action you are avoiding.", "Rate the discomfort from 1 to 10.", "Shrink the action until it is challenging but safe—around a 3 or 4.", "Rehearse starting it calmly.", "Schedule or complete the step within 24 hours."],
+    affirmation: "I can feel discomfort and still move.",
+    insight: "Courage is one of the Reddit framework’s core catalysts. Calibrated action builds confidence more reliably than waiting.", defaultDuration: 10,
+    goalBridge: "Choose one safe but uncomfortable step toward {goal}. Make it small enough to do within 24 hours.",
+    goalCue: "Courage for {goal} means taking the next workable step."
+  },
+  {
+    title: "The Curiosity Experiment", theme: "Replace judgment with learning",
+    lesson: "Curiosity turns a high-stakes verdict into an experiment. You do not need to prove yourself; you need to learn what works.",
+    steps: ["Turn your current worry into a question.", "Write one prediction you want to test.", "Design the smallest low-cost experiment.", "Define what you will observe—not whether you ‘win.’", "Run the experiment and record what you learn."],
+    affirmation: "I do not need to know; I am willing to learn.",
+    insight: "Curiosity, paired with courage, generates more attempts and therefore more opportunities for useful luck.", defaultDuration: 10,
+    goalBridge: "Turn uncertainty about {goal} into one question and one low-cost experiment.",
+    goalCue: "I approach {goal} with curiosity, test, and learn."
+  },
+  {
+    title: "Reframe the Setback", theme: "Extract information without self-attack",
+    lesson: "A setback contains data. Separate the event from the identity judgment so you can adjust without losing momentum.",
+    steps: ["Describe what happened using only observable facts.", "Name the harsh story you added.", "Ask what the result teaches about timing, strategy or support.", "Choose one adjustment—not a total reinvention.", "Restart with the adjusted step."],
+    affirmation: "A result is information, not my identity.",
+    insight: "Resilience grows when feedback updates the plan without becoming a verdict on personal worth.", defaultDuration: 10,
+    goalBridge: "Use the latest difficulty around {goal} as data. Keep the goal, adjust one part of the approach, and restart.",
+    goalCue: "Feedback helps me improve my path to {goal}."
+  },
+  {
+    title: "Opportunity Radar", theme: "Train attention toward possibility",
+    lesson: "Focused attention changes what you notice. Define the opportunities relevant to your goal so they become easier to recognize.",
+    steps: ["List three forms an opportunity could take.", "Name where each is likely to appear.", "Identify one person, place or channel to explore.", "Imagine recognizing the opportunity and responding promptly.", "Search, ask or apply today."],
+    affirmation: "I notice relevant opportunities and respond with action.",
+    insight: "Attention does not create opportunities from nothing; it helps you detect options that were previously filtered out.", defaultDuration: 10,
+    goalBridge: "Define what a real opportunity for {goal} looks like, where it may appear, and how you will respond.",
+    goalCue: "My attention is tuned to practical opportunities for {goal}."
+  },
+  {
+    title: "Resource Map", theme: "Make support visible",
+    lesson: "People often feel stuck because needed resources remain vague. Mapping people, skills, time and tools reveals the next request or move.",
+    steps: ["Divide a page into people, skills, tools and time.", "List what you already have in each category.", "Circle the strongest underused resource.", "Name one missing resource and the easiest way to access it.", "Make one request or reserve one time block."],
+    affirmation: "I can see, organize and expand my resources.",
+    insight: "A visible resource map reduces helplessness and turns abstract need into specific acquisition steps.", defaultDuration: 10,
+    goalBridge: "Map the people, skills, tools and time already available for {goal}; activate one underused resource.",
+    goalCue: "I have resources for {goal}, and I know how to seek the next one."
+  },
+  {
+    title: "Ask a Better Question", theme: "Direct the mind toward solutions",
+    lesson: "Questions organize attention. Replace ‘Why can’t I?’ with a question that invites choices, evidence and movement.",
+    steps: ["Write the repetitive question keeping you stuck.", "Notice whether it invites blame or action.", "Rewrite it: ‘What is one way I could…?’", "Generate five imperfect answers quickly.", "Test the easiest credible answer."],
+    affirmation: "Better questions reveal better choices.",
+    insight: "Open, directional questions can soften resistance more effectively than an affirmation your mind immediately rejects.", defaultDuration: 10,
+    goalBridge: "Ask: ‘What is one realistic way I could move {goal} forward this week?’ Generate five answers and test one.",
+    goalCue: "I wonder how much progress on {goal} becomes possible through one better question."
+  },
+  {
+    title: "Behavioral Rehearsal", theme: "Practice the moment that matters",
+    lesson: "Do not visualize only the reward. Rehearse the difficult behavior—starting, asking, focusing or recovering—so it feels more familiar when required.",
+    steps: ["Choose one upcoming moment that matters.", "Picture the setting and the likely friction.", "See yourself pause and use a helpful response.", "Rehearse the exact first words or movement.", "Put the real event on your calendar."],
+    affirmation: "I have practiced how I will respond.",
+    insight: "Process rehearsal connects visualization to execution and prepares for obstacles rather than imagining effortless success.", defaultDuration: 10,
+    goalBridge: "Rehearse one upcoming behavior that advances {goal}, including the obstacle and your response to it.",
+    goalCue: "When the moment for {goal} arrives, I know how I will begin."
+  },
+  {
+    title: "Calm-and-Choose Anchor", theme: "Create a pause before reaction",
+    lesson: "A short physical cue can remind you to slow down and choose intentionally. It is a prompt, not a cure or a clinical treatment.",
+    steps: ["Place both feet on the floor and exhale slowly.", "Press thumb and finger together gently.", "Recall one moment when you acted with calm competence.", "Say your identity cue once.", "While holding the cue, begin the first step of today’s task."],
+    affirmation: "Pause. Choose. Begin.",
+    insight: "Repeatedly pairing a simple cue with deliberate action can make it a useful reminder at moments of hesitation.", defaultDuration: 5,
+    goalBridge: "Pair a calm physical cue with the first action toward {goal}, then reuse it whenever hesitation appears.",
+    goalCue: "Pause. Choose the next step for {goal}. Begin."
+  },
+  {
+    title: "If–Then Rewiring", theme: "Pre-decide your response",
+    lesson: "A useful belief becomes stronger when attached to a specific trigger and behavior. Decide in advance what you will do when friction appears.",
+    steps: ["Name the recurring trigger that interrupts progress.", "Name your usual automatic response.", "Write: ‘If [trigger], then I will [small response].’", "Mentally rehearse the trigger and new response three times.", "Place the reminder where the trigger occurs."],
+    affirmation: "When friction appears, I already know my response.",
+    insight: "Implementation intentions reduce the need to make a fresh decision in the hardest moment.", defaultDuration: 10,
+    goalBridge: "Create one if–then response for the obstacle most likely to interrupt {goal}.",
+    goalCue: "When my obstacle appears, I return to the next action for {goal}."
+  },
+  {
+    title: "Tiny Exposure", theme: "Build tolerance through safe repetition",
+    lesson: "Avoidance teaches the mind that discomfort is dangerous. A small, safe exposure teaches that you can experience it and continue.",
+    steps: ["Name the safe situation you have been avoiding.", "Create a ladder from easiest to hardest.", "Choose the easiest step that creates mild discomfort.", "Complete it without demanding perfect calm.", "Record what actually happened versus what you predicted."],
+    affirmation: "I can practice discomfort in small, safe steps.",
+    insight: "Stay within ordinary goal-related discomfort. Seek qualified support for trauma, panic, or mental-health concerns.", defaultDuration: 10,
+    goalBridge: "Choose the smallest safe exposure to a situation you avoid on the way to {goal}; compare prediction with reality.",
+    goalCue: "I build courage for {goal} through safe, repeated action."
+  },
+  {
+    title: "Create Social Luck", theme: "Increase meaningful connections",
+    lesson: "Many ‘lucky breaks’ arrive through people. Genuine curiosity, contribution and follow-through increase the surface area for connection.",
+    steps: ["Identify one community related to your goal.", "Choose one person you can learn from or help.", "Write a specific, respectful outreach message.", "Ask one curious question or offer one useful contribution.", "Schedule a follow-up instead of leaving the connection to chance."],
+    affirmation: "I create opportunities by connecting with generosity and curiosity.",
+    insight: "The Reddit framework emphasizes courage and curiosity; social follow-through turns both into opportunity.", defaultDuration: 10,
+    goalBridge: "Create one genuine connection that could support or be supported by your work toward {goal}.",
+    goalCue: "I expand the possibilities for {goal} through genuine connection."
+  },
+  {
+    title: "Lead with Value", theme: "Make opportunity reciprocal",
+    lesson: "Instead of asking only what you can receive, identify useful value you can create. Contribution builds trust, skill and opportunity.",
+    steps: ["Name the person or group you want to serve.", "Identify a real problem or desire they have.", "List three useful things you can offer now.", "Choose the smallest valuable contribution.", "Deliver it or ask whether it would help."],
+    affirmation: "I create useful value and let opportunity grow from it.",
+    insight: "Value creation is concrete: a useful introduction, insight, prototype, act of care, or completed piece of work.", defaultDuration: 10,
+    goalBridge: "Identify who benefits from {goal} and create one small piece of value for them now.",
+    goalCue: "My progress toward {goal} creates real value for others."
+  },
+  {
+    title: "Recover from Rejection", theme: "Protect momentum after a no",
+    lesson: "Rejection often activates a global story about worth. Narrow it back to one decision, then choose the next attempt.",
+    steps: ["State the rejection in one factual sentence.", "Name the meaning you automatically attached to it.", "List three alternative explanations.", "Extract any useful feedback without inventing it.", "Choose the next outreach, application or iteration."],
+    affirmation: "One no is one result, not my future.",
+    insight: "Recovery speed matters more than never feeling disappointed. Let the feeling exist without letting it write the whole story.", defaultDuration: 10,
+    goalBridge: "Separate one setback related to {goal} from your identity and decide the next attempt.",
+    goalCue: "A no does not decide {goal}; I learn and continue."
+  },
+  {
+    title: "Decision Clarity", theme: "Choose by values and evidence",
+    lesson: "Anxious thinking asks for certainty that decisions cannot provide. Clarify values, evidence and reversibility, then choose.",
+    steps: ["Name the decision in one sentence.", "List the two values that matter most.", "Separate known facts from assumptions.", "Ask whether the decision is reversible or testable.", "Choose the next decision or information-gathering step and set a deadline."],
+    affirmation: "I can make a thoughtful decision without perfect certainty.",
+    insight: "Clarity often follows commitment to a reasonable experiment, not endless internal debate.", defaultDuration: 10,
+    goalBridge: "Use values, facts and reversibility to make one decision that has been delaying {goal}.",
+    goalCue: "I make the next sound decision for {goal} without waiting for certainty."
+  },
+  {
+    title: "Letter from Day 90", theme: "Connect future progress to today",
+    lesson: "A future-self letter can make delayed benefits emotionally concrete and reveal the behaviors that created them.",
+    steps: ["Imagine the final day of your 90-day plan.", "Write a short letter from that future version of you.", "Describe what you did repeatedly—not only what you achieved.", "Thank your present self for one choice made today.", "Make that choice before the day ends."],
+    affirmation: "My future is shaped by the choice I repeat today.",
+    insight: "Keep the letter grounded in controllable behaviors so it motivates execution rather than fantasy.", defaultDuration: 10,
+    goalBridge: "Write from Day 90 after meaningful progress on {goal}; identify the action your future self thanks you for taking today.",
+    goalCue: "Today’s action is a gift to the version of me progressing toward {goal}."
+  },
+  {
+    title: "Rewrite the Inner Coach", theme: "Use language that creates movement",
+    lesson: "Harsh self-talk may feel motivating but often increases avoidance. Replace it with language that is honest, specific and directional.",
+    steps: ["Write the sentence your inner critic repeats.", "Ask whether you would use it with someone you respect.", "Keep any useful truth and remove contempt or exaggeration.", "Rewrite it as a coaching instruction.", "Follow the instruction for five minutes."],
+    affirmation: "I speak to myself in a way that helps me act.",
+    insight: "Compassion is not lowering standards. It is communicating those standards without adding shame that interferes with execution.", defaultDuration: 10,
+    goalBridge: "Replace one self-critical message about {goal} with a precise coaching instruction, then follow it for five minutes.",
+    goalCue: "I coach myself toward {goal} with honesty, respect and action."
+  },
+  {
+    title: "Weekly Luck Review", theme: "Notice, learn and adjust",
+    lesson: "Progress becomes visible when you review actions, opportunities and lessons. A weekly review prevents useful evidence from disappearing.",
+    steps: ["List three actions you completed this week.", "Record one unexpected opportunity or helpful connection.", "Name one belief that became less useful.", "Write one lesson and one adjustment.", "Choose next week’s courage step and calendar it."],
+    affirmation: "I create momentum by noticing, learning and adjusting.",
+    insight: "This integrates belief change, gratitude, courage and curiosity into the weekly execution cycle.", defaultDuration: 10,
+    goalBridge: "Review this week’s progress on {goal}, notice one opportunity, update one belief, and schedule the next courage step.",
+    goalCue: "Every week I learn how to move {goal} forward more effectively."
+  },
+  {
+    title: "Rewire to Action", theme: "Use one repeatable daily ritual",
+    lesson: "The most useful practice is one you can repeat. Use this five-part ritual whenever self-doubt interrupts execution.",
+    steps: ["NOTICE: name the limiting thought without treating it as fact.", "QUESTION: ask what is true, incomplete or still possible.", "CHOOSE: state the identity you want to practice.", "REHEARSE: picture the obstacle and your useful response.", "ACT: begin one concrete step within the next two minutes."],
+    affirmation: "Notice. Question. Choose. Rehearse. Act.",
+    insight: "Repetition links reflection to behavior. The ritual is complete only when it produces an observable next action.", defaultDuration: 5,
+    goalBridge: "Run the full five-part ritual on the thought currently blocking {goal}, then begin the next action within two minutes.",
+    goalCue: "I rewire my response to {goal} through the action I take now."
+  }
+];
+
+REWIRING_EXERCISES.forEach((exercise, index) => Object.assign(EXERCISES[index], exercise));
+
 // ── Per-part personalization ──────────────────
 // Each entry: { bridge, affirmation }
 // {goal} is replaced with the user's actual goal at render time.
@@ -2183,7 +2407,11 @@ function populateJourneySection(part) {
     return;
   }
 
-  const p = PART_PERSONALIZATION[part - 1];
+  const ex = EXERCISES[part - 1];
+  const p = {
+    bridge: ex.goalBridge || "Connect this practice directly to {goal}, then finish with one observable action.",
+    affirmation: ex.goalCue || ex.affirmation
+  };
   const bridge = applyGoalText(p.bridge, goal);
   const affirmation = applyGoalText(p.affirmation, goal);
 
@@ -2408,7 +2636,7 @@ function openExercise(part) {
   document.getElementById('ex-steps').innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
 
   // Duration buttons
-  const durations = [10, 15, 20, 25, 30];
+  const durations = [5, 10, 15, 20];
   document.getElementById('dur-row').innerHTML = durations.map(d =>
     `<button class="dur-btn ${d === selectedDuration ? 'active' : ''}" data-dur="${d}">${d} min</button>`
   ).join('');
