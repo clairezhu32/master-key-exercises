@@ -85,7 +85,7 @@ async function claimGeneration(userId, email, serviceRoleKey) {
   const [record] = await stateRes.json();
   const storedCount = Number(record?.goal_data?._generation_count);
   const used = Number.isFinite(storedCount) ? storedCount : record?.plan ? 1 : 0;
-  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT, goalData: record?.goal_data || {}, hasPlan: Boolean(record?.plan) };
+  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT, goalData: record?.goal_data || {} };
 }
 
 // mks_goal_generations is also the durable copy of the plan itself:
@@ -496,7 +496,6 @@ export default async function handler(req, res) {
 
   const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
   if (!claimed) return res.status(500).json({ error: 'Could not prepare plan generation' });
-  if (!claimed.goalData?._beta_access && !claimed.hasPlan) return res.status(403).json({ error: 'Enter your Lucky beta invitation code before building a plan.', code: 'INVITE_REQUIRED' });
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {

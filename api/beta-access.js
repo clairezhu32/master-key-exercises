@@ -93,8 +93,7 @@ export default async function handler(req, res) {
   try {
     const record = await getRecord(user.id, serviceRoleKey);
     const goalData = record?.goal_data || {};
-    const grandfathered = Boolean(record?.plan);
-    const access = goalData._beta_access || (grandfathered ? { campaign: 'existing-user', redeemed_at: record.generated_at } : null);
+    const access = goalData._beta_access || null;
     const feedback = goalData._beta_feedback || {};
 
     if (req.method === 'GET') {
