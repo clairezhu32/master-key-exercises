@@ -1184,6 +1184,9 @@
     .sound-volume { width: min(190px,50vw); accent-color: var(--gold); }
     .sound-duration { min-height: 36px; padding: 0 9px; border: 1px solid var(--border); border-radius: 8px; color: var(--text); background: var(--surface); }
     .sound-status { color: var(--text-faint); font-size: .75rem; }
+    .reflection-label { display: block; margin: 18px 0 8px; color: var(--text); font-size: .84rem; font-weight: 600; line-height: 1.5; }
+    .reflection-label:first-of-type { margin-top: 0; }
+    .reflection-answer { min-height: 82px; }
 
     @media (max-width: 700px) {
       .header { padding: 16px; }
@@ -1235,21 +1238,9 @@
 
 <!-- ── List View ─────────────────────────────── -->
 <div id="view-list" class="active">
-  <!-- Master Plan prompt (shown when no plan is available) -->
-  <div class="goal-banner" id="goal-setup-banner" style="display:none">
-    <p>Build your Master Plan to make all 24 exercises <strong>specific to your goal and obstacles</strong>.</p>
-    <a class="goal-banner-btn" href="/goals">Build my Master Plan →</a>
-  </div>
-
-  <!-- Master Plan goal (shown when a plan is available) -->
-  <div class="goal-display" id="goal-display">
-    <span class="goal-display-label">Master Plan goal</span>
-    <span class="goal-display-text" id="goal-display-text"></span>
-  </div>
-
   <div class="list-hero">
     <h1>Twenty-Four <em>Rewiring Practices</em><br>for Real-World Action</h1>
-    <p>Short, goal-specific sessions combining belief reframing, compassionate self-inquiry, body awareness, courage and curiosity—always ending in one concrete action. Practice two each week alongside your 90-day action plan. These are coaching and reflection exercises—not therapy or medical treatment. If a prompt feels overwhelming, stop and seek support from a qualified professional.</p>
+    <p>General practices for belief reframing, compassionate self-inquiry, body awareness, courage and curiosity. Apply each exercise to whatever situation matters today, then use the structured Reflection Session to capture your own answers and next action. These are coaching and reflection exercises—not therapy or medical treatment. If a prompt feels overwhelming, stop and seek support from a qualified professional.</p>
   </div>
   <div class="exercises-grid" id="exercises-grid"></div>
 </div>
@@ -1276,13 +1267,13 @@
 
     <!-- Intention -->
     <div class="ex-section">
-      <div class="ex-section-label">Your Intention</div>
+      <div class="ex-section-label">Your Session Focus</div>
       <div class="intention-wrap">
         <textarea
           id="intention-input"
           class="intention-input"
           rows="2"
-          placeholder="What do you want to bring into focus today?"
+          placeholder="What situation, decision, pattern, or goal do you want to explore today?"
         ></textarea>
         <div class="intention-callback" id="intention-callback"></div>
       </div>
@@ -1357,26 +1348,29 @@
       <div class="ex-affirmation" id="ex-affirmation"></div>
     </div>
 
-    <!-- Your Journey (personalized, hidden when no goal) -->
-    <div class="ex-section" id="journey-section" style="display:none">
-      <div class="ex-section-label">For Your Journey</div>
-      <div class="journey-card" id="journey-card"></div>
-    </div>
-
     <!-- Insight -->
     <div class="ex-section">
       <div class="ex-section-label">Why This Matters</div>
       <div class="ex-insight" id="ex-insight"></div>
     </div>
 
-    <!-- Journal -->
+    <!-- Structured reflection session -->
     <div class="ex-section journal-wrap">
-      <div class="ex-section-label">Session Notes</div>
+      <div class="ex-section-label">Your Reflection Session</div>
+      <label class="reflection-label" for="reflection-notice">1. What thought, emotion, or body sensation did you notice?</label>
+      <textarea class="journal-textarea reflection-answer" id="reflection-notice" placeholder="I noticed…"></textarea>
+      <label class="reflection-label" for="reflection-need">2. What might this reaction be protecting—or what do you need?</label>
+      <textarea class="journal-textarea reflection-answer" id="reflection-need" placeholder="This may be protecting me from… What I need is…"></textarea>
+      <label class="reflection-label" for="reflection-response">3. What more helpful belief or response will you practice?</label>
+      <textarea class="journal-textarea reflection-answer" id="reflection-response" placeholder="A more accurate and useful response is…"></textarea>
+      <label class="reflection-label" for="reflection-action">4. What specific action will you take, and when?</label>
+      <textarea class="journal-textarea reflection-answer" id="reflection-action" placeholder="I will… at…"></textarea>
+      <label class="reflection-label" for="journal-textarea">Optional notes</label>
       <textarea class="journal-textarea" id="journal-textarea"
-        placeholder="What belief did you notice? What new response will you practice? What action will you take now?"></textarea>
+        placeholder="Add anything else you want to remember from this session."></textarea>
       <div class="journal-save-row">
-        <button class="btn" id="btn-save-note">Save note</button>
-        <span class="journal-saved-note" id="save-note-feedback">Saved</span>
+        <button class="btn" id="btn-save-note">Save my answers</button>
+        <span class="journal-saved-note" id="save-note-feedback">Answers saved</span>
       </div>
     </div>
 
@@ -2429,19 +2423,8 @@ function applyGoalText(template, goal) {
 }
 
 function renderGoalUI() {
-  const profile = loadProfileForPersonalization();
-  const goal = profile.goal || '';
-  const setupBanner = document.getElementById('goal-setup-banner');
-  const goalDisplay = document.getElementById('goal-display');
-  const goalDisplayText = document.getElementById('goal-display-text');
-  if (goal) {
-    setupBanner.style.display = 'none';
-    goalDisplay.classList.add('visible');
-    goalDisplayText.textContent = goal;
-  } else {
-    setupBanner.style.display = 'flex';
-    goalDisplay.classList.remove('visible');
-  }
+  // Exercises are intentionally general. Personal context belongs in the
+  // user's structured reflection session, not in the exercise instructions.
 }
 
 function buildPlanCue(profile, part) {
@@ -2453,52 +2436,31 @@ function buildPlanCue(profile, part) {
 }
 
 function populateJourneySection(part) {
-  const profile = loadProfileForPersonalization();
-  const goal = profile.goal || '';
-  const section = document.getElementById('journey-section');
-  const card = document.getElementById('journey-card');
+  // Retained as a no-op for older authentication callbacks.
+}
 
-  if (!goal) {
-    section.style.display = 'none';
-    const ex = EXERCISES[part - 1];
-    const affirmationEl = document.getElementById('ex-affirmation');
-    affirmationEl.textContent = `"${ex.affirmation}"`;
-    affirmationEl.classList.remove('personalized');
-    return;
-  }
+const REFLECTION_PREFIX = 'LUCKY_REFLECTION_V1:';
+const REFLECTION_IDS = ['reflection-notice','reflection-need','reflection-response','reflection-action','journal-textarea'];
 
-  const ex = EXERCISES[part - 1];
-  const p = {
-    bridge: ex.goalBridge || "Connect this practice directly to {goal}, then finish with one observable action.",
-    affirmation: ex.goalCue || ex.affirmation
+function parseReflection(savedNote) {
+  if (!savedNote) return {notice:'',need:'',response:'',action:'',notes:''};
+  if (!savedNote.startsWith(REFLECTION_PREFIX)) return {notice:'',need:'',response:'',action:'',notes:savedNote};
+  try { return JSON.parse(savedNote.slice(REFLECTION_PREFIX.length)); }
+  catch { return {notice:'',need:'',response:'',action:'',notes:''}; }
+}
+
+function collectReflection() {
+  return {
+    notice: document.getElementById('reflection-notice').value.trim(),
+    need: document.getElementById('reflection-need').value.trim(),
+    response: document.getElementById('reflection-response').value.trim(),
+    action: document.getElementById('reflection-action').value.trim(),
+    notes: document.getElementById('journal-textarea').value.trim()
   };
-  const bridge = applyGoalText(p.bridge, goal);
-  const affirmation = applyGoalText(p.affirmation, goal);
+}
 
-  card.textContent = '';
-
-  const goalLabel = document.createElement('div');
-  goalLabel.className = 'journey-goal-label';
-  goalLabel.textContent = (profile.name ? `${profile.name}'s goal` : 'Your goal');
-
-  const goalText = document.createElement('div');
-  goalText.className = 'journey-goal-text';
-  goalText.textContent = goal;
-
-  const bridgeEl = document.createElement('div');
-  bridgeEl.className = 'journey-bridge';
-  const planCue = buildPlanCue(profile, part);
-  bridgeEl.textContent = planCue ? `${bridge} ${planCue}` : bridge;
-
-  card.appendChild(goalLabel);
-  card.appendChild(goalText);
-  card.appendChild(bridgeEl);
-  section.style.display = 'block';
-
-  // Override affirmation display with personalized version
-  const affirmationEl = document.getElementById('ex-affirmation');
-  affirmationEl.textContent = `"${affirmation}"`;
-  affirmationEl.classList.add('personalized');
+function saveReflection(part) {
+  saveNote(part, `${REFLECTION_PREFIX}${JSON.stringify(collectReflection())}`);
 }
 
 function saveSession(part) {
@@ -2506,6 +2468,7 @@ function saveSession(part) {
   if (!store[part]) store[part] = { sessions: [], note: '' };
   const intention = (document.getElementById('intention-input')?.value ?? '').trim();
   store[part].sessions.push({ ts: Date.now(), intention });
+  store[part].note = `${REFLECTION_PREFIX}${JSON.stringify(collectReflection())}`;
   saveStore(store);
   cloudUpsertProgress(part); // fire-and-forget cloud sync
 }
@@ -2742,11 +2705,13 @@ function openExercise(part) {
   document.getElementById('ex-lesson').textContent = ex.lesson;
   document.getElementById('ex-affirmation').textContent = `"${ex.affirmation}"`;
   document.getElementById('ex-insight').textContent = ex.insight;
-  document.getElementById('journal-textarea').value = data.note || '';
+  const reflection = parseReflection(data.note || '');
+  document.getElementById('reflection-notice').value = reflection.notice || '';
+  document.getElementById('reflection-need').value = reflection.need || '';
+  document.getElementById('reflection-response').value = reflection.response || '';
+  document.getElementById('reflection-action').value = reflection.action || '';
+  document.getElementById('journal-textarea').value = reflection.notes || '';
   renderSessionGuidance(ex);
-
-  // Personalize with goal
-  populateJourneySection(part);
 
   // Intention — pre-fill with last session's intention, show callback
   const intentionInput = document.getElementById('intention-input');
@@ -2798,7 +2763,7 @@ function openExercise(part) {
 
   // Note saving
   document.getElementById('btn-save-note').onclick = () => {
-    saveNote(part, document.getElementById('journal-textarea').value);
+    saveReflection(part);
     const fb = document.getElementById('save-note-feedback');
     fb.classList.add('show');
     setTimeout(() => fb.classList.remove('show'), 2000);
@@ -2936,22 +2901,12 @@ async function setCachedAudio(key, buffer) {
 }
 
 function buildNarrationSegments(ex, intention, previousIntention) {
-  const profile = loadProfileForPersonalization();
-  const goal = profile.goal || '';
-  const name = profile.name || '';
   const segments = [];
 
   // A — title + theme (stable per exercise)
   segments.push({ key: `en-a-${ex.part}`, text: `${ex.title}. ${ex.theme}.` });
 
-  // B — goal opening (varies by part + goal + name)
-  if (goal) {
-    const greeting = name ? `${name}, you` : 'You';
-    const gk = audioHash(`${ex.part}|${goal}|${name}`);
-    segments.push({ key: `en-b-${gk}`, text: `${greeting} are here working toward ${goal}.\n${applyGoalText(ex.goalBridge, goal)}` });
-  }
-
-  // C — lesson (stable per exercise)
+  // B — lesson (stable and general for every user)
   segments.push({ key: `en-c-${ex.part}`, text: ex.lesson });
 
   // D — intention intro (varies by intention + previousIntention only)
@@ -2969,21 +2924,17 @@ function buildNarrationSegments(ex, intention, previousIntention) {
   // E — arrival + detailed practice (stable per exercise)
   segments.push({ key: `en-e3-${ex.part}`, text: `Let us begin. Put both feet on the floor. Let your eyes rest on one point, or close them if comfortable. Take three easy breaths. Notice one body sensation and name your present emotion. You can be curious without judging what you find.\n\n${getDetailedSteps(ex).join('\n\n')}\n\nHere is an example. ${ex.example}\n\nIf you feel stuck: ${ex.stuck}` });
 
-  // F — affirmation (varies by part + goal)
-  if (goal) {
-    segments.push({ key: `en-f2-${audioHash(`${ex.part}|${goal}`)}`, text: `Hold this in mind: ${applyGoalText(ex.goalCue, goal)}` });
-  } else {
-    segments.push({ key: `en-f-${ex.part}`, text: `Hold this in mind: ${ex.affirmation}` });
-  }
+  // F — general identity cue
+  segments.push({ key: `en-f-${ex.part}`, text: `Hold this in mind: ${ex.affirmation}` });
 
   // G — reflection + closing intention and action
-  segments.push({ key: `en-h-${ex.part}`, text: `Before you finish, reflect: ${ex.reflect}\n\nNow close with action. ${ex.act}` });
+  segments.push({ key: `en-h2-${ex.part}`, text: `Before you finish, open Your Reflection Session and answer these questions in your own words. What thought, emotion, or body sensation did you notice? What might this reaction be protecting, or what do you need? What more helpful belief or response will you practice? What specific action will you take, and when? Add any optional notes you want to remember.\n\nFor this exercise, reflect: ${ex.reflect}\n\nNow close with action. ${ex.act}` });
   if (intention) {
     segments.push({ key: `en-g-${audioHash(intention)}`, text: `Return now to your intention: ${intention}. Carry it with you as you close this session.` });
   }
 
   const fullText = segments.map(segment => segment.text).join('\n\n');
-  const narrationKey = audioHash(`v4|${ex.part}|${goal}|${name}|${intention}|${previousIntention}`);
+  const narrationKey = audioHash(`v5-general|${ex.part}|${intention}|${previousIntention}`);
   return [{ key: `en-full-${narrationKey}`, text: fullText }];
 }
 
