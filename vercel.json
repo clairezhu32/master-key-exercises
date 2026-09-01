@@ -5,6 +5,7 @@
     { "src": "/exercises", "dest": "/exercises.html" },
     { "src": "/exercises-zh", "dest": "/exercises-zh.html" },
     { "src": "/goals", "dest": "/goals.html" },
+    { "src": "/bootcamp", "dest": "/goals.html" },
     { "src": "/welcome", "dest": "/welcome.html" },
     { "src": "/analytics", "dest": "/analytics.html" }
   ]
