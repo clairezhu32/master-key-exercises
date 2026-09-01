@@ -1266,33 +1266,6 @@
       </div>
     </div>
 
-    <!-- Timer -->
-    <div class="ex-section">
-      <div class="ex-section-label">Session Timer</div>
-      <div class="timer-card">
-        <div class="timer-duration-row" id="dur-row"></div>
-        <div class="timer-ring-wrap">
-          <svg viewBox="0 0 180 180">
-            <circle class="ring-track" cx="90" cy="90" r="82"/>
-            <circle class="ring-fill" id="ring-fill" cx="90" cy="90" r="82"
-              stroke-dasharray="515.2"
-              stroke-dashoffset="0"/>
-          </svg>
-          <div class="timer-display">
-            <div class="timer-time" id="timer-display">15:00</div>
-            <div class="timer-label" id="timer-state-label">ready</div>
-          </div>
-        </div>
-        <div class="timer-done-banner" id="timer-done-banner">
-          Rewiring complete. Take your next action while the intention is fresh.
-        </div>
-        <div class="timer-controls">
-          <button class="btn btn-primary" id="btn-start">Begin</button>
-          <button class="btn" id="btn-reset" style="display:none">Reset</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Instructions -->
     <div class="ex-section">
       <div class="section-label-row">
@@ -2441,11 +2414,11 @@ function populateJourneySection(part) {
   affirmationEl.classList.add('personalized');
 }
 
-function saveSession(part, durationMin) {
+function saveSession(part) {
   const store = loadStore();
   if (!store[part]) store[part] = { sessions: [], note: '' };
   const intention = (document.getElementById('intention-input')?.value ?? '').trim();
-  store[part].sessions.push({ ts: Date.now(), duration: durationMin, intention });
+  store[part].sessions.push({ ts: Date.now(), intention });
   saveStore(store);
   cloudUpsertProgress(part); // fire-and-forget cloud sync
 }
@@ -2463,94 +2436,6 @@ function getCompletedParts() {
   return Object.entries(store)
     .filter(([, v]) => v.sessions && v.sessions.length > 0)
     .map(([k]) => parseInt(k));
-}
-
-// ── Timer state ───────────────────────────────
-let timerInterval = null;
-let timerSecondsLeft = 0;
-let timerTotalSeconds = 0;
-let timerRunning = false;
-let selectedDuration = 15;
-
-const CIRCUMFERENCE = 2 * Math.PI * 82; // 515.2
-
-function formatTime(s) {
-  const m = Math.floor(s / 60).toString().padStart(2, '0');
-  const sec = (s % 60).toString().padStart(2, '0');
-  return `${m}:${sec}`;
-}
-
-function updateRing(secondsLeft, totalSeconds) {
-  const fill = document.getElementById('ring-fill');
-  const fraction = secondsLeft / totalSeconds;
-  fill.style.strokeDashoffset = CIRCUMFERENCE * (1 - fraction);
-}
-
-function chime() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const freqs = [528, 660, 792];
-    freqs.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      const t = ctx.currentTime + i * 0.6;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.18, t + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
-      osc.start(t);
-      osc.stop(t + 2.5);
-    });
-  } catch {}
-}
-
-function startTimer(durationMin) {
-  if (timerRunning) return;
-  timerTotalSeconds = durationMin * 60;
-  timerSecondsLeft = timerTotalSeconds;
-  timerRunning = true;
-  document.getElementById('btn-start').textContent = 'Pause';
-  document.getElementById('btn-reset').style.display = 'inline-block';
-  document.getElementById('timer-state-label').textContent = 'in session';
-  document.getElementById('timer-done-banner').classList.remove('visible');
-
-  timerInterval = setInterval(() => {
-    timerSecondsLeft--;
-    document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
-    updateRing(timerSecondsLeft, timerTotalSeconds);
-
-    if (timerSecondsLeft <= 0) {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      document.getElementById('btn-start').textContent = 'Begin';
-      document.getElementById('timer-state-label').textContent = 'complete';
-      document.getElementById('timer-done-banner').classList.add('visible');
-      chime();
-    }
-  }, 1000);
-}
-
-function pauseTimer() {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  document.getElementById('btn-start').textContent = 'Resume';
-  document.getElementById('timer-state-label').textContent = 'paused';
-}
-
-function resetTimer(durationMin) {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  timerSecondsLeft = durationMin * 60;
-  timerTotalSeconds = timerSecondsLeft;
-  document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
-  document.getElementById('btn-start').textContent = 'Begin';
-  document.getElementById('btn-reset').style.display = 'none';
-  document.getElementById('timer-state-label').textContent = 'ready';
-  document.getElementById('timer-done-banner').classList.remove('visible');
-  updateRing(timerSecondsLeft, timerTotalSeconds);
 }
 
 // ── Render helpers ────────────────────────────
@@ -2574,7 +2459,6 @@ function renderGrid() {
         <div class="card-title">${ex.title}</div>
         <div class="card-theme">${ex.theme}</div>
         <div class="card-footer">
-          <span class="card-duration">${ex.defaultDuration} min</span>
           <span class="card-sessions">${sessionCount > 0 ? `${sessionCount} session${sessionCount > 1 ? 's' : ''}` : ''}</span>
           <span class="card-status ${done ? 'done' : 'pending'}">${done ? '✓ done' : 'begin'}</span>
         </div>
@@ -2593,11 +2477,6 @@ function openExercise(part) {
   currentPart = part;
   const ex = EXERCISES[part - 1];
   const data = getExData(part);
-
-  // Reset timer
-  clearInterval(timerInterval);
-  timerRunning = false;
-  selectedDuration = ex.defaultDuration;
 
   // Populate content
   document.getElementById('ex-eyebrow').textContent = `Part ${part} of 24`;
@@ -2635,34 +2514,12 @@ function openExercise(part) {
   // Steps
   document.getElementById('ex-steps').innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
 
-  // Duration buttons
-  const durations = [5, 10, 15, 20];
-  document.getElementById('dur-row').innerHTML = durations.map(d =>
-    `<button class="dur-btn ${d === selectedDuration ? 'active' : ''}" data-dur="${d}">${d} min</button>`
-  ).join('');
-  document.getElementById('dur-row').querySelectorAll('.dur-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedDuration = parseInt(btn.dataset.dur);
-      document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      resetTimer(selectedDuration);
-    });
-  });
-
-  // Timer init
-  resetTimer(selectedDuration);
-  document.getElementById('btn-start').onclick = () => {
-    if (timerRunning) pauseTimer();
-    else startTimer(selectedDuration);
-  };
-  document.getElementById('btn-reset').onclick = () => resetTimer(selectedDuration);
-
   // Sessions log
   renderSessions(part);
 
   // Mark complete button
   document.getElementById('btn-mark-complete').onclick = () => {
-    saveSession(part, selectedDuration);
+    saveSession(part);
     renderSessions(part);
     renderGrid();
     updateHeader();
@@ -2734,7 +2591,7 @@ function renderSessions(part) {
   [...data.sessions].reverse().forEach(s => {
     const ts = Number(s.ts);
     const dur = parseInt(s.duration, 10);
-    if (!ts || !dur) return;
+    if (!ts) return;
 
     const dateStr = new Date(ts).toLocaleDateString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
@@ -2750,13 +2607,16 @@ function renderSessions(part) {
     date.className = 'session-date';
     date.textContent = dateStr;
 
-    const duration = document.createElement('span');
-    duration.className = 'session-duration';
-    duration.textContent = `${dur} min`;
-
     row.appendChild(dot);
     row.appendChild(date);
-    row.appendChild(duration);
+
+    // Keep duration visible for sessions recorded before the timer was removed.
+    if (dur) {
+      const duration = document.createElement('span');
+      duration.className = 'session-duration';
+      duration.textContent = `${dur} min`;
+      row.appendChild(duration);
+    }
 
     if (s.intention) {
       const intent = document.createElement('span');
