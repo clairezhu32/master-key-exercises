@@ -1302,7 +1302,7 @@
         <div class="sound-options">
           <button class="sound-btn" type="button" data-sound="rain">Soft rain</button>
           <button class="sound-btn" type="button" data-sound="brown">Brown noise</button>
-          <button class="sound-btn" type="button" data-sound="tones">Gentle tones</button>
+          <button class="sound-btn" type="button" data-sound="ocean">Ocean waves</button>
         </div>
         <div class="sound-controls">
           <button class="sound-stop" id="sound-stop" type="button">Stop sound</button>
@@ -2628,7 +2628,7 @@ function clearAmbientNodes() {
 function updateSoundUI(type = '') {
   activeSound = type;
   document.querySelectorAll('.sound-btn').forEach(button => button.classList.toggle('active', button.dataset.sound === type));
-  const names = {rain:'Soft rain playing', brown:'Brown noise playing', tones:'Gentle tones playing'};
+  const names = {rain:'Soft rain playing', brown:'Brown noise playing', ocean:'Ocean waves playing'};
   const remaining = ambientEndsAt ? Math.max(0, Math.ceil((ambientEndsAt - Date.now()) / 1000)) : 0;
   const time = remaining ? ` · ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2,'0')}` : '';
   document.getElementById('sound-status').textContent = type ? `${names[type]}${time}` : 'Sound off';
@@ -2685,32 +2685,34 @@ function createNoiseSource(kind) {
   const filter = ambientContext.createBiquadFilter();
   if (kind === 'rain') {
     filter.type = 'bandpass'; filter.frequency.value = 2600; filter.Q.value = .38;
+  } else if (kind === 'ocean') {
+    filter.type = 'lowpass'; filter.frequency.value = 1050; filter.Q.value = .7;
   } else {
     filter.type = 'lowpass'; filter.frequency.value = 650; filter.Q.value = .2;
   }
-  source.connect(filter).connect(ambientGain);
+  if (kind === 'ocean') {
+    const waveGain = ambientContext.createGain();
+    waveGain.gain.value = .55;
+    const swell = ambientContext.createOscillator();
+    const swellDepth = ambientContext.createGain();
+    swell.type = 'sine';
+    swell.frequency.value = .09;
+    swellDepth.gain.value = .34;
+    swell.connect(swellDepth).connect(waveGain.gain);
+    source.connect(filter).connect(waveGain).connect(ambientGain);
+    swell.start();
+    ambientNodes.push(source, filter, waveGain, swell, swellDepth);
+  } else {
+    source.connect(filter).connect(ambientGain);
+    ambientNodes.push(source, filter);
+  }
   source.start();
-  ambientNodes.push(source, filter);
-}
-
-function createGentleTones() {
-  [174, 261.63, 392].forEach((frequency, index) => {
-    const oscillator = ambientContext.createOscillator();
-    const toneGain = ambientContext.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.value = frequency;
-    toneGain.gain.value = [.12,.07,.035][index];
-    oscillator.connect(toneGain).connect(ambientGain);
-    oscillator.start();
-    ambientNodes.push(oscillator, toneGain);
-  });
 }
 
 function playAmbientSound(type) {
   ensureAmbientContext();
   clearAmbientNodes();
-  if (type === 'tones') createGentleTones();
-  else createNoiseSource(type);
+  createNoiseSource(type);
   updateSoundUI(type);
   scheduleAmbientStop();
 }
