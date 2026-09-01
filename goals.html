@@ -166,7 +166,7 @@
     function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
     document.getElementById('auth-close').addEventListener('click', closeAuth);
     document.getElementById('auth-overlay').addEventListener('click', event => { if(event.target.id === 'auth-overlay') closeAuth(); });
-    document.getElementById('google-sign-in').addEventListener('click', async () => { const button = document.getElementById('google-sign-in'); button.disabled = true; button.textContent = 'Redirecting…'; await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/goals'}}); });
+    document.getElementById('google-sign-in').addEventListener('click', async () => { const button = document.getElementById('google-sign-in'); button.disabled = true; button.textContent = 'Redirecting…'; await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+(cohortMode?'/bootcamp':'/goals')}}); });
 
     async function betaRequest(method='GET', body=null) {
       const sessionResult=await sb.auth.getSession(); currentSession=sessionResult.data.session || currentSession;
