@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exercises — Lucky</title>
+  <title>Lucky Exercises</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js"
@@ -1163,6 +1163,27 @@
     .complete-btn { background: var(--green); border-color: var(--green); color:#07140f; }
     .exercise-card, button, input, textarea, select { -webkit-tap-highlight-color: rgba(157,140,255,.15); }
 
+    .arrival-card, .guidance-card, .sound-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(25,33,61,.66);
+    }
+    .arrival-card p, .guidance-block p { color: var(--text-dim); font-size: .9rem; line-height: 1.7; }
+    .arrival-card strong, .guidance-block strong { color: var(--text); }
+    .guidance-card { display: grid; gap: 16px; }
+    .guidance-block + .guidance-block { padding-top: 16px; border-top: 1px solid var(--border); }
+    .guidance-kicker { margin-bottom: 5px; color: var(--green); font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .sound-card { display: grid; gap: 14px; }
+    .sound-intro { color: var(--text-dim); font-size: .82rem; line-height: 1.55; }
+    .sound-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sound-btn { min-height: 38px; padding: 0 13px; border: 1px solid var(--border); border-radius: 9px; color: var(--text-dim); background: transparent; cursor: pointer; }
+    .sound-btn:hover, .sound-btn.active { border-color: var(--gold); color: var(--text); background: var(--gold-glow); }
+    .sound-controls { display: flex; align-items: center; gap: 12px; }
+    .sound-stop { padding: 7px 11px; border: 0; border-radius: 8px; color: #07140f; background: var(--green); font-weight: 700; cursor: pointer; }
+    .sound-volume { width: min(190px,50vw); accent-color: var(--gold); }
+    .sound-status { color: var(--text-faint); font-size: .75rem; }
+
     @media (max-width: 700px) {
       .header { padding: 16px; }
       .header-nav { display: none; }
@@ -1268,6 +1289,29 @@
 
     <!-- Instructions -->
     <div class="ex-section">
+      <div class="ex-section-label">Arrive</div>
+      <div class="arrival-card" id="arrival-guidance"></div>
+    </div>
+
+    <!-- Optional ambient audio -->
+    <div class="ex-section">
+      <div class="ex-section-label">Optional Focus Sound</div>
+      <div class="sound-card">
+        <p class="sound-intro">Use a quiet background sound if it helps you focus. The audio is generated on your device and contains no spoken suggestions.</p>
+        <div class="sound-options">
+          <button class="sound-btn" type="button" data-sound="rain">Soft rain</button>
+          <button class="sound-btn" type="button" data-sound="brown">Brown noise</button>
+          <button class="sound-btn" type="button" data-sound="tones">Gentle tones</button>
+        </div>
+        <div class="sound-controls">
+          <button class="sound-stop" id="sound-stop" type="button">Stop sound</button>
+          <input class="sound-volume" id="sound-volume" type="range" min="0" max="100" value="28" aria-label="Sound volume">
+          <span class="sound-status" id="sound-status">Sound off</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ex-section">
       <div class="section-label-row">
         <div class="ex-section-label">How to Practice</div>
         <button class="voice-btn" id="voice-btn" title="Read exercise aloud">
@@ -1291,6 +1335,11 @@
       </div>
       <div class="voice-error" id="voice-error"></div>
       <ol class="ex-steps" id="ex-steps"></ol>
+    </div>
+
+    <div class="ex-section">
+      <div class="ex-section-label">More Guidance</div>
+      <div class="guidance-card" id="session-guidance"></div>
     </div>
 
     <!-- Affirmation -->
@@ -2191,6 +2240,35 @@ const REWIRING_EXERCISES = [
 
 REWIRING_EXERCISES.forEach((exercise, index) => Object.assign(EXERCISES[index], exercise));
 
+const SESSION_SUPPORT = [
+  {example:"Instead of ‘I always fail at networking,’ try: ‘I have felt awkward in some conversations, and I have also created good connections before.’",stuck:"Use a thought with less emotional charge. You only need a more accurate sentence—not the perfect belief.",reflect:"What changed when you described the thought as an interpretation rather than a fact?",act:"Complete the two-minute action you identified before opening another app."},
+  {example:"Procrastination may be protecting you from judgment while the deeper need is reassurance or a smaller, safer starting point.",stuck:"Do not search for a childhood cause. Stay with what the pattern does for you in the present.",reflect:"What does this pattern provide temporarily, and what healthier response could provide the same need?",act:"Give yourself the need in a healthier form, then begin one small task."},
+  {example:"A future identity might be: ‘I am someone who sends the application even when it is not perfect.’",stuck:"Picture an ordinary Tuesday, not an idealized life. Focus on behavior rather than appearance or status.",reflect:"Which repeated behavior makes the future identity believable?",act:"Cast one vote for that identity now."},
+  {example:"Evidence could include asking for help, finishing a difficult week, learning a tool, or recovering after rejection.",stuck:"Small evidence counts. Capability is usually built from ordinary moments, not dramatic wins.",reflect:"Which strength appeared more often than your old story admitted?",act:"Use that strength in today’s plan task."},
+  {example:"Change ‘People like me cannot do this’ to ‘What if I have not yet found the approach that fits me?’",stuck:"Choose a belief that is testable. Avoid replacing one absolute claim with another.",reflect:"What new option appeared when the belief became less rigid?",act:"Run the smallest experiment that could provide new evidence."},
+  {example:"A supportive colleague, an available hour, an existing skill, or access to a community can all be goal-relevant resources.",stuck:"Gratitude does not require liking every circumstance. Notice one useful thing without denying what is difficult.",reflect:"Which available resource have you underestimated or underused?",act:"Use, protect, thank or reciprocate that resource today."},
+  {example:"Instead of ‘network with twenty people,’ make the courage step ‘introduce myself to one person and ask one real question.’",stuck:"If the step feels like an 8 out of 10, reduce its size. Courage grows through workable repetitions.",reflect:"What did you predict would happen, and what happened after you acted?",act:"Put the step on today’s calendar or do it now."},
+  {example:"Test ‘Would two personalized messages get more replies than two generic messages?’ rather than ‘Am I good at outreach?’",stuck:"Measure behavior or response, not your worth. A useful experiment can produce a disappointing result.",reflect:"What did the experiment teach you that thinking alone could not?",act:"Run the test and record one observation."},
+  {example:"Fact: ‘The proposal was declined.’ Story: ‘No one will ever value my work.’ Adjustment: ask for one reason and revise the opening.",stuck:"If emotion is strong, name it first. You can analyze the lesson after your nervous system settles.",reflect:"What belongs to the result, and what did you add about your identity?",act:"Make one adjustment and define the restart point."},
+  {example:"For a career goal, opportunities might be openings, introductions, speaking invitations, portfolio feedback or emerging problems you can solve.",stuck:"Look for relevant possibilities, not signs from the universe. Define observable opportunities.",reflect:"Where have these opportunities appeared before, and how quickly did you respond?",act:"Search one channel or contact one person today."},
+  {example:"People: former colleagues. Skills: analytics. Tools: portfolio. Time: Saturday morning. Missing resource: customer interviews.",stuck:"List resources you can access, not only resources you own. Asking is a valid acquisition strategy.",reflect:"Which constraint became more manageable once the resources were visible?",act:"Activate one resource with a message, booking or protected block."},
+  {example:"Replace ‘Why am I so behind?’ with ‘What could I complete in 30 minutes that would reduce uncertainty?’",stuck:"If answers remain vague, add a constraint: this week, with current resources, without spending money.",reflect:"Which question produced choices rather than self-judgment?",act:"Test the easiest credible answer."},
+  {example:"Rehearse opening the document, seeing an imperfect draft, breathing once, and writing the first rough paragraph anyway.",stuck:"Visualize the friction too. A flawless movie prepares you less than a realistic rehearsal.",reflect:"Which exact response do you want to remember when the difficult moment arrives?",act:"Schedule the real behavior and prepare its first cue."},
+  {example:"Feet down, long exhale, thumb and finger together, then say ‘Pause. Choose. Begin’ before sending the message.",stuck:"The cue does not need to create calm. Its job is simply to interrupt autopilot long enough to choose.",reflect:"Did the cue create even one second of additional choice?",act:"Use the cue as you begin today’s next step."},
+  {example:"If I start scrolling during my work block, then I will put my phone face down and work for five minutes.",stuck:"Make the response smaller and more specific. ‘Try harder’ is not an observable response.",reflect:"Which trigger appears most reliably, and what response can happen immediately?",act:"Place the if–then reminder where the trigger occurs."},
+  {example:"Exposure ladder: read the event page, register, attend for 20 minutes, introduce yourself, then follow up with one person.",stuck:"Mild discomfort is enough. Do not use this exercise to confront trauma, panic or unsafe situations alone.",reflect:"How did reality differ from the feared prediction?",act:"Complete the easiest safe rung and stop there for today."},
+  {example:"Join one relevant group, ask someone about their work, share a useful resource, and follow up the next day.",stuck:"Focus on genuine interest rather than extracting value. One real connection is better than ten transactional contacts.",reflect:"What did you learn about the other person, and what follow-up would be meaningful?",act:"Send the introduction or follow-up while the context is fresh."},
+  {example:"Offer a short analysis, useful introduction, thoughtful feedback, template or small prototype that solves a real problem.",stuck:"Ask before doing substantial unpaid work. Useful value should respect your time and the recipient’s needs.",reflect:"What did the recipient actually need—not what was easiest for you to provide?",act:"Deliver the smallest useful version or validate the need."},
+  {example:"Alternative explanations for a no: timing, budget, fit, limited capacity, stronger competition or unclear communication.",stuck:"You do not need to feel positive. Aim to avoid turning one result into a permanent identity claim.",reflect:"What feedback is real, what is unknown, and what remains under your control?",act:"Choose the next attempt before rumination expands."},
+  {example:"You may genuinely prefer one path while fearing that choosing it will disappoint someone whose approval matters.",stuck:"Body sensation is information, not an automatic verdict. Combine it with values, facts and responsibility.",reflect:"What feels true, and what relationship need makes it difficult to acknowledge?",act:"Take one honest step that does not require an abrupt or harmful decision."},
+  {example:"Your Day-90 self might thank you for protecting Tuesday mornings, making one weekly ask, or reviewing progress every Friday.",stuck:"Write about controllable routines rather than guaranteed outcomes.",reflect:"Which ordinary choice did your future self describe as pivotal?",act:"Make that choice once today."},
+  {example:"Change ‘You are lazy and wasting everything’ to ‘You are overwhelmed; choose the smallest deliverable and work for five minutes.’",stuck:"Compassionate language can still be direct. Remove humiliation, not accountability.",reflect:"What was the critic afraid would happen if it stopped attacking you?",act:"Follow the revised coaching instruction for five minutes."},
+  {example:"Progress: three outreaches. Opportunity: one introduction. Updated belief: replies require better targeting. Courage step: request a call.",stuck:"Review behavior first. Outcomes may lag behind actions and should not erase evidence of follow-through.",reflect:"What should you continue, stop and adjust next week?",act:"Calendar the next courage step before ending the review."},
+  {example:"‘I cannot do this’ → notice the thought → question the absolute → choose ‘I can begin imperfectly’ → rehearse opening the task → act for two minutes.",stuck:"Do only one cycle. Rewiring becomes avoidance if you keep reflecting instead of acting.",reflect:"Which part of the ritual created the shift from thought to behavior?",act:"Start the action within two minutes. The session ends when action begins."}
+];
+
+SESSION_SUPPORT.forEach((support, index) => Object.assign(EXERCISES[index], support));
+
 // ── Per-part personalization ──────────────────
 // Each entry: { bridge, affirmation }
 // {goal} is replaced with the user's actual goal at render time.
@@ -2473,6 +2551,127 @@ function renderGrid() {
 // ── Exercise view ─────────────────────────────
 let currentPart = null;
 
+function appendGuidanceBlock(container, label, text) {
+  const block = document.createElement('div');
+  block.className = 'guidance-block';
+  const kicker = document.createElement('div');
+  kicker.className = 'guidance-kicker';
+  kicker.textContent = label;
+  const copy = document.createElement('p');
+  copy.textContent = text;
+  block.append(kicker, copy);
+  container.appendChild(block);
+}
+
+function renderSessionGuidance(ex) {
+  const arrival = document.getElementById('arrival-guidance');
+  arrival.textContent = '';
+  const arrivalCopy = document.createElement('p');
+  arrivalCopy.textContent = 'Put both feet on the floor. Let your eyes rest on one point or close them if comfortable. Take three easy breaths without forcing them. Notice one body sensation, name your present emotion, and remind yourself: “I can be curious without judging what I find.” Then read the Rewiring Prompt once.';
+  arrival.appendChild(arrivalCopy);
+
+  const guidance = document.getElementById('session-guidance');
+  guidance.textContent = '';
+  appendGuidanceBlock(guidance, 'Example', ex.example);
+  appendGuidanceBlock(guidance, 'If you feel stuck', ex.stuck);
+  appendGuidanceBlock(guidance, 'Reflect', ex.reflect);
+  appendGuidanceBlock(guidance, 'Close with action', ex.act);
+}
+
+// Optional procedural ambience. Audio is synthesized locally, so no music file,
+// tracking request or copyrighted recording is loaded.
+let ambientContext = null;
+let ambientGain = null;
+let ambientNodes = [];
+let activeSound = '';
+
+function ensureAmbientContext() {
+  if (!ambientContext) {
+    ambientContext = new (window.AudioContext || window.webkitAudioContext)();
+    ambientGain = ambientContext.createGain();
+    ambientGain.gain.value = .035;
+    ambientGain.connect(ambientContext.destination);
+  }
+  if (ambientContext.state === 'suspended') ambientContext.resume();
+}
+
+function clearAmbientNodes() {
+  ambientNodes.forEach(node => { try { node.stop?.(); } catch {} try { node.disconnect?.(); } catch {} });
+  ambientNodes = [];
+}
+
+function updateSoundUI(type = '') {
+  activeSound = type;
+  document.querySelectorAll('.sound-btn').forEach(button => button.classList.toggle('active', button.dataset.sound === type));
+  const names = {rain:'Soft rain playing', brown:'Brown noise playing', tones:'Gentle tones playing'};
+  document.getElementById('sound-status').textContent = names[type] || 'Sound off';
+}
+
+function stopAmbientSound() {
+  clearAmbientNodes();
+  updateSoundUI('');
+}
+
+function createNoiseSource(kind) {
+  const seconds = 4;
+  const buffer = ambientContext.createBuffer(1, ambientContext.sampleRate * seconds, ambientContext.sampleRate);
+  const data = buffer.getChannelData(0);
+  let brown = 0;
+  for (let i = 0; i < data.length; i++) {
+    const white = Math.random() * 2 - 1;
+    if (kind === 'brown') {
+      brown = (brown + .02 * white) / 1.02;
+      data[i] = brown * 3.5;
+    } else {
+      data[i] = white * .42;
+    }
+  }
+  const source = ambientContext.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const filter = ambientContext.createBiquadFilter();
+  if (kind === 'rain') {
+    filter.type = 'bandpass'; filter.frequency.value = 2600; filter.Q.value = .38;
+  } else {
+    filter.type = 'lowpass'; filter.frequency.value = 650; filter.Q.value = .2;
+  }
+  source.connect(filter).connect(ambientGain);
+  source.start();
+  ambientNodes.push(source, filter);
+}
+
+function createGentleTones() {
+  [174, 261.63, 392].forEach((frequency, index) => {
+    const oscillator = ambientContext.createOscillator();
+    const toneGain = ambientContext.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = frequency;
+    toneGain.gain.value = [.12,.07,.035][index];
+    oscillator.connect(toneGain).connect(ambientGain);
+    oscillator.start();
+    ambientNodes.push(oscillator, toneGain);
+  });
+}
+
+function playAmbientSound(type) {
+  ensureAmbientContext();
+  clearAmbientNodes();
+  if (type === 'tones') createGentleTones();
+  else createNoiseSource(type);
+  updateSoundUI(type);
+}
+
+document.querySelectorAll('.sound-btn').forEach(button => button.addEventListener('click', () => {
+  if (activeSound === button.dataset.sound) stopAmbientSound();
+  else playAmbientSound(button.dataset.sound);
+}));
+document.getElementById('sound-stop').addEventListener('click', stopAmbientSound);
+document.getElementById('sound-volume').addEventListener('input', event => {
+  ensureAmbientContext();
+  ambientGain.gain.setTargetAtTime((Number(event.target.value) / 100) * .12, ambientContext.currentTime, .05);
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopAmbientSound(); });
+
 function openExercise(part) {
   currentPart = part;
   const ex = EXERCISES[part - 1];
@@ -2486,6 +2685,7 @@ function openExercise(part) {
   document.getElementById('ex-affirmation').textContent = `"${ex.affirmation}"`;
   document.getElementById('ex-insight').textContent = ex.insight;
   document.getElementById('journal-textarea').value = data.note || '';
+  renderSessionGuidance(ex);
 
   // Personalize with goal
   populateJourneySection(part);
