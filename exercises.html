@@ -2572,6 +2572,18 @@ function appendGuidanceBlock(container, label, text) {
   container.appendChild(block);
 }
 
+const STEP_COACHING = [
+  "Take 30 to 60 seconds here. Do not rush to the answer you think you should give. Notice the first honest response, along with any tension, resistance, relief or uncertainty in your body.",
+  "Pause for three easy breaths before continuing. Describe what you observe in plain, specific language. If no answer comes, begin with the facts you can verify instead of forcing an insight.",
+  "Stay with this question for at least one quiet minute. Let more than one possibility exist. The purpose is compassionate curiosity—not proving that your first interpretation is right or wrong.",
+  "Write your response as one clear sentence. Make it realistic enough that your mind can accept it and specific enough that you would recognize it in your behavior today.",
+  "Turn the reflection into something observable. Decide exactly what you will do, where you will do it, and when you will begin. If the action feels too large, reduce it until you can start within two minutes."
+];
+
+function getDetailedSteps(ex) {
+  return ex.steps.map((step, index) => `${step} ${STEP_COACHING[index] || STEP_COACHING[STEP_COACHING.length - 1]}`);
+}
+
 function renderSessionGuidance(ex) {
   const arrival = document.getElementById('arrival-guidance');
   arrival.textContent = '';
@@ -2756,7 +2768,7 @@ function openExercise(part) {
   }
 
   // Steps
-  document.getElementById('ex-steps').innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
+  document.getElementById('ex-steps').innerHTML = getDetailedSteps(ex).map(s => `<li>${s}</li>`).join('');
 
   // Sessions log
   renderSessions(part);
@@ -2953,7 +2965,7 @@ function buildNarrationSegments(ex, intention, previousIntention) {
   }
 
   // E — arrival + detailed practice (stable per exercise)
-  segments.push({ key: `en-e2-${ex.part}`, text: `Let us begin. Put both feet on the floor. Let your eyes rest on one point, or close them if comfortable. Take three easy breaths. Notice one body sensation and name your present emotion. You can be curious without judging what you find.\n\n${ex.steps.join('\n\n')}\n\nHere is an example. ${ex.example}\n\nIf you feel stuck: ${ex.stuck}` });
+  segments.push({ key: `en-e3-${ex.part}`, text: `Let us begin. Put both feet on the floor. Let your eyes rest on one point, or close them if comfortable. Take three easy breaths. Notice one body sensation and name your present emotion. You can be curious without judging what you find.\n\n${getDetailedSteps(ex).join('\n\n')}\n\nHere is an example. ${ex.example}\n\nIf you feel stuck: ${ex.stuck}` });
 
   // F — affirmation (varies by part + goal)
   if (goal) {
@@ -2969,7 +2981,7 @@ function buildNarrationSegments(ex, intention, previousIntention) {
   }
 
   const fullText = segments.map(segment => segment.text).join('\n\n');
-  const narrationKey = audioHash(`v3|${ex.part}|${goal}|${name}|${intention}|${previousIntention}`);
+  const narrationKey = audioHash(`v4|${ex.part}|${goal}|${name}|${intention}|${previousIntention}`);
   return [{ key: `en-full-${narrationKey}`, text: fullText }];
 }
 
