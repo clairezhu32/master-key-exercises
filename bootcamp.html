@@ -4,8 +4,125 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
+  <meta name="description" content="Join Lucky's Job Search Founding Cohort and turn your career goal into a personalized 90-day action plan.">
   <title>Lucky — Job Search Founding Cohort</title>
-  <script>window.location.replace('/goals?cohort=bootcamp');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#080b17; --panel:#131a33; --panel2:#19213d; --line:rgba(255,255,255,.1); --text:#f7f5ff; --muted:#a8adc2; --violet:#9d8cff; --mint:#71e5c1; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { min-height:100vh; color:var(--text); background:radial-gradient(circle at 85% 4%,rgba(114,92,255,.2),transparent 30rem),radial-gradient(circle at 5% 60%,rgba(113,229,193,.08),transparent 28rem),var(--bg); font-family:'DM Sans',sans-serif; }
+    button,input { font:inherit; }
+    button { cursor:pointer; }
+    .shell { width:min(1080px,calc(100% - 36px)); margin:0 auto; padding:28px 0 76px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:62px; }
+    .brand { display:flex; align-items:center; gap:10px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
+    .brand-mark { width:32px; height:32px; display:grid; place-items:center; border-radius:9px; color:var(--bg); background:linear-gradient(135deg,var(--mint),var(--violet)); font-family:'Playfair Display',serif; }
+    .cohort-label { padding:7px 11px; border:1px solid rgba(113,229,193,.25); border-radius:99px; color:var(--mint); background:rgba(113,229,193,.06); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .hero { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(330px,.8fr); align-items:center; gap:64px; }
+    .eyebrow { margin-bottom:18px; color:var(--mint); font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { max-width:720px; font:600 clamp(42px,6vw,69px)/1.03 'Playfair Display',serif; letter-spacing:-.025em; }
+    h1 em { color:var(--violet); font-weight:600; }
+    .lead { max-width:650px; margin:24px 0 30px; color:var(--muted); font-size:17px; line-height:1.7; }
+    .promise { display:grid; gap:13px; }
+    .promise li { display:flex; align-items:flex-start; gap:11px; color:#dce0ef; line-height:1.5; list-style:none; }
+    .check { width:21px; height:21px; flex:0 0 auto; display:grid; place-items:center; margin-top:1px; border-radius:50%; color:#07140f; background:var(--mint); font-size:11px; font-weight:800; }
+    .gate { padding:30px; border:1px solid var(--line); border-radius:22px; background:rgba(19,26,51,.94); box-shadow:0 30px 80px rgba(0,0,0,.3); }
+    .gate h2 { margin-bottom:9px; font:600 29px 'Playfair Display',serif; }
+    .gate-copy { color:var(--muted); font-size:13px; line-height:1.6; }
+    .gate label { display:block; margin:22px 0 7px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .gate input { width:100%; padding:14px; border:1px solid var(--line); border-radius:10px; outline:none; color:var(--text); background:var(--panel2); text-transform:uppercase; }
+    .gate input:focus { border-color:var(--violet); }
+    .primary { width:100%; min-height:48px; display:flex; align-items:center; justify-content:center; margin-top:12px; padding:0 18px; border:0; border-radius:9px; color:#07140f; background:linear-gradient(110deg,var(--mint),var(--violet)); font-weight:700; text-decoration:none; }
+    .primary:disabled { opacity:.55; cursor:wait; }
+    .gate-note { margin-top:13px; color:#7f879f; font-size:11px; line-height:1.5; text-align:center; }
+    .error { min-height:18px; margin-top:9px; color:#ff9d9d; font-size:12px; }
+    .success { margin-top:20px; padding:13px; border:1px solid rgba(113,229,193,.24); border-radius:10px; color:var(--mint); background:rgba(113,229,193,.06); font-size:13px; line-height:1.5; }
+    .how { margin-top:82px; padding-top:34px; border-top:1px solid var(--line); }
+    .how h2 { font:600 31px 'Playfair Display',serif; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:22px; }
+    .step { padding:21px; border:1px solid var(--line); border-radius:14px; background:rgba(25,33,61,.58); }
+    .step-number { color:var(--violet); font-size:11px; font-weight:700; letter-spacing:.1em; }
+    .step h3 { margin:10px 0 7px; font-size:15px; }
+    .step p { color:var(--muted); font-size:13px; line-height:1.55; }
+    .expectation { margin-top:22px; padding:18px 20px; border-left:2px solid var(--mint); color:var(--muted); background:rgba(113,229,193,.045); font-size:13px; line-height:1.6; }
+    .expectation strong { color:var(--text); }
+    @media(max-width:780px) { header{margin-bottom:42px}.hero{grid-template-columns:1fr;gap:38px}.steps{grid-template-columns:1fr}.gate{padding:24px}.how{margin-top:58px} }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin="anonymous"></script>
 </head>
-<body></body>
+<body>
+  <main class="shell">
+    <header><a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a><span class="cohort-label">Invitation only</span></header>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Job Search Founding Cohort</div>
+        <h1>Turn your job search into a <em>90-day action plan.</em></h1>
+        <p class="lead">Lucky helps you move from an important career goal to weekly actions you can actually execute—with guided mindset support when uncertainty, rejection or self-doubt gets in the way.</p>
+        <ul class="promise">
+          <li><span class="check">✓</span><span>A personalized 12-week roadmap built around your career goal, starting point and available time.</span></li>
+          <li><span class="check">✓</span><span>Trackable weekly actions and relevant Lucky Exercises to help you keep moving.</span></li>
+          <li><span class="check">✓</span><span>Direct influence on the product through two short founding-member feedback check-ins.</span></li>
+        </ul>
+      </div>
+      <aside class="gate">
+        <div class="eyebrow">Your invitation</div>
+        <h2 id="gate-title">Join the founding cohort</h2>
+        <p class="gate-copy" id="gate-copy">Enter the code shared by your bootcamp leader. You’ll sign in with Google so your plan allowance and feedback stay connected to your account.</p>
+        <form id="access-form">
+          <label for="invite-code">Invitation code</label>
+          <input id="invite-code" autocomplete="off" placeholder="LUCKY-…" required>
+          <div class="error" id="access-error"></div>
+          <button class="primary" id="access-button" type="submit">Continue with Google</button>
+        </form>
+        <div id="unlocked" style="display:none"><div class="success">Founding-member access is unlocked for this account.</div><a class="primary" href="/goals?cohort=bootcamp">Build my 90-day plan →</a></div>
+        <p class="gate-note">Free during the founding cohort. One initial Master Plan plus two revisions per account.</p>
+      </aside>
+    </section>
+    <section class="how">
+      <div class="eyebrow">How the cohort works</div>
+      <h2>Plan, execute and help shape Lucky.</h2>
+      <div class="steps">
+        <article class="step"><span class="step-number">01</span><h3>Build your plan</h3><p>Answer nine focused questions and receive a personalized 90-day roadmap with weekly actions.</p></article>
+        <article class="step"><span class="step-number">02</span><h3>Take the first action</h3><p>Check off tasks as you execute and use Lucky Exercises when mindset becomes the obstacle.</p></article>
+        <article class="step"><span class="step-number">03</span><h3>Share honest feedback</h3><p>Respond after your first completed action and again after seven days so Claire can improve the experience.</p></article>
+      </div>
+      <div class="expectation"><strong>The founding-member exchange:</strong> Lucky is free to use. In return, please use the plan in your real job search and tell Claire candidly what feels useful, generic, unclear or difficult to execute.</div>
+    </section>
+  </main>
+  <script>
+    const SUPABASE_URL='https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+    const SUPABASE_ANON_KEY='sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+    const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    const PENDING_CODE_KEY='lucky_bootcamp_pending_code';
+    let currentSession=null;
+
+    async function accessRequest(method='GET',body=null){
+      const result=await sb.auth.getSession(); currentSession=result.data.session||currentSession;
+      if(!currentSession?.access_token) throw new Error('Sign in required');
+      const response=await fetch('/api/beta-access',{method,headers:{Authorization:`Bearer ${currentSession.access_token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
+      const data=await response.json(); if(!response.ok) throw new Error(data.error||'Could not verify access'); return data;
+    }
+    function showUnlocked(){ document.getElementById('access-form').style.display='none'; document.getElementById('unlocked').style.display='block'; document.getElementById('gate-title').textContent='Welcome, founding member'; document.getElementById('gate-copy').textContent='Your invitation has been verified. Continue when you’re ready to build your plan.'; }
+    async function redeem(code){ const state=await accessRequest('POST',{action:'redeem',code}); localStorage.removeItem(PENDING_CODE_KEY); if(state.allowed) showUnlocked(); }
+
+    document.getElementById('access-form').addEventListener('submit',async event=>{
+      event.preventDefault(); const code=document.getElementById('invite-code').value.trim().toUpperCase(), button=document.getElementById('access-button'), error=document.getElementById('access-error'); error.textContent=''; button.disabled=true;
+      try {
+        if(!currentSession){ localStorage.setItem(PENDING_CODE_KEY,code); button.textContent='Redirecting…'; await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/bootcamp'}}); return; }
+        button.textContent='Checking code…'; await redeem(code);
+      } catch(err){ error.textContent=err.message; button.disabled=false; button.textContent=currentSession?'Unlock cohort access':'Continue with Google'; }
+    });
+
+    async function init(){
+      const result=await sb.auth.getSession(); currentSession=result.data.session;
+      const button=document.getElementById('access-button'); button.textContent=currentSession?'Unlock cohort access':'Continue with Google';
+      if(!currentSession) return;
+      try { const state=await accessRequest(); if(state.allowed){ showUnlocked(); return; } const pending=localStorage.getItem(PENDING_CODE_KEY); if(pending){ button.disabled=true; button.textContent='Verifying invitation…'; await redeem(pending); } }
+      catch(err){ document.getElementById('access-error').textContent=err.message; button.disabled=false; button.textContent='Unlock cohort access'; }
+    }
+    init();
+  </script>
+</body>
 </html>
