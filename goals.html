@@ -86,7 +86,7 @@
     .auth-modal p { margin:12px 0 22px; color:var(--muted); line-height:1.6; }
     .google { width:100%; min-height:48px; border:0; border-radius:9px; color:#111; background:#fff; font-weight:700; }
     .auth-close { float:right; margin:-18px -14px 0 0; border:0; color:var(--muted); background:none; font-size:18px; }
-    .beta-note { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:14px; padding:12px 15px; border:1px solid rgba(113,229,193,.22); border-radius:11px; color:var(--muted); background:rgba(113,229,193,.055); font-size:12px; }
+    .beta-note { display:none; justify-content:space-between; align-items:center; gap:14px; margin-bottom:14px; padding:12px 15px; border:1px solid rgba(113,229,193,.22); border-radius:11px; color:var(--muted); background:rgba(113,229,193,.055); font-size:12px; }
     .beta-note strong { color:var(--mint); }
     .beta-note button { padding:7px 10px; border:1px solid var(--line); border-radius:7px; color:var(--text); background:transparent; white-space:nowrap; }
     .modal-form { margin-top:20px; text-align:left; }
@@ -105,7 +105,7 @@
 <body>
   <main class="shell">
     <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
-    <div class="beta-note"><span><strong>Private beta</strong> · A valid invitation code is required before your first plan is generated.</span><button type="button" id="enter-code">Enter code</button></div>
+    <div class="beta-note"><span><strong>Job Search Founding Cohort</strong> · Enter your invitation code to join and share structured feedback.</span><button type="button" id="enter-code">Enter code</button></div>
 
     <section class="card" id="wizard">
       <div class="step active" id="step-1">
@@ -145,7 +145,9 @@
     const DRAFT_KEY = 'lucky_builder_draft_v1';
     const PLAN_KEY = 'lucky_builder_plan_v1';
     const PENDING_KEY = 'lucky_builder_generation_pending';
+    const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp';
     let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null;
+    if(cohortMode) { document.querySelector('.beta-note').style.display='flex'; document.title='Lucky — Job Search Founding Cohort'; }
 
     function showStep(number) { document.getElementById(`step-${currentStep}`).classList.remove('active'); currentStep = number; document.getElementById(`step-${number}`).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
     function showView(id) { ['wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
@@ -193,12 +195,12 @@
     document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { document.getElementById('finish-error').textContent = 'Define one concrete first-week result before generating the plan.'; return; } const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
 
     async function generatePlan(answers) {
-      if(generationInFlight) return; if(!await ensureBetaAccess()) return; generationInFlight = true; closeAuth(); closeInvite(); showView('generating');
+      if(generationInFlight) return; if(cohortMode && !await ensureBetaAccess()) return; generationInFlight = true; closeAuth(); closeInvite(); showView('generating');
       try {
         const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session || currentSession;
         const token = currentSession?.access_token; if(!token) { showView('wizard'); openAuth(); return; }
         const response = await fetch('/api/decompose-goal',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(answers)});
-        const data = await response.json(); if(!response.ok) { if(data.code==='INVITE_REQUIRED'){ showView('wizard'); openInvite(); return; } throw new Error(data.error || `Generation failed (${response.status})`); }
+        const data = await response.json(); if(!response.ok) throw new Error(data.error || `Generation failed (${response.status})`);
         const saved = {answers,plan:data.plan,usage:data.usage,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); renderPlan(saved);
       } catch(error) { document.getElementById('error-message').textContent = `${error.message}. Your answers are still saved, so you can retry.`; showView('error-view'); }
       finally { generationInFlight = false; }
@@ -256,7 +258,7 @@
       return '<label>How many plan actions have you completed?</label><input name="actions_completed" type="number" min="0" required><label>What has made execution difficult?</label><textarea name="blocked" required></textarea><label>What has been most helpful?</label><textarea name="helpful" required></textarea><label>What should Lucky improve?</label><textarea name="improve" required></textarea><label>How would you feel if Lucky were no longer available?</label><select name="disappointment" required><option value="">Choose one</option><option>Very disappointed</option><option>Somewhat disappointed</option><option>Not disappointed</option></select>';
     }
     async function maybePromptFeedback(stage) {
-      if(!currentSession) return; try { if(!betaState) await refreshBetaAccess(); } catch { return; }
+      if(!cohortMode || !currentSession) return; try { if(!betaState) await refreshBetaAccess(); } catch { return; }
       if(!betaState?.allowed || betaState.feedback?.includes(stage)) return;
       const deferred=Number(localStorage.getItem(`lucky_feedback_deferred_${stage}`)||0); if(Date.now()-deferred<86400000) return;
       feedbackStage=stage; document.getElementById('feedback-title').textContent=stage==='first_action'?'You completed your first action!':'How is your first week going?'; document.getElementById('feedback-intro').textContent=stage==='first_action'?'A few honest answers will help Claire make Lucky more useful for job seekers.':'Tell Claire what helped you execute and where Lucky needs to improve.'; document.getElementById('feedback-fields').innerHTML=feedbackMarkup(stage); document.getElementById('feedback-error').textContent=''; document.getElementById('feedback-overlay').style.display='grid';
@@ -272,7 +274,7 @@
 
     async function init() {
       const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
-      if(currentSession){ try { await refreshBetaAccess(); if(betaState.allowed) document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>'; else openInvite(); } catch {} }
+      if(cohortMode&&currentSession){ try { await refreshBetaAccess(); if(betaState.allowed) document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>'; else openInvite(); } catch {} }
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
       if(currentSession && localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
       const saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
