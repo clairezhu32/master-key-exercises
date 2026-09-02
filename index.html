@@ -229,11 +229,13 @@
     .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 110px; padding: 74px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
     .final-cta h2 { font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 50px); line-height: 1.1; letter-spacing: -.035em; }
     .final-cta p { margin: 17px auto 27px; max-width: 600px; color: var(--muted); }
+    .final-actions { display: flex; justify-content: center; gap: 14px; }
     .footer { width: min(var(--max), calc(100% - 40px)); min-height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: #747d98; font-size: 11px; }
     .footer-links { display: flex; gap: 22px; }
 
     @media (max-width: 900px) {
-      .nav-links a:not(.nav-cta) { display: none; }
+      .nav-links { gap: 16px; }
+      .nav-links a[href="#how"], .nav-cta { display: none; }
       .hero { grid-template-columns: 1fr; gap: 60px; padding-top: 70px; }
       .hero-copy { text-align: center; }
       .hero-copy > p { margin-left: auto; margin-right: auto; }
@@ -272,7 +274,9 @@
       .feature { padding: 18px; }
       .origin { padding: 85px 20px; }
       .final-cta { width: calc(100% - 32px); margin-bottom: 80px; padding: 54px 22px; }
+      .final-actions { align-items: stretch; flex-direction: column; }
       .footer { width: calc(100% - 32px); padding: 28px 0; flex-direction: column; gap: 15px; text-align: center; }
+      .nav-links { gap: 11px; font-size: 11px; }
     }
   </style>
 </head>
@@ -298,7 +302,7 @@
         <p>Lucky helps you turn the area of life that matters most into a clear, realistic action plan—without overwhelming yourself with another productivity system.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
-          <a class="button button-secondary" href="#how">See how it works</a>
+          <a class="button button-secondary" href="/exercises">Explore Lucky Exercises</a>
         </div>
         <div class="hero-note"><span>12 weekly milestones</span><span>24 mindset practices</span><span>Progress and reflections saved</span></div>
       </div>
@@ -404,7 +408,10 @@
     <section class="final-cta">
       <h2>Give your goal a plan—and your mindset a practice.</h2>
       <p>Start by building your personalized 90-day roadmap. Then use Lucky Exercises to support the person executing it.</p>
-      <a class="button button-primary" href="/goals">Build my Master Plan <span>→</span></a>
+      <div class="final-actions">
+        <a class="button button-primary" href="/goals">Build my Master Plan <span>→</span></a>
+        <a class="button button-secondary" href="/exercises">Explore Lucky Exercises</a>
+      </div>
     </section>
   </main>
 
