@@ -50,6 +50,10 @@
     .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
     .stat-grid .stat-tile { margin:0; padding:22px; }
     .stat-grid .stat-value { font-size:38px; }
+    .funnel-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .funnel-metric { padding:15px; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.018); }
+    .funnel-metric strong { display:block; margin-top:6px; color:var(--gold-light); font:500 28px 'Cormorant Garamond',serif; }
+    .funnel-metric small { color:var(--muted); font-size:10px; }
 
     .chart-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
@@ -77,7 +81,7 @@
     .feedback-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin-bottom:11px; font-size:11px; color:var(--muted); }
     .feedback-answer { margin-top:8px; font-size:12px; line-height:1.5; }
     .feedback-answer strong { display:block; color:var(--gold-light); font-weight:500; }
-    @media(max-width:600px){ .stat-grid{grid-template-columns:1fr}.feedback-meta{display:block} }
+    @media(max-width:600px){ .stat-grid,.funnel-grid{grid-template-columns:1fr 1fr}.feedback-meta{display:block} }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
 </head>
@@ -114,6 +118,11 @@
       <div class="stat-tile"><div class="stat-label">Total registrations</div><div class="stat-value" id="stat-total">0</div></div>
       <div class="stat-tile"><div class="stat-label">Beta members</div><div class="stat-value" id="stat-beta">0</div></div>
       <div class="stat-tile"><div class="stat-label">Feedback responses</div><div class="stat-value" id="stat-feedback">0</div></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Product funnel — last 30 days</div>
+      <div class="funnel-grid" id="funnel-grid"></div>
     </div>
 
     <div class="chart-card">
@@ -267,6 +276,12 @@ function renderFeedback(feedback) {
   feedback.forEach(item=>{ const card=document.createElement('article'); card.className='feedback-item'; const meta=document.createElement('div'); meta.className='feedback-meta'; const identity=document.createElement('span'); identity.textContent=`${item.email} · ${labelize(item.stage)}`; const when=document.createElement('span'); when.textContent=new Date(item.submitted_at).toLocaleString(); meta.append(identity,when); card.appendChild(meta); Object.entries(item.answers||{}).forEach(([question,answer])=>{ const row=document.createElement('div'); row.className='feedback-answer'; const label=document.createElement('strong'); label.textContent=labelize(question); const value=document.createElement('span'); value.textContent=answer||'—'; row.append(label,value); card.appendChild(row); }); list.appendChild(card); });
 }
 
+function renderFunnel(funnel={}) {
+  const labels={quiz_started:'Quiz starts',quiz_completed:'Quiz completions',plan_generated:'Plans generated',plan_saved:'Plans saved',plan_shared:'Plans shared',task_completed:'Tasks completed',returning_user:'Returning visits'};
+  const grid=document.getElementById('funnel-grid'); grid.replaceChildren();
+  Object.entries(labels).forEach(([key,label])=>{ const metric=document.createElement('div'); metric.className='funnel-metric'; const name=document.createElement('div'); name.className='stat-label'; name.textContent=label; const value=document.createElement('strong'); value.textContent=funnel[key]?.last30||0; const total=document.createElement('small'); total.textContent=`${funnel[key]?.total||0} all time`; metric.append(name,value,total); grid.appendChild(metric); });
+}
+
 async function loadDashboard() {
   show('view-loading');
   try {
@@ -281,6 +296,7 @@ async function loadDashboard() {
     document.getElementById('stat-beta').textContent = data.beta?.members || 0;
     document.getElementById('stat-feedback').textContent = data.beta?.feedbackSubmissions || 0;
     renderBarChart(data.daily);
+    renderFunnel(data.funnel);
     renderRecentTable(data.recent);
     renderFeedback(data.beta?.feedback || []);
     show('view-dashboard');
