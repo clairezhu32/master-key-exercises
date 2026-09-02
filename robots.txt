@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /analytics
+Disallow: /bootcamp
+
+Sitemap: https://lucky-action-plan.vercel.app/sitemap.xml

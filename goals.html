@@ -46,6 +46,9 @@
     .summary { margin-top:14px; color:var(--muted); line-height:1.65; }
     .milestone { display:inline-block; margin-top:17px; padding:8px 13px; border:1px solid rgba(113,229,193,.25); border-radius:999px; color:var(--mint); background:rgba(113,229,193,.06); font-size:12px; }
     .insight { margin:22px 0; padding:17px; border-left:2px solid var(--violet); color:#c5cbe0; background:rgba(157,140,255,.06); line-height:1.65; }
+    .first-action { margin:18px 0 22px; padding:18px; border:1px solid rgba(113,229,193,.28); border-radius:13px; background:linear-gradient(135deg,rgba(113,229,193,.09),rgba(157,140,255,.06)); }
+    .first-action span { display:block; margin-bottom:7px; color:var(--mint); font-size:10px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+    .first-action strong { display:block; font-size:16px; line-height:1.5; }
     .section-title { margin:30px 0 14px; color:var(--muted); font-size:11px; letter-spacing:.15em; text-transform:uppercase; }
     .weeks { display:grid; gap:12px; }
     .week { padding:20px; border:1px solid var(--line); border-radius:14px; background:var(--panel2); }
@@ -79,6 +82,8 @@
     .exercise-link { padding:10px 13px; border:1px solid rgba(157,140,255,.3); border-radius:8px; color:var(--text); background:rgba(157,140,255,.08); text-decoration:none; font-size:12px; }
     .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
     .plan-allowance { width:100%; color:var(--muted); font-size:12px; }
+    .saved-state { width:100%; padding:11px 13px; border:1px solid rgba(113,229,193,.2); border-radius:9px; color:var(--mint); background:rgba(113,229,193,.05); font-size:12px; }
+    .share-status { width:100%; min-height:18px; color:var(--mint); font-size:11px; }
     .secondary { min-height:44px; padding:0 18px; border:1px solid var(--line); border-radius:9px; color:var(--text); background:transparent; }
     .auth-overlay { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:20px; background:rgba(4,6,14,.82); backdrop-filter:blur(8px); }
     .auth-modal { width:min(430px,100%); padding:32px; border:1px solid var(--line); border-radius:20px; background:var(--panel); text-align:center; }
@@ -130,7 +135,7 @@
     </section>
 
     <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
-    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your execution progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended Lucky Exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><div class="plan-allowance" id="plan-allowance"></div><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin a Lucky Exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
+    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="first-action"><span>Start here · your first action</span><strong id="result-first-action"></strong></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your execution progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended Lucky Exercises</div><div class="exercise-links" id="result-exercises"></div><div class="result-actions"><div class="saved-state" id="saved-state">✓ Your plan is saved to your Lucky account.</div><button class="secondary" id="copy-summary">Copy plan summary</button><button class="secondary" id="share-plan">Share my plan</button><div class="share-status" id="share-status"></div><div class="plan-allowance" id="plan-allowance"></div><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin a Lucky Exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
     <section class="card center" id="error-view"><h2>We couldn’t build the plan yet.</h2><p id="error-message"></p><button class="primary" id="retry" style="margin-top:22px">Try again</button></section>
   </main>
 
@@ -146,8 +151,12 @@
     const PLAN_KEY = 'lucky_builder_plan_v1';
     const PENDING_KEY = 'lucky_builder_generation_pending';
     const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp' || new URLSearchParams(window.location.search).get('cohort') === 'bootcamp';
-    let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null;
+    const VISITOR_KEY = 'lucky_visitor_id';
+    let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null, activeSavedPlan = null, quizStartedTracked = false;
     if(cohortMode) { document.querySelector('.beta-note').style.display='flex'; document.title='Lucky — Job Search Founding Cohort'; }
+
+    function visitorId(){ let id=localStorage.getItem(VISITOR_KEY); if(!id){ id=crypto.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`; localStorage.setItem(VISITOR_KEY,id); } return id; }
+    async function trackEvent(eventName,properties={}){ try { const session=(await sb.auth.getSession()).data.session; await fetch('/api/events',{method:'POST',headers:{'Content-Type':'application/json',...(session?.access_token?{Authorization:`Bearer ${session.access_token}`}:{})},body:JSON.stringify({event_name:eventName,visitor_id:visitorId(),properties})}); } catch {} }
 
     function showStep(number) { document.getElementById(`step-${currentStep}`).classList.remove('active'); currentStep = number; document.getElementById(`step-${number}`).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
     function showView(id) { ['wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
@@ -155,12 +164,12 @@
     function collectAnswers() { const startWeek = Number(document.getElementById('start-week').value) || 1; return { category:selectedCategory, goal:value('goal'), baseline:value('baseline'), gap:value('gap'), tried:value('tried'), resources:value('resources'), constraints:value('constraints'), why:value('why'), obstacle:value('obstacle'), hours:selectedHours, schedule:value('schedule'), first_week:value('first-week'), start_week:startWeek, progress:`90-DAY OUTCOME: ${value('goal')}\n\nGAP TO CLOSE: ${value('gap')}`, createdAt:Date.now()-(startWeek-1)*7*86400000 }; }
     function setInlineError(button, message) { const step = button.closest('.step'); const target = step.querySelector('.error-inline'); if(target) target.textContent = message; }
 
-    document.querySelectorAll('#category-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#category-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedCategory = button.dataset.category; document.getElementById('next-1').disabled = false; }));
+    document.querySelectorAll('#category-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#category-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedCategory = button.dataset.category; document.getElementById('next-1').disabled = false; if(!quizStartedTracked){ quizStartedTracked=true; trackEvent('quiz_started',{category:selectedCategory,source:new URLSearchParams(location.search).get('source')||'direct'}); } }));
     document.querySelectorAll('#hour-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#hour-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedHours = button.dataset.hours; document.getElementById('next-6').disabled = false; }));
-    document.getElementById('next-1').addEventListener('click', () => showStep(2));
-    document.getElementById('next-6').addEventListener('click', () => showStep(7));
+    document.getElementById('next-1').addEventListener('click', () => { trackEvent('quiz_step_completed',{step:1}); showStep(2); });
+    document.getElementById('next-6').addEventListener('click', () => { trackEvent('quiz_step_completed',{step:6}); showStep(7); });
     document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
-    document.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => { const required = button.dataset.require; if(required && !value(required)) { setInlineError(button,'Please answer this question so the plan has enough context.'); return; } showStep(Number(button.dataset.next)); }));
+    document.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => { const required = button.dataset.require; if(required && !value(required)) { setInlineError(button,'Please answer this question so the plan has enough context.'); return; } trackEvent('quiz_step_completed',{step:Number(button.dataset.next)-1}); showStep(Number(button.dataset.next)); }));
 
     function openAuth() { document.getElementById('auth-overlay').style.display = 'grid'; }
     function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
@@ -192,7 +201,7 @@
       finally { button.disabled=false; button.textContent='Unlock Lucky'; }
     });
 
-    document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { document.getElementById('finish-error').textContent = 'Define one concrete first-week result before generating the plan.'; return; } const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
+    document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { document.getElementById('finish-error').textContent = 'Define one concrete first-week result before generating the plan.'; return; } trackEvent('quiz_step_completed',{step:9}); trackEvent('quiz_completed',{category:selectedCategory}); const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
 
     async function generatePlan(answers) {
       if(generationInFlight) return; if(cohortMode && !await ensureBetaAccess()) return; generationInFlight = true; closeAuth(); closeInvite(); showView('generating');
@@ -201,7 +210,7 @@
         const token = currentSession?.access_token; if(!token) { showView('wizard'); openAuth(); return; }
         const response = await fetch('/api/decompose-goal',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(answers)});
         const data = await response.json(); if(!response.ok) throw new Error(data.error || `Generation failed (${response.status})`);
-        const saved = {answers,plan:data.plan,usage:data.usage,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); renderPlan(saved);
+        const saved = {answers,plan:data.plan,usage:data.usage,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); trackEvent('plan_generated',{category:answers.category}); trackEvent('plan_saved',{category:answers.category}); renderPlan(saved);
       } catch(error) { document.getElementById('error-message').textContent = `${error.message}. Your answers are still saved, so you can retry.`; showView('error-view'); }
       finally { generationInFlight = false; }
     }
@@ -211,12 +220,16 @@
 
     function renderPlan(saved) {
       const plan = saved.plan || {}, answers = saved.answers || {};
+      activeSavedPlan = saved;
       saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {};
       document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your Master Plan';
       document.getElementById('result-goal').textContent = answers.goal || plan.milestone_90day || 'Your 90-day goal';
       document.getElementById('result-summary').textContent = plan.summary || '';
       document.getElementById('result-milestone').textContent = `90-day milestone: ${plan.milestone_90day || answers.goal || ''}`;
       document.getElementById('result-insight').textContent = plan.insight || 'Begin with the first small action and let execution create clarity.';
+      const firstAction=plan.weeks?.[0]?.actions?.[0] || answers.first_week || 'Choose one small action you can complete today.';
+      document.getElementById('result-first-action').textContent=firstAction;
+      document.getElementById('saved-state').textContent=currentSession?.user?.email ? `✓ Plan saved to ${currentSession.user.email}. Progress is saved in this browser.` : '✓ Your plan is saved. Progress is saved in this browser.';
       const weeks = document.getElementById('result-weeks'); weeks.replaceChildren();
       (plan.weeks || []).forEach((week,index) => {
         const weekNumber=week.week || index+1, weekKey=`week-${weekNumber}`;
@@ -230,18 +243,18 @@
           const taskKey=`${weekKey}-task-${actionIndex}`; const item=document.createElement('label'); item.className='task';
           const checkbox=document.createElement('input'); checkbox.type='checkbox'; checkbox.checked=Boolean(saved.progress.completed[taskKey]);
           const text=document.createElement('span'); text.textContent=action; item.append(checkbox,text); item.classList.toggle('done',checkbox.checked);
-          checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); const completed=Object.values(saved.progress.completed).filter(Boolean).length; if(checkbox.checked&&completed===1) maybePromptFeedback('first_action',saved); });
+          checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); const completed=Object.values(saved.progress.completed).filter(Boolean).length; if(checkbox.checked){ trackEvent('task_completed',{week:weekNumber,completed_count:completed}); } if(checkbox.checked&&completed===1) maybePromptFeedback('first_action',saved); });
           list.appendChild(item);
         });
         const fallbackExercises=plan.exercises || []; const recommended=week.exercise_part ? {part:week.exercise_part,reason:week.exercise_reason} : fallbackExercises.length ? fallbackExercises[Math.min(Math.floor(index/4),fallbackExercises.length-1)] : null;
         const weekExercise=recommended ? document.createElement('a') : null;
         if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises?part=${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Part ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this Lucky Exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this Lucky Exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
         const feedback=document.createElement('div'); feedback.className='week-feedback';
-        const feedbackLabel=document.createElement('span'); feedbackLabel.className='feedback-label'; feedbackLabel.textContent='Weekly reflection';
+        const feedbackLabel=document.createElement('span'); feedbackLabel.className='feedback-label'; feedbackLabel.textContent='Weekly check-in';
         const statuses=document.createElement('div'); statuses.className='feedback-status';
         const currentFeedback=saved.progress.feedback[weekKey] || {status:'',note:''};
         ['On track','Need adjustment','Blocked'].forEach(status=>{ const button=document.createElement('button'); button.type='button'; button.className='status-button'; button.textContent=status; button.classList.toggle('selected',currentFeedback.status===status); button.addEventListener('click',()=>{ currentFeedback.status=status; saved.progress.feedback[weekKey]=currentFeedback; statuses.querySelectorAll('.status-button').forEach(item=>item.classList.toggle('selected',item===button)); savePlanProgress(saved); savedNote.textContent='Feedback saved'; }); statuses.appendChild(button); });
-        const note=document.createElement('textarea'); note.className='feedback-note'; note.placeholder='What worked? What was difficult? What will you change next week?'; note.value=currentFeedback.note || '';
+        const note=document.createElement('textarea'); note.className='feedback-note'; note.placeholder='What worked this week? What was difficult? What will you adjust next week?'; note.value=currentFeedback.note || '';
         const savedNote=document.createElement('div'); savedNote.className='save-note'; let noteTimer;
         note.addEventListener('input',()=>{ currentFeedback.note=note.value; saved.progress.feedback[weekKey]=currentFeedback; clearTimeout(noteTimer); noteTimer=setTimeout(()=>{ savePlanProgress(saved); savedNote.textContent='Reflection saved'; setTimeout(()=>savedNote.textContent='',1400); },350); });
         feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
@@ -252,6 +265,11 @@
       if(usage){ allowance.textContent=usage.remaining>0 ? `${usage.remaining} of ${usage.limit} Master Plan generations remaining` : 'You have used all 3 Master Plan generations for this account.'; buildAnother.disabled=usage.remaining<=0; buildAnother.textContent=usage.remaining>0 ? 'Build another plan' : 'Plan limit reached'; }
       showView('result'); window.scrollTo({top:0}); if(Date.now()-(saved.savedAt||Date.now())>=7*86400000) setTimeout(()=>maybePromptFeedback('seven_day',saved),500);
     }
+
+    function planShareText(){ const saved=activeSavedPlan||{}, plan=saved.plan||{}, answers=saved.answers||{}, first=plan.weeks?.[0]?.actions?.[0]||answers.first_week||''; return `My focus for the next 90 days is: ${answers.goal||plan.milestone_90day||'my meaningful goal'}\n\n90-day outcome: ${plan.milestone_90day||answers.goal||''}\nFirst action: ${first}\n\nBuilt with Lucky: ${location.origin}`; }
+    function showShareStatus(message){ const target=document.getElementById('share-status'); target.textContent=message; setTimeout(()=>target.textContent='',2400); }
+    document.getElementById('copy-summary').addEventListener('click',async()=>{ try { await navigator.clipboard.writeText(planShareText()); showShareStatus('Plan summary copied.'); trackEvent('plan_shared',{method:'copy'}); } catch { showShareStatus('Could not copy automatically. Please try again.'); } });
+    document.getElementById('share-plan').addEventListener('click',async()=>{ const text=planShareText(); try { if(navigator.share){ await navigator.share({title:'My Lucky 90-Day Action Plan',text,url:location.origin}); trackEvent('plan_shared',{method:'native'}); } else { await navigator.clipboard.writeText(text); showShareStatus('Sharing is not available here, so the summary was copied.'); trackEvent('plan_shared',{method:'copy_fallback'}); } } catch(error){ if(error.name!=='AbortError') showShareStatus('Sharing was not completed.'); } });
 
     function feedbackMarkup(stage) {
       if(stage==='first_action') return '<label>How personalized does your plan feel?</label><select name="plan_fit" required><option value="">Choose one</option><option>Very personalized</option><option>Somewhat personalized</option><option>Too generic</option></select><label>Which action feels most useful?</label><textarea name="most_useful" required></textarea><label>What feels unclear or unrealistic?</label><textarea name="unclear"></textarea><label>How likely are you to continue this plan? (1–10)</label><input name="likelihood" type="number" min="1" max="10" required>';
@@ -270,16 +288,17 @@
     document.getElementById('retry').addEventListener('click', () => { const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(draft) generatePlan(draft); else showView('wizard'); });
     document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
 
-    async function fetchUsage() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/decompose-goal',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data.usage : null; } catch { return null; } }
+    async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/saved-plan',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
 
     async function init() {
       const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
+      const categoryFromUrl=new URLSearchParams(location.search).get('category'); if(categoryFromUrl){ const categoryButton=[...document.querySelectorAll('#category-choices .choice')].find(button=>button.dataset.category===categoryFromUrl); if(categoryButton) categoryButton.click(); }
       if(cohortMode&&currentSession){ try { await refreshBetaAccess(); if(betaState.allowed) document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>'; else openInvite(); } catch {} }
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
       if(currentSession && localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
-      const saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
-      if(saved && currentSession){ const usage=await fetchUsage(); if(usage){ saved.usage=usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); } }
-      if(saved && (!currentSession || saved.ownerId === currentSession.user.id)) renderPlan(saved);
+      let saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
+      if(currentSession){ const account=await fetchAccountState(); if(account?.usage&&saved){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); } else if(account?.savedPlan){ saved={...account.savedPlan,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); } }
+      if(saved && (!currentSession || saved.ownerId === currentSession.user.id)){ trackEvent('returning_user',{has_saved_plan:true}); renderPlan(saved); }
     }
     init();
   </script>
