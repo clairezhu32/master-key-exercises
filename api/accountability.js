@@ -86,7 +86,6 @@ async function findMatch(userId, profile, serviceRoleKey) {
   if (!response.ok) throw new Error(`Match query failed (${response.status})`);
   const candidates = await response.json();
   return candidates.find((candidate) => candidate.goal_data?._buddy_match_profile?.category === profile.category && candidate.goal_data?._buddy_match_profile?.cadence === profile.cadence)
-    || candidates.find((candidate) => candidate.goal_data?._buddy_match_profile?.category === profile.category)
     || null;
 }
 
