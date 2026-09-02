@@ -7,6 +7,11 @@ function isAllowedOrigin(origin) {
   return Boolean(process.env.ALLOWED_ORIGIN && origin === process.env.ALLOWED_ORIGIN);
 }
 
+function requestOrigin(req) {
+  if (req.headers.origin) return req.headers.origin;
+  try { return new URL(req.headers.referer || '').origin; } catch { return ''; }
+}
+
 async function getUser(authHeader, serviceRoleKey) {
   const token = authHeader?.replace(/^Bearer\s+/i, '').trim();
   if (!token) return null;
@@ -16,7 +21,7 @@ async function getUser(authHeader, serviceRoleKey) {
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-  if (!isAllowedOrigin(req.headers.origin || '')) return res.status(403).json({ error: 'Forbidden' });
+  if (!isAllowedOrigin(requestOrigin(req))) return res.status(403).json({ error: 'Forbidden' });
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) return res.status(500).json({ error: 'Plan recovery is not configured' });
   const user = await getUser(req.headers.authorization, serviceRoleKey);

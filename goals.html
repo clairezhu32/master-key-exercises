@@ -35,7 +35,7 @@
     .primary:disabled { opacity:.38; cursor:default; }
     .progress { color:#747d99; font-size:11px; }
     .error-inline { min-height:18px; margin-top:13px; color:#ff9d9d; font-size:12px; }
-    #generating, #result, #error-view { display:none; }
+    #wizard, #generating, #result, #error-view { display:none; }
     .center { padding:65px 20px; text-align:center; }
     .spinner { width:52px; height:52px; margin:0 auto 24px; border:3px solid var(--line); border-top-color:var(--mint); border-radius:50%; animation:spin .9s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
@@ -139,6 +139,7 @@
     <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
     <div class="beta-note"><span><strong>Job Search Founding Cohort</strong> · Enter your invitation code to join and share structured feedback.</span><button type="button" id="enter-code">Enter code</button></div>
 
+    <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your Master Plan…</h2><p>Checking your Lucky account for a saved plan.</p></section>
     <section class="card" id="wizard">
       <div class="step active" id="step-1">
         <div class="num">Question 1 of 9</div><div class="question">What area of your life is this goal in?</div>
@@ -187,7 +188,7 @@
     async function trackEvent(eventName,properties={}){ try { const session=(await sb.auth.getSession()).data.session; await fetch('/api/events',{method:'POST',headers:{'Content-Type':'application/json',...(session?.access_token?{Authorization:`Bearer ${session.access_token}`}:{})},body:JSON.stringify({event_name:eventName,visitor_id:visitorId(),properties})}); } catch {} }
 
     function showStep(number) { document.getElementById(`step-${currentStep}`).classList.remove('active'); currentStep = number; document.getElementById(`step-${number}`).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
-    function showView(id) { ['wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
+    function showView(id) { ['account-loading','wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
     function value(id) { return document.getElementById(id).value.trim(); }
     function collectAnswers() { const startWeek = Number(document.getElementById('start-week').value) || 1; return { category:selectedCategory, goal:value('goal'), baseline:value('baseline'), gap:value('gap'), tried:value('tried'), resources:value('resources'), constraints:value('constraints'), why:value('why'), obstacle:value('obstacle'), hours:selectedHours, schedule:value('schedule'), first_week:value('first-week'), start_week:startWeek, progress:`90-DAY OUTCOME: ${value('goal')}\n\nGAP TO CLOSE: ${value('gap')}`, createdAt:Date.now()-(startWeek-1)*7*86400000 }; }
     function setInlineError(button, message) { const step = button.closest('.step'); const target = step.querySelector('.error-inline'); if(target) target.textContent = message; }
@@ -363,8 +364,14 @@
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
       if(currentSession && localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
       let saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
-      if(currentSession){ const account=await fetchAccountState(); if(account?.usage&&saved){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); } else if(account?.savedPlan){ saved={...account.savedPlan,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); } }
-      if(saved && (!currentSession || saved.ownerId === currentSession.user.id)){ trackEvent('returning_user',{has_saved_plan:true}); renderPlan(saved); }
+      if(currentSession){
+        const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
+        if(account?.savedPlan){ saved={...account.savedPlan,progress:localBelongsToUser?saved.progress:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        else if(saved&&!localBelongsToUser){ saved=null; }
+      }
+      if(saved && (!currentSession || saved.ownerId === currentSession.user.id)){ trackEvent('returning_user',{has_saved_plan:true}); renderPlan(saved); return; }
+      showView('wizard');
     }
     init();
   </script>
