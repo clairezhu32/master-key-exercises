@@ -288,7 +288,7 @@
     document.getElementById('retry').addEventListener('click', () => { const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(draft) generatePlan(draft); else showView('wizard'); });
     document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
 
-    async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/decompose-goal',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
+    async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/saved-plan',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
 
     async function init() {
       const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
