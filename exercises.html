@@ -1228,6 +1228,8 @@
     .sound-volume { width: min(190px,50vw); accent-color: var(--gold); }
     .sound-duration { min-height: 36px; padding: 0 9px; border: 1px solid var(--border); border-radius: 8px; color: var(--text); background: var(--surface); }
     .sound-status { color: var(--text-faint); font-size: .75rem; }
+    .audio-embed-wrap { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+    .audio-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .reflection-label { display: block; margin: 18px 0 8px; color: var(--text); font-size: .84rem; font-weight: 600; line-height: 1.5; }
     .reflection-label:first-of-type { margin-top: 0; }
     .reflection-answer { min-height: 82px; }
@@ -1313,6 +1315,25 @@
       <span class="share-status" id="share-status" aria-live="polite"></span>
     </div>
 
+    <!-- Simple mode: audio + a few questions, used when ex.audioEmbedId is set -->
+    <div id="simple-exercise-body" style="display:none">
+      <div class="ex-section">
+        <div class="ex-section-label">Listen</div>
+        <div class="audio-embed-wrap">
+          <iframe id="ex-audio-frame" src="" title="Guided audio" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="ex-section">
+        <div class="ex-section-label">Answer</div>
+        <div id="simple-questions-wrap"></div>
+        <div class="journal-save-row">
+          <button class="btn" id="btn-save-simple">Save my answers</button>
+          <span class="journal-saved-note" id="save-simple-feedback">Answers saved</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="classic-exercise-body">
     <!-- Lesson context -->
     <div class="ex-section">
         <div class="ex-section-label">Rewiring Prompt</div>
@@ -1426,6 +1447,7 @@
         <button class="btn" id="btn-save-note">Save my answers</button>
         <span class="journal-saved-note" id="save-note-feedback">Answers saved</span>
       </div>
+    </div>
     </div>
 
     <!-- Mark complete / sessions -->
@@ -2326,6 +2348,18 @@ const SESSION_SUPPORT = [
 
 SESSION_SUPPORT.forEach((support, index) => Object.assign(EXERCISES[index], support));
 
+// Prototype: "listen, then answer" simple format for Exercise 1.
+// audioEmbedId set → openExercise() swaps the full classic flow for just
+// the audio + these questions (see simple-exercise-body).
+Object.assign(EXERCISES[0], {
+  audioEmbedId: 'TqD1KjETwuM',
+  simpleQuestions: [
+    'What did you notice in your body while you listened?',
+    'What is one thought that came up during the audio?',
+    'Name one thing you feel lucky for today.',
+  ],
+});
+
 // ── Per-part personalization ──────────────────
 // Each entry: { bridge, affirmation }
 // {goal} is replaced with the user's actual goal at render time.
@@ -2517,12 +2551,44 @@ function saveReflection(part) {
   saveNote(part, `${REFLECTION_PREFIX}${JSON.stringify(collectReflection())}`);
 }
 
+// ── Simple mode (listen to audio, answer a few questions) ────
+const SIMPLE_PREFIX = 'LUCKY_SIMPLE_V1:';
+
+function parseSimpleAnswers(savedNote) {
+  if (!savedNote || !savedNote.startsWith(SIMPLE_PREFIX)) return { answers: [] };
+  try { return JSON.parse(savedNote.slice(SIMPLE_PREFIX.length)); }
+  catch { return { answers: [] }; }
+}
+
+function collectSimpleAnswers(ex) {
+  return { answers: ex.simpleQuestions.map((_, i) => (document.getElementById(`simple-q-${i}`)?.value || '').trim()) };
+}
+
+function renderSimpleQuestions(ex, part, data) {
+  const parsed = parseSimpleAnswers(data.note || '');
+  const wrap = document.getElementById('simple-questions-wrap');
+  wrap.innerHTML = ex.simpleQuestions.map((q, i) => `
+    <label class="reflection-label" for="simple-q-${i}">${i + 1}. ${q}</label>
+    <textarea class="journal-textarea" id="simple-q-${i}" placeholder="Your answer…"></textarea>
+  `).join('');
+  ex.simpleQuestions.forEach((q, i) => {
+    document.getElementById(`simple-q-${i}`).value = parsed.answers?.[i] || '';
+  });
+}
+
+function saveSimpleReflection(part, ex) {
+  saveNote(part, `${SIMPLE_PREFIX}${JSON.stringify(collectSimpleAnswers(ex))}`);
+}
+
 function saveSession(part) {
   const store = loadStore();
   if (!store[part]) store[part] = { sessions: [], note: '' };
-  const intention = (document.getElementById('intention-input')?.value ?? '').trim();
+  const ex = EXERCISES[part - 1];
+  const intention = ex.audioEmbedId ? '' : (document.getElementById('intention-input')?.value ?? '').trim();
   store[part].sessions.push({ ts: Date.now(), intention });
-  store[part].note = `${REFLECTION_PREFIX}${JSON.stringify(collectReflection())}`;
+  store[part].note = ex.audioEmbedId
+    ? `${SIMPLE_PREFIX}${JSON.stringify(collectSimpleAnswers(ex))}`
+    : `${REFLECTION_PREFIX}${JSON.stringify(collectReflection())}`;
   saveStore(store);
   cloudUpsertProgress(part); // fire-and-forget cloud sync
 }
@@ -2767,6 +2833,17 @@ function openExercise(part) {
   document.getElementById('journal-textarea').value = reflection.notes || '';
   renderSessionGuidance(ex);
 
+  // Simple mode — audio + a few questions, replaces the full classic flow
+  const simpleMode = !!ex.audioEmbedId;
+  document.getElementById('classic-exercise-body').style.display = simpleMode ? 'none' : '';
+  document.getElementById('simple-exercise-body').style.display = simpleMode ? '' : 'none';
+  if (simpleMode) {
+    document.getElementById('ex-audio-frame').src = `https://www.youtube.com/embed/${ex.audioEmbedId}`;
+    renderSimpleQuestions(ex, part, data);
+  } else {
+    document.getElementById('ex-audio-frame').src = '';
+  }
+
   // Intention — pre-fill with last session's intention, show callback
   const intentionInput = document.getElementById('intention-input');
   const intentionCallback = document.getElementById('intention-callback');
@@ -2819,6 +2896,12 @@ function openExercise(part) {
   document.getElementById('btn-save-note').onclick = () => {
     saveReflection(part);
     const fb = document.getElementById('save-note-feedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+  };
+  document.getElementById('btn-save-simple').onclick = () => {
+    saveSimpleReflection(part, ex);
+    const fb = document.getElementById('save-simple-feedback');
     fb.classList.add('show');
     setTimeout(() => fb.classList.remove('show'), 2000);
   };
