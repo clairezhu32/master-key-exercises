@@ -1,6 +1,16 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "master-key-exercises.vercel.app" }
+      ],
+      "destination": "https://lucky-action-plan.vercel.app/:path*",
+      "permanent": true
+    }
+  ],
   "routes": [
     { "src": "/exercises", "dest": "/exercises.html" },
     { "src": "/exercises-zh", "dest": "/exercises-zh.html" },
