@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Lucky turns one meaningful goal into a personalized 90-day action plan, then supports follow-through with 24 guided Lucky Exercises for mindset and reflection.">
+  <meta property="og:title" content="Lucky — Your 90-Day Action Plan and Mindset Practice">
+  <meta property="og:description" content="Choose one meaningful goal. Get a personalized 90-day roadmap plus 24 guided mindset practices to help you follow through.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://master-key-exercises.vercel.app/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Lucky — Your 90-Day Action Plan and Mindset Practice">
+  <meta name="twitter:description" content="Choose one meaningful goal. Get a personalized 90-day roadmap plus 24 guided mindset practices to help you follow through.">
+  <link rel="canonical" href="https://master-key-exercises.vercel.app/">
   <title>Lucky — Your 90-Day Action Plan and Mindset Practice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,9 +68,14 @@
     }
     .nav-links { display: flex; align-items: center; gap: 28px; color: var(--muted); font-size: 13px; font-weight: 500; }
     .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 10px 16px; color: var(--text) !important; border: 1px solid rgba(157,140,255,.45);
+      border-radius: 9px; background: rgba(157,140,255,.08);
+    }
+
     .hero {
       width: min(var(--max), calc(100% - 40px));
-      min-height: 640px;
+      min-height: 690px;
       margin: 0 auto;
       padding: 90px 0 86px;
       display: grid;
@@ -147,7 +160,7 @@
       background: rgba(255,255,255,.018);
     }
     .proof-inner {
-      width: min(var(--max), calc(100% - 40px)); min-height: 104px; margin: 0 auto;
+      width: min(var(--max), calc(100% - 40px)); min-height: 120px; margin: 0 auto;
       display: grid; grid-template-columns: repeat(3, 1fr);
     }
     .proof-item { padding: 29px 36px; display: flex; align-items: center; gap: 18px; border-right: 1px solid var(--line); }
@@ -156,7 +169,18 @@
     .proof-item strong { color: var(--text); font-family: "Playfair Display", serif; font-size: 34px; font-weight: 600; }
     .proof-item span { color: var(--muted); font-size: 12px; line-height: 1.45; }
 
-    .section { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 96px 0; }
+    .goal-paths { width: min(var(--max), calc(100% - 40px)); margin: 84px auto 0; }
+    .goal-paths-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 24px; }
+    .goal-paths-head h2 { max-width: 620px; margin-top: 13px; font: 600 clamp(31px,4vw,45px)/1.12 "Playfair Display",serif; }
+    .goal-paths-head > p { max-width: 430px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .goal-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 11px; }
+    .goal-link { min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; padding: 19px; border: 1px solid var(--line); border-radius: 14px; color: var(--text); background: rgba(19,26,51,.65); transition: transform .2s,border-color .2s,background .2s; }
+    .goal-link:hover { transform: translateY(-3px); border-color: rgba(157,140,255,.38); background: rgba(25,33,61,.9); }
+    .goal-link span { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .goal-link strong { font: 600 19px/1.24 "Playfair Display",serif; }
+    .goal-link small { color: var(--muted); font-size: 10px; }
+
+    .section { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 120px 0; }
     .section-heading { max-width: 720px; margin-bottom: 54px; }
     .section-kicker { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
     .section h2 { margin-top: 13px; font-family: "Playfair Display", serif; font-size: clamp(36px, 4.8vw, 56px); line-height: 1.1; letter-spacing: -.035em; }
@@ -181,8 +205,12 @@
     .step-card p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
     .step-card:nth-child(2) { border-color: rgba(157,140,255,.3); background: linear-gradient(145deg, rgba(157,140,255,.105), rgba(255,255,255,.02)); }
     .step-output { display: block; margin-top: 20px; color: #8e96b1; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .journey-cta { margin-top: 34px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 23px 26px; border: 1px solid rgba(113,229,193,.2); border-radius: 14px; background: rgba(113,229,193,.055); }
+    .journey-cta p { color: var(--muted); font-size: 13px; }
+    .journey-cta strong { color: var(--text); }
+
     .experience {
-      width: min(var(--max), calc(100% - 40px)); margin: 0 auto 96px; overflow: hidden;
+      width: min(var(--max), calc(100% - 40px)); margin: 0 auto 120px; overflow: hidden;
       display: grid; grid-template-columns: .9fr 1.1fr; border: 1px solid var(--line); border-radius: 22px;
       background: var(--navy);
     }
@@ -199,17 +227,39 @@
     .feature h3 { font-size: 15px; }
     .feature p { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.55; }
 
-    .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 90px; padding: 62px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
+    .origin { padding: 110px 20px; text-align: center; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(157,140,255,.045), transparent); }
+    .origin-inner { max-width: 800px; margin: 0 auto; }
+    .origin h2 { margin-top: 15px; font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 52px); line-height: 1.12; letter-spacing: -.035em; }
+    .origin p { margin: 22px auto 0; max-width: 700px; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .quote { margin-top: 34px; padding-top: 30px; border-top: 1px solid var(--line); color: #d7d3e5; font-family: "Playfair Display", serif; font-size: 20px !important; font-style: italic; }
+    .quote cite { display: block; margin-top: 10px; color: #737b96; font-family: "DM Sans", sans-serif; font-size: 10px; font-style: normal; letter-spacing: .1em; text-transform: uppercase; }
+
+    .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 110px; padding: 74px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
     .final-cta h2 { font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 50px); line-height: 1.1; letter-spacing: -.035em; }
     .final-cta p { margin: 17px auto 27px; max-width: 600px; color: var(--muted); }
-    .final-actions { display: flex; justify-content: center; gap: 14px; }
-    .final-note { margin-top: 20px; color: #737b96; font-size: 10px; }
     .footer { width: min(var(--max), calc(100% - 40px)); min-height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: #747d98; font-size: 11px; }
     .footer-links { display: flex; gap: 22px; }
 
+    .waitlist { width: min(var(--max), calc(100% - 40px)); margin: 0 auto 90px; padding: 56px 50px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015)); }
+    .waitlist-inner { max-width: 640px; margin: 0 auto; text-align: center; }
+    .waitlist h2 { font-family: "Playfair Display", serif; font-size: clamp(26px, 4vw, 36px); line-height: 1.15; letter-spacing: -.03em; }
+    .waitlist p { margin: 14px auto 0; max-width: 520px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .waitlist-form { margin-top: 26px; display: flex; gap: 10px; justify-content: center; }
+    .waitlist-form input {
+      min-height: 52px; flex: 1; max-width: 320px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px;
+      color: var(--text); background: rgba(8,11,23,.55); font-size: 14px; outline: none;
+    }
+    .waitlist-form input:focus { border-color: rgba(157,140,255,.55); }
+    .waitlist-form input::placeholder { color: #747d98; }
+    .waitlist-form button { min-height: 52px; padding: 0 22px; border: 0; border-radius: 10px; color: var(--night); background: linear-gradient(100deg, var(--mint), #a99bff); font-size: 14px; font-weight: 700; cursor: pointer; transition: .2s ease; }
+    .waitlist-form button:hover:not(:disabled) { transform: translateY(-2px); }
+    .waitlist-form button:disabled { opacity: .5; cursor: default; }
+    .waitlist-status { min-height: 20px; margin-top: 14px; font-size: 13px; }
+    .waitlist-status.success { color: var(--mint); }
+    .waitlist-status.error { color: #ff9d9d; }
+
     @media (max-width: 900px) {
-      .nav-links { gap: 16px; }
-      .nav-links a[href="#how"] { display: none; }
+      .nav-links a:not(.nav-cta) { display: none; }
       .hero { grid-template-columns: 1fr; gap: 60px; padding-top: 70px; }
       .hero-copy { text-align: center; }
       .hero-copy > p { margin-left: auto; margin-right: auto; }
@@ -219,30 +269,39 @@
       .steps::before { display: none; }
       .proof-item { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
       .proof-item:last-child { border-bottom: 0; }
+      .goal-grid { grid-template-columns: repeat(2,1fr); }
+      .goal-paths-head { align-items: flex-start; flex-direction: column; }
       .experience { grid-template-columns: 1fr; }
       .feature-list { border-left: 0; border-top: 1px solid var(--line); }
     }
 
     @media (max-width: 600px) {
       .nav { width: calc(100% - 28px); }
+      .nav-cta { padding: 9px 12px; }
       .hero { width: calc(100% - 32px); min-height: auto; padding: 58px 0 70px; }
       .hero h1 { font-size: 43px; }
       .hero-copy > p { font-size: 16px; }
       .hero-actions { align-items: stretch; flex-direction: column; }
       .hero-note { align-items: center; flex-direction: column; gap: 6px; }
+      .goal-paths { width: calc(100% - 32px); margin-top: 60px; }
+      .goal-grid { grid-template-columns: 1fr; }
+      .goal-link { min-height: 120px; }
       .app-preview { padding: 13px; transform: none; }
       .goal-card { padding: 18px; }
       .section { width: calc(100% - 32px); padding: 85px 0; }
       .step-card { min-height: 250px; }
+      .journey-cta { align-items: stretch; flex-direction: column; }
       .experience { width: calc(100% - 32px); margin-bottom: 85px; }
       .experience-copy { padding: 45px 25px; }
       .experience-copy h2 { font-size: 36px; }
       .feature-list { padding: 20px; }
       .feature { padding: 18px; }
+      .origin { padding: 85px 20px; }
       .final-cta { width: calc(100% - 32px); margin-bottom: 80px; padding: 54px 22px; }
-      .final-actions { align-items: stretch; flex-direction: column; }
+      .waitlist { width: calc(100% - 32px); margin-bottom: 70px; padding: 44px 24px; }
+      .waitlist-form { align-items: stretch; flex-direction: column; }
+      .waitlist-form input { max-width: none; }
       .footer { width: calc(100% - 32px); padding: 28px 0; flex-direction: column; gap: 15px; text-align: center; }
-      .nav-links { gap: 11px; font-size: 11px; }
     }
   </style>
 </head>
@@ -256,6 +315,7 @@
       <a href="#how">How it works</a>
       <a href="/exercises">Lucky Exercises</a>
       <a href="/goals">Master Plan</a>
+      <a class="nav-cta" href="/goals">Build my plan →</a>
     </nav>
   </header>
 
@@ -267,7 +327,7 @@
         <p>Lucky helps you turn the area of life that matters most into a clear, realistic action plan—without overwhelming yourself with another productivity system.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
-          <a class="button button-secondary" href="/exercises">Explore Lucky Exercises</a>
+          <a class="button button-secondary" href="#how">See how it works</a>
         </div>
         <div class="hero-note"><span>12 weekly milestones</span><span>24 mindset practices</span><span>Progress and reflections saved</span></div>
       </div>
@@ -278,18 +338,18 @@
           <div class="preview-top"><span class="preview-title">Your Lucky Master Plan</span><span class="preview-week">Week 1 of 12</span></div>
           <div class="goal-card">
             <div class="mini-label">Your 90-day goal</div>
-            <h3>Pivot into a Product Manager role in the tech industry</h3>
+            <h3>Build a healthier social life in my new city</h3>
             <div class="progress-row"><div class="progress"><span></span></div><span>Week 1 progress · 38%</span></div>
           </div>
           <div class="today-card">
             <div class="mini-label">This week’s actions</div>
-            <div class="task done"><span class="task-check"></span><span>Define my target PM roles and identify the three biggest skill gaps</span></div>
-            <div class="task"><span class="task-check"></span><span>Rewrite one resume story around a product decision and measurable outcome</span></div>
-            <div class="task"><span class="task-check"></span><span>Schedule two conversations with Product Managers in tech</span></div>
+            <div class="task done"><span class="task-check"></span><span>Choose two recurring social activities I genuinely enjoy</span></div>
+            <div class="task"><span class="task-check"></span><span>Attend one event and introduce myself to one person</span></div>
+            <div class="task"><span class="task-check"></span><span>Invite one new connection to coffee or another activity</span></div>
           </div>
           <div class="insight-card">
             <div class="insight-icon">✦</div>
-            <div><div class="mini-label">Recommended mindset practice</div><p>The Courage Step: send one PM outreach message before the resume or career story feels perfect.</p></div>
+            <div><div class="mini-label">Recommended mindset practice</div><p>The Courage Step: make one uncomfortable action small enough to complete within 24 hours.</p></div>
           </div>
         </div>
       </div>
@@ -300,6 +360,17 @@
         <div class="proof-item"><strong>90</strong><span>days of personalized<br>direction and execution</span></div>
         <div class="proof-item"><strong>12</strong><span>weekly milestones<br>with checkable actions</span></div>
         <div class="proof-item"><strong>24</strong><span>Lucky Exercises<br>for mindset and reflection</span></div>
+      </div>
+    </section>
+
+    <section class="goal-paths" aria-labelledby="goal-paths-title">
+      <div class="goal-paths-head"><div><div class="section-kicker">Start where it matters</div><h2 id="goal-paths-title">What do you want to change in the next 90 days?</h2></div><p>Explore an example path, then use the same focused onboarding to build a plan around your real circumstances.</p></div>
+      <div class="goal-grid">
+        <a class="goal-link" href="/career"><span>Career</span><strong>Move toward your next role</strong><small>Explore career planning →</small></a>
+        <a class="goal-link" href="/health"><span>Health</span><strong>Build sustainable energy and habits</strong><small>Explore health planning →</small></a>
+        <a class="goal-link" href="/finances"><span>Finances</span><strong>Create measurable financial progress</strong><small>Explore financial planning →</small></a>
+        <a class="goal-link" href="/relationships"><span>Relationships</span><strong>Strengthen connection and belonging</strong><small>Explore relationship planning →</small></a>
+        <a class="goal-link" href="/launch"><span>Build</span><strong>Launch something of your own</strong><small>Explore launch planning →</small></a>
       </div>
     </section>
 
@@ -329,6 +400,10 @@
           <span class="step-output">Mindset · Reflection into behavior</span>
         </article>
       </div>
+      <div class="journey-cta">
+        <p><strong>Start with direction.</strong> Once your plan exists, use Lucky Exercises whenever your mindset needs support.</p>
+        <a class="button button-primary" href="/goals">Build my Master Plan →</a>
+      </div>
     </section>
 
     <section class="experience">
@@ -346,14 +421,32 @@
       </div>
     </section>
 
+    <section class="origin">
+      <div class="origin-inner">
+        <div class="section-kicker">The Lucky approach</div>
+        <h2>Strategy changes the path. Practice changes the pattern.</h2>
+        <p>A plan alone cannot resolve every fear, belief or protective habit that appears during execution. Reflection alone cannot replace a concrete roadmap. Lucky brings both together: personalized direction for the goal and general Lucky Exercises that help you respond differently when mindset becomes the obstacle.</p>
+        <p class="quote">Lucky is a self-reflection and coaching tool—not psychotherapy or medical treatment.<cite>If a prompt feels overwhelming, stop and seek qualified support.</cite></p>
+      </div>
+    </section>
+
     <section class="final-cta">
       <h2>Give your goal a plan—and your mindset a practice.</h2>
       <p>Start by building your personalized 90-day roadmap. Then use Lucky Exercises to support the person executing it.</p>
-      <div class="final-actions">
-        <a class="button button-primary" href="/goals">Build my Master Plan <span>→</span></a>
-        <a class="button button-secondary" href="/exercises">Explore Lucky Exercises</a>
+      <a class="button button-primary" href="/goals">Build my Master Plan <span>→</span></a>
+    </section>
+
+    <section class="waitlist" aria-labelledby="waitlist-title">
+      <div class="waitlist-inner">
+        <div class="section-kicker">Stay in the loop</div>
+        <h2 id="waitlist-title">Get a weekly 90-day planning prompt.</h2>
+        <p>One short email each week with a reflection question, a proven mindset practice and a concrete action idea you can apply to your own goal.</p>
+        <form class="waitlist-form" id="waitlist-form">
+          <input type="email" id="waitlist-email" placeholder="your@email.com" required aria-label="Email address">
+          <button type="submit" id="waitlist-submit">Join the list</button>
+        </form>
+        <div class="waitlist-status" id="waitlist-status" aria-live="polite"></div>
       </div>
-      <div class="final-note">Lucky is a self-reflection and coaching tool—not psychotherapy or medical treatment.</div>
     </section>
   </main>
 
@@ -362,5 +455,54 @@
     <span>Personalized direction. Mindset practice. Measurable action.</span>
     <div class="footer-links"><a href="/exercises">Lucky Exercises</a><a href="/goals">Master Plan</a></div>
   </footer>
+
+  <script>
+    (function() {
+      const form = document.getElementById('waitlist-form');
+      const emailInput = document.getElementById('waitlist-email');
+      const submitButton = document.getElementById('waitlist-submit');
+      const status = document.getElementById('waitlist-status');
+
+      function showStatus(message, isError) {
+        status.textContent = message;
+        status.className = 'waitlist-status ' + (isError ? 'error' : 'success');
+      }
+
+      form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Joining…';
+        status.className = 'waitlist-status';
+        status.textContent = '';
+
+        try {
+          const response = await fetch('/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, source: 'homepage_footer' }),
+          });
+          const data = await response.json().catch(() => ({}));
+
+          if (response.status === 202) {
+            showStatus('You’re on the list. Watch your inbox for the first prompt.', false);
+            emailInput.value = '';
+          } else if (response.status === 409) {
+            showStatus(data.error || 'This email is already on the list.', false);
+            emailInput.value = '';
+          } else {
+            showStatus(data.error || 'Something went wrong. Please try again.', true);
+          }
+        } catch (error) {
+          showStatus('Could not connect. Please try again.', true);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Join the list';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

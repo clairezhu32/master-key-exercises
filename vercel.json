@@ -7,6 +7,11 @@
     { "src": "/goals", "dest": "/goals.html" },
     { "src": "/buddy", "dest": "/buddy.html" },
     { "src": "/welcome", "dest": "/welcome.html" },
-    { "src": "/analytics", "dest": "/analytics.html" }
+    { "src": "/analytics", "dest": "/analytics.html" },
+    { "src": "/career", "dest": "/career.html" },
+    { "src": "/health", "dest": "/health.html" },
+    { "src": "/finances", "dest": "/finances.html" },
+    { "src": "/relationships", "dest": "/relationships.html" },
+    { "src": "/launch", "dest": "/launch.html" }
   ]
 }
