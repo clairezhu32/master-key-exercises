@@ -267,24 +267,6 @@
     .footer { width: min(var(--max), calc(100% - 40px)); min-height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: #747d98; font-size: 11px; }
     .footer-links { display: flex; gap: 22px; }
 
-    .waitlist { width: min(var(--max), calc(100% - 40px)); margin: 0 auto 90px; padding: 56px 50px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015)); }
-    .waitlist-inner { max-width: 640px; margin: 0 auto; text-align: center; }
-    .waitlist h2 { font-family: "Playfair Display", serif; font-size: clamp(26px, 4vw, 36px); line-height: 1.15; letter-spacing: -.03em; }
-    .waitlist p { margin: 14px auto 0; max-width: 520px; color: var(--muted); font-size: 14px; line-height: 1.65; }
-    .waitlist-form { margin-top: 26px; display: flex; gap: 10px; justify-content: center; }
-    .waitlist-form input {
-      min-height: 52px; flex: 1; max-width: 320px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px;
-      color: var(--text); background: rgba(8,11,23,.55); font-size: 14px; outline: none;
-    }
-    .waitlist-form input:focus { border-color: rgba(157,140,255,.55); }
-    .waitlist-form input::placeholder { color: #747d98; }
-    .waitlist-form button { min-height: 52px; padding: 0 22px; border: 0; border-radius: 10px; color: var(--night); background: linear-gradient(100deg, var(--mint), #a99bff); font-size: 14px; font-weight: 700; cursor: pointer; transition: .2s ease; }
-    .waitlist-form button:hover:not(:disabled) { transform: translateY(-2px); }
-    .waitlist-form button:disabled { opacity: .5; cursor: default; }
-    .waitlist-status { min-height: 20px; margin-top: 14px; font-size: 13px; }
-    .waitlist-status.success { color: var(--mint); }
-    .waitlist-status.error { color: #ff9d9d; }
-
     @media (max-width: 900px) {
       .nav-links a:not(.nav-cta) { display: none; }
       .hero { grid-template-columns: 1fr; gap: 60px; padding-top: 70px; }
@@ -318,9 +300,6 @@
       .feature { padding: 18px; }
       .origin { padding: 85px 20px; }
       .final-cta { width: calc(100% - 32px); margin-bottom: 80px; padding: 54px 22px; }
-      .waitlist { width: calc(100% - 32px); margin-bottom: 70px; padding: 44px 24px; }
-      .waitlist-form { align-items: stretch; flex-direction: column; }
-      .waitlist-form input { max-width: none; }
       .footer { width: calc(100% - 32px); padding: 28px 0; flex-direction: column; gap: 15px; text-align: center; }
     }
   </style>
@@ -467,18 +446,6 @@
       <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
     </section>
 
-    <section class="waitlist" aria-labelledby="waitlist-title">
-      <div class="waitlist-inner">
-        <div class="section-kicker">Stay in the loop</div>
-        <h2 id="waitlist-title">Get a weekly 90-day planning prompt.</h2>
-        <p>One short email each week with a reflection question, a proven mindset practice and a concrete action idea you can apply to your own goal.</p>
-        <form class="waitlist-form" id="waitlist-form">
-          <input type="email" id="waitlist-email" placeholder="your@email.com" required aria-label="Email address">
-          <button type="submit" id="waitlist-submit">Join the list</button>
-        </form>
-        <div class="waitlist-status" id="waitlist-status" aria-live="polite"></div>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
@@ -563,55 +530,6 @@
     document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
     document.getElementById('auth-signout-btn').addEventListener('click', handleSignOut);
     document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu);
-  </script>
-
-  <script>
-    (function() {
-      const form = document.getElementById('waitlist-form');
-      const emailInput = document.getElementById('waitlist-email');
-      const submitButton = document.getElementById('waitlist-submit');
-      const status = document.getElementById('waitlist-status');
-
-      function showStatus(message, isError) {
-        status.textContent = message;
-        status.className = 'waitlist-status ' + (isError ? 'error' : 'success');
-      }
-
-      form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const email = emailInput.value.trim();
-        if (!email) return;
-
-        submitButton.disabled = true;
-        submitButton.textContent = 'Joining…';
-        status.className = 'waitlist-status';
-        status.textContent = '';
-
-        try {
-          const response = await fetch('/api/waitlist', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, source: 'homepage_footer' }),
-          });
-          const data = await response.json().catch(() => ({}));
-
-          if (response.status === 202) {
-            showStatus('You’re on the list. Watch your inbox for the first prompt.', false);
-            emailInput.value = '';
-          } else if (response.status === 409) {
-            showStatus(data.error || 'This email is already on the list.', false);
-            emailInput.value = '';
-          } else {
-            showStatus(data.error || 'Something went wrong. Please try again.', true);
-          }
-        } catch (error) {
-          showStatus('Could not connect. Please try again.', true);
-        } finally {
-          submitButton.disabled = false;
-          submitButton.textContent = 'Join the list';
-        }
-      });
-    })();
   </script>
 </body>
 </html>
