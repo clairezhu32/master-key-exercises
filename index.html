@@ -236,16 +236,7 @@
     .step-card:nth-child(2) { border-color: rgba(157,140,255,.3); background: linear-gradient(145deg, rgba(157,140,255,.105), rgba(255,255,255,.02)); }
     .step-output { display: block; margin-top: 20px; color: #8e96b1; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 
-    .experience {
-      width: min(var(--max), calc(100% - 40px)); margin: 0 auto 120px; overflow: hidden;
-      display: grid; grid-template-columns: .9fr 1.1fr; border: 1px solid var(--line); border-radius: 22px;
-      background: var(--navy);
-    }
-    .experience-copy { padding: 68px 58px; }
-    .experience-copy h2 { margin-top: 14px; font-family: "Playfair Display", serif; font-size: 44px; line-height: 1.1; letter-spacing: -.035em; }
-    .experience-copy > p { margin-top: 20px; color: var(--muted); line-height: 1.75; }
-    .experience-copy .button { margin-top: 30px; }
-    .feature-list { padding: 38px; display: grid; gap: 12px; background: rgba(255,255,255,.02); border-left: 1px solid var(--line); }
+    .feature-grid { margin-top: 54px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .feature {
       padding: 22px; display: grid; grid-template-columns: 38px 1fr; gap: 15px; border: 1px solid var(--line);
       border-radius: 13px; background: rgba(8,11,23,.5);
@@ -253,6 +244,7 @@
     .feature-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; color: var(--mint); background: rgba(113,229,193,.08); }
     .feature h3 { font-size: 15px; }
     .feature p { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .how-cta { margin-top: 36px; display: flex; justify-content: center; }
 
 
     .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 110px; padding: 74px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
@@ -272,8 +264,7 @@
       .steps::before { display: none; }
       .proof-item { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
       .proof-item:last-child { border-bottom: 0; }
-      .experience { grid-template-columns: 1fr; }
-      .feature-list { border-left: 0; border-top: 1px solid var(--line); }
+      .feature-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
@@ -287,10 +278,6 @@
       .video-feature { width: calc(100% - 32px); margin-top: 65px; }
       .section { width: calc(100% - 32px); padding: 85px 0; }
       .step-card { min-height: 250px; }
-      .experience { width: calc(100% - 32px); margin-bottom: 85px; }
-      .experience-copy { padding: 45px 25px; }
-      .experience-copy h2 { font-size: 36px; }
-      .feature-list { padding: 20px; }
       .feature { padding: 18px; }
       .final-cta { width: calc(100% - 32px); margin-bottom: 80px; padding: 54px 22px; }
       .footer { width: calc(100% - 32px); padding: 28px 0; flex-direction: column; gap: 15px; text-align: center; }
@@ -384,8 +371,8 @@
     <section class="section" id="how">
       <div class="section-heading">
         <div class="section-kicker">One goal. Two connected tools.</div>
-        <h2>Know what to do—and strengthen how you show up.</h2>
-        <p>The Master Plan provides the external roadmap. Lucky Exercises support the internal work of noticing and changing the mindset patterns that interfere with execution.</p>
+        <h2>A practical plan—and the mindset support to follow through.</h2>
+        <p>The Master Plan is your external roadmap: check off weekly actions and track progress. Lucky Exercises handle the internal work—open one whenever fear, doubt or an old pattern gets in the way.</p>
       </div>
       <div class="steps">
         <article class="step-card">
@@ -407,20 +394,14 @@
           <span class="step-output">Mindset · Reflection into behavior</span>
         </article>
       </div>
-    </section>
-
-    <section class="experience">
-      <div class="experience-copy">
-        <div class="section-kicker">The execution system</div>
-        <h2>A practical plan with mindset support built around it.</h2>
-        <p>Check off weekly actions and record what's working or blocked. When the obstacle is internal, open a Lucky Exercise and work through the pattern.</p>
-        <a class="button button-primary" href="/goals">Build my 90-day plan →</a>
+      <div class="feature-grid">
+        <article class="feature"><div class="feature-icon">⌁</div><div><h3>Personalized weekly roadmap</h3><p>Actions fitted to your goal, starting point, constraints and schedule.</p></div></article>
+        <article class="feature"><div class="feature-icon">✓</div><div><h3>Interactive execution</h3><p>Check off tasks and record whether each week is on track, needs adjustment or feels blocked.</p></div></article>
+        <article class="feature"><div class="feature-icon">▶</div><div><h3>Guided Lucky Exercises</h3><p>Narrated, self-paced practices with optional ambient sound.</p></div></article>
+        <article class="feature"><div class="feature-icon">✎</div><div><h3>Structured reflection and action</h3><p>What you noticed, what you need, and the next action you'll take.</p></div></article>
       </div>
-      <div class="feature-list">
-        <article class="feature"><div class="feature-icon">⌁</div><div><h3>Personalized weekly roadmap</h3><p>Move through 12 milestones with actions fitted to your goal, starting point, constraints, schedule and likely obstacles.</p></div></article>
-        <article class="feature"><div class="feature-icon">✓</div><div><h3>Interactive execution</h3><p>Check off tasks, see progress and record whether each week is on track, needs adjustment or feels blocked.</p></div></article>
-        <article class="feature"><div class="feature-icon">▶</div><div><h3>Guided Lucky Exercises</h3><p>Use narrated, self-paced practices with optional ambient sound to work through the internal pattern behind the obstacle.</p></div></article>
-        <article class="feature"><div class="feature-icon">✎</div><div><h3>Structured reflection and action</h3><p>Answer what you noticed, what you need, the response you will practice and the exact next action you will take.</p></div></article>
+      <div class="how-cta">
+        <a class="button button-primary" href="/goals">Build my 90-day plan →</a>
       </div>
     </section>
 
