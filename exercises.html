@@ -2348,20 +2348,121 @@ const SESSION_SUPPORT = [
 
 SESSION_SUPPORT.forEach((support, index) => Object.assign(EXERCISES[index], support));
 
-// Prototype: "listen, then answer" simple format for Exercise 1.
-// audioEmbedId set → openExercise() swaps the full classic flow for just
-// the audio + these questions (see simple-exercise-body).
-Object.assign(EXERCISES[0], {
-  title: 'I Am Lucky',
-  theme: 'A five-minute luck affirmation',
-  audioEmbedId: 'TqD1KjETwuM',
-  audioStartSeconds: 84, // skip the video's intro, start where the meditation itself begins
-  simpleQuestions: [
-    'What did you notice in your body while you listened?',
-    'What is one thought that came up during the audio?',
-    'Name one thing you feel lucky for today.',
-  ],
-});
+// "Listen, then answer" simple format for Exercises 1–12 (meditation &
+// manifestation). audioEmbedId set → openExercise() swaps the full classic
+// flow for just the audio + these questions (see simple-exercise-body).
+// Exercises 13–24 keep the original classic format.
+const SIMPLE_MEDITATION_EXERCISES = [
+  {
+    part: 1, title: 'I Am Lucky', theme: 'A five-minute luck affirmation',
+    audioEmbedId: 'TqD1KjETwuM', audioStartSeconds: 84,
+    simpleQuestions: [
+      'What did you notice in your body while you listened?',
+      'What is one thought that came up during the audio?',
+      'Name one thing you feel lucky for today.',
+    ],
+  },
+  {
+    part: 2, title: 'I Am Grateful', theme: 'A ten-minute abundance and gratitude practice',
+    audioEmbedId: 'P9Y3I8PiGpI',
+    simpleQuestions: [
+      'What are three things you feel grateful for right now?',
+      'Where did you feel that gratitude in your body?',
+      'What is one small sign of abundance you can notice today?',
+    ],
+  },
+  {
+    part: 3, title: 'I Choose Positivity', theme: 'A five-minute gratitude and positivity practice',
+    audioEmbedId: 'uEwppoJVfEs',
+    simpleQuestions: [
+      'What shifted in your mood during this practice?',
+      'What is one positive thought you want to carry with you today?',
+      'What is one thing going right in your life right now?',
+    ],
+  },
+  {
+    part: 4, title: 'Morning Gratitude', theme: 'A guided morning practice to attract abundance',
+    audioEmbedId: 'dxqeQ46ybY8',
+    simpleQuestions: [
+      'How did you feel at the start versus the end of this practice?',
+      'What affirmation stood out to you the most?',
+      'What is one intention you want to set for today?',
+    ],
+  },
+  {
+    part: 5, title: 'Visualize It', theme: 'A five-minute manifestation visualization',
+    audioEmbedId: 'Rk6BOZbYxKM',
+    simpleQuestions: [
+      'What did you visualize during this practice?',
+      'What emotion came up as you imagined it?',
+      'What is one action that would move you closer to what you visualized?',
+    ],
+  },
+  {
+    part: 6, title: 'Abundance Mindset', theme: 'A ten-minute gratitude meditation for wealth and abundance',
+    audioEmbedId: 'sC6TiA2A2_U',
+    simpleQuestions: [
+      'What does abundance mean to you personally?',
+      'What belief about money or abundance came up during this practice?',
+      'What is one small step you can take today toward more abundance?',
+    ],
+  },
+  {
+    part: 7, title: 'Abundant Morning', theme: 'A five-minute morning meditation for abundance',
+    audioEmbedId: '8bBPJ1EEUCc',
+    simpleQuestions: [
+      'How do you want to feel for the rest of today?',
+      'What is one thing you already have that feels abundant?',
+      'What is one small win you can create today?',
+    ],
+  },
+  {
+    part: 8, title: 'Raise My Vibration', theme: 'A ten-minute practice for positivity, gratitude and joy',
+    audioEmbedId: '-9KLB2HI9BI',
+    simpleQuestions: [
+      'What brought you a moment of joy during this practice?',
+      'What is one thing you are proud of this week?',
+      'How can you carry this feeling into the rest of your day?',
+    ],
+  },
+  {
+    part: 9, title: 'Manifest It', theme: 'A ten-minute powerful manifestation visualization',
+    audioEmbedId: 'NVPrxcR_RZI',
+    simpleQuestions: [
+      'What did you picture yourself achieving during this practice?',
+      'What feeling did you attach to that outcome?',
+      'What is one belief you need to let go of to get there?',
+    ],
+  },
+  {
+    part: 10, title: 'I Am Enough', theme: 'A ten-minute meditation for self-love and confidence',
+    audioEmbedId: 'LL5j1cL6FmE',
+    simpleQuestions: [
+      'What did you notice about how you speak to yourself?',
+      'What is one thing you appreciate about yourself?',
+      'What is one way you can be kinder to yourself today?',
+    ],
+  },
+  {
+    part: 11, title: 'Attract My Dreams', theme: 'A ten-minute law of attraction meditation',
+    audioEmbedId: '78TKdgxG_K8',
+    simpleQuestions: [
+      'What dream or desire did you focus on during this practice?',
+      'What does it feel like to already have it?',
+      'What is one action you can take today as if it is already true?',
+    ],
+  },
+  {
+    part: 12, title: 'Love Myself', theme: 'A five-minute power meditation for self-love',
+    audioEmbedId: 'KD6Zr1V5CzQ',
+    simpleQuestions: [
+      'What did it feel like to say kind words to yourself?',
+      'What is one part of yourself you want to accept more fully?',
+      'What is one loving action you can take for yourself today?',
+    ],
+  },
+];
+SIMPLE_MEDITATION_EXERCISES.forEach(({ part, ...fields }) => Object.assign(EXERCISES[part - 1], fields));
 
 // ── Per-part personalization ──────────────────
 // Each entry: { bridge, affirmation }
