@@ -3020,9 +3020,7 @@ function buildNarrationSegments(ex, intention, previousIntention) {
     segments.push({ key: `en-g-${audioHash(intention)}`, text: `Return now to your intention: ${intention}. Carry it with you as you close this session.` });
   }
 
-  const fullText = segments.map(segment => segment.text).join('\n\n');
-  const narrationKey = audioHash(`v5-general|${ex.part}|${intention}|${previousIntention}`);
-  return [{ key: `en-full-${narrationKey}`, text: fullText }];
+  return segments;
 }
 
 function setVoiceState(state) {
@@ -3089,48 +3087,65 @@ async function speakExercise(ex) {
   try {
     const segments = buildNarrationSegments(ex, intention, previousIntention);
     const cached = await Promise.all(segments.map(s => getCachedAudio(s.key)));
-    // Google's free-tier TTS quota is a hard 3 requests/minute — far
-    // stricter than this feature was originally sized for (up to 7
-    // segments, fired concurrently). Fetch serially instead of all at once,
-    // and skip rather than abort on a segment that still fails, so one
-    // rate-limited segment doesn't take down the whole reading.
-    const buffers = [];
+
+    // Resolve segments one at a time in the background (Google's free-tier
+    // TTS quota is a hard 3 requests/minute, so fetch serially with pacing
+    // rather than all at once). Each segment gets its own "ready" signal so
+    // playback can start on the first segment instead of waiting for the
+    // whole narration to finish fetching — with several segments per
+    // exercise, that wait could otherwise run well past a minute before any
+    // audio played at all.
+    const buffers = new Array(segments.length).fill(undefined);
+    const ready = segments.map(() => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; });
     let failedCount = 0;
-    for (let i = 0; i < segments.length; i++) {
-      if (cached[i]) { buffers.push(cached[i]); continue; }
-      if (buffers.length > 0) await new Promise((r) => setTimeout(r, 400));
-      try {
-        const res = await fetch('/api/speak', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: segments[i].text }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: res.statusText }));
-          throw new Error(err.error || `Error ${res.status}`);
+    (async () => {
+      for (let i = 0; i < segments.length; i++) {
+        if (cached[i]) { buffers[i] = cached[i]; ready[i].resolve(); continue; }
+        if (i > 0) await new Promise((r) => setTimeout(r, 400));
+        try {
+          const res = await fetch('/api/speak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: segments[i].text }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(err.error || `Error ${res.status}`);
+          }
+          const buf = await res.arrayBuffer();
+          setCachedAudio(segments[i].key, buf);
+          buffers[i] = buf;
+        } catch (err) {
+          console.error(`Narration segment ${i} failed:`, err.message);
+          buffers[i] = null;
+          failedCount++;
         }
-        const buf = await res.arrayBuffer();
-        setCachedAudio(segments[i].key, buf);
-        buffers.push(buf);
-      } catch (err) {
-        console.error(`Narration segment ${i} failed:`, err.message);
-        buffers.push(null);
-        failedCount++;
+        ready[i].resolve();
+      }
+      if (failedCount > 0 && buffers.some(Boolean)) {
+        showVoiceError(`${failedCount} segment${failedCount > 1 ? 's' : ''} couldn't load (voice service is rate-limited) — playing the rest.`);
+      }
+    })();
+
+    await ready[0].promise;
+    if (!buffers[0]) {
+      await Promise.all(ready.map(r => r.promise));
+      if (buffers.every((b) => !b)) {
+        throw new Error('Voice service unavailable right now — please try again shortly.');
       }
     }
-    if (buffers.every((b) => !b)) {
-      throw new Error('Voice service unavailable right now — please try again shortly.');
-    }
-    if (failedCount > 0) {
-      showVoiceError(`${failedCount} segment${failedCount > 1 ? 's' : ''} couldn't load (voice service is rate-limited) — playing the rest.`);
-    }
+
     voicePlaying = true;
     setAmbientDucked(true);
     setVoiceState('playing');
     let idx = 0;
-    function playNext() {
-      while (idx < buffers.length && !buffers[idx]) idx++;
-      if (idx >= buffers.length || !voicePlaying) { voicePlaying = false; setAmbientDucked(false); setVoiceState('idle'); return; }
+    async function playNext() {
+      while (idx < segments.length) {
+        await ready[idx].promise;
+        if (buffers[idx]) break;
+        idx++;
+      }
+      if (idx >= segments.length || !voicePlaying) { voicePlaying = false; setAmbientDucked(false); setVoiceState('idle'); return; }
       const url = URL.createObjectURL(new Blob([buffers[idx]], { type: 'audio/wav' }));
       voiceAudio = new Audio(url);
       voiceAudio.playbackRate = 1;
