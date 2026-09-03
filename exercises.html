@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="24 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
-  <meta property="og:title" content="Lucky Exercises — 24 Rewiring Practices for Real-World Action">
-  <meta property="og:description" content="24 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
+  <meta name="description" content="12 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
+  <meta property="og:title" content="Lucky Exercises — 12 Rewiring Practices for Real-World Action">
+  <meta property="og:description" content="12 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lucky-action-plan.vercel.app/exercises">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Lucky Exercises — 24 Rewiring Practices for Real-World Action">
-  <meta name="twitter:description" content="24 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
+  <meta name="twitter:title" content="Lucky Exercises — 12 Rewiring Practices for Real-World Action">
+  <meta name="twitter:description" content="12 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
   <link rel="canonical" href="https://lucky-action-plan.vercel.app/exercises">
   <title>Lucky Exercises</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1275,7 +1275,7 @@
 
   <div class="header-progress">
     <div class="progress-label">Progress</div>
-    <div class="progress-count" id="progress-count">0 / 24</div>
+    <div class="progress-count" id="progress-count">0 / 12</div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
     </div>
@@ -1620,7 +1620,7 @@ async function cloudLoadAll() {
 async function syncLocalToCloud() {
   if (!currentUser) return;
   const store = loadStore();
-  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 24);
+  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 12);
   if (!parts.length) return;
   await Promise.all(parts.map(part => cloudUpsertProgress(part)));
 }
@@ -2351,7 +2351,9 @@ SESSION_SUPPORT.forEach((support, index) => Object.assign(EXERCISES[index], supp
 // "Listen, then answer" simple format for Exercises 1–12 (meditation &
 // manifestation). audioEmbedId set → openExercise() swaps the full classic
 // flow for just the audio + these questions (see simple-exercise-body).
-// Exercises 13–24 keep the original classic format.
+// The grid, progress counters and navigation only surface parts 1-12
+// (see renderGrid/updateHeader/openExercise). Parts 13-24 keep their
+// original classic-format data in EXERCISES but are no longer shown.
 const SIMPLE_MEDITATION_EXERCISES = [
   {
     part: 1, title: 'I Am Lucky', theme: 'A five-minute luck affirmation',
@@ -2715,15 +2717,15 @@ function getCompletedParts() {
 // ── Render helpers ────────────────────────────
 function updateHeader() {
   const completed = getCompletedParts();
-  const count = completed.length;
-  document.getElementById('progress-count').textContent = `${count} / 24`;
-  document.getElementById('progress-bar').style.width = `${(count / 24) * 100}%`;
+  const count = completed.filter(p => p <= 12).length;
+  document.getElementById('progress-count').textContent = `${count} / 12`;
+  document.getElementById('progress-bar').style.width = `${(count / 12) * 100}%`;
 }
 
 function renderGrid() {
   const grid = document.getElementById('exercises-grid');
   const completed = getCompletedParts();
-  grid.innerHTML = EXERCISES.map(ex => {
+  grid.innerHTML = EXERCISES.filter(ex => ex.part <= 12).map(ex => {
     const done = completed.includes(ex.part);
     const data = getExData(ex.part);
     const sessionCount = data.sessions.length;
@@ -2923,7 +2925,7 @@ function openExercise(part) {
   const data = getExData(part);
 
   // Populate content
-  document.getElementById('ex-eyebrow').textContent = `Part ${part} of 24`;
+  document.getElementById('ex-eyebrow').textContent = `Part ${part} of 12`;
   document.getElementById('ex-title').textContent = ex.title;
   document.getElementById('ex-theme').textContent = ex.theme;
   document.getElementById('ex-lesson').textContent = ex.lesson;
@@ -3025,7 +3027,7 @@ function openExercise(part) {
     document.getElementById('prev-part').textContent = '';
     document.getElementById('prev-title').textContent = '';
   }
-  if (part < 24) {
+  if (part < 12) {
     const next = EXERCISES[part];
     nextBtn.disabled = false;
     document.getElementById('next-part').textContent = `Part ${next.part}`;
@@ -3106,7 +3108,7 @@ document.getElementById('share-exercise').addEventListener('click', async () => 
   const url = `${location.origin}/exercises?part=${currentPart || 1}`;
   const text = ex
     ? `${ex.title}\n\n${ex.lesson}\n\n${url}`
-    : `Lucky Exercises — 24 rewiring practices for real-world action. ${url}`;
+    : `Lucky Exercises — 12 rewiring practices for real-world action. ${url}`;
   const status = document.getElementById('share-status');
   try {
     if (navigator.share) {
@@ -3393,7 +3395,7 @@ function showToast(msg, durationMs = 3500) {
 (function handlePartParam() {
   const params = new URLSearchParams(location.search);
   const part = parseInt(params.get('part'));
-  if (part >= 1 && part <= 24) {
+  if (part >= 1 && part <= 12) {
     history.replaceState(null, '', location.pathname);
     openExercise(part);
   } else {
