@@ -209,16 +209,6 @@
     .tiktok-embed-wrap { display: flex; justify-content: center; }
     .video-caption { margin-bottom: 16px; text-align: center; color: var(--text); font-family: "Playfair Display", serif; font-size: 22px; font-weight: 600; }
 
-    .goal-paths { width: min(var(--max), calc(100% - 40px)); margin: 84px auto 0; }
-    .goal-paths-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 24px; }
-    .goal-paths-head h2 { max-width: 620px; margin-top: 13px; font: 600 clamp(31px,4vw,45px)/1.12 "Playfair Display",serif; }
-    .goal-paths-head > p { max-width: 430px; color: var(--muted); font-size: 14px; line-height: 1.65; }
-    .goal-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 11px; }
-    .goal-link { min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; padding: 19px; border: 1px solid var(--line); border-radius: 14px; color: var(--text); background: rgba(19,26,51,.65); transition: transform .2s,border-color .2s,background .2s; }
-    .goal-link:hover { transform: translateY(-3px); border-color: rgba(157,140,255,.38); background: rgba(25,33,61,.9); }
-    .goal-link span { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-    .goal-link strong { font: 600 19px/1.24 "Playfair Display",serif; }
-    .goal-link small { color: var(--muted); font-size: 10px; }
 
     .section { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 120px 0; }
     .section-heading { max-width: 720px; margin-bottom: 54px; }
@@ -306,8 +296,6 @@
       .steps::before { display: none; }
       .proof-item { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
       .proof-item:last-child { border-bottom: 0; }
-      .goal-grid { grid-template-columns: repeat(2,1fr); }
-      .goal-paths-head { align-items: flex-start; flex-direction: column; }
       .experience { grid-template-columns: 1fr; }
       .feature-list { border-left: 0; border-top: 1px solid var(--line); }
     }
@@ -321,9 +309,6 @@
       .hero-actions { align-items: stretch; flex-direction: column; }
       .hero-note { align-items: center; flex-direction: column; gap: 6px; }
       .video-feature { width: calc(100% - 32px); margin-top: 65px; }
-      .goal-paths { width: calc(100% - 32px); margin-top: 60px; }
-      .goal-grid { grid-template-columns: 1fr; }
-      .goal-link { min-height: 120px; }
       .section { width: calc(100% - 32px); padding: 85px 0; }
       .step-card { min-height: 250px; }
       .experience { width: calc(100% - 32px); margin-bottom: 85px; }
@@ -421,17 +406,6 @@
       </div>
       <div class="video-embed" style="max-width:720px;margin:0 auto">
         <iframe src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fmelrobbins%2Fvideos%2Fstanford-luck-researcher-how-to-manifest-the-life-you-want%2F1276277637984247%2F&amp;show_text=false&amp;width=560&amp;t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="Stanford Luck Researcher: How to Manifest the Life You Want — The Mel Robbins Podcast"></iframe>
-      </div>
-    </section>
-
-    <section class="goal-paths" aria-labelledby="goal-paths-title">
-      <div class="goal-paths-head"><div><div class="section-kicker">Start where it matters</div><h2 id="goal-paths-title">What do you want to change in the next 90 days?</h2></div><p>Explore an example path, then use the same focused onboarding to build a plan around your real circumstances.</p></div>
-      <div class="goal-grid">
-        <a class="goal-link" href="/career"><span>Career</span><strong>Move toward your next role</strong><small>Explore career planning →</small></a>
-        <a class="goal-link" href="/health"><span>Health</span><strong>Build sustainable energy and habits</strong><small>Explore health planning →</small></a>
-        <a class="goal-link" href="/finances"><span>Finances</span><strong>Create measurable financial progress</strong><small>Explore financial planning →</small></a>
-        <a class="goal-link" href="/relationships"><span>Relationships</span><strong>Strengthen connection and belonging</strong><small>Explore relationship planning →</small></a>
-        <a class="goal-link" href="/launch"><span>Build</span><strong>Launch something of your own</strong><small>Explore launch planning →</small></a>
       </div>
     </section>
 
