@@ -182,34 +182,6 @@
       position: absolute; inset: 10% 5%; background: rgba(114,92,255,.28); filter: blur(75px);
       border-radius: 50%; pointer-events: none;
     }
-    .app-preview {
-      position: relative; overflow: hidden; padding: 20px; border: 1px solid rgba(255,255,255,.12);
-      border-radius: 20px; background: rgba(19,26,51,.86); box-shadow: 0 35px 90px rgba(0,0,0,.38);
-      backdrop-filter: blur(18px); transform: rotate(1.2deg);
-    }
-    .preview-top { display: flex; align-items: center; justify-content: space-between; padding: 1px 2px 17px; }
-    .preview-title { font-size: 12px; font-weight: 700; }
-    .preview-week { color: var(--violet); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .goal-card { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, rgba(157,140,255,.13), rgba(255,255,255,.025)); }
-    .mini-label { color: #8f97b3; font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-    .goal-card h3 { margin-top: 9px; font-family: "Playfair Display", serif; font-size: 22px; line-height: 1.28; font-weight: 600; }
-    .progress-row { margin-top: 18px; display: flex; align-items: center; gap: 11px; color: var(--muted); font-size: 10px; }
-    .progress { height: 5px; flex: 1; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.09); }
-    .progress > span { display: block; width: 38%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), var(--violet)); }
-    .today-card { margin-top: 13px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(8,11,23,.62); }
-    .task { display: flex; align-items: flex-start; gap: 11px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.07); color: #dce0f0; font-size: 12px; line-height: 1.5; }
-    .task:last-child { border-bottom: 0; padding-bottom: 0; }
-    .task-check { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 1px; border: 1px solid rgba(113,229,193,.48); border-radius: 50%; }
-    .task.done { color: #77809b; text-decoration: line-through; }
-    .task.done .task-check { display: grid; place-items: center; color: var(--night); background: var(--mint); }
-    .task.done .task-check::after { content: "✓"; font-size: 10px; font-weight: 800; }
-    .insight-card {
-      margin-top: 13px; padding: 16px 18px; display: grid; grid-template-columns: 30px 1fr; gap: 12px;
-      border: 1px solid rgba(255,217,162,.14); border-radius: 14px; background: rgba(255,217,162,.055);
-    }
-    .insight-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: rgba(255,217,162,.1); }
-    .insight-card p { margin-top: 3px; color: #c4c8d8; font-size: 10px; line-height: 1.55; }
-
     .proof {
       border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
       background: rgba(255,255,255,.018);
@@ -228,14 +200,12 @@
     .video-feature-head { max-width: 640px; margin: 0 auto 30px; text-align: center; }
     .video-feature-head h2 { margin-top: 13px; font: 600 clamp(28px,3.6vw,40px)/1.15 "Playfair Display",serif; }
     .video-feature-head > p { margin-top: 16px; color: var(--muted); font-size: 15px; line-height: 1.7; }
-    .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; max-width: 900px; margin: 0 auto; }
     .video-embed {
       position: relative; width: 100%; aspect-ratio: 560 / 314;
       overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--panel);
       box-shadow: 0 30px 70px rgba(0,0,0,.32);
     }
     .video-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-    .video-caption { margin-top: 12px; text-align: center; color: var(--muted); font-size: 12px; }
 
     .goal-paths { width: min(var(--max), calc(100% - 40px)); margin: 84px auto 0; }
     .goal-paths-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 24px; }
@@ -349,12 +319,9 @@
       .hero-actions { align-items: stretch; flex-direction: column; }
       .hero-note { align-items: center; flex-direction: column; gap: 6px; }
       .video-feature { width: calc(100% - 32px); margin-top: 65px; }
-      .video-grid { grid-template-columns: 1fr; gap: 32px; }
       .goal-paths { width: calc(100% - 32px); margin-top: 60px; }
       .goal-grid { grid-template-columns: 1fr; }
       .goal-link { min-height: 120px; }
-      .app-preview { padding: 13px; transform: none; }
-      .goal-card { padding: 18px; }
       .section { width: calc(100% - 32px); padding: 85px 0; }
       .step-card { min-height: 250px; }
       .experience { width: calc(100% - 32px); margin-bottom: 85px; }
@@ -425,25 +392,10 @@
         <div class="hero-note"><span>Progress and reflections saved automatically</span></div>
       </div>
 
-      <div class="preview-wrap" aria-label="Lucky Master Plan preview">
+      <div class="preview-wrap" aria-label="Video: Stanford Luck Researcher on The Mel Robbins Podcast">
         <div class="preview-glow"></div>
-        <div class="app-preview">
-          <div class="preview-top"><span class="preview-title">Your Lucky Master Plan</span><span class="preview-week">Week 1 of 12</span></div>
-          <div class="goal-card">
-            <div class="mini-label">Your 90-day goal</div>
-            <h3>Build a healthier social life in my new city</h3>
-            <div class="progress-row"><div class="progress"><span></span></div><span>Week 1 progress · 38%</span></div>
-          </div>
-          <div class="today-card">
-            <div class="mini-label">This week’s actions</div>
-            <div class="task done"><span class="task-check"></span><span>Choose two recurring social activities I genuinely enjoy</span></div>
-            <div class="task"><span class="task-check"></span><span>Attend one event and introduce myself to one person</span></div>
-            <div class="task"><span class="task-check"></span><span>Invite one new connection to coffee or another activity</span></div>
-          </div>
-          <div class="insight-card">
-            <div class="insight-icon">✦</div>
-            <div><div class="mini-label">Recommended mindset practice</div><p>The Courage Step: make one uncomfortable action small enough to complete within 24 hours.</p></div>
-          </div>
+        <div class="video-embed">
+          <iframe src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fmelrobbins%2Fvideos%2Fstanford-luck-researcher-how-to-manifest-the-life-you-want%2F1276277637984247%2F&amp;show_text=false&amp;width=560&amp;t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="Stanford Luck Researcher: How to Manifest the Life You Want — The Mel Robbins Podcast"></iframe>
         </div>
       </div>
     </section>
@@ -462,19 +414,8 @@
         <h2 id="video-feature-title">How do you catch the winds of luck?</h2>
         <p>Stanford's Tina Seelig on why luck isn't something that happens to you—it's something you build through action. That idea is why Lucky exists.</p>
       </div>
-      <div class="video-grid">
-        <div>
-          <div class="video-embed">
-            <iframe src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1473763587465391&amp;show_text=false&amp;width=560&amp;t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="How do you catch the winds of luck? — Tina Seelig, Stanford"></iframe>
-          </div>
-          <p class="video-caption">Stanford</p>
-        </div>
-        <div>
-          <div class="video-embed">
-            <iframe src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fmelrobbins%2Fvideos%2Fstanford-luck-researcher-how-to-manifest-the-life-you-want%2F1276277637984247%2F&amp;show_text=false&amp;width=560&amp;t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="Stanford Luck Researcher: How to Manifest the Life You Want — The Mel Robbins Podcast"></iframe>
-          </div>
-          <p class="video-caption">The Mel Robbins Podcast</p>
-        </div>
+      <div class="video-embed" style="max-width:720px;margin:0 auto">
+        <iframe src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1473763587465391&amp;show_text=false&amp;width=560&amp;t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="How do you catch the winds of luck? — Tina Seelig, Stanford"></iframe>
       </div>
     </section>
 
