@@ -15,7 +15,11 @@
     button, input, textarea, select { font:inherit; }
     button { cursor:pointer; }
     .shell { width:min(900px,calc(100% - 32px)); margin:0 auto; padding:28px 0 80px; }
-    .brand { display:flex; align-items:center; gap:10px; width:max-content; margin-bottom:26px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
+    .brand { display:flex; align-items:center; gap:10px; width:max-content; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
+    .top-nav { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:26px; }
+    .top-nav-links { display:flex; align-items:center; gap:20px; }
+    .top-nav-links a { color:var(--muted); font-size:13px; font-weight:500; text-decoration:none; }
+    .top-nav-links a:hover { color:var(--text); }
     .brand-mark { width:32px; height:32px; display:grid; place-items:center; border-radius:9px; color:var(--bg); background:linear-gradient(135deg,var(--mint),var(--violet)); font-family:'Playfair Display',serif; }
     .card { padding:36px; border:1px solid var(--line); border-radius:22px; background:rgba(19,26,51,.92); box-shadow:0 30px 80px rgba(0,0,0,.28); }
     .step { display:none; }
@@ -136,7 +140,13 @@
 </head>
 <body>
   <main class="shell">
-    <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
+    <div class="top-nav">
+      <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
+      <nav class="top-nav-links" aria-label="Primary navigation">
+        <a href="/">Introduction</a>
+        <a href="/exercises">Lucky Exercises</a>
+      </nav>
+    </div>
     <div class="beta-note"><span><strong>Job Search Founding Cohort</strong> · Enter your invitation code to join and share structured feedback.</span><button type="button" id="enter-code">Enter code</button></div>
 
     <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your Master Plan…</h2><p>Checking your Lucky account for a saved plan.</p></section>
