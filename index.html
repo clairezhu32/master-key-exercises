@@ -16,6 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -72,6 +73,60 @@
       padding: 10px 16px; color: var(--text) !important; border: 1px solid rgba(157,140,255,.45);
       border-radius: 9px; background: rgba(157,140,255,.08);
     }
+
+    .auth-area { display: flex; align-items: center; position: relative; }
+    .auth-signin-btn {
+      min-height: 40px; padding: 0 16px; color: var(--text); border: 1px solid var(--line);
+      border-radius: 9px; background: rgba(255,255,255,.035); font: 600 13px "DM Sans", sans-serif;
+      cursor: pointer; transition: .2s ease;
+    }
+    .auth-signin-btn:hover { border-color: rgba(157,140,255,.45); background: rgba(157,140,255,.08); }
+    .auth-user-area { display: flex; align-items: center; position: relative; }
+    .auth-avatar {
+      width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%;
+      color: var(--night); background: linear-gradient(135deg, var(--mint), var(--violet));
+      font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; transition: opacity .2s;
+    }
+    .auth-avatar:hover { opacity: .86; }
+    .auth-dropdown {
+      position: absolute; top: calc(100% + 12px); right: 0; z-index: 30; min-width: 210px; padding: 12px;
+      border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
+      box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    }
+    .auth-dropdown-email {
+      margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
+      color: var(--muted); font-size: 11px; line-height: 1.5; word-break: break-all;
+    }
+    .auth-dropdown button {
+      padding: 0; border: 0; background: none; color: var(--muted); font: 600 12px "DM Sans", sans-serif;
+      cursor: pointer; transition: color .2s;
+    }
+    .auth-dropdown button:hover { color: var(--text); }
+
+    .auth-modal-overlay {
+      position: fixed; inset: 0; z-index: 40; display: none; background: rgba(4,6,14,.82); backdrop-filter: blur(8px);
+    }
+    .auth-modal {
+      position: fixed; top: 50%; left: 50%; z-index: 41; display: none; transform: translate(-50%, -50%);
+      width: min(420px, calc(100% - 40px)); padding: 36px 32px; text-align: center;
+      border: 1px solid var(--line); border-radius: 20px; background: var(--panel);
+    }
+    .auth-modal-close {
+      position: absolute; top: 14px; right: 16px; padding: 4px 8px; border: 0; background: none;
+      color: var(--muted); font-size: 16px; cursor: pointer;
+    }
+    .auth-modal-close:hover { color: var(--text); }
+    .auth-modal h3 { font-family: "Playfair Display", serif; font-size: 26px; font-weight: 600; }
+    .auth-modal p { margin: 12px 0 26px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .google-btn {
+      width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px;
+      border: 0; border-radius: 10px; color: #1a1a1a; background: #fff; font: 600 14px "DM Sans", sans-serif;
+      cursor: pointer; transition: .15s ease;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-btn:active { transform: scale(.98); }
+    .google-btn:disabled { opacity: .6; cursor: default; }
+    .auth-modal-note { margin-top: 18px !important; color: #747d98 !important; font-size: 11px !important; }
 
     .hero {
       width: min(var(--max), calc(100% - 40px));
@@ -316,8 +371,35 @@
       <a href="/exercises">Lucky Exercises</a>
       <a href="/goals">Master Plan</a>
       <a class="nav-cta" href="/goals">Build my plan →</a>
+      <div class="auth-area">
+        <button class="auth-signin-btn" id="auth-signin-btn">Sign in</button>
+        <div class="auth-user-area" id="auth-user-area" style="display:none">
+          <div class="auth-avatar" id="auth-avatar" title="Account"></div>
+          <div class="auth-dropdown" id="auth-dropdown" style="display:none">
+            <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
+            <button id="auth-signout-btn">Sign out</button>
+          </div>
+        </div>
+      </div>
     </nav>
   </header>
+
+  <div class="auth-modal-overlay" id="auth-modal-overlay"></div>
+  <div class="auth-modal" id="auth-modal">
+    <button class="auth-modal-close" id="auth-modal-close">✕</button>
+    <h3>Sign in to Lucky</h3>
+    <p>Sign in with Google to save your Master Plan and Lucky Exercises progress, and pick up where you left off on any device.</p>
+    <button class="google-btn" id="google-sign-in-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+    <p class="auth-modal-note">By continuing you agree this is a self-reflection and coaching tool — not psychotherapy or medical treatment.</p>
+  </div>
 
   <main>
     <section class="hero">
@@ -455,6 +537,84 @@
     <span>Personalized direction. Mindset practice. Measurable action.</span>
     <div class="footer-links"><a href="/exercises">Lucky Exercises</a><a href="/goals">Master Plan</a></div>
   </footer>
+
+  <script>
+    // ── Supabase auth (Google sign-in) ──────────
+    const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null;
+
+    function updateAuthUI() {
+      const signinBtn = document.getElementById('auth-signin-btn');
+      const userArea = document.getElementById('auth-user-area');
+      const avatar = document.getElementById('auth-avatar');
+      const emailEl = document.getElementById('auth-dropdown-email');
+      if (currentUser) {
+        signinBtn.style.display = 'none';
+        userArea.style.display = 'flex';
+        const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email || '?';
+        avatar.textContent = name[0].toUpperCase();
+        if (emailEl) emailEl.textContent = currentUser.email || '';
+      } else {
+        signinBtn.style.display = 'block';
+        userArea.style.display = 'none';
+      }
+    }
+
+    function openAuthModal() {
+      document.getElementById('auth-modal-overlay').style.display = 'block';
+      document.getElementById('auth-modal').style.display = 'block';
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal-overlay').style.display = 'none';
+      document.getElementById('auth-modal').style.display = 'none';
+    }
+    function toggleUserMenu() {
+      const dd = document.getElementById('auth-dropdown');
+      dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    }
+    document.addEventListener('click', event => {
+      const userArea = document.getElementById('auth-user-area');
+      const dd = document.getElementById('auth-dropdown');
+      if (dd && !userArea.contains(event.target)) dd.style.display = 'none';
+    });
+
+    async function signInWithGoogle() {
+      const button = document.getElementById('google-sign-in-btn');
+      button.disabled = true;
+      button.textContent = 'Redirecting to Google…';
+      await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/' } });
+    }
+
+    async function handleSignOut() {
+      try {
+        // sb.auth.signOut() can hang rather than reject, so race it against
+        // a timeout and fall back to a local-only sign-out if it stalls.
+        await Promise.race([
+          sb.auth.signOut(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('signOut timed out')), 4000)),
+        ]);
+      } catch (error) {
+        await sb.auth.signOut({ scope: 'local' }).catch(() => {});
+      }
+      currentUser = null;
+      updateAuthUI();
+      document.getElementById('auth-dropdown').style.display = 'none';
+    }
+
+    sb.auth.onAuthStateChange((event, session) => {
+      currentUser = session?.user ?? null;
+      updateAuthUI();
+    });
+
+    document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+    document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
+    document.getElementById('auth-modal-overlay').addEventListener('click', closeAuthModal);
+    document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
+    document.getElementById('auth-signout-btn').addEventListener('click', handleSignOut);
+    document.getElementById('auth-avatar').addEventListener('click', toggleUserMenu);
+  </script>
 
   <script>
     (function() {
