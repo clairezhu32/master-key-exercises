@@ -12,6 +12,11 @@
     { "src": "/health", "dest": "/health.html" },
     { "src": "/finances", "dest": "/finances.html" },
     { "src": "/relationships", "dest": "/relationships.html" },
-    { "src": "/launch", "dest": "/launch.html" }
+    { "src": "/launch", "dest": "/launch.html" },
+    { "src": "/career-plan", "dest": "/career-plan.html" },
+    { "src": "/health-plan", "dest": "/health-plan.html" },
+    { "src": "/finance-plan", "dest": "/finance-plan.html" },
+    { "src": "/relationships-plan", "dest": "/relationships-plan.html" },
+    { "src": "/launch-plan", "dest": "/launch-plan.html" }
   ]
 }
