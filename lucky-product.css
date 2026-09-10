@@ -1,0 +1,222 @@
+/* Shared visual finish for Lucky's main product surfaces. */
+:root {
+  --night: #11110f;
+  --navy: #181814;
+  --panel: #181814;
+  --panel-2: #22221d;
+  --line: #3c3c34;
+  --text: #f5f4ec;
+  --muted: #aaa99e;
+  --violet: #d7ff58;
+  --violet-2: #d7ff58;
+  --mint: #d7ff58;
+  --warm: #d7ff58;
+}
+
+body.home-page,
+body.exercises-page {
+  background: var(--night);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+}
+
+/* Homepage */
+.home-page .nav { height: 72px; border-color: var(--line); }
+.home-page .brand { gap: 9px; letter-spacing: -.01em; }
+.home-page .brand-mark,
+.exercises-page .header-title::before {
+  border-radius: 3px;
+  color: #11110f;
+  background: var(--mint);
+  box-shadow: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+}
+.home-page .brand-mark { width: 28px; height: 28px; font-size: 14px; }
+.home-page .nav-links { gap: 22px; color: #cbc9bd; font-size: 14px; }
+.home-page .nav-cta,
+.home-page .auth-signin-btn {
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: transparent;
+  font-family: inherit;
+}
+.home-page .hero {
+  min-height: 590px;
+  padding: 72px 0 78px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
+  gap: 68px;
+}
+.home-page .eyebrow,
+.home-page .section-kicker {
+  color: var(--mint);
+  font-size: 13px;
+  letter-spacing: .03em;
+  text-transform: none;
+}
+.home-page .eyebrow { margin-bottom: 22px; padding: 0; border: 0; background: none; }
+.home-page .eyebrow-dot,
+.home-page .preview-glow,
+.home-page .feature-icon { display: none; }
+.home-page .hero h1,
+.home-page .section h2,
+.home-page .video-feature-head h2,
+.home-page .goal-paths h2,
+.home-page .waitlist-section h2,
+.home-page .final-cta h2,
+.home-page .auth-modal h3 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  letter-spacing: -.045em;
+}
+.home-page .hero h1 { max-width: 670px; font-size: clamp(48px, 6vw, 72px); line-height: 1; }
+.home-page .hero h1 em {
+  color: var(--text);
+  background: none;
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--mint);
+  text-decoration-thickness: .11em;
+  text-underline-offset: .1em;
+}
+.home-page .hero-copy > p { max-width: 590px; color: #c4c3b9; font-size: 18px; line-height: 1.6; }
+.home-page .button,
+.home-page .waitlist-form input,
+.home-page .waitlist-form button,
+.home-page .google-btn,
+.home-page .auth-modal,
+.home-page .auth-dropdown { border-radius: 3px; }
+.home-page .button-primary,
+.home-page .waitlist-form button { color: #11110f; background: var(--mint); box-shadow: none; }
+.home-page .button-primary:hover,
+.home-page .waitlist-form button:hover { transform: none; box-shadow: none; }
+.home-page .video-caption { font-family: Arial, Helvetica, sans-serif; font-weight: 700; }
+.home-page .video-embed,
+.home-page .tiktok-embed,
+.home-page .path-card,
+.home-page .step-card,
+.home-page .feature { border-radius: 4px; box-shadow: none; }
+.home-page .proof,
+.home-page .waitlist-section,
+.home-page .video-feature,
+.home-page .goal-paths,
+.home-page .section { border-color: var(--line); }
+.home-page .proof { background: var(--panel); }
+.home-page .proof-item { border-color: var(--line); }
+.home-page .proof-item strong { color: var(--mint); font-family: Arial, Helvetica, sans-serif; }
+.home-page .steps { gap: 0; border-top: 1px solid var(--line); }
+.home-page .steps::before { display: none; }
+.home-page .step-card {
+  padding: 27px 28px 28px 0;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: none;
+}
+.home-page .step-card + .step-card { padding-left: 28px; }
+.home-page .step-card:last-child { border-right: 0; }
+.home-page .step-card:nth-child(2) { border-color: var(--line); background: none; }
+.home-page .step-number { width: auto; height: auto; display: block; color: var(--mint); background: none !important; box-shadow: none; text-align: left; }
+.home-page .step-card h3 { margin-top: 34px; }
+.home-page .step-card p { color: var(--muted); font-size: 15px; }
+.home-page .step-output { color: #77776e; letter-spacing: .02em; text-transform: none; }
+.home-page .feature-grid,
+.home-page .paths-grid { gap: 0; border-top: 1px solid var(--line); }
+.home-page .feature,
+.home-page .path-card { border: 0; border-bottom: 1px solid var(--line); background: transparent; }
+.home-page .path-card:hover { transform: none; border-color: var(--line); background: #1d1d18; }
+.home-page .final-cta { border-radius: 0; background: none; border-color: var(--line); }
+
+/* Exercise library */
+.exercises-page {
+  --bg: #11110f;
+  --surface: #181814;
+  --card: #181814;
+  --border: #3c3c34;
+  --gold: #d7ff58;
+  --gold-dim: #d7ff58;
+  --gold-glow: rgba(215, 255, 88, .07);
+  --text: #f5f4ec;
+  --text-dim: #aaa99e;
+  --text-faint: #77776e;
+  --green: #d7ff58;
+  --radius: 4px;
+}
+.exercises-page .header { padding: 18px 28px; background: var(--bg); backdrop-filter: none; }
+.exercises-page .header-title,
+.exercises-page .progress-count,
+.exercises-page .list-hero h1,
+.exercises-page .card-title,
+.exercises-page .ex-title,
+.exercises-page .ex-lesson,
+.exercises-page .ex-affirmation,
+.exercises-page .journal-textarea { font-family: Arial, Helvetica, sans-serif; }
+.exercises-page .header-title { color: var(--text); font-weight: 700; }
+.exercises-page .header-nav-link.active { color: var(--gold); }
+.exercises-page .progress-bar-wrap,
+.exercises-page .progress-bar-fill { border-radius: 0; }
+.exercises-page .list-hero { max-width: 920px; margin: 68px auto 40px; text-align: left; }
+.exercises-page .list-hero h1 { max-width: 800px; font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; line-height: 1.02; letter-spacing: -.055em; }
+.exercises-page .list-hero h1 em { font-style: normal; }
+.exercises-page .list-hero p { max-width: 670px; margin: 0; font-size: 1rem; }
+.exercises-page .exercises-grid { display: block; max-width: 920px; padding: 0 32px; }
+.exercises-page .exercise-card {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 22px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+.exercises-page .exercise-card:last-child { border-bottom: 1px solid var(--border); }
+.exercises-page .exercise-card:hover { border-color: var(--text-dim); background: transparent; transform: none; }
+.exercises-page .exercise-card.completed::after { display: none; }
+.exercises-page .card-part,
+.exercises-page .card-title,
+.exercises-page .card-theme,
+.exercises-page .card-footer { margin: 0; }
+.exercises-page .card-title { font-size: 1.05rem; font-weight: 700; }
+.exercises-page .card-footer { justify-self: end; gap: 18px; }
+.exercises-page .exercise-view { max-width: 760px; padding-top: 48px; }
+.exercises-page .ex-title { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; letter-spacing: -.05em; }
+.exercises-page .ex-lesson { font-weight: 400; border-left-color: var(--gold); }
+.exercises-page .ex-affirmation { color: var(--text); text-align: left; font-size: 1rem; font-style: normal; font-weight: 600; }
+.exercises-page .ex-affirmation,
+.exercises-page .ex-insight,
+.exercises-page .journey-card,
+.exercises-page .journal-textarea,
+.exercises-page .audio-embed-wrap,
+.exercises-page .auth-modal,
+.exercises-page .auth-dropdown,
+.exercises-page button,
+.exercises-page input,
+.exercises-page textarea,
+.exercises-page select { border-radius: 3px; box-shadow: none; }
+.exercises-page .goal-banner { display: none !important; }
+.exercises-page .timer-card { display: none; }
+
+@media (max-width: 800px) {
+  .home-page .hero { grid-template-columns: 1fr; }
+  .home-page .step-card,
+  .home-page .step-card + .step-card { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+}
+
+@media (max-width: 700px) {
+  .home-page .hero h1 { font-size: 44px; }
+  .home-page .nav-links { gap: 10px; font-size: 11px; }
+  .home-page .feature-grid,
+  .home-page .paths-grid { grid-template-columns: 1fr; }
+  .exercises-page .header { padding: 15px 16px; }
+  .exercises-page .header-subtitle,
+  .exercises-page .header-progress { display: none; }
+  .exercises-page .header-nav { display: flex; gap: 12px; }
+  .exercises-page .header-nav-link { font-size: .73rem; }
+  .exercises-page .list-hero { margin: 44px auto 30px; }
+  .exercises-page .list-hero h1 { font-size: 2.5rem; }
+  .exercises-page .exercises-grid { padding: 0 20px; }
+  .exercises-page .exercise-card { grid-template-columns: 58px minmax(0, 1fr); gap: 12px; }
+  .exercises-page .card-footer { display: none; }
+}

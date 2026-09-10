@@ -7,5 +7,10 @@
   <url><loc>https://lucky-action-plan.vercel.app/finances</loc><priority>0.8</priority></url>
   <url><loc>https://lucky-action-plan.vercel.app/relationships</loc><priority>0.8</priority></url>
   <url><loc>https://lucky-action-plan.vercel.app/launch</loc><priority>0.8</priority></url>
+  <url><loc>https://lucky-action-plan.vercel.app/career-plan</loc><priority>0.8</priority></url>
+  <url><loc>https://lucky-action-plan.vercel.app/health-plan</loc><priority>0.8</priority></url>
+  <url><loc>https://lucky-action-plan.vercel.app/finance-plan</loc><priority>0.8</priority></url>
+  <url><loc>https://lucky-action-plan.vercel.app/relationships-plan</loc><priority>0.8</priority></url>
+  <url><loc>https://lucky-action-plan.vercel.app/launch-plan</loc><priority>0.8</priority></url>
   <url><loc>https://lucky-action-plan.vercel.app/exercises</loc><priority>0.7</priority></url>
 </urlset>

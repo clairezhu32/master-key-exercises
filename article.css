@@ -1,0 +1,261 @@
+/* Lucky — SEO article pages. Loaded after goal-area.css and reuses its tokens. */
+
+.article-hero {
+  padding: 74px 0 26px;
+  max-width: 800px;
+}
+
+.article-hero h1 {
+  font-size: clamp(34px, 4.7vw, 54px);
+  line-height: 1.08;
+}
+
+.article-hero .lead {
+  max-width: 720px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.button.ghost {
+  color: var(--text);
+  background: rgba(25, 33, 61, .75);
+  border: 1px solid var(--line);
+}
+
+.meta {
+  margin-top: 22px;
+  color: #777f99;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+
+.toc {
+  margin: 34px 0 0;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(19, 26, 51, .72);
+}
+
+.toc h2 {
+  color: var(--violet);
+  font: 700 10px/1 'DM Sans', sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.toc ol {
+  margin: 12px 0 0 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.toc li {
+  padding: 3px 0;
+}
+
+.toc a:hover,
+.prose a:hover {
+  color: var(--mint);
+}
+
+.prose {
+  max-width: 720px;
+}
+
+.prose h2 {
+  margin-top: 10px;
+  font: 600 clamp(27px, 3.4vw, 36px)/1.16 'Playfair Display', serif;
+  letter-spacing: -.02em;
+}
+
+.prose h3 {
+  margin: 32px 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.prose p {
+  margin-top: 16px;
+  color: #d7dbea;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.prose ul,
+.prose ol {
+  margin: 16px 0 0 20px;
+  color: #d7dbea;
+  font-size: 16px;
+}
+
+.prose li {
+  padding: 5px 0;
+  line-height: 1.7;
+}
+
+.prose li::marker {
+  color: var(--mint);
+}
+
+.prose a {
+  color: var(--violet);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(157, 140, 255, .45);
+  text-underline-offset: 3px;
+}
+
+.prose strong {
+  color: var(--text);
+}
+
+.callout {
+  margin-top: 26px;
+  padding: 20px 22px;
+  border-left: 3px solid var(--mint);
+  border-radius: 0 14px 14px 0;
+  background: rgba(113, 229, 193, .07);
+}
+
+.callout p {
+  margin-top: 0;
+  color: #e2e6f3;
+  font-size: 15px;
+}
+
+.callout p + p {
+  margin-top: 12px;
+}
+
+.phases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.phase {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(25, 33, 61, .58);
+}
+
+.phase .weeks {
+  color: var(--mint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.phase h3 {
+  margin: 10px 0 7px;
+  font-size: 15px;
+}
+
+.phase p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.62;
+}
+
+.checklist {
+  margin-top: 24px;
+  padding: 4px 0;
+  border-top: 1px solid var(--line);
+}
+
+.checklist li {
+  list-style: none;
+  padding: 13px 0 13px 28px;
+  position: relative;
+  border-bottom: 1px solid var(--line);
+  color: #dce0ef;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.checklist li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 13px;
+  color: var(--mint);
+  font-size: 13px;
+}
+
+.checklist {
+  margin-left: 0;
+}
+
+.inline-cta {
+  margin-top: 30px;
+  padding: 24px 26px;
+  border: 1px solid rgba(157, 140, 255, .24);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(113, 229, 193, .08), rgba(157, 140, 255, .12));
+}
+
+.inline-cta h3 {
+  margin: 0;
+  font: 600 21px/1.25 'Playfair Display', serif;
+}
+
+.inline-cta p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.inline-cta .button {
+  margin-top: 18px;
+}
+
+.next-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.next-links a {
+  display: block;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(25, 33, 61, .58);
+}
+
+.next-links a:hover {
+  border-color: rgba(157, 140, 255, .45);
+}
+
+.next-links strong {
+  display: block;
+  font-size: 15px;
+}
+
+.next-links span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .article-hero {
+    padding-top: 52px;
+  }
+
+  .phases,
+  .next-links {
+    grid-template-columns: 1fr;
+  }
+}
