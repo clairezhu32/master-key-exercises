@@ -1,3 +1,5 @@
+import { createPlanPreview, getPlanAccess } from '../lib/plan-access.js';
+
 // A full 12-week, 7-stage funnel plan (maxOutputTokens: 8000) routinely takes
 // Gemini well past Vercel's old unconfigured default duration — without this,
 // the function gets killed mid-generation and the request just hangs from
@@ -85,7 +87,7 @@ async function claimGeneration(userId, email, serviceRoleKey) {
   const [record] = await stateRes.json();
   const storedCount = Number(record?.goal_data?._generation_count);
   const used = Number.isFinite(storedCount) ? storedCount : record?.plan ? 1 : 0;
-  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT };
+  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT, goalData: record?.goal_data || {} };
 }
 
 // mks_goal_generations is also the durable copy of the plan itself:
@@ -94,7 +96,7 @@ async function claimGeneration(userId, email, serviceRoleKey) {
 // lose a plan that had actually succeeded, since it previously only ever
 // lived in the browser's localStorage. This write also advances the account's
 // successful-generation count, so a failed write must not report success.
-async function saveGenerationResult(userId, goalData, plan, generationCount, serviceRoleKey) {
+async function saveGenerationResult(userId, goalData, plan, generationCount, serviceRoleKey, existingGoalData = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${userId}`, {
     method: 'PATCH',
     headers: {
@@ -103,7 +105,7 @@ async function saveGenerationResult(userId, goalData, plan, generationCount, ser
       'Content-Type': 'application/json',
       Prefer: 'return=minimal',
     },
-    body: JSON.stringify({ goal_data: { ...goalData, _generation_count: generationCount }, plan, generated_at: new Date().toISOString() }),
+    body: JSON.stringify({ goal_data: { ...existingGoalData, ...goalData, _generation_count: generationCount }, plan, generated_at: new Date().toISOString() }),
   });
   if (!res.ok) console.error(`Failed to save generation result for user ${userId}: ${res.status}`);
   return res.ok;
@@ -502,9 +504,11 @@ export default async function handler(req, res) {
     const plan = await callGemini({ goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, intensity, category }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
-    const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey);
+    const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);
     if (!saved) { const saveError = new Error('Your plan was created but could not be saved. Please try again.'); saveError.status = 500; throw saveError; }
-    return res.status(200).json({ plan: { ...plan, intensity }, usage: { used: generationCount, remaining: PLAN_GENERATION_LIMIT - generationCount, limit: PLAN_GENERATION_LIMIT } });
+    const fullPlan = { ...plan, intensity };
+    const access = await getPlanAccess(user.id, serviceRoleKey);
+    return res.status(200).json({ plan: access.unlocked ? fullPlan : createPlanPreview(fullPlan), access, usage: { used: generationCount, remaining: PLAN_GENERATION_LIMIT - generationCount, limit: PLAN_GENERATION_LIMIT } });
   } catch (err) {
     const status = err.status || 500;
     console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);

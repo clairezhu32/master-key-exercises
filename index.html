@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Lucky turns one meaningful goal into a personalized 90-day action plan, then supports follow-through with 24 guided Lucky Exercises for mindset and reflection.">
   <title>Lucky — Your 90-Day Action Plan and Mindset Practice</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -60,14 +57,9 @@
     }
     .nav-links { display: flex; align-items: center; gap: 28px; color: var(--muted); font-size: 13px; font-weight: 500; }
     .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      padding: 10px 16px; color: var(--text) !important; border: 1px solid rgba(157,140,255,.45);
-      border-radius: 9px; background: rgba(157,140,255,.08);
-    }
-
     .hero {
       width: min(var(--max), calc(100% - 40px));
-      min-height: 690px;
+      min-height: 640px;
       margin: 0 auto;
       padding: 90px 0 86px;
       display: grid;
@@ -152,7 +144,7 @@
       background: rgba(255,255,255,.018);
     }
     .proof-inner {
-      width: min(var(--max), calc(100% - 40px)); min-height: 120px; margin: 0 auto;
+      width: min(var(--max), calc(100% - 40px)); min-height: 104px; margin: 0 auto;
       display: grid; grid-template-columns: repeat(3, 1fr);
     }
     .proof-item { padding: 29px 36px; display: flex; align-items: center; gap: 18px; border-right: 1px solid var(--line); }
@@ -161,7 +153,7 @@
     .proof-item strong { color: var(--text); font-family: "Playfair Display", serif; font-size: 34px; font-weight: 600; }
     .proof-item span { color: var(--muted); font-size: 12px; line-height: 1.45; }
 
-    .section { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 120px 0; }
+    .section { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 96px 0; }
     .section-heading { max-width: 720px; margin-bottom: 54px; }
     .section-kicker { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
     .section h2 { margin-top: 13px; font-family: "Playfair Display", serif; font-size: clamp(36px, 4.8vw, 56px); line-height: 1.1; letter-spacing: -.035em; }
@@ -186,12 +178,8 @@
     .step-card p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
     .step-card:nth-child(2) { border-color: rgba(157,140,255,.3); background: linear-gradient(145deg, rgba(157,140,255,.105), rgba(255,255,255,.02)); }
     .step-output { display: block; margin-top: 20px; color: #8e96b1; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .journey-cta { margin-top: 34px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 23px 26px; border: 1px solid rgba(113,229,193,.2); border-radius: 14px; background: rgba(113,229,193,.055); }
-    .journey-cta p { color: var(--muted); font-size: 13px; }
-    .journey-cta strong { color: var(--text); }
-
     .experience {
-      width: min(var(--max), calc(100% - 40px)); margin: 0 auto 120px; overflow: hidden;
+      width: min(var(--max), calc(100% - 40px)); margin: 0 auto 96px; overflow: hidden;
       display: grid; grid-template-columns: .9fr 1.1fr; border: 1px solid var(--line); border-radius: 22px;
       background: var(--navy);
     }
@@ -208,21 +196,17 @@
     .feature h3 { font-size: 15px; }
     .feature p { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.55; }
 
-    .origin { padding: 110px 20px; text-align: center; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(157,140,255,.045), transparent); }
-    .origin-inner { max-width: 800px; margin: 0 auto; }
-    .origin h2 { margin-top: 15px; font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 52px); line-height: 1.12; letter-spacing: -.035em; }
-    .origin p { margin: 22px auto 0; max-width: 700px; color: var(--muted); font-size: 15px; line-height: 1.8; }
-    .quote { margin-top: 34px; padding-top: 30px; border-top: 1px solid var(--line); color: #d7d3e5; font-family: "Playfair Display", serif; font-size: 20px !important; font-style: italic; }
-    .quote cite { display: block; margin-top: 10px; color: #737b96; font-family: "DM Sans", sans-serif; font-size: 10px; font-style: normal; letter-spacing: .1em; text-transform: uppercase; }
-
-    .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 110px; padding: 74px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
+    .final-cta { width: min(940px, calc(100% - 40px)); margin: 0 auto 90px; padding: 62px 50px; text-align: center; border: 1px solid rgba(157,140,255,.22); border-radius: 22px; background: linear-gradient(135deg, rgba(113,229,193,.1), rgba(157,140,255,.13)); }
     .final-cta h2 { font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 50px); line-height: 1.1; letter-spacing: -.035em; }
     .final-cta p { margin: 17px auto 27px; max-width: 600px; color: var(--muted); }
+    .final-actions { display: flex; justify-content: center; gap: 14px; }
+    .final-note { margin-top: 20px; color: #737b96; font-size: 10px; }
     .footer { width: min(var(--max), calc(100% - 40px)); min-height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: #747d98; font-size: 11px; }
     .footer-links { display: flex; gap: 22px; }
 
     @media (max-width: 900px) {
-      .nav-links a:not(.nav-cta) { display: none; }
+      .nav-links { gap: 16px; }
+      .nav-links a[href="#how"] { display: none; }
       .hero { grid-template-columns: 1fr; gap: 60px; padding-top: 70px; }
       .hero-copy { text-align: center; }
       .hero-copy > p { margin-left: auto; margin-right: auto; }
@@ -238,7 +222,6 @@
 
     @media (max-width: 600px) {
       .nav { width: calc(100% - 28px); }
-      .nav-cta { padding: 9px 12px; }
       .hero { width: calc(100% - 32px); min-height: auto; padding: 58px 0 70px; }
       .hero h1 { font-size: 43px; }
       .hero-copy > p { font-size: 16px; }
@@ -248,16 +231,90 @@
       .goal-card { padding: 18px; }
       .section { width: calc(100% - 32px); padding: 85px 0; }
       .step-card { min-height: 250px; }
-      .journey-cta { align-items: stretch; flex-direction: column; }
       .experience { width: calc(100% - 32px); margin-bottom: 85px; }
       .experience-copy { padding: 45px 25px; }
       .experience-copy h2 { font-size: 36px; }
       .feature-list { padding: 20px; }
       .feature { padding: 18px; }
-      .origin { padding: 85px 20px; }
       .final-cta { width: calc(100% - 32px); margin-bottom: 80px; padding: 54px 22px; }
+      .final-actions { align-items: stretch; flex-direction: column; }
       .footer { width: calc(100% - 32px); padding: 28px 0; flex-direction: column; gap: 15px; text-align: center; }
+      .nav-links { gap: 11px; font-size: 11px; }
     }
+  </style>
+  <style>
+    /* Lucky's product voice: direct, editorial, and intentionally low-gloss. */
+    :root { --night:#11110f; --navy:#181814; --panel:#1b1b17; --panel-2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet-2:#d7ff58; --mint:#d7ff58; --warm:#d7ff58; --max:1120px; }
+    body { background:var(--night); font-family:Arial, Helvetica, sans-serif; line-height:1.5; }
+    .nav { height:72px; border-color:var(--line); }
+    .brand { gap:9px; letter-spacing:-.01em; }
+    .brand-mark { width:28px; height:28px; border-radius:3px; color:#11110f; background:var(--mint); box-shadow:none; font-family:Arial, Helvetica, sans-serif; font-size:14px; font-weight:800; }
+    .nav-links { gap:24px; color:#cbc9bd; font-size:14px; }
+    .hero { min-height:600px; padding:76px 0 82px; grid-template-columns:minmax(0,1.1fr) minmax(390px,.9fr); gap:70px; }
+    .eyebrow { margin-bottom:22px; padding:0; color:var(--mint); border:0; border-radius:0; background:none; font-size:13px; letter-spacing:.04em; text-transform:none; }
+    .eyebrow-dot { display:none; }
+    .hero h1 { max-width:650px; font-family:Arial, Helvetica, sans-serif; font-size:clamp(48px,6vw,72px); line-height:1; letter-spacing:-.055em; font-weight:700; }
+    .hero h1 em { color:var(--text); background:none; font-style:normal; text-decoration:underline; text-decoration-color:var(--mint); text-decoration-thickness:.12em; text-underline-offset:.1em; }
+    .hero-copy > p { max-width:590px; margin-top:27px; color:#c4c3b9; font-size:18px; line-height:1.6; }
+    .hero-actions { margin-top:32px; }
+    .button { min-height:50px; gap:18px; border-radius:3px; font-size:15px; transition:background .15s,color .15s,border-color .15s; }
+    .button-primary { color:#11110f; background:var(--mint); box-shadow:none; }
+    .button-primary:hover { transform:none; color:var(--text); background:#2a2a24; box-shadow:none; }
+    .button-secondary { background:transparent; }
+    .hero-note { flex-wrap:wrap; gap:8px 18px; margin-top:20px; color:#8e8e84; font-size:13px; }
+    .hero-note span::before { content:""; width:4px; height:4px; background:var(--mint); }
+    .preview-glow { display:none; }
+    .app-preview { padding:0; border-color:#5a5a4e; border-radius:4px; background:var(--panel); box-shadow:12px 12px 0 var(--mint); backdrop-filter:none; transform:none; }
+    .preview-top { padding:16px 18px; border-bottom:1px solid var(--line); }
+    .preview-title, .preview-week { font-size:13px; letter-spacing:0; text-transform:none; }
+    .preview-week { color:var(--mint); }
+    .goal-card, .today-card { margin:0; padding:20px 18px; border:0; border-bottom:1px solid var(--line); border-radius:0; background:transparent; }
+    .goal-card h3 { margin-top:8px; font-family:Arial, Helvetica, sans-serif; font-size:21px; line-height:1.3; }
+    .mini-label { color:#8f8f84; font-size:12px; letter-spacing:.06em; }
+    .progress-row { font-size:12px; }
+    .progress, .progress > span { border-radius:0; }
+    .progress > span { width:33%; background:var(--mint); }
+    .task { color:#e4e3da; font-size:14px; }
+    .task-check { border-radius:2px; }
+    .insight-card { margin:0; padding:18px; grid-template-columns:1fr; border:0; border-radius:0; background:#25251f; }
+    .insight-icon { display:none; }
+    .insight-card p { color:#c4c3b9; font-size:13px; }
+    .proof { border-color:var(--line); background:#181814; }
+    .proof-inner { min-height:92px; }
+    .proof-item { padding:23px 30px; border-color:var(--line); }
+    .proof-item strong { color:var(--mint); font-family:Arial, Helvetica, sans-serif; font-size:28px; }
+    .proof-item span { font-size:13px; }
+    .section { padding:88px 0; }
+    .section-heading { max-width:760px; margin-bottom:44px; }
+    .section-kicker { color:var(--mint); font-size:13px; letter-spacing:.04em; text-transform:none; }
+    .section h2, .experience-copy h2, .final-cta h2 { font-family:Arial, Helvetica, sans-serif; letter-spacing:-.04em; }
+    .section h2 { max-width:760px; font-size:clamp(36px,4.6vw,54px); }
+    .section-heading > p { color:#bbb9af; font-size:17px; }
+    .steps { gap:0; border-top:1px solid var(--line); }
+    .steps::before { display:none; }
+    .step-card { min-height:270px; padding:27px 28px 28px 0; border:0; border-right:1px solid var(--line); border-radius:0; background:none; }
+    .step-card + .step-card { padding-left:28px; }
+    .step-card:last-child { border-right:0; }
+    .step-card:nth-child(2) { border-color:var(--line); background:none; }
+    .step-number { width:auto; height:auto; display:block; color:var(--mint); border-radius:0; background:none !important; box-shadow:none; font-size:14px; text-align:left; }
+    .step-card h3 { margin-top:38px; font-size:20px; }
+    .step-card p { color:#aaa99e; font-size:15px; line-height:1.6; }
+    .step-output { margin-top:18px; color:#77776e; font-size:12px; letter-spacing:.03em; text-transform:none; }
+    .experience { margin-bottom:88px; border-color:var(--line); border-radius:4px; background:#181814; }
+    .experience-copy { padding:58px 52px; }
+    .experience-copy h2 { font-size:42px; }
+    .experience-copy > p { color:#bbb9af; font-size:16px; }
+    .feature-list { padding:24px 34px; gap:0; background:#20201b; border-color:var(--line); }
+    .feature { padding:20px 0; grid-template-columns:1fr; gap:5px; border:0; border-bottom:1px solid var(--line); border-radius:0; background:none; }
+    .feature:last-child { border-bottom:0; }
+    .feature-icon { display:none; }
+    .feature h3 { font-size:16px; }
+    .feature p { color:#aaa99e; font-size:14px; }
+    .final-cta { margin-bottom:70px; padding:66px 0; border:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; background:none; }
+    .final-cta p { color:#aaa99e; font-size:16px; }
+    .final-note, .footer { font-size:12px; }
+    @media(max-width:900px){ .hero{grid-template-columns:1fr}.step-card,.step-card+.step-card{padding:24px 0;border-right:0;border-bottom:1px solid var(--line)}.step-card:last-child{border-bottom:0} }
+    @media(max-width:600px){ .hero-copy{text-align:left}.hero-actions,.hero-note{justify-content:flex-start}.hero h1{font-size:44px}.app-preview{box-shadow:7px 7px 0 var(--mint)}.nav-links a:first-child{display:none}.proof-item{padding:20px 0}.experience-copy{padding:42px 24px}.feature-list{padding:12px 24px}.final-cta{text-align:left}.final-actions{align-items:flex-start}.final-actions .button{width:100%} }
   </style>
 </head>
 <body>
@@ -269,93 +326,80 @@
     <nav class="nav-links" aria-label="Primary navigation">
       <a href="#how">How it works</a>
       <a href="/exercises">Lucky Exercises</a>
-      <a href="/goals">Master Plan</a>
-      <a class="nav-cta" href="/goals">Build my plan →</a>
+      <a href="/goals">My plan</a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="eyebrow-dot"></span> Direction for your goal · mindset for the journey</div>
-        <h1>Build the plan. <em>Become ready to execute it.</em></h1>
-        <p>Turn one meaningful goal into a personalized 90-day action plan—then use guided Lucky Exercises to work through the beliefs, patterns and self-doubt that can get in the way of follow-through.</p>
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Plan less. Do the next thing.</div>
+        <h1>A 90-day plan <em>you’ll actually use.</em></h1>
+        <p>Tell Lucky what you want to change. You’ll get a practical week-by-week plan, plus guided exercises for the moments when doubt or avoidance gets in the way.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
-          <a class="button button-secondary" href="/exercises">Explore Lucky Exercises</a>
+          <a class="button button-primary" href="/goals">Make my plan <span>→</span></a>
+          <a class="button button-secondary" href="/exercises">See the exercises</a>
         </div>
-        <div class="hero-note"><span>12 weekly milestones</span><span>24 mindset practices</span><span>Progress and reflections saved</span></div>
+        <div class="hero-note"><span>Week 1 is free</span><span>Built around your schedule</span><span>Saved to your account</span></div>
       </div>
 
-      <div class="preview-wrap" aria-label="Lucky Master Plan preview">
+      <div class="preview-wrap" aria-label="Lucky 90-day plan preview">
         <div class="preview-glow"></div>
         <div class="app-preview">
-          <div class="preview-top"><span class="preview-title">Your Lucky Master Plan</span><span class="preview-week">Week 1 of 12</span></div>
+          <div class="preview-top"><span class="preview-title">Your 90-day plan</span><span class="preview-week">Week 1 of 12</span></div>
           <div class="goal-card">
             <div class="mini-label">Your 90-day goal</div>
-            <h3>Build a healthier social life in my new city</h3>
-            <div class="progress-row"><div class="progress"><span></span></div><span>Week 1 progress · 38%</span></div>
+            <h3>Pivot into a Product Manager role in the tech industry</h3>
+            <div class="progress-row"><div class="progress"><span></span></div><span>1 of 3 done</span></div>
           </div>
           <div class="today-card">
             <div class="mini-label">This week’s actions</div>
-            <div class="task done"><span class="task-check"></span><span>Choose two recurring social activities I genuinely enjoy</span></div>
-            <div class="task"><span class="task-check"></span><span>Attend one event and introduce myself to one person</span></div>
-            <div class="task"><span class="task-check"></span><span>Invite one new connection to coffee or another activity</span></div>
+            <div class="task done"><span class="task-check"></span><span>Define my target PM roles and identify the three biggest skill gaps</span></div>
+            <div class="task"><span class="task-check"></span><span>Rewrite one resume story around a product decision and measurable outcome</span></div>
+            <div class="task"><span class="task-check"></span><span>Schedule two conversations with Product Managers in tech</span></div>
           </div>
           <div class="insight-card">
             <div class="insight-icon">✦</div>
-            <div><div class="mini-label">Recommended mindset practice</div><p>The Courage Step: make one uncomfortable action small enough to complete within 24 hours.</p></div>
+            <div><div class="mini-label">When this feels uncomfortable</div><p>Send one outreach message before your resume or career story feels perfect.</p></div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="proof" aria-label="Product details">
-      <div class="proof-inner">
-        <div class="proof-item"><strong>90</strong><span>days of personalized<br>direction and execution</span></div>
-        <div class="proof-item"><strong>12</strong><span>weekly milestones<br>with checkable actions</span></div>
-        <div class="proof-item"><strong>24</strong><span>Lucky Exercises<br>for mindset and reflection</span></div>
       </div>
     </section>
 
     <section class="section" id="how">
       <div class="section-heading">
-        <div class="section-kicker">One goal. Two connected tools.</div>
-        <h2>Know what to do—and strengthen how you show up.</h2>
-        <p>The Master Plan provides the external roadmap. Lucky Exercises support the internal work of noticing and changing the mindset patterns that interfere with execution.</p>
+        <div class="section-kicker">How Lucky works</div>
+        <h2>A plan for the work. Exercises for the moments you get stuck.</h2>
+        <p>Lucky connects concrete weekly actions with short reflection practices, so insight leads back to something you can do.</p>
       </div>
       <div class="steps">
         <article class="step-card">
           <div class="step-number">1</div>
-          <h3>Define your meaningful goal</h3>
-          <p>Answer focused questions about the result you want, your starting point, resources, constraints, motivation, likely obstacles and first proof of momentum.</p>
-          <span class="step-output">Input · Your real context</span>
+          <h3>Describe the change</h3>
+          <p>Answer nine questions about the result, your starting point, available time and the things likely to get in the way.</p>
+          <span class="step-output">About 5 minutes</span>
         </article>
         <article class="step-card">
           <div class="step-number">2</div>
-          <h3>Generate your 90-day plan</h3>
-          <p>Lucky turns your answers into 12 weekly milestones with specific actions, recommended Lucky Exercises, measurable progress and space to reflect and adjust.</p>
-          <span class="step-output">Direction · A plan you can execute</span>
+          <h3>Start with Week 1</h3>
+          <p>Get a clear milestone and a short list of actions that fit the time you actually have. Your first week is free.</p>
+          <span class="step-output">No credit card required</span>
         </article>
         <article class="step-card">
           <div class="step-number">3</div>
-          <h3>Work on the mindset behind action</h3>
-          <p>Choose from 24 general Lucky Exercises when fear, self-doubt, avoidance or an old pattern appears. Listen, reflect, save your answers and leave with one concrete next action.</p>
-          <span class="step-output">Mindset · Reflection into behavior</span>
+          <h3>Adjust as you go</h3>
+          <p>Check off the work, note what is blocked, and use a Lucky Exercise when the problem is follow-through rather than the plan itself.</p>
+          <span class="step-output">A plan that changes with you</span>
         </article>
-      </div>
-      <div class="journey-cta">
-        <p><strong>Start with direction.</strong> Once your plan exists, use Lucky Exercises whenever your mindset needs support.</p>
-        <a class="button button-primary" href="/goals">Build my Master Plan →</a>
       </div>
     </section>
 
     <section class="experience">
       <div class="experience-copy">
-        <div class="section-kicker">The execution system</div>
-        <h2>A practical plan with mindset support built around it.</h2>
-        <p>Check off weekly actions and record what is working, difficult or blocked. When the obstacle is internal—not knowing what to do, but struggling to do it—open a Lucky Exercise and work through the pattern.</p>
-        <a class="button button-primary" href="/goals">Create my 90-day plan →</a>
+        <div class="section-kicker">Inside your plan</div>
+        <h2>Everything points back to action.</h2>
+        <p>See this week’s priority, check off the work and write a quick note when something needs to change. If you are avoiding an action, open the exercise attached to that week.</p>
+        <a class="button button-primary" href="/goals">Make my plan →</a>
       </div>
       <div class="feature-list">
         <article class="feature"><div class="feature-icon">⌁</div><div><h3>Personalized weekly roadmap</h3><p>Move through 12 milestones with actions fitted to your goal, starting point, constraints, schedule and likely obstacles.</p></div></article>
@@ -365,26 +409,21 @@
       </div>
     </section>
 
-    <section class="origin">
-      <div class="origin-inner">
-        <div class="section-kicker">The Lucky approach</div>
-        <h2>Strategy changes the path. Practice changes the pattern.</h2>
-        <p>A plan alone cannot resolve every fear, belief or protective habit that appears during execution. Reflection alone cannot replace a concrete roadmap. Lucky brings both together: personalized direction for the goal and general Lucky Exercises that help you respond differently when mindset becomes the obstacle.</p>
-        <p class="quote">Lucky is a self-reflection and coaching tool—not psychotherapy or medical treatment.<cite>If a prompt feels overwhelming, stop and seek qualified support.</cite></p>
-      </div>
-    </section>
-
     <section class="final-cta">
-      <h2>Give your goal a plan—and your mindset a practice.</h2>
-      <p>Start by building your personalized 90-day roadmap. Then use Lucky Exercises to support the person executing it.</p>
-      <a class="button button-primary" href="/goals">Build my Master Plan <span>→</span></a>
+      <h2>What do you want to be different 90 days from now?</h2>
+      <p>Start with one goal. Lucky will help you decide what to do this week.</p>
+      <div class="final-actions">
+        <a class="button button-primary" href="/goals">Make my plan <span>→</span></a>
+        <a class="button button-secondary" href="/exercises">Browse exercises</a>
+      </div>
+      <div class="final-note">Lucky is a self-reflection and coaching tool—not psychotherapy or medical treatment.</div>
     </section>
   </main>
 
   <footer class="footer">
     <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
-    <span>Personalized direction. Mindset practice. Measurable action.</span>
-    <div class="footer-links"><a href="/exercises">Lucky Exercises</a><a href="/goals">Master Plan</a></div>
+    <span>Built by Claire. One goal, one week at a time.</span>
+    <div class="footer-links"><a href="/exercises">Lucky Exercises</a><a href="/goals">My plan</a></div>
   </footer>
 </body>
 </html>
