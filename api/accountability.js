@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { getPlanAccess } from '../lib/plan-access.js';
 
 const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const messageRateLimit = new Map();
@@ -65,17 +66,19 @@ function ownerState(record) {
   };
 }
 
-function buddyView(record) {
+async function buddyView(record, serviceRoleKey) {
   const answers = record.goal_data || {}, plan = record.plan || {}, progress = answers._accountability_progress || {};
+  const access = await getPlanAccess(record.user_id, serviceRoleKey);
+  const visibleWeeks = access.unlocked ? (plan.weeks || []) : (plan.weeks || []).slice(0, 1);
   return {
     owner_name: answers._buddy_match_profile?.first_name || answers._accountability?.owner_name || 'Your buddy',
     goal: answers.goal || plan.milestone_90day || 'A meaningful 90-day goal',
     milestone: plan.milestone_90day || answers.goal || '',
     completed: progress.completed || {},
     completed_count: Number(progress.completed_count) || 0,
-    total_tasks: Number(progress.total_tasks) || (plan.weeks || []).flatMap((week) => week.actions || []).length,
+    total_tasks: access.unlocked ? (Number(progress.total_tasks) || visibleWeeks.flatMap((week) => week.actions || []).length) : visibleWeeks.flatMap((week) => week.actions || []).length,
     updated_at: progress.updated_at || record.generated_at,
-    weeks: (plan.weeks || []).map((week, index) => ({ week: week.week || index + 1, theme: week.theme || '', target: week.target || '', actions: week.actions || [] })),
+    weeks: visibleWeeks.map((week, index) => ({ week: week.week || index + 1, theme: week.theme || '', target: week.target || '', actions: week.actions || [] })),
   };
 }
 
@@ -94,7 +97,7 @@ async function stateWithMatch(record, serviceRoleKey) {
   if (match?.partner_user_id) {
     const partner = await getRecordByUser(match.partner_user_id, serviceRoleKey);
     const reciprocal = partner?.goal_data?._buddy_match?.partner_user_id === record.user_id;
-    state.match = reciprocal ? { status: 'matched', cadence: profile?.cadence || 'weekly', partner: buddyView(partner) } : { status: 'waiting', cadence: profile?.cadence || 'weekly' };
+    state.match = reciprocal ? { status: 'matched', cadence: profile?.cadence || 'weekly', partner: await buddyView(partner, serviceRoleKey) } : { status: 'waiting', cadence: profile?.cadence || 'weekly' };
   } else if (profile?.status === 'waiting') state.match = { status: 'waiting', cadence: profile.cadence || 'weekly' };
   else state.match = { status: 'inactive' };
   return state;
@@ -121,7 +124,7 @@ export default async function handler(req, res) {
       }
       const record = await getRecordByShareToken(req.query?.token, serviceRoleKey);
       if (!record) return res.status(404).json({ error: 'This buddy link is invalid or has been turned off.' });
-      return res.status(200).json(buddyView(record));
+      return res.status(200).json(await buddyView(record, serviceRoleKey));
     }
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
@@ -175,7 +178,7 @@ export default async function handler(req, res) {
       try { await saveGoalData(user.id, { ...goalData, _buddy_match_profile: { ...profile, status: 'matched' }, _buddy_match: { partner_user_id: candidate.user_id, matched_at: matchedAt } }, serviceRoleKey); }
       catch (error) { await saveGoalData(candidate.user_id, { ...candidate.goal_data, _buddy_match_profile: { ...candidate.goal_data._buddy_match_profile, status: 'waiting' }, _buddy_match: null }, serviceRoleKey).catch(() => {}); throw error; }
       await track('accountability_match_created', user.id, user.email, { category: profile.category, cadence }, serviceRoleKey);
-      return res.status(200).json({ match: { status: 'matched', cadence, partner: buddyView(candidate) } });
+      return res.status(200).json({ match: { status: 'matched', cadence, partner: await buddyView(candidate, serviceRoleKey) } });
     }
 
     if (body.action === 'leave_pool') {

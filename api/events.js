@@ -3,6 +3,7 @@ const rateLimit = new Map();
 const ALLOWED_EVENTS = new Set([
   'quiz_started', 'quiz_step_completed', 'quiz_completed', 'plan_generated',
   'plan_saved', 'plan_shared', 'task_completed', 'returning_user',
+  'upgrade_viewed', 'upgrade_started', 'upgrade_completed',
 ]);
 
 function isAllowedOrigin(origin) {

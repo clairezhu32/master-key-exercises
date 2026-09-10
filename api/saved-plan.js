@@ -1,3 +1,5 @@
+import { createPlanPreview, getPlanAccess } from '../lib/plan-access.js';
+
 const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const PLAN_LIMIT = 3;
 
@@ -36,9 +38,12 @@ export default async function handler(req, res) {
     const count = Number(record?.goal_data?._generation_count);
     const used = Number.isFinite(count) ? count : record?.plan ? 1 : 0;
     const answers = Object.fromEntries(Object.entries(record?.goal_data || {}).filter(([key]) => !key.startsWith('_')));
+    const access = await getPlanAccess(user.id, serviceRoleKey);
+    const clientPlan = access.unlocked ? record?.plan : createPlanPreview(record?.plan);
     return res.status(200).json({
       usage: { used, remaining: Math.max(0, PLAN_LIMIT - used), limit: PLAN_LIMIT },
-      savedPlan: record?.plan ? { answers, plan: record.plan, savedAt: record.generated_at } : null,
+      access,
+      savedPlan: clientPlan ? { answers, plan: clientPlan, savedAt: record.generated_at, access } : null,
     });
   } catch (error) {
     console.error('saved-plan failed:', error);

@@ -1,3 +1,5 @@
+import { createPlanPreview, getPlanAccess } from '../lib/plan-access.js';
+
 // A full 12-week, 7-stage funnel plan (maxOutputTokens: 8000) routinely takes
 // Gemini well past Vercel's old unconfigured default duration — without this,
 // the function gets killed mid-generation and the request just hangs from
@@ -504,7 +506,9 @@ export default async function handler(req, res) {
     const generationCount = claimed.used + 1;
     const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);
     if (!saved) { const saveError = new Error('Your plan was created but could not be saved. Please try again.'); saveError.status = 500; throw saveError; }
-    return res.status(200).json({ plan: { ...plan, intensity }, usage: { used: generationCount, remaining: PLAN_GENERATION_LIMIT - generationCount, limit: PLAN_GENERATION_LIMIT } });
+    const fullPlan = { ...plan, intensity };
+    const access = await getPlanAccess(user.id, serviceRoleKey);
+    return res.status(200).json({ plan: access.unlocked ? fullPlan : createPlanPreview(fullPlan), access, usage: { used: generationCount, remaining: PLAN_GENERATION_LIMIT - generationCount, limit: PLAN_GENERATION_LIMIT } });
   } catch (err) {
     const status = err.status || 500;
     console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);

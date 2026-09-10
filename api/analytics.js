@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   if (!isAdmin(user.email)) return res.status(403).json({ error: 'Not authorized' });
 
   try {
-    const [allRes, recentRes, betaRes, funnelRes] = await Promise.all([
+    const [allRes, recentRes, betaRes, funnelRes, unlockRes] = await Promise.all([
       fetch(
         `${SUPABASE_URL}/rest/v1/mks_events?event_name=eq.user_registered&select=created_at&order=created_at.asc`,
         {
@@ -71,13 +71,17 @@ export default async function handler(req, res) {
         { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
       ),
       fetch(
-        `${SUPABASE_URL}/rest/v1/mks_events?event_name=in.(quiz_started,quiz_completed,plan_generated,plan_saved,plan_shared,task_completed,returning_user)&select=event_name,created_at&order=created_at.desc&limit=5000`,
+        `${SUPABASE_URL}/rest/v1/mks_events?event_name=in.(quiz_started,quiz_completed,plan_generated,plan_saved,plan_shared,task_completed,returning_user,upgrade_viewed,upgrade_started,upgrade_completed)&select=event_name,created_at&order=created_at.desc&limit=5000`,
+        { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
+      ),
+      fetch(
+        `${SUPABASE_URL}/rest/v1/mks_unlocks?select=unlocked_at&order=unlocked_at.desc&limit=5000`,
         { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } }
       ),
     ]);
 
-    if (!allRes.ok || !recentRes.ok || !betaRes.ok || !funnelRes.ok) {
-      throw new Error(`analytics query failed: ${allRes.status}/${recentRes.status}/${betaRes.status}/${funnelRes.status}`);
+    if (!allRes.ok || !recentRes.ok || !betaRes.ok || !funnelRes.ok || !unlockRes.ok) {
+      throw new Error(`analytics query failed: ${allRes.status}/${recentRes.status}/${betaRes.status}/${funnelRes.status}/${unlockRes.status}`);
     }
 
     const totalRegistrations = Number(allRes.headers.get('content-range')?.split('/')[1] || 0);
@@ -85,6 +89,7 @@ export default async function handler(req, res) {
     const recent = await recentRes.json();
     const betaRows = await betaRes.json();
     const funnelRows = await funnelRes.json();
+    const unlockRows = await unlockRes.json();
     const betaMembers = betaRows.filter((row) => row.goal_data?._beta_access);
     const feedback = betaRows.flatMap((row) => Object.entries(row.goal_data?._beta_feedback || {}).map(([stage, entry]) => ({
       email: row.email,
@@ -93,12 +98,16 @@ export default async function handler(req, res) {
       submitted_at: entry.submitted_at,
       campaign: row.goal_data?._beta_access?.campaign || 'existing-user',
     }))).sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at));
-    const funnelNames = ['quiz_started', 'quiz_completed', 'plan_generated', 'plan_saved', 'plan_shared', 'task_completed', 'returning_user'];
+    const funnelNames = ['quiz_started', 'quiz_completed', 'plan_generated', 'plan_saved', 'upgrade_viewed', 'upgrade_started', 'upgrade_completed', 'plan_shared', 'task_completed', 'returning_user'];
     const cutoff = Date.now() - 30 * 86_400_000;
     const funnel = Object.fromEntries(funnelNames.map((name) => [name, {
       total: funnelRows.filter((row) => row.event_name === name).length,
       last30: funnelRows.filter((row) => row.event_name === name && new Date(row.created_at).getTime() >= cutoff).length,
     }]));
+    funnel.upgrade_completed = {
+      total: unlockRows.length,
+      last30: unlockRows.filter((row) => new Date(row.unlocked_at).getTime() >= cutoff).length,
+    };
 
     // Bucket into the last 30 UTC days, including days with zero.
     const dayBuckets = new Map();

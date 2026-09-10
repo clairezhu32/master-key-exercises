@@ -83,6 +83,10 @@
     .feedback-answer strong { display:block; color:var(--gold-light); font-weight:500; }
     @media(max-width:600px){ .stat-grid,.funnel-grid{grid-template-columns:1fr 1fr}.feedback-meta{display:block} }
   </style>
+  <style>
+    :root{--bg:#11110f;--surface:#181814;--border:#3c3c34;--gold:#d7ff58;--gold-light:#d7ff58;--text:#f5f4ec;--muted:#aaa99e}
+    body{font-family:Arial,Helvetica,sans-serif}.page{max-width:900px}.wordmark,h1,.stat-value,.funnel-metric strong{font-family:Arial,Helvetica,sans-serif}.wordmark{color:var(--text);font-size:16px;font-weight:700}h1{color:var(--text);font-size:40px;font-weight:700;letter-spacing:-.04em}.subtitle{font-size:14px}.google-btn,.stat-tile,.funnel-metric,.chart-card,.table-card,.feedback-item{border-radius:4px}.stat-tile,.chart-card,.table-card{background:var(--surface)}.stat-label,th{font-size:12px;letter-spacing:.02em;text-transform:none}.stat-value{color:var(--gold);font-weight:700}.funnel-metric{background:#20201b}.funnel-metric strong{color:var(--gold);font-weight:700}.funnel-metric small{font-size:12px}.bar-axis-label{font-family:Arial,Helvetica,sans-serif}.feedback-answer{font-size:14px}.feedback-answer strong{color:var(--text);font-weight:700}
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" integrity="sha384-nD3dwv4+ZqdYnmZKe/249ImlV04om7xTCcsoSeQYI+RO+XlKPoqAWaJR1M5SJH9p" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -277,7 +281,7 @@ function renderFeedback(feedback) {
 }
 
 function renderFunnel(funnel={}) {
-  const labels={quiz_started:'Quiz starts',quiz_completed:'Quiz completions',plan_generated:'Plans generated',plan_saved:'Plans saved',plan_shared:'Plans shared',task_completed:'Tasks completed',returning_user:'Returning visits'};
+  const labels={quiz_started:'Quiz starts',quiz_completed:'Quiz completions',plan_generated:'Plans generated',plan_saved:'Plans saved',upgrade_viewed:'Upgrade views',upgrade_started:'Checkout starts',upgrade_completed:'Paid unlocks',plan_shared:'Plans shared',task_completed:'Tasks completed',returning_user:'Returning visits'};
   const grid=document.getElementById('funnel-grid'); grid.replaceChildren();
   Object.entries(labels).forEach(([key,label])=>{ const metric=document.createElement('div'); metric.className='funnel-metric'; const name=document.createElement('div'); name.className='stat-label'; name.textContent=label; const value=document.createElement('strong'); value.textContent=funnel[key]?.last30||0; const total=document.createElement('small'); total.textContent=`${funnel[key]?.total||0} all time`; metric.append(name,value,total); grid.appendChild(metric); });
 }

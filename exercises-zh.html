@@ -206,6 +206,71 @@
       .list-hero { padding: 0 20px; }
       .list-hero h1 { font-size: 1.8rem; }
     }
+
+    /* Lucky product system */
+    :root {
+      --bg: #11110f;
+      --surface: #181814;
+      --card: #181814;
+      --border: #3c3c34;
+      --gold: #d7ff58;
+      --gold-dim: #d7ff58;
+      --gold-glow: rgba(215, 255, 88, 0.07);
+      --text: #f5f4ec;
+      --text-dim: #aaa99e;
+      --text-faint: #77776e;
+      --green: #d7ff58;
+      --radius: 4px;
+    }
+    body { font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.6; }
+    .header { padding: 18px 28px; background: #11110f; backdrop-filter: none; }
+    .header-title, .progress-count { font-family: inherit; font-weight: 700; color: var(--text); }
+    .header-title { font-size: 1.05rem; letter-spacing: -0.02em; }
+    .header-subtitle, .progress-label, .card-part, .ex-eyebrow, .ex-section-label,
+    .goal-display-label, .timer-label { letter-spacing: 0.04em; text-transform: none; }
+    .header-nav-link.active, .back-btn:hover { color: var(--gold); }
+    .progress-bar-wrap, .progress-bar-fill { border-radius: 0; }
+    .list-hero { max-width: 920px; margin: 72px auto 40px; text-align: left; }
+    .list-hero h1, .ex-title, .card-title, .ex-lesson, .ex-affirmation,
+    .goal-display-text, .journey-goal-text, .journal-textarea, .intention-input,
+    .profile-modal h3, .auth-modal h3, .timer-time { font-family: inherit; }
+    .list-hero h1 { max-width: 760px; font-size: clamp(2.3rem, 6vw, 4.4rem); font-weight: 700; line-height: 1.04; letter-spacing: -0.055em; }
+    .list-hero h1 em { font-style: normal; }
+    .list-hero p { max-width: 650px; margin: 0; font-size: 1rem; }
+    .exercises-grid { display: block; max-width: 920px; padding: 0 32px; }
+    .exercise-card { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 20px; align-items: center; padding: 22px 0; background: transparent; border: 0; border-top: 1px solid var(--border); border-radius: 0; overflow: visible; }
+    .exercise-card:last-child { border-bottom: 1px solid var(--border); }
+    .exercise-card:hover { background: transparent; border-color: var(--text-dim); transform: none; }
+    .exercise-card.completed::after { display: none; }
+    .card-part, .card-title, .card-theme, .card-footer { margin: 0; }
+    .card-title { font-size: 1.05rem; font-weight: 700; }
+    .card-footer { justify-self: end; gap: 18px; }
+    .goal-banner { display: none !important; }
+    .goal-display { max-width: 920px; margin: 28px auto 0; padding: 18px 32px; border: 1px solid var(--border); }
+    .goal-display-text { color: var(--text); font-weight: 600; }
+    .exercise-view { max-width: 760px; padding-top: 48px; }
+    .ex-title { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; letter-spacing: -0.05em; }
+    .ex-lesson { font-size: 1rem; font-weight: 400; border-left-color: var(--gold); }
+    .ex-affirmation, .ex-insight, .journey-card, .intention-wrap, .journal-textarea,
+    .profile-modal, .auth-modal, .auth-dropdown { border-radius: 4px; box-shadow: none; }
+    .ex-affirmation { color: var(--text); text-align: left; font-size: 1rem; font-weight: 600; }
+    .btn, .dur-btn, .voice-btn, .auth-signin-btn, .goal-banner-btn, .toast,
+    .google-btn, .profile-save-btn, .ex-nav-btn { border-radius: 3px; }
+    .btn-primary, .profile-save-btn { background: var(--gold); border-color: var(--gold); color: #11110f; }
+    .timer-card { display: none; }
+    .voice-btn { border-color: var(--border); background: transparent; color: var(--text-dim); }
+    .voice-btn:hover:not(:disabled), .voice-btn.playing { border-color: var(--gold); background: var(--gold-glow); color: var(--gold); }
+    @media (max-width: 700px) {
+      .header { padding: 15px 16px; }
+      .header-subtitle, .header-progress { display: none; }
+      .header-nav { display: flex; gap: 12px; }
+      .header-nav-link { font-size: 0.73rem; }
+      .list-hero { margin: 46px auto 30px; }
+      .list-hero h1 { font-size: 2.5rem; }
+      .exercises-grid { padding: 0 20px; }
+      .exercise-card { grid-template-columns: 58px minmax(0, 1fr); gap: 12px; }
+      .card-footer { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -214,12 +279,12 @@
 <header class="header">
   <div id="header-logo" style="cursor:pointer">
     <div class="header-title">Lucky</div>
-    <div class="header-subtitle">查尔斯·哈内尔 · 1919</div>
+    <div class="header-subtitle">反思 · 决定 · 行动</div>
   </div>
   <div class="header-nav">
-    <a class="header-nav-link" href="/">简介</a>
-    <a class="header-nav-link active" href="/exercises-zh">练习</a>
-    <a class="header-nav-link" href="/goals">计划</a>
+    <a class="header-nav-link" href="/">介绍</a>
+    <a class="header-nav-link active" href="/exercises-zh">Lucky 练习</a>
+    <a class="header-nav-link" href="/goals">我的计划</a>
   </div>
   <div class="auth-area">
     <button class="auth-signin-btn" id="auth-signin-btn">登录</button>
@@ -252,8 +317,8 @@
     <button class="goal-display-edit" id="goal-display-edit">编辑</button>
   </div>
   <div class="list-hero">
-    <h1>二十四节<em>心灵精通</em>练习</h1>
-    <p>哈内尔最初将此设计为一套为期 24 周的课程——每周一部分。本应用将节奏调整为 12 周，每次两部分，但保留他的核心指导：在当前练习感觉毫不费力、自然而然之前，不要继续前进。当然，请遵循你自己的节奏。有些人会在某一部分多停留一两周；有些人则进展更快。重要的是，每一层次都真正被吸收，然后再加入下一层。</p>
+    <h1>知道该做什么，<em>却迟迟没有行动？</em></h1>
+    <p>当怀疑、回避或旧习惯阻碍行动时，选择一个练习。每次练习最后都要写下一个具体的下一步。这些内容用于自我反思，不能替代心理治疗或医疗建议。</p>
   </div>
   <div class="exercises-grid" id="exercises-grid"></div>
 </div>

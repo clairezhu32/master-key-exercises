@@ -29,14 +29,12 @@ CREATE POLICY "users manage own progress"
   ON mks_user_progress FOR ALL
   USING (auth.uid() = user_id);
 
--- Unlocks: users can read and insert their own row (no self-delete)
+-- Unlocks: users can read their own row; only the server can insert after payment verification.
 CREATE POLICY "users read own unlock"
   ON mks_unlocks FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "users insert own unlock"
-  ON mks_unlocks FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+-- Unlock rows are inserted only by the server after Stripe verifies payment.
 
 -- 3. [DEPRECATED] Subscription status for /goals access, synced from Stripe via
 -- webhook. /goals no longer gates on this table (see mks_goal_generations below) —

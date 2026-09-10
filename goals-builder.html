@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Build Your 90-Day Master Plan — Master Key</title>
-  <style>body{background:#080b17;color:#f7f5ff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}.loading{color:#a8adc2;font-size:14px}</style>
+  <title>Build Your 90-Day Action Plan — Lucky</title>
+  <style>body{background:#11110f;color:#f5f4ec;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}.loading{color:#aaa99e;font-size:14px}</style>
 </head>
 <body>
-  <div class="loading">Loading your Master Plan builder…</div>
+  <div class="loading">Loading your plan…</div>
   <script>
     (async function () {
       try {
         const response = await fetch('/goals.html', { cache: 'no-store' });
-        if (!response.ok) throw new Error('Could not load the Master Plan builder.');
+        if (!response.ok) throw new Error('Could not load your plan.');
         let html = await response.text();
 
         // Keep the existing dashboard, authentication, generation, and progress
@@ -26,11 +26,11 @@
         replaceStep(1, 2, `    <div id="step-1" class="step active">
       <div class="step-hero">
         <div class="step-num">Step 1 of 8</div>
-        <div class="step-q">What area of your life are you ready to transform?</div>
-        <div class="step-hint">Choose the area where a meaningful 90-day breakthrough would matter most.</div>
+        <div class="step-q">Which part of life do you want to work on?</div>
+        <div class="step-hint">Choose the area where focused action over the next 90 days would matter most.</div>
         <div class="category-grid">
-          <button class="category-btn" data-category="Career breakthrough">Career breakthrough</button>
-          <button class="category-btn" data-category="Financial abundance">Financial abundance</button>
+          <button class="category-btn" data-category="Career breakthrough">Career</button>
+          <button class="category-btn" data-category="Financial abundance">Money &amp; finances</button>
           <button class="category-btn" data-category="Relationship &amp; connection">Relationship &amp; connection</button>
           <button class="category-btn" data-category="Health &amp; energy">Health &amp; energy</button>
           <button class="category-btn" data-category="Launching something of my own">Launching something of my own</button>
@@ -89,7 +89,7 @@
       <div class="step-hero">
         <div class="step-num">Step 5 of 8</div>
         <div class="step-q">What have you already tried — and what happened?</div>
-        <div class="step-hint">This keeps your Master Plan from repeating strategies that have already failed or been exhausted.</div>
+        <div class="step-hint">Your answer helps the plan avoid repeating approaches that did not work.</div>
         <select id="input-obstacle-reason" style="display:none" aria-hidden="true"><option value="What I have already tried" selected>What I have already tried</option></select>
         <textarea id="input-obstacle-detail" placeholder="I have tried… The result was…" maxlength="800"></textarea>
       </div>
@@ -104,7 +104,7 @@
       <div class="step-hero">
         <div class="step-num">Step 6 of 8</div>
         <div class="step-q">What strengths, resources, relationships, or opportunities can you leverage?</div>
-        <div class="step-hint">A Master Plan should build from what you already have — not assume you are starting from zero.</div>
+        <div class="step-hint">The plan should build from what you already have, not assume you are starting from zero.</div>
         <textarea id="input-leverage" placeholder="I can leverage…" maxlength="700"></textarea>
         <div class="start-week-field">
           <div class="start-week-label">How much time can you realistically commit each week?</div>
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.write(html);
         document.close();
       } catch (error) {
-        document.body.innerHTML = '<div style="color:#f7f5ff;font:14px Arial">Could not load the Master Plan builder. Please refresh and try again.</div>';
+        document.body.innerHTML = '<div style="color:#aaa99e;font:14px Arial">Could not load your plan. Please refresh and try again.</div>';
         console.error(error);
       }
     })();

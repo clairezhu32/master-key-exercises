@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Turn your answers into a personalized 90-day plan with weekly milestones and focused actions.">
-  <title>Lucky — 90-Day Master Plan</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <title>Lucky — Your 90-Day Action Plan</title>
   <style>
     :root { --bg:#080b17; --panel:#131a33; --panel2:#19213d; --line:rgba(255,255,255,.1); --text:#f7f5ff; --muted:#a8adc2; --violet:#9d8cff; --violet2:#725cff; --mint:#71e5c1; }
     * { box-sizing:border-box; margin:0; padding:0; }
@@ -15,11 +12,7 @@
     button, input, textarea, select { font:inherit; }
     button { cursor:pointer; }
     .shell { width:min(900px,calc(100% - 32px)); margin:0 auto; padding:28px 0 80px; }
-    .brand { display:flex; align-items:center; gap:10px; width:max-content; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
-    .top-nav { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:26px; }
-    .top-nav-links { display:flex; align-items:center; gap:20px; }
-    .top-nav-links a { color:var(--muted); font-size:13px; font-weight:500; text-decoration:none; }
-    .top-nav-links a:hover { color:var(--text); }
+    .brand { display:flex; align-items:center; gap:10px; width:max-content; margin-bottom:26px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
     .brand-mark { width:32px; height:32px; display:grid; place-items:center; border-radius:9px; color:var(--bg); background:linear-gradient(135deg,var(--mint),var(--violet)); font-family:'Playfair Display',serif; }
     .card { padding:36px; border:1px solid var(--line); border-radius:22px; background:rgba(19,26,51,.92); box-shadow:0 30px 80px rgba(0,0,0,.28); }
     .step { display:none; }
@@ -34,47 +27,11 @@
     .choice { padding:15px; border:1px solid var(--line); border-radius:10px; color:var(--muted); background:var(--panel2); text-align:left; }
     .choice.selected { border-color:var(--violet); color:var(--text); background:rgba(157,140,255,.12); }
     .nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:24px; }
-    .back { min-height:44px; border:0; color:var(--muted); background:none; }
+    .back { border:0; color:var(--muted); background:none; }
     .primary { min-height:46px; padding:0 22px; border:0; border-radius:9px; color:#07140f; background:linear-gradient(110deg,var(--mint),var(--violet)); font-weight:700; }
     .primary:disabled { opacity:.38; cursor:default; }
     .progress { color:#747d99; font-size:11px; }
     .error-inline { min-height:18px; margin-top:13px; color:#ff9d9d; font-size:12px; }
-    .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; clip-path:inset(50%); }
-    .wizard-progress { margin-bottom:28px; }
-    .progress-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; color:var(--muted); font-size:12px; }
-    .progress-head strong { color:var(--text); }
-    .wizard-track { height:6px; overflow:hidden; border-radius:999px; background:rgba(255,255,255,.08); }
-    .wizard-fill { width:11.11%; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--mint),var(--violet)); transition:width .25s ease; }
-    .turn { display:grid; gap:20px; }
-    .turn-lucky { display:flex; align-items:flex-start; gap:11px; }
-    .lucky-avatar { width:30px; height:30px; flex:0 0 auto; display:grid; place-items:center; border-radius:9px; color:var(--bg); background:linear-gradient(135deg,var(--mint),var(--violet)); font:600 16px 'Playfair Display',serif; }
-    .bubble { width:100%; padding:22px; border:1px solid rgba(157,140,255,.25); border-radius:16px; background:linear-gradient(135deg,rgba(157,140,255,.12),rgba(25,33,61,.85)); }
-    .bubble:focus:not(:focus-visible) { outline:none; }
-    .echo { margin-top:13px; color:#d7d5eb; font-size:14px; line-height:1.55; }
-    .turn-you { padding:18px; border-left:2px solid rgba(113,229,193,.7); border-radius:0 12px 12px 0; background:rgba(113,229,193,.045); }
-    .you-label, .starter-label { color:var(--mint); font-size:10px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
-    .starter-label { margin:16px 0 9px; color:var(--muted); font-size:10px; letter-spacing:.08em; }
-    .guidance { margin-top:13px; padding:12px 14px; border-left:2px solid var(--mint); color:#cbd0e2; background:rgba(113,229,193,.06); font-size:13px; line-height:1.55; }
-    .example-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:13px; }
-    .example-chip { min-height:40px; padding:8px 11px; border:1px solid var(--line); border-radius:999px; color:#dce0ef; background:var(--panel2); font-size:12px; text-align:left; }
-    .example-chip:hover { border-color:rgba(157,140,255,.6); background:rgba(157,140,255,.1); }
-    .field-label { display:block; margin:14px 0 7px; color:var(--muted); font-size:12px; font-weight:600; }
-    .nudge { min-height:19px; margin-top:-5px; color:#c5cbe0; font-size:12px; line-height:1.45; }
-    .optional-note { margin:8px 0 0; color:#8189a4; font-size:11px; }
-    .capacity-section { margin-top:20px; padding-top:20px; border-top:1px solid var(--line); }
-    .answer-recap { margin-bottom:22px; border:1px solid var(--line); border-radius:12px; background:rgba(8,11,23,.28); }
-    .answer-recap summary { min-height:44px; display:flex; align-items:center; padding:0 14px; color:var(--muted); cursor:pointer; font-size:12px; font-weight:600; }
-    .recap-list { display:grid; gap:1px; padding:0 8px 8px; }
-    .recap-item { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; padding:10px; border-radius:8px; background:rgba(255,255,255,.025); }
-    .recap-item strong { display:block; margin-bottom:3px; color:var(--muted); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
-    .recap-item span { display:block; overflow:hidden; color:#dce0ef; font-size:12px; line-height:1.4; text-overflow:ellipsis; white-space:nowrap; }
-    .recap-edit, .start-over { min-height:34px; padding:0 10px; border:1px solid var(--line); border-radius:8px; color:var(--text); background:transparent; font-size:11px; }
-    .resume-note { display:none; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; padding:11px 13px; border:1px solid rgba(113,229,193,.23); border-radius:10px; color:#d6f5eb; background:rgba(113,229,193,.055); font-size:12px; line-height:1.45; }
-    .choice[aria-checked="true"] { border-color:var(--violet); color:var(--text); background:rgba(157,140,255,.12); }
-    :focus-visible { outline:2px solid var(--violet); outline-offset:3px; }
-    @keyframes turn-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-    .step.active .turn-lucky { animation:turn-in .2s ease-out; }
-    @media (prefers-reduced-motion:reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
     #wizard, #generating, #result, #error-view { display:none; }
     .center { padding:65px 20px; text-align:center; }
     .spinner { width:52px; height:52px; margin:0 auto 24px; border:3px solid var(--line); border-top-color:var(--mint); border-radius:50%; animation:spin .9s linear infinite; }
@@ -120,6 +77,19 @@
     .save-note { min-height:18px; margin-top:6px; color:var(--mint); font-size:11px; }
     .exercise-links { display:flex; flex-wrap:wrap; gap:9px; }
     .exercise-link { padding:10px 13px; border:1px solid rgba(157,140,255,.3); border-radius:8px; color:var(--text); background:rgba(157,140,255,.08); text-decoration:none; font-size:12px; }
+    .upgrade-card { display:none; position:relative; overflow:hidden; margin-top:16px; padding:28px; border:1px solid rgba(157,140,255,.4); border-radius:18px; background:linear-gradient(145deg,rgba(157,140,255,.16),rgba(113,229,193,.07)); }
+    .upgrade-card::after { content:''; position:absolute; width:190px; height:190px; top:-110px; right:-70px; border-radius:50%; background:rgba(113,229,193,.09); filter:blur(4px); pointer-events:none; }
+    .upgrade-badge { display:inline-flex; min-height:27px; align-items:center; padding:0 10px; border:1px solid rgba(113,229,193,.3); border-radius:999px; color:var(--mint); background:rgba(8,11,23,.35); font-size:10px; font-weight:800; letter-spacing:.11em; text-transform:uppercase; }
+    .upgrade-card h2 { position:relative; z-index:1; max-width:580px; margin:14px 0 9px; font:600 clamp(25px,4vw,34px) 'Playfair Display',serif; line-height:1.2; }
+    .upgrade-copy { position:relative; z-index:1; max-width:650px; color:#c8cde0; line-height:1.65; }
+    .upgrade-benefits { position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:20px 0; list-style:none; }
+    .upgrade-benefits li { padding:12px; border:1px solid var(--line); border-radius:10px; color:#dce0ef; background:rgba(8,11,23,.3); font-size:12px; line-height:1.45; }
+    .upgrade-action { position:relative; z-index:1; display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+    .upgrade-price { min-width:92px; font:600 25px 'Playfair Display',serif; }
+    .upgrade-price small { display:block; color:var(--muted); font:500 10px 'DM Sans',sans-serif; letter-spacing:.06em; text-transform:uppercase; }
+    .upgrade-note { width:100%; color:#7f88a4; font-size:10px; }
+    .upgrade-error { width:100%; min-height:17px; color:#ff9d9d; font-size:11px; }
+    .checkout-message { display:none; margin:0 0 14px; padding:11px 13px; border:1px solid rgba(157,140,255,.25); border-radius:9px; color:#cfd3e4; background:rgba(157,140,255,.07); font-size:12px; }
     .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
     .plan-allowance { width:100%; color:var(--muted); font-size:12px; }
     .saved-state { width:100%; padding:11px 13px; border:1px solid rgba(113,229,193,.2); border-radius:9px; color:var(--mint); background:rgba(113,229,193,.05); font-size:12px; }
@@ -170,90 +140,78 @@
     .modal-actions .primary { flex:1; }
     .modal-actions .secondary { flex:0 0 auto; }
     .thank-you { color:var(--mint); font-size:13px; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices{grid-template-columns:1fr}.bubble{padding:18px}.turn-you{padding:15px}.nav{align-items:flex-end;position:sticky;bottom:0;padding:12px 0 calc(4px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(19,26,51,.98),rgba(19,26,51,.76))}.week-head{display:block}.week-theme{margin-top:5px}.recap-item{grid-template-columns:minmax(0,1fr)}.recap-edit{justify-self:start} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%} }
+  </style>
+  <style>
+    :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
+    body { background:var(--bg); font-family:Arial, Helvetica, sans-serif; line-height:1.5; }
+    .shell { width:min(920px,calc(100% - 32px)); padding-top:24px; }
+    .brand { font-size:16px; }
+    .brand-mark { width:28px; height:28px; border-radius:3px; color:#11110f; background:var(--mint); font-family:Arial, Helvetica, sans-serif; font-weight:800; }
+    .card { padding:38px; border-color:var(--line); border-radius:4px; background:var(--panel); box-shadow:none; }
+    .num,.eyebrow { margin-bottom:18px; color:var(--mint); font-size:13px; letter-spacing:.03em; text-transform:none; }
+    h1,.question { font-family:Arial, Helvetica, sans-serif; font-size:clamp(30px,5vw,44px); font-weight:700; line-height:1.1; letter-spacing:-.035em; }
+    .hint { max-width:700px; color:#b7b6ac; font-size:16px; line-height:1.55; }
+    textarea,input,select { padding:15px; border-color:#4a4a40; border-radius:3px; background:var(--panel2); font-size:16px; }
+    textarea:focus,input:focus,select:focus { border-color:var(--mint); }
+    .choices { gap:8px; }
+    .choice { min-height:54px; padding:14px 15px; border-color:#47473e; border-radius:3px; background:var(--panel2); font-size:15px; }
+    .choice.selected { border-color:var(--mint); color:#11110f; background:var(--mint); }
+    .primary { min-height:48px; border-radius:3px; color:#11110f; background:var(--mint); }
+    .secondary,.status-button { border-radius:3px; }
+    .center h2,.week-theme,.buddy-card h3,.upgrade-card h2,.upgrade-price { font-family:Arial, Helvetica, sans-serif; }
+    .milestone { border-radius:3px; color:#11110f; background:var(--mint); }
+    .insight { border-left-color:var(--mint); background:#20201b; }
+    .first-action,.plan-progress,.week,.week-exercise,.upgrade-card,.buddy-card,.buddy-scope,.buddy-message,.saved-state,.checkout-message { border-color:var(--line); border-radius:4px; background:var(--panel2); }
+    .first-action,.upgrade-card,.buddy-card { background:#20201b; }
+    .upgrade-card::after { display:none; }
+    .upgrade-badge,.exercise-part { border-radius:2px; color:#11110f; background:var(--mint); }
+    .upgrade-benefits li { border-radius:3px; background:#181814; font-size:14px; }
+    .progress-track,.progress-fill { border-radius:0; }
+    .progress-fill { background:var(--mint); }
+    .task { border-radius:3px; font-size:15px; }
+    .week-exercise,.exercise-link { border-color:#525246; border-radius:3px; background:#282822; }
+    .week-label,.save-note,.buddy-status,.share-status,.saved-state { color:var(--mint); }
+    .status-button.selected { border-color:var(--mint); color:#11110f; background:var(--mint); }
+    .section-title,.feedback-label { font-size:13px; letter-spacing:.04em; text-transform:none; }
+    .upgrade-note,.upgrade-error,.plan-allowance,.buddy-copy,.exercise-copy strong,.exercise-copy span { font-size:13px; }
+    .progress,.error-inline,.week-label,.status-button,.save-note,.buddy-status,.share-status,.match-consent,.updated { font-size:12px; }
+    .auth-overlay { background:rgba(0,0,0,.72); backdrop-filter:none; }
+    .auth-modal { border-radius:4px; background:#20201b; }
+    @media(max-width:620px){ .card{padding:27px 20px}.hint{font-size:15px} }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <main class="shell">
-    <div class="top-nav">
-      <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
-      <nav class="top-nav-links" aria-label="Primary navigation">
-        <a href="/">Introduction</a>
-        <a href="/exercises">Lucky Exercises</a>
-      </nav>
-    </div>
+    <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
     <div class="beta-note"><span><strong>Job Search Founding Cohort</strong> · Enter your invitation code to join and share structured feedback.</span><button type="button" id="enter-code">Enter code</button></div>
 
-    <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your Master Plan…</h2><p>Checking your Lucky account for a saved plan.</p></section>
+    <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your plan…</h2><p>Checking your Lucky account for a saved plan.</p></section>
     <section class="card" id="wizard">
-      <div class="wizard-progress" aria-label="Your onboarding progress">
-        <div class="progress-head"><span id="progress-label">A short conversation with Lucky</span><strong id="progress-count-wizard">1 of 9</strong></div>
-        <div class="wizard-track" aria-hidden="true"><div class="wizard-fill" id="wizard-fill"></div></div>
-      </div>
-      <div class="resume-note" id="resume-note"><span>Your answers are still here. Pick up where you left off.</span><button class="start-over" id="start-over" type="button">Start over</button></div>
-      <details class="answer-recap" id="answer-recap">
-        <summary>Your answers so far</summary>
-        <div class="recap-list" id="recap-list"></div>
-      </details>
-      <div class="visually-hidden" id="step-announcer" aria-live="polite"></div>
-
       <div class="step active" id="step-1">
-        <div class="turn">
-          <div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 1 of 9</div><div class="question" id="question-1">Where do you want a meaningful breakthrough?</div><div class="hint">Choose the part of your life where progress over the next 90 days would make the biggest difference.</div></div></div>
-          <div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">This sets the strategy Lucky adapts. A career plan and a health plan need different kinds of weekly action.</div><div class="starter-label">Choose the closest fit</div><div class="choices" id="category-choices" role="radiogroup" aria-labelledby="question-1">
-            <button class="choice" type="button" role="radio" aria-checked="false" data-category="Career breakthrough">Career breakthrough</button><button class="choice" type="button" role="radio" aria-checked="false" data-category="Financial abundance">Financial abundance</button>
-            <button class="choice" type="button" role="radio" aria-checked="false" data-category="Relationship & connection">Relationship &amp; connection</button><button class="choice" type="button" role="radio" aria-checked="false" data-category="Health & energy">Health &amp; energy</button>
-            <button class="choice" type="button" role="radio" aria-checked="false" data-category="Launching something of my own">Launching something of my own</button><button class="choice" type="button" role="radio" aria-checked="false" data-category="Inner peace">Inner peace</button>
-            <button class="choice" type="button" role="radio" aria-checked="false" data-category="Something else">Something else</button>
-          </div></div>
+        <div class="num">Question 1 of 9</div><div class="question">What area of your life is this goal in?</div>
+        <div class="hint">Choose the area where focused action over the next 90 days would matter most.</div>
+        <div class="choices" id="category-choices">
+          <button class="choice" data-category="Career breakthrough">Career</button><button class="choice" data-category="Financial abundance">Money &amp; finances</button>
+          <button class="choice" data-category="Relationship & connection">Relationship &amp; connection</button><button class="choice" data-category="Health & energy">Health &amp; energy</button>
+          <button class="choice" data-category="Launching something of my own">Launching something of my own</button><button class="choice" data-category="Inner peace">Inner peace</button>
+          <button class="choice" data-category="Something else">Something else</button>
         </div>
-        <div class="nav"><span class="progress">Choose one to continue</span><button class="primary" id="next-1" disabled>Continue →</button></div>
+        <div class="nav"><span class="progress">1 / 9</span><button class="primary" id="next-1" disabled>Continue →</button></div>
       </div>
-
-      <div class="step" id="step-2">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 2 of 9</div><label class="question" id="question-2" for="goal">Ninety days from now, what will be true that is not true today?</label><div class="hint">Name a result someone else could recognize: a number, milestone, completed project, or specific change.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">A clear outcome gives every week a direction. Specific beats impressive.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="I will have completed…">I will have completed…</button><button class="example-chip" type="button" data-fill="I will have reached [number] by [date]…">I will have reached [number] by [date]…</button><button class="example-chip" type="button" data-fill="I will be able to…">I will be able to…</button></div><textarea id="goal" maxlength="500" aria-labelledby="question-2" aria-describedby="nudge-goal" placeholder="In 90 days, I will have…"></textarea><div class="nudge" id="nudge-goal" aria-live="polite">A number, date, or observable milestone makes the weekly targets sharper.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="1">← Back</button><span class="progress">2 / 9</span><button class="primary" type="button" data-next="3" data-require="goal">Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-3">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 3 of 9</div><label class="question" id="question-3" for="baseline">Where is the starting line today?</label><div class="hint">Describe what is working, what is unfinished, and what is true right now.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">Lucky builds from reality, not from zero. Include any strengths or momentum you already have.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="Right now, I have…">Right now, I have…</button><button class="example-chip" type="button" data-fill="I have already started by…">I have already started by…</button><button class="example-chip" type="button" data-fill="The main thing holding me back is…">The main thing holding me back is…</button></div><textarea id="baseline" maxlength="800" aria-labelledby="question-3" aria-describedby="nudge-baseline" placeholder="Today, my situation is…"></textarea><div class="nudge" id="nudge-baseline" aria-live="polite">A sentence or two is enough. Honest detail helps Lucky keep the plan realistic.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="2">← Back</button><span class="progress">3 / 9</span><button class="primary" type="button" data-next="4" data-require="baseline">Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-4">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 4 of 9</div><label class="question" id="question-4" for="gap">What needs to change between here and there?</label><div class="hint">Think about skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">You do not need the perfect diagnosis. A rough map helps Lucky choose the right first moves.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="I need to get better at…">I need to get better at…</button><button class="example-chip" type="button" data-fill="I need to make time for…">I need to make time for…</button><button class="example-chip" type="button" data-fill="I need support from…">I need support from…</button></div><textarea id="gap" maxlength="800" aria-labelledby="question-4" aria-describedby="nudge-gap" placeholder="The biggest changes I need are…"></textarea><div class="nudge" id="nudge-gap" aria-live="polite">Optional, but this is what makes your plan feel less generic.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="3">← Back</button><span class="progress">4 / 9</span><button class="primary" type="button" data-next="5">Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-5">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 5 of 9</div><label class="question" id="question-5" for="tried">What have you already tried, and what happened?</label><div class="hint">This can be a past attempt, an incomplete effort, or even something you learned from watching others.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">This prevents Lucky from handing you a strategy you have already exhausted.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="I tried… and the result was…">I tried… and the result was…</button><button class="example-chip" type="button" data-fill="I stopped because…">I stopped because…</button><button class="example-chip" type="button" data-fill="What helped most was…">What helped most was…</button></div><textarea id="tried" maxlength="800" aria-labelledby="question-5" aria-describedby="nudge-tried" placeholder="I tried… The result was…"></textarea><div class="nudge" id="nudge-tried" aria-live="polite">Optional. Even one honest lesson helps Lucky avoid repetition.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="4">← Back</button><span class="progress">5 / 9</span><button class="primary" type="button" data-next="6">Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-6">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 6 of 9</div><label class="question" id="question-6" for="resources">What are you already working with?</label><div class="hint">Let’s make the support around you visible—people, skills, tools, time, and opportunities.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">A useful plan activates what you have before asking you to acquire everything else.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="People I can ask include…">People I can ask include…</button><button class="example-chip" type="button" data-fill="Skills or tools I already have…">Skills or tools I already have…</button><button class="example-chip" type="button" data-fill="An opportunity I could use is…">An opportunity I could use is…</button></div><textarea id="resources" maxlength="800" aria-labelledby="question-6" aria-describedby="nudge-resources" placeholder="I can leverage…"></textarea><div class="nudge" id="nudge-resources" aria-live="polite">Optional, but naming one underused resource can change your first week.</div><div class="capacity-section"><div class="field-label" id="hours-label">How much time can you honestly protect each week?</div><div class="choices" id="hour-choices" role="radiogroup" aria-labelledby="hours-label"><button class="choice" type="button" role="radio" aria-checked="false" data-hours="1-2">1–2 hours</button><button class="choice" type="button" role="radio" aria-checked="false" data-hours="3-5">3–5 hours</button><button class="choice" type="button" role="radio" aria-checked="false" data-hours="5-10">5–10 hours</button><button class="choice" type="button" role="radio" aria-checked="false" data-hours="10+">10+ hours</button></div><label class="field-label" for="schedule">Which days or time blocks can you protect?</label><input id="schedule" maxlength="300" autocapitalize="sentences" enterkeyhint="next" placeholder="For example: Tuesday and Thursday, 7–8pm"><label class="field-label" for="start-week">Which week are you beginning?</label><select id="start-week"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select><p class="optional-note">Be realistic, not heroic. A smaller plan you can repeat beats an ambitious plan that disappears in week three.</p></div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="5">← Back</button><span class="progress">6 / 9</span><button class="primary" type="button" id="next-6" disabled>Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-7">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 7 of 9</div><label class="question" id="question-7" for="constraints">What must this plan respect?</label><div class="hint">Name the constraints and non-negotiables that deserve protection while you make progress.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">A plan is only useful if it fits your actual life: family, health, money, work, relationships, and recovery all count.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="I can realistically commit to…">I can realistically commit to…</button><button class="example-chip" type="button" data-fill="I need to protect…">I need to protect…</button><button class="example-chip" type="button" data-fill="My plan cannot require…">My plan cannot require…</button></div><textarea id="constraints" maxlength="800" aria-labelledby="question-7" aria-describedby="nudge-constraints" placeholder="I can commit to… I need to protect…"></textarea><div class="nudge" id="nudge-constraints" aria-live="polite">Optional. Constraints help Lucky avoid unrealistic advice.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="6">← Back</button><span class="progress">7 / 9</span><button class="primary" type="button" data-next="8">Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-8">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 8 of 9</div><div class="question" id="question-8">Why does this matter, and what could knock you off course?</div><div class="hint">We’ll use both answers to make the plan meaningful and prepare for real friction.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">Motivation gets more durable when it is specific. So does recovery when an obstacle is named before it appears.</div><label class="field-label" for="why">Why this matters</label><div class="example-chips"><button class="example-chip" type="button" data-fill="This matters because…">This matters because…</button><button class="example-chip" type="button" data-fill="If I make progress, it will change…">If I make progress, it will change…</button></div><textarea id="why" maxlength="500" aria-labelledby="question-8" aria-describedby="nudge-why" placeholder="This matters because…"></textarea><div class="nudge" id="nudge-why" aria-live="polite">Optional, but this gives Lucky a reason to bring you back to when things get hard.</div><label class="field-label" for="obstacle">What could derail you</label><div class="example-chips"><button class="example-chip" type="button" data-fill="I am most likely to get derailed by…">I am most likely to get derailed by…</button><button class="example-chip" type="button" data-fill="When that happens, I usually…">When that happens, I usually…</button></div><textarea id="obstacle" maxlength="500" aria-labelledby="question-8" aria-describedby="nudge-obstacle" placeholder="What could derail me is…"></textarea><div class="nudge" id="nudge-obstacle" aria-live="polite">Optional. Naming the pattern is the first step toward planning around it.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="7">← Back</button><span class="progress">8 / 9</span><button class="primary" type="button" data-next="9">Continue →</button></div><div class="error-inline" aria-live="polite"></div>
-      </div>
-
-      <div class="step" id="step-9">
-        <div class="turn"><div class="turn-lucky"><span class="lucky-avatar" aria-hidden="true">L</span><div class="bubble" tabindex="-1"><div class="num">Lucky · question 9 of 9</div><label class="question" id="question-9" for="first-week">Seven days from now, what small thing will prove you started?</label><div class="hint">Not the full 90-day outcome—just one observable proof of momentum.</div><div class="echo" data-echo></div></div></div><div class="turn-you"><div class="you-label">Your answer</div><div class="guidance">This becomes the first meaningful win in your plan. Make it small enough to complete, but real enough to matter.</div><div class="starter-label">Try one of these starters</div><div class="example-chips"><button class="example-chip" type="button" data-fill="I will schedule…">I will schedule…</button><button class="example-chip" type="button" data-fill="I will complete the first…">I will complete the first…</button><button class="example-chip" type="button" data-fill="I will reach out to…">I will reach out to…</button></div><textarea id="first-week" maxlength="500" aria-labelledby="question-9" aria-describedby="nudge-first-week" placeholder="In the first seven days, I will…"></textarea><div class="nudge" id="nudge-first-week" aria-live="polite">Choose one action you can point to, calendar, send, finish, or practice.</div></div></div>
-        <div class="nav"><button class="back" type="button" data-back="8">← Back</button><span class="progress">9 / 9</span><button class="primary" type="button" id="finish">Build My Master Plan →</button></div><div class="error-inline" id="finish-error" aria-live="polite"></div>
-      </div>
+      <div class="step" id="step-2"><div class="num">Question 2 of 9</div><div class="question">What measurable result do you want by the end of 90 days?</div><div class="hint">Name the number, observable result, or clear evidence that will show meaningful progress.</div><textarea id="goal" placeholder="In 90 days, I will have…"></textarea><div class="nav"><button class="back" data-back="1">← Back</button><span class="progress">2 / 9</span><button class="primary" data-next="3" data-require="goal">Continue →</button></div><div class="error-inline"></div></div>
+      <div class="step" id="step-3"><div class="num">Question 3 of 9</div><div class="question">Where are you today?</div><div class="hint">Describe your starting point: what is working, what is unfinished, and what is currently true.</div><textarea id="baseline" placeholder="Today, my situation is…"></textarea><div class="nav"><button class="back" data-back="2">← Back</button><span class="progress">3 / 9</span><button class="primary" data-next="4" data-require="baseline">Continue →</button></div><div class="error-inline"></div></div>
+      <div class="step" id="step-4"><div class="num">Question 4 of 9</div><div class="question">What needs to change to get from here to there?</div><div class="hint">Consider the real gap: skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div><textarea id="gap" placeholder="The biggest changes I need are…"></textarea><div class="nav"><button class="back" data-back="3">← Back</button><span class="progress">4 / 9</span><button class="primary" data-next="5">Continue →</button></div></div>
+      <div class="step" id="step-5"><div class="num">Question 5 of 9</div><div class="question">What have you already tried—and what happened?</div><div class="hint">This keeps your plan from repeating strategies that have already failed or been exhausted.</div><textarea id="tried" placeholder="I tried… The result was…"></textarea><div class="nav"><button class="back" data-back="4">← Back</button><span class="progress">5 / 9</span><button class="primary" data-next="6">Continue →</button></div></div>
+      <div class="step" id="step-6"><div class="num">Question 6 of 9</div><div class="question">What strengths, resources, or opportunities can you leverage?</div><div class="hint">Build from what you already have, then choose a realistic weekly commitment.</div><textarea id="resources" placeholder="I can leverage…"></textarea><div class="choices" id="hour-choices"><button class="choice" data-hours="1-2">1–2 hours</button><button class="choice" data-hours="3-5">3–5 hours</button><button class="choice" data-hours="5-10">5–10 hours</button><button class="choice" data-hours="10+">10+ hours</button></div><input id="schedule" placeholder="Which days or time blocks can you protect?"><select id="start-week"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select><div class="nav"><button class="back" data-back="5">← Back</button><span class="progress">6 / 9</span><button class="primary" id="next-6" disabled>Continue →</button></div></div>
+      <div class="step" id="step-7"><div class="num">Question 7 of 9</div><div class="question">What can you realistically commit—and what must you protect?</div><div class="hint">Name the constraints the plan must respect: family, health, money, work, relationships, or other non-negotiables.</div><textarea id="constraints" placeholder="I can commit to… I need to protect…"></textarea><div class="nav"><button class="back" data-back="6">← Back</button><span class="progress">7 / 9</span><button class="primary" data-next="8">Continue →</button></div></div>
+      <div class="step" id="step-8"><div class="num">Question 8 of 9</div><div class="question">Why does this matter—and what could realistically derail you?</div><div class="hint">Connect the goal to what matters most, then name the failure modes the plan should anticipate.</div><textarea id="why" placeholder="This matters because…"></textarea><textarea id="obstacle" placeholder="What could derail me is…"></textarea><div class="nav"><button class="back" data-back="7">← Back</button><span class="progress">8 / 9</span><button class="primary" data-next="9">Continue →</button></div></div>
+      <div class="step" id="step-9"><div class="num">Question 9 of 9</div><div class="question">What would make the first seven days a success?</div><div class="hint">Choose one small result you can see or measure. Your personalized first week is free; the remaining 11 weeks are available as a paid upgrade.</div><textarea id="first-week" placeholder="In the first seven days, I will…"></textarea><div class="nav"><button class="back" data-back="8">← Back</button><span class="progress">9 / 9</span><button class="primary" id="finish">Build my plan →</button></div><div class="error-inline" id="finish-error"></div></div>
     </section>
 
-    <section class="card center" id="generating"><div class="spinner"></div><h2>Building your Master Plan…</h2><p>Lucky is turning your answers into 12 weekly milestones and focused actions. This can take up to a minute.</p></section>
-    <section class="card" id="result"><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="first-action"><span>Start here · your first action</span><strong id="result-first-action"></strong></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your execution progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week roadmap</div><div class="weeks" id="result-weeks"></div><div class="section-title">Recommended Lucky Exercises</div><div class="exercise-links" id="result-exercises"></div><section class="buddy-card"><div class="eyebrow" style="margin-bottom:0">Accountability buddy</div><h3>Keep going with someone in your corner.</h3><p class="buddy-copy">Invite someone you know, or ask Lucky to match you privately with another member working toward a similar kind of goal.</p><div class="buddy-scope"><strong>Your privacy:</strong> a buddy can see your first name, goal, 90-day milestone, weekly tasks and completion status. They will not see your email, onboarding answers, private reflections or Lucky Exercise notes. Buddies cannot edit each other’s plans.</div><div><h4 style="margin:0 0 7px;font-size:15px">Invite someone you know</h4><p class="buddy-copy">Create a private, revocable progress link for a friend, mentor or coach.</p><button class="primary" id="create-buddy-link" style="width:auto;margin-top:12px">Create private buddy link</button><div id="buddy-share" style="display:none"><input class="buddy-link" id="buddy-link" readonly aria-label="Private accountability buddy link"><div class="buddy-actions"><button class="secondary" id="copy-buddy-link">Copy link</button><button class="secondary" id="share-buddy-link">Invite my buddy</button><button class="secondary" id="disable-buddy-link">Turn off link</button></div></div><div class="buddy-status" id="buddy-status"></div></div><div class="match-panel"><h4>Get matched inside Lucky</h4><p class="buddy-copy">Lucky first looks for someone in the same goal area with the same check-in rhythm. If no close match is available, you will remain in the private waiting pool.</p><div id="match-join"><div class="match-form"><div><label for="match-cadence">How often should you check in?</label><select id="match-cadence"><option value="weekly">Once a week</option><option value="twice_weekly">Twice a week</option></select></div><button class="primary" id="join-match-pool">Find my Lucky buddy</button></div><label class="match-consent"><input type="checkbox" id="match-consent">I agree to share my first name, goal, 90-day milestone, weekly tasks and completion status with my matched buddy.</label></div><div class="match-state" id="match-state"></div><div class="buddy-status" id="match-status"></div></div><div class="buddy-messages" id="buddy-messages"></div></section><div class="result-actions"><div class="saved-state" id="saved-state">✓ Your plan is saved to your Lucky account.</div><button class="secondary" id="copy-summary">Copy plan summary</button><button class="secondary" id="share-plan">Share my plan</button><div class="share-status" id="share-status"></div><div class="plan-allowance" id="plan-allowance"></div><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin a Lucky Exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
+    <section class="card center" id="generating"><div class="spinner"></div><h2>Building your plan…</h2><p>Lucky is organizing your answers into 12 weeks of focused actions. This can take up to a minute.</p></section>
+    <section class="card" id="result"><div class="checkout-message" id="checkout-message"></div><div class="result-hero"><div class="eyebrow" id="result-domain"></div><h1 id="result-goal"></h1><p class="summary" id="result-summary"></p><div class="milestone" id="result-milestone"></div></div><div class="insight" id="result-insight"></div><div class="first-action"><span>Start here · your first action</span><strong id="result-first-action"></strong></div><div class="plan-progress"><div class="plan-progress-head"><strong>Your progress</strong><span id="progress-count">0 of 0 tasks complete</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div><div class="section-title">Your 12-week plan</div><div class="weeks" id="result-weeks"></div><section class="upgrade-card" id="upgrade-card"><span class="upgrade-badge">Week 1 is free</span><h2>Continue with weeks 2–12.</h2><p class="upgrade-copy">Get the remaining weekly actions and track your progress through day 90.</p><ul class="upgrade-benefits"><li>Weeks 2–12 with focused actions</li><li>Weekly Lucky Exercises matched to the work</li><li>Progress tracking and buddy accountability</li></ul><div class="upgrade-action"><div class="upgrade-price" id="upgrade-price">One-time access<small>Pay once</small></div><button class="primary" id="upgrade-button">Get the full plan →</button><div class="upgrade-error" id="upgrade-error"></div><div class="upgrade-note">Secure checkout powered by Stripe. Your purchase unlocks this Lucky account.</div></div></section><div class="section-title">Recommended Lucky Exercises</div><div class="exercise-links" id="result-exercises"></div><section class="buddy-card"><div class="eyebrow" style="margin-bottom:0">Accountability buddy</div><h3>Ask someone to check in on your progress.</h3><p class="buddy-copy">Invite someone you know, or ask Lucky to match you privately with another member working on a similar goal.</p><div class="buddy-scope"><strong>Your privacy:</strong> a buddy can see your first name, goal, 90-day milestone, weekly tasks and completion status. They will not see your email, onboarding answers, private reflections or Lucky Exercise notes. Buddies cannot edit each other’s plans.</div><div><h4 style="margin:0 0 7px;font-size:15px">Invite someone you know</h4><p class="buddy-copy">Create a private link for a friend, mentor or coach. You can turn it off at any time.</p><button class="primary" id="create-buddy-link" style="width:auto;margin-top:12px">Create private buddy link</button><div id="buddy-share" style="display:none"><input class="buddy-link" id="buddy-link" readonly aria-label="Private accountability buddy link"><div class="buddy-actions"><button class="secondary" id="copy-buddy-link">Copy link</button><button class="secondary" id="share-buddy-link">Invite my buddy</button><button class="secondary" id="disable-buddy-link">Turn off link</button></div></div><div class="buddy-status" id="buddy-status"></div></div><div class="match-panel"><h4>Get matched inside Lucky</h4><p class="buddy-copy">Lucky first looks for someone in the same goal area with the same check-in rhythm. If no close match is available, you will remain in the private waiting pool.</p><div id="match-join"><div class="match-form"><div><label for="match-cadence">How often should you check in?</label><select id="match-cadence"><option value="weekly">Once a week</option><option value="twice_weekly">Twice a week</option></select></div><button class="primary" id="join-match-pool">Find my Lucky buddy</button></div><label class="match-consent"><input type="checkbox" id="match-consent">I agree to share my first name, goal, 90-day milestone, weekly tasks and completion status with my matched buddy.</label></div><div class="match-state" id="match-state"></div><div class="buddy-status" id="match-status"></div></div><div class="buddy-messages" id="buddy-messages"></div></section><div class="result-actions"><div class="saved-state" id="saved-state">✓ Your plan is saved to your Lucky account.</div><button class="secondary" id="copy-summary">Copy plan summary</button><button class="secondary" id="share-plan">Share my plan</button><div class="share-status" id="share-status"></div><div class="plan-allowance" id="plan-allowance"></div><a class="primary" href="/exercises" style="display:grid;place-items:center;text-decoration:none">Begin a Lucky Exercise</a><button class="secondary" id="build-another">Build another plan</button></div></section>
     <section class="card center" id="error-view"><h2>We couldn’t build the plan yet.</h2><p id="error-message"></p><button class="primary" id="retry" style="margin-top:22px">Try again</button></section>
   </main>
 
@@ -268,61 +226,27 @@
     const DRAFT_KEY = 'lucky_builder_draft_v1';
     const PLAN_KEY = 'lucky_builder_plan_v1';
     const PENDING_KEY = 'lucky_builder_generation_pending';
-    const WIP_KEY = 'lucky_builder_wip_v1';
-    const WIP_FIELD_IDS = ['goal','baseline','gap','tried','resources','schedule','start-week','constraints','why','obstacle','first-week'];
     const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp' || new URLSearchParams(window.location.search).get('cohort') === 'bootcamp';
     const VISITOR_KEY = 'lucky_visitor_id';
     const BUDDY_LINK_KEY = 'lucky_accountability_buddy_link';
-    const TURNS = {
-      1: () => '',
-      2: ({category}) => category ? `${category} is a meaningful place to focus. Let’s make the outcome concrete.` : '',
-      3: ({goal}) => goal ? `You’re aiming for “${shortText(goal)}.” Now let’s find the honest starting line.` : '',
-      4: ({goal,baseline}) => goal && baseline ? `You want “${shortText(goal)},” and today you’re starting from “${shortText(baseline)}.” What needs to shift?` : '',
-      5: ({gap}) => gap ? `That gives us a useful map: “${shortText(gap)}.” Let’s use what you have already learned.` : '',
-      6: ({tried}) => tried ? `You have already learned from “${shortText(tried)}.” Now let’s build with the resources around you.` : '',
-      7: ({hours}) => hours ? `${hours} hours a week is a real commitment. Let’s make sure the plan fits the rest of your life.` : '',
-      8: ({constraints}) => constraints ? `We’ll respect “${shortText(constraints)}” as we make the plan. Now let’s name the reason and the friction.` : '',
-      9: ({why,goal}) => why ? `That reason—“${shortText(why)}”—can carry you through the hard days. What would a real first-week win look like?` : (goal ? `You’re building toward “${shortText(goal)}.” Let’s choose a first-week win you can actually complete.` : '')
-    };
-    let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null, activeSavedPlan = null, quizStartedTracked = false, accountabilitySyncTimer = null;
+    let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null, activeSavedPlan = null, quizStartedTracked = false, accountabilitySyncTimer = null, planAccess = {unlocked:false,source:'free'}, upgradeViewTracked = false, checkoutNotice = '';
     if(cohortMode) { document.querySelector('.beta-note').style.display='flex'; document.title='Lucky — Job Search Founding Cohort'; }
 
     function visitorId(){ let id=localStorage.getItem(VISITOR_KEY); if(!id){ id=crypto.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`; localStorage.setItem(VISITOR_KEY,id); } return id; }
     async function trackEvent(eventName,properties={}){ try { const session=(await sb.auth.getSession()).data.session; await fetch('/api/events',{method:'POST',headers:{'Content-Type':'application/json',...(session?.access_token?{Authorization:`Bearer ${session.access_token}`}:{})},body:JSON.stringify({event_name:eventName,visitor_id:visitorId(),properties})}); } catch {} }
 
-    function shortText(text,limit=120) { const normalized=String(text||'').replace(/\s+/g,' ').trim(); return normalized.length>limit ? `${normalized.slice(0,limit - 1).trimEnd()}…` : normalized; }
-    function wizardContext() { return {category:selectedCategory,hours:selectedHours,...Object.fromEntries(WIP_FIELD_IDS.map(id=>[id,value(id)]))}; }
-    function reducedMotion() { return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches; }
-    function currentQuestion() { return document.querySelector(`#step-${currentStep} .question`); }
-    function updateProgress() { const total=9; document.getElementById('progress-count-wizard').textContent=`${currentStep} of ${total}`; document.getElementById('progress-label').textContent=currentStep===1?'A short conversation with Lucky':`Question ${currentStep} of ${total}`; document.getElementById('wizard-fill').style.width=`${Math.round(currentStep/total*100)}%`; }
-    function renderTurn() { const echo=TURNS[currentStep]?.(wizardContext()) || ''; document.querySelectorAll(`#step-${currentStep} [data-echo]`).forEach(target=>{ target.textContent=echo; target.hidden=!echo; }); }
-    function announceStep() { const question=currentQuestion(); if(question) document.getElementById('step-announcer').textContent=`Question ${currentStep} of 9. ${question.textContent.trim()}`; }
-    function showStep(number,{focus=true,scroll=true,persist=true}={}) { const next=Math.min(9,Math.max(1,Number(number)||1)); document.getElementById(`step-${currentStep}`)?.classList.remove('active'); currentStep=next; document.getElementById(`step-${currentStep}`).classList.add('active'); updateProgress(); renderTurn(); renderRecap(); announceStep(); if(persist) saveWizardProgress(); if(scroll) window.scrollTo({top:0,behavior:reducedMotion()?'auto':'smooth'}); if(focus) requestAnimationFrame(()=>currentQuestion()?.closest('.bubble')?.focus({preventScroll:true})); }
+    function showStep(number) { document.getElementById(`step-${currentStep}`).classList.remove('active'); currentStep = number; document.getElementById(`step-${number}`).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
     function showView(id) { ['account-loading','wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
     function value(id) { return document.getElementById(id).value.trim(); }
     function collectAnswers() { const startWeek = Number(document.getElementById('start-week').value) || 1; return { category:selectedCategory, goal:value('goal'), baseline:value('baseline'), gap:value('gap'), tried:value('tried'), resources:value('resources'), constraints:value('constraints'), why:value('why'), obstacle:value('obstacle'), hours:selectedHours, schedule:value('schedule'), first_week:value('first-week'), start_week:startWeek, progress:`90-DAY OUTCOME: ${value('goal')}\n\nGAP TO CLOSE: ${value('gap')}`, createdAt:Date.now()-(startWeek-1)*7*86400000 }; }
-    function setInlineError(button,message,fieldId=button.dataset.require) { const step=button.closest('.step'), target=step?.querySelector('.error-inline'); if(target) target.textContent=message; const groupId=fieldId==='hours'?'hour-choices':fieldId, isChoiceGroup=['category-choices','hour-choices'].includes(groupId), field=document.getElementById(groupId); if(field){ field.setAttribute('aria-invalid','true'); const focusTarget=isChoiceGroup ? field.querySelector('[aria-checked="true"]') || field.querySelector('.choice') : field; focusTarget?.focus(); } }
-    function clearInlineError(field) { field.removeAttribute('aria-invalid'); const step=field.closest('.step'); const target=step?.querySelector('.error-inline'); if(target) target.textContent=''; }
-    function setSelectedChoice(groupId,button) { const group=document.getElementById(groupId); group.querySelectorAll('.choice').forEach(item=>{ const selected=item===button; item.classList.toggle('selected',selected); item.setAttribute('aria-checked',String(selected)); }); group.removeAttribute('aria-invalid'); }
-    function selectCategory(button,{track=true,persist=true}={}) { setSelectedChoice('category-choices',button); selectedCategory=button.dataset.category; document.getElementById('next-1').disabled=false; if(track&&!quizStartedTracked){ quizStartedTracked=true; trackEvent('quiz_started',{category:selectedCategory,source:new URLSearchParams(location.search).get('source')||'direct'}); } if(persist) saveWizardProgress(); renderTurn(); renderRecap(); }
-    function selectHours(button,{persist=true}={}) { setSelectedChoice('hour-choices',button); selectedHours=button.dataset.hours; document.getElementById('next-6').disabled=false; if(persist) saveWizardProgress(); renderTurn(); renderRecap(); }
-    function setupRadioGroup(groupId,select) { const options=[...document.querySelectorAll(`#${groupId} .choice`)]; options.forEach(button=>{ button.addEventListener('click',()=>select(button)); button.addEventListener('keydown',event=>{ const key=event.key; if(!['ArrowRight','ArrowDown','ArrowLeft','ArrowUp','Home','End'].includes(key)) return; event.preventDefault(); const index=options.indexOf(button), next=key==='Home'?0:key==='End'?options.length-1:(index+(key==='ArrowRight'||key==='ArrowDown'?1:-1)+options.length)%options.length; options[next].focus(); select(options[next]); }); }); }
-    function wizardState() { return {step:currentStep,category:selectedCategory,hours:selectedHours,fields:Object.fromEntries(WIP_FIELD_IDS.map(id=>[id,document.getElementById(id).value]))}; }
-    function saveWizardProgress() { localStorage.setItem(WIP_KEY,JSON.stringify(wizardState())); }
-    function clearWizardProgress() { localStorage.removeItem(WIP_KEY); document.getElementById('resume-note').style.display='none'; }
-    function restoreWizardProgress() { let state; try { state=JSON.parse(localStorage.getItem(WIP_KEY)||'null'); } catch { localStorage.removeItem(WIP_KEY); return null; } if(!state||typeof state!=='object') return null; WIP_FIELD_IDS.forEach(id=>{ if(typeof state.fields?.[id]==='string') document.getElementById(id).value=state.fields[id]; }); const categoryButton=[...document.querySelectorAll('#category-choices .choice')].find(button=>button.dataset.category===state.category); if(categoryButton){ selectCategory(categoryButton,{track:false,persist:false}); quizStartedTracked=true; } const hoursButton=[...document.querySelectorAll('#hour-choices .choice')].find(button=>button.dataset.hours===state.hours); if(hoursButton) selectHours(hoursButton,{persist:false}); const step=Math.min(9,Math.max(1,Number(state.step)||1)), hasAnswers=Boolean(state.category||state.hours||WIP_FIELD_IDS.some(id=>state.fields?.[id])); document.getElementById('resume-note').style.display=hasAnswers?'flex':'none'; return hasAnswers ? step : null; }
-    function resetWizard() { WIP_FIELD_IDS.forEach(id=>{ const field=document.getElementById(id); field.value=id==='start-week'?'1':''; clearInlineError(field); }); selectedCategory=''; selectedHours=''; ['category-choices','hour-choices'].forEach(groupId=>document.querySelectorAll(`#${groupId} .choice`).forEach(button=>{ button.classList.remove('selected'); button.setAttribute('aria-checked','false'); })); document.getElementById('next-1').disabled=true; document.getElementById('next-6').disabled=true; showStep(1,{persist:false}); clearWizardProgress(); }
-    function renderRecap() { const context=wizardContext(); const entries=[{step:1,label:'Focus',answer:context.category},{step:2,label:'90-day outcome',answer:context.goal},{step:3,label:'Starting line',answer:context.baseline},{step:4,label:'What needs to change',answer:context.gap},{step:5,label:'What you have tried',answer:context.tried},{step:6,label:'Resources and time',answer:[context.resources,context.hours&&`${context.hours} hours a week`,context.schedule].filter(Boolean).join(' · ')},{step:7,label:'Constraints',answer:context.constraints},{step:8,label:'Reason and obstacle',answer:[context.why,context.obstacle].filter(Boolean).join(' · ')},{step:9,label:'First-week win',answer:context['first-week']}].filter(entry=>entry.step<currentStep&&entry.answer); const recap=document.getElementById('answer-recap'), list=document.getElementById('recap-list'); recap.style.display=entries.length?'block':'none'; list.replaceChildren(); entries.forEach(entry=>{ const item=document.createElement('div'); item.className='recap-item'; const copy=document.createElement('div'), label=document.createElement('strong'), answer=document.createElement('span'); label.textContent=entry.label; answer.textContent=shortText(entry.answer,110); copy.append(label,answer); const edit=document.createElement('button'); edit.className='recap-edit'; edit.type='button'; edit.textContent='Edit'; edit.addEventListener('click',()=>showStep(entry.step)); item.append(copy,edit); list.appendChild(item); }); }
+    function setInlineError(button, message) { const step = button.closest('.step'); const target = step.querySelector('.error-inline'); if(target) target.textContent = message; }
 
-    setupRadioGroup('category-choices',selectCategory);
-    setupRadioGroup('hour-choices',selectHours);
-    document.querySelectorAll('.example-chip').forEach(chip=>chip.addEventListener('click',()=>{ const field=chip.closest('.turn-you')?.querySelector('textarea'); if(!field) return; const starter=chip.dataset.fill||''; const current=field.value.trim(); field.value=current ? `${current}${/[.!?]$/.test(current)?' ':' '}${starter}` : starter; field.focus(); clearInlineError(field); saveWizardProgress(); renderTurn(); renderRecap(); }));
-    WIP_FIELD_IDS.forEach(id=>{ const field=document.getElementById(id); field.addEventListener('input',()=>{ clearInlineError(field); saveWizardProgress(); renderTurn(); renderRecap(); }); field.addEventListener('change',()=>{ clearInlineError(field); saveWizardProgress(); renderTurn(); renderRecap(); }); });
-    document.getElementById('start-over').addEventListener('click',resetWizard);
-    document.getElementById('next-1').addEventListener('click',()=>{ if(!selectedCategory){ setInlineError(document.getElementById('next-1'),'Choose the area where you want to make progress.','category-choices'); return; } trackEvent('quiz_step_completed',{step:1,category:selectedCategory}); showStep(2); });
-    document.getElementById('next-6').addEventListener('click',()=>{ if(!selectedHours){ setInlineError(document.getElementById('next-6'),'Choose the weekly capacity that feels realistic.','hours'); return; } trackEvent('quiz_step_completed',{step:6,hours:selectedHours}); showStep(7); });
-    document.querySelectorAll('[data-back]').forEach(button=>button.addEventListener('click',()=>showStep(Number(button.dataset.back))));
-    document.querySelectorAll('[data-next]').forEach(button=>button.addEventListener('click',()=>{ const required=button.dataset.require; if(required&&!value(required)){ setInlineError(button,'Please answer this question so the plan has enough context.',required); return; } trackEvent('quiz_step_completed',{step:Number(button.dataset.next)-1}); showStep(Number(button.dataset.next)); }));
+    document.querySelectorAll('#category-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#category-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedCategory = button.dataset.category; document.getElementById('next-1').disabled = false; if(!quizStartedTracked){ quizStartedTracked=true; trackEvent('quiz_started',{category:selectedCategory,source:new URLSearchParams(location.search).get('source')||'direct'}); } }));
+    document.querySelectorAll('#hour-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#hour-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedHours = button.dataset.hours; document.getElementById('next-6').disabled = false; }));
+    document.getElementById('next-1').addEventListener('click', () => { trackEvent('quiz_step_completed',{step:1}); showStep(2); });
+    document.getElementById('next-6').addEventListener('click', () => { trackEvent('quiz_step_completed',{step:6}); showStep(7); });
+    document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
+    document.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => { const required = button.dataset.require; if(required && !value(required)) { setInlineError(button,'Please answer this question so the plan has enough context.'); return; } trackEvent('quiz_step_completed',{step:Number(button.dataset.next)-1}); showStep(Number(button.dataset.next)); }));
 
     function openAuth() { document.getElementById('auth-overlay').style.display = 'grid'; }
     function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
@@ -354,7 +278,7 @@
       finally { button.disabled=false; button.textContent='Unlock Lucky'; }
     });
 
-    document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { setInlineError(document.getElementById('finish'),'Define one concrete first-week result before generating the plan.','first-week'); return; } trackEvent('quiz_step_completed',{step:9}); trackEvent('quiz_completed',{category:selectedCategory}); const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
+    document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { document.getElementById('finish-error').textContent = 'Define one concrete first-week result before generating the plan.'; return; } trackEvent('quiz_step_completed',{step:9}); trackEvent('quiz_completed',{category:selectedCategory}); const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
 
     async function generatePlan(answers) {
       if(generationInFlight) return; if(cohortMode && !await ensureBetaAccess()) return; generationInFlight = true; closeAuth(); closeInvite(); showView('generating');
@@ -363,19 +287,23 @@
         const token = currentSession?.access_token; if(!token) { showView('wizard'); openAuth(); return; }
         const response = await fetch('/api/decompose-goal',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(answers)});
         const data = await response.json(); if(!response.ok) throw new Error(data.error || `Generation failed (${response.status})`);
-        const saved = {answers,plan:data.plan,usage:data.usage,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); clearWizardProgress(); trackEvent('plan_generated',{category:answers.category}); trackEvent('plan_saved',{category:answers.category}); renderPlan(saved);
+        const saved = {answers,plan:data.plan,access:data.access||{unlocked:false,source:'free'},usage:data.usage,ownerId:currentSession.user.id,savedAt:Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); localStorage.removeItem(PENDING_KEY); trackEvent('plan_generated',{category:answers.category}); trackEvent('plan_saved',{category:answers.category}); renderPlan(saved);
       } catch(error) { document.getElementById('error-message').textContent = `${error.message}. Your answers are still saved, so you can retry.`; showView('error-view'); }
       finally { generationInFlight = false; }
     }
 
     function savePlanProgress(saved) { saved.progress = saved.progress || {completed:{},feedback:{}}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
-    function updateProgressSummary(saved) { const actions=(saved.plan?.weeks || []).flatMap(week=>week.actions || []); const completed=Object.values(saved.progress?.completed || {}).filter(Boolean).length; document.getElementById('progress-count').textContent=`${completed} of ${actions.length} tasks complete`; document.getElementById('progress-fill').style.width=`${actions.length ? Math.round(completed/actions.length*100) : 0}%`; }
+    function visiblePlanWeeks(saved) { const weeks=saved.plan?.weeks||[]; return saved.access?.unlocked ? weeks : weeks.slice(0,1); }
+    function updateProgressSummary(saved) { const actions=visiblePlanWeeks(saved).flatMap(week=>week.actions || []); const visibleKeys=new Set(visiblePlanWeeks(saved).flatMap((week,index)=>(week.actions||[]).map((_,actionIndex)=>`week-${week.week||index+1}-task-${actionIndex}`))); const completed=Object.entries(saved.progress?.completed||{}).filter(([key,value])=>value&&visibleKeys.has(key)).length; document.getElementById('progress-count').textContent=`${completed} of ${actions.length} tasks complete`; document.getElementById('progress-fill').style.width=`${actions.length ? Math.round(completed/actions.length*100) : 0}%`; }
 
     function renderPlan(saved) {
       const plan = saved.plan || {}, answers = saved.answers || {};
       activeSavedPlan = saved;
+      planAccess = saved.access || {unlocked:false,source:'free'};
+      saved.access = planAccess;
+      const checkoutMessage=document.getElementById('checkout-message'); checkoutMessage.textContent=checkoutNotice; checkoutMessage.style.display=checkoutNotice?'block':'none';
       saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {};
-      document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your Master Plan';
+      document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your 90-day plan';
       document.getElementById('result-goal').textContent = answers.goal || plan.milestone_90day || 'Your 90-day goal';
       document.getElementById('result-summary').textContent = plan.summary || '';
       document.getElementById('result-milestone').textContent = `90-day milestone: ${plan.milestone_90day || answers.goal || ''}`;
@@ -384,7 +312,8 @@
       document.getElementById('result-first-action').textContent=firstAction;
       document.getElementById('saved-state').textContent=currentSession?.user?.email ? `✓ Plan saved to ${currentSession.user.email}. Progress is saved in this browser.` : '✓ Your plan is saved. Progress is saved in this browser.';
       const weeks = document.getElementById('result-weeks'); weeks.replaceChildren();
-      (plan.weeks || []).forEach((week,index) => {
+      const visibleWeeks=visiblePlanWeeks(saved);
+      visibleWeeks.forEach((week,index) => {
         const weekNumber=week.week || index+1, weekKey=`week-${weekNumber}`;
         const card=document.createElement('article'); card.className='week';
         const head=document.createElement('div'); head.className='week-head';
@@ -413,9 +342,10 @@
         feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
       });
       updateProgressSummary(saved);
-      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); (plan.exercises || []).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?part=${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
+      const upgradeCard=document.getElementById('upgrade-card'); upgradeCard.style.display=planAccess.unlocked?'none':'block'; if(!planAccess.unlocked){ loadUpgradeState(); if(!upgradeViewTracked){ upgradeViewTracked=true; trackEvent('upgrade_viewed',{preview_weeks:visibleWeeks.length}); } }
+      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); const visibleExerciseParts=new Set(visibleWeeks.map(week=>Number(week.exercise_part)).filter(Boolean)); (plan.exercises || []).filter(ex=>planAccess.unlocked||visibleExerciseParts.has(Number(ex.part))).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?part=${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
       const usage=saved.usage; const buildAnother=document.getElementById('build-another'); const allowance=document.getElementById('plan-allowance');
-      if(usage){ allowance.textContent=usage.remaining>0 ? `${usage.remaining} of ${usage.limit} Master Plan generations remaining` : 'You have used all 3 Master Plan generations for this account.'; buildAnother.disabled=usage.remaining<=0; buildAnother.textContent=usage.remaining>0 ? 'Build another plan' : 'Plan limit reached'; }
+      if(usage){ allowance.textContent=usage.remaining>0 ? `${usage.remaining} of ${usage.limit} plan generations remaining` : 'You have used all 3 plan generations for this account.'; buildAnother.disabled=usage.remaining<=0; buildAnother.textContent=usage.remaining>0 ? 'Build another plan' : 'Plan limit reached'; }
       showView('result'); window.scrollTo({top:0}); loadAccountabilityState(); if(Date.now()-(saved.savedAt||Date.now())>=7*86400000) setTimeout(()=>maybePromptFeedback('seven_day',saved),500);
     }
 
@@ -423,6 +353,43 @@
     function showShareStatus(message){ const target=document.getElementById('share-status'); target.textContent=message; setTimeout(()=>target.textContent='',2400); }
     document.getElementById('copy-summary').addEventListener('click',async()=>{ try { await navigator.clipboard.writeText(planShareText()); showShareStatus('Plan summary copied.'); trackEvent('plan_shared',{method:'copy'}); } catch { showShareStatus('Could not copy automatically. Please try again.'); } });
     document.getElementById('share-plan').addEventListener('click',async()=>{ const text=planShareText(); try { if(navigator.share){ await navigator.share({title:'My Lucky 90-Day Action Plan',text,url:location.origin}); trackEvent('plan_shared',{method:'native'}); } else { await navigator.clipboard.writeText(text); showShareStatus('Sharing is not available here, so the summary was copied.'); trackEvent('plan_shared',{method:'copy_fallback'}); } } catch(error){ if(error.name!=='AbortError') showShareStatus('Sharing was not completed.'); } });
+
+    function formatUpgradePrice(price){
+      if(!price||!Number.isFinite(Number(price.amount))) return 'One-time access';
+      return new Intl.NumberFormat(undefined,{style:'currency',currency:String(price.currency||'usd').toUpperCase()}).format(Number(price.amount)/100);
+    }
+    async function loadUpgradeState(){
+      if(!currentSession?.access_token||planAccess.unlocked) return;
+      const button=document.getElementById('upgrade-button'), price=document.getElementById('upgrade-price'), error=document.getElementById('upgrade-error');
+      try {
+        const response=await fetch('/api/upgrade-status',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json();
+        if(!response.ok) throw new Error(data.error||'Could not load upgrade details');
+        if(data.unlocked){ await refreshFullPlan(); return; }
+        price.innerHTML=`${formatUpgradePrice(data.price)}<small>One-time payment</small>`;
+        button.disabled=!data.configured; button.textContent=data.configured?'Unlock my full plan →':'Upgrade coming soon';
+        error.textContent=data.configured?'':'Payment setup is being finalized. Your free first week remains available.';
+      } catch(err){ button.disabled=true; error.textContent=err.message; }
+    }
+    async function refreshFullPlan(){
+      const account=await fetchAccountState();
+      if(!account?.savedPlan||!account.access?.unlocked) throw new Error('Your full plan is not available yet. Please refresh in a moment.');
+      const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
+      const saved={...account.savedPlan,access:account.access,progress:current?.ownerId===currentSession.user.id?current.progress:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+      localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); renderPlan(saved);
+    }
+    async function startUpgrade(){
+      const button=document.getElementById('upgrade-button'), error=document.getElementById('upgrade-error'); error.textContent=''; button.disabled=true; button.textContent='Opening secure checkout…';
+      trackEvent('upgrade_started',{product:'full_90_day_plan'});
+      try {
+        const response=await fetch('/api/create-checkout',{method:'POST',headers:{Authorization:`Bearer ${currentSession?.access_token||''}`}}); const data=await response.json();
+        if(!response.ok) throw new Error(data.error||'Could not open checkout');
+        if(data.unlocked){ await refreshFullPlan(); return; }
+        if(!data.url) throw new Error('Checkout link was not created');
+        sessionStorage.setItem('lucky_pending_checkout','1');
+        window.location.assign(data.url);
+      } catch(err){ error.textContent=err.message; button.disabled=false; button.textContent='Unlock my full plan →'; }
+    }
+    document.getElementById('upgrade-button').addEventListener('click',startUpgrade);
 
     async function accountabilityRequest(method='GET',body=null){ const session=(await sb.auth.getSession()).data.session||currentSession; if(!session?.access_token) throw new Error('Sign in required'); const response=await fetch('/api/accountability',{method,headers:{Authorization:`Bearer ${session.access_token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined}); const data=await response.json(); if(!response.ok) throw new Error(data.error||'Accountability request failed'); return data; }
     function buddyStatus(message,isError=false){ const target=document.getElementById('buddy-status'); target.textContent=message; target.style.color=isError?'#ff9d9d':'var(--mint)'; }
@@ -450,7 +417,7 @@
       state.append(heading,cadence,goal,progress,nextAction,message,actions);
     }
     async function loadAccountabilityState(){ if(!currentSession) return; try { const state=await accountabilityRequest(); renderBuddyMessages(state.messages||[]); renderMatchState(state.match); const localLink=localStorage.getItem(BUDDY_LINK_KEY); if(state.active&&localLink){ showBuddyShare(localLink); scheduleAccountabilitySync(activeSavedPlan); } else if(state.active){ const button=document.getElementById('create-buddy-link'); button.textContent='Create a new private link'; buddyStatus('A buddy link is active. Creating a new link will replace the old one.'); } if(['waiting','matched'].includes(state.match?.status)) scheduleAccountabilitySync(activeSavedPlan); } catch(error){ buddyStatus(error.message,true); } }
-    async function syncAccountabilityProgress(saved){ if(!saved||!currentSession) return; const actions=(saved.plan?.weeks||[]).flatMap(week=>week.actions||[]); try { await accountabilityRequest('POST',{action:'progress',completed:saved.progress?.completed||{},total_tasks:actions.length}); } catch {} }
+    async function syncAccountabilityProgress(saved){ if(!saved||!currentSession) return; const actions=visiblePlanWeeks(saved).flatMap(week=>week.actions||[]); try { await accountabilityRequest('POST',{action:'progress',completed:saved.progress?.completed||{},total_tasks:actions.length}); } catch {} }
     function scheduleAccountabilitySync(saved){ clearTimeout(accountabilitySyncTimer); accountabilitySyncTimer=setTimeout(()=>syncAccountabilityProgress(saved),450); }
     document.getElementById('create-buddy-link').addEventListener('click',async()=>{ const button=document.getElementById('create-buddy-link'); button.disabled=true; button.textContent='Creating private link…'; buddyStatus(''); try { const state=await accountabilityRequest('POST',{action:'create'}); localStorage.setItem(BUDDY_LINK_KEY,state.share_url); showBuddyShare(state.share_url); await syncAccountabilityProgress(activeSavedPlan); buddyStatus('Private link created. Share it only with someone you trust.'); } catch(error){ buddyStatus(error.message,true); button.disabled=false; button.textContent='Create private buddy link'; } });
     document.getElementById('copy-buddy-link').addEventListener('click',async()=>{ try { await navigator.clipboard.writeText(document.getElementById('buddy-link').value); buddyStatus('Buddy link copied.'); } catch { buddyStatus('Could not copy the link automatically.',true); } });
@@ -477,33 +444,39 @@
     document.getElementById('feedback-form').addEventListener('submit',async event=>{ event.preventDefault(); const button=document.getElementById('feedback-submit'), error=document.getElementById('feedback-error'); const answers=Object.fromEntries(new FormData(event.target).entries()); button.disabled=true; button.textContent='Sending…'; try { betaState=await betaRequest('POST',{action:'feedback',stage:feedbackStage,answers}); document.getElementById('feedback-intro').innerHTML='<span class="thank-you">Thank you—your feedback has been saved.</span>'; document.getElementById('feedback-form').style.display='none'; setTimeout(()=>{ document.getElementById('feedback-overlay').style.display='none'; document.getElementById('feedback-form').style.display='block'; button.textContent='Send feedback'; button.disabled=false; },1200); } catch(err){ error.textContent=err.message; button.disabled=false; button.textContent='Send feedback'; } });
 
     document.getElementById('retry').addEventListener('click', () => { const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(draft) generatePlan(draft); else showView('wizard'); });
-    document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); localStorage.removeItem(WIP_KEY); window.location.reload(); });
+    document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
 
     async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/saved-plan',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
+    async function verifyCheckout(sessionId){
+      const response=await fetch('/api/verify-session',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${currentSession?.access_token||''}`},body:JSON.stringify({sessionId})});
+      const data=await response.json(); if(!response.ok) throw new Error(data.error||'Could not confirm your payment'); return data;
+    }
 
     async function init() {
       const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
+      const checkoutParams=new URLSearchParams(location.search), checkoutStatus=checkoutParams.get('checkout'), checkoutSession=checkoutParams.get('session_id');
+      if(checkoutStatus==='success'&&checkoutSession) sessionStorage.setItem('lucky_checkout_session',checkoutSession);
+      const pendingCheckoutSession=checkoutSession||sessionStorage.getItem('lucky_checkout_session');
+      if((checkoutStatus==='success'||pendingCheckoutSession)&&!currentSession){ openAuth(); return; }
+      if((checkoutStatus==='success'||pendingCheckoutSession)&&currentSession&&pendingCheckoutSession){
+        showView('account-loading');
+        try { await verifyCheckout(pendingCheckoutSession); sessionStorage.removeItem('lucky_checkout_session'); sessionStorage.removeItem('lucky_pending_checkout'); checkoutNotice='Payment confirmed. Your complete 90-day action plan is now unlocked.'; trackEvent('upgrade_completed',{product:'full_90_day_plan'}); }
+        catch(error){ checkoutNotice=`We received your checkout return, but could not confirm it yet: ${error.message}`; }
+      } else if(checkoutStatus==='cancelled') checkoutNotice='Checkout was canceled. Your free first week is still available.';
+      if(checkoutStatus){ history.replaceState({},'',location.pathname); }
+      const categoryFromUrl=new URLSearchParams(location.search).get('category'); if(categoryFromUrl){ const categoryButton=[...document.querySelectorAll('#category-choices .choice')].find(button=>button.dataset.category===categoryFromUrl); if(categoryButton) categoryButton.click(); }
       if(cohortMode&&currentSession){ try { await refreshBetaAccess(); if(betaState.allowed) document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>'; else openInvite(); } catch {} }
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
-      if(localStorage.getItem(PENDING_KEY) === '1' && draft) {
-        if(currentSession) { await generatePlan(draft); return; }
-        showView('wizard');
-        openAuth();
-        return;
-      }
+      if(currentSession && localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
       let saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
       if(currentSession){
         const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
-        if(account?.savedPlan){ saved={...account.savedPlan,progress:localBelongsToUser?saved.progress:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        if(account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(saved&&!localBelongsToUser){ saved=null; }
       }
       if(saved && (!currentSession || saved.ownerId === currentSession.user.id)){ trackEvent('returning_user',{has_saved_plan:true}); renderPlan(saved); return; }
       showView('wizard');
-      const restoredStep=restoreWizardProgress();
-      const categoryFromUrl=new URLSearchParams(location.search).get('category');
-      if(categoryFromUrl){ const categoryButton=[...document.querySelectorAll('#category-choices .choice')].find(button=>button.dataset.category===categoryFromUrl); if(categoryButton) selectCategory(categoryButton); }
-      showStep(restoredStep||currentStep,{focus:false,scroll:false,persist:false});
     }
     init();
   </script>
