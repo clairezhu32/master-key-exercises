@@ -530,6 +530,7 @@ export default async function handler(req, res) {
 
   const claimed = await claimGeneration(user.id, user.email, serviceRoleKey);
   if (!claimed) return res.status(500).json({ error: 'Could not prepare plan generation' });
+  if (!claimed.goalData?._beta_access) return res.status(403).json({ error: 'A valid invitation code is required before generating a plan.', code: 'INVITATION_REQUIRED' });
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {
