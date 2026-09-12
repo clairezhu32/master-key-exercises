@@ -1,4 +1,5 @@
 import { createPlanPreview, getPlanAccess } from '../lib/plan-access.js';
+import { getOnboardingTree } from '../lib/onboarding-tree.js';
 
 // A full 12-week, 7-stage funnel plan (maxOutputTokens: 8000) routinely takes
 // Gemini well past Vercel's old unconfigured default duration — without this,
@@ -325,35 +326,52 @@ Ground everything in the person's measurable outcome, baseline, reason, stated g
 
 Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
 
-The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 6 Lucky Exercises are:
+The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 6 Lucky Method steps are:
 ${partList}
 
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
-function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, gap, gap_types, tried, tried_result, resources, resource_types, constraints, obstacle, obstacle_types, hours, schedule, first_week, first_week_type, intensity, category }) {
+function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, first_week, first_week_type, intensity, category, category_key }) {
   const choiceList = value => Array.isArray(value) && value.length ? value.join(', ') : '(not specified)';
-  return `Goal category: ${category || '(not specified)'}
-Measurable 90-day outcome: ${goal}
-Type of success evidence they selected: ${outcome_type || '(not specified)'}
-Current stage they selected: ${current_stage || '(not specified)'}
+  return `Goal category: ${category || '(not specified)'} (${category_key || 'general'} decision path)
 Current baseline: ${baseline || '(not specified)'}
-Why it matters to them: ${why || '(not specified)'}
-Gap categories they selected: ${choiceList(gap_types)}
-The gap they believe must close: ${gap || '(not specified)'}
-Result of previous attempts: ${tried_result || '(not specified)'}
-What they already tried and what happened: ${tried || '(nothing specified)'}
-Resource categories they selected: ${choiceList(resource_types)}
-Resources and advantages already available: ${resources || '(none specified)'}
-Constraints the plan must protect: ${constraints || '(none specified)'}
-Likely derailers they selected: ${choiceList(obstacle_types)}
-Their biggest obstacle right now: ${obstacle || '(not specified)'}
+Current stage: ${current_stage || '(not specified)'}
+
+LUCKY STEP 1 — CLARIFY WHAT THEY TRULY WANT
+Measurable 90-day outcome: ${goal}
+Type of success evidence: ${outcome_type || '(not specified)'}
+Why it matters now: ${why || '(not specified)'}
+
+LUCKY STEP 2 — VISUALIZE THE LIVED PROCESS
+Behaviors they selected: ${choiceList(process_types)}
+Their description of a realistic week: ${process_vision || '(not specified)'}
+
+LUCKY STEP 3 — REFRAME A LIMITING BELIEF
+Belief pattern they selected: ${limiting_belief_type || '(not specified)'}
+The thought and behavior it triggers: ${limiting_belief || '(not specified)'}
+Evidence/resource types: ${choiceList(resource_types)}
+Evidence and resources already available: ${resources || '(none specified)'}
+Believable replacement thought they will test: ${reframe || '(not specified)'}
+
+LUCKY STEP 4 — ASK THEIR FUTURE SELF
+Repeated choices they selected: ${choiceList(future_choices)}
+Advice from their Day-90 self: ${future_self || '(not specified)'}
+
+LUCKY STEP 5 — TAKE REAL-WORLD ACTION
+High-leverage action types: ${choiceList(action_types)}
 Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensity)
 Realistic days or time blocks: ${schedule || '(not specified)'}
+Constraints the plan must protect: ${constraints || '(none specified)'}
 Type of first-week win they selected: ${first_week_type || '(not specified)'}
 What would make the first seven days successful: ${first_week || '(not specified)'}
 
-Build their strategic plan now. Week 1 must directly deliver the first-week success test, and the later weeks must credibly bridge their baseline to the measurable 90-day outcome within the stated time and constraints.`;
+LUCKY STEP 6 — COMMIT TO THE GOAL, RELEASE THE ROUTE
+Feedback signals they selected: ${choiceList(obstacle_types)}
+Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
+Evidence review cadence: ${review_cadence || 'Weekly'}
+
+Build their strategic plan now. Treat all six Lucky steps above as core planning inputs, not decorative mindset advice. Week 1 must directly deliver the first-week success test. Later weeks must credibly bridge their baseline to the measurable 90-day outcome, use their chosen real-world actions, test the reframed belief through evidence, and adjust tactics at the stated review cadence without abandoning the meaningful intention.`;
 }
 
 async function callGeminiOnce(goalData) {
@@ -510,6 +528,10 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const usage = await claimGeneration(user.id, user.email, serviceRoleKey);
     if (!usage) return res.status(500).json({ error: 'Could not read plan allowance' });
+    if (req.query?.mode === 'questions') {
+      if (!usage.goalData?._beta_access) return res.status(403).json({ error: 'A valid invitation code is required before starting onboarding.', code: 'INVITATION_REQUIRED' });
+      return res.status(200).json({ tree: getOnboardingTree(req.query?.category) });
+    }
     return res.status(200).json({ usage: { used: usage.used, remaining: usage.remaining, limit: PLAN_GENERATION_LIMIT } });
   }
 
@@ -520,7 +542,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { goal, outcome_type, baseline, current_stage, why, gap, gap_types, tried, tried_result, resources, resource_types, constraints, obstacle, obstacle_types, hours, schedule, first_week, first_week_type, category } = body ?? {};
+  const { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, first_week, first_week_type, category, category_key } = body ?? {};
   if (!goal?.trim()) return res.status(400).json({ error: 'Goal is required' });
 
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
@@ -534,7 +556,7 @@ export default async function handler(req, res) {
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {
-    const plan = await callGemini({ goal, outcome_type, baseline, current_stage, why, gap, gap_types, tried, tried_result, resources, resource_types, constraints, obstacle, obstacle_types, hours, schedule, first_week, first_week_type, intensity, category }, deadlineAt);
+    const plan = await callGemini({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, first_week, first_week_type, intensity, category, category_key }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
     const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);
