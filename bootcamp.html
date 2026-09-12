@@ -74,12 +74,13 @@
       <aside class="gate">
         <div class="eyebrow">Your invitation</div>
         <h2 id="gate-title">Join the founding cohort</h2>
-        <p class="gate-copy" id="gate-copy">Enter the code shared by your bootcamp leader. You’ll sign in with Google so your plan allowance and feedback stay connected to your account.</p>
-        <form id="access-form">
+        <p class="gate-copy" id="gate-copy">Sign in first so your plan, progress and feedback stay connected to one Lucky account. Then verify the code shared by your bootcamp leader.</p>
+        <div id="signin-panel"><button class="primary" id="bootcamp-google-sign-in" type="button">Continue with Google</button></div>
+        <form id="access-form" style="display:none">
           <label for="invite-code">Invitation code</label>
           <input id="invite-code" autocomplete="off" placeholder="LUCKY-…" required>
           <div class="error" id="access-error"></div>
-          <button class="primary" id="access-button" type="submit">Continue with Google</button>
+          <button class="primary" id="access-button" type="submit">Verify invitation code</button>
         </form>
         <div id="unlocked" style="display:none"><div class="success">Founding-member access is unlocked for this account.</div><a class="primary" href="/goals?cohort=bootcamp">Build my 90-day plan →</a></div>
         <p class="gate-note">Free during the founding cohort. One plan plus two revisions per account.</p>
@@ -100,7 +101,6 @@
     const SUPABASE_URL='https://hvuhpnvsxhvvsisrsmaq.supabase.co';
     const SUPABASE_ANON_KEY='sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
     const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-    const PENDING_CODE_KEY='lucky_bootcamp_pending_code';
     let currentSession=null;
 
     async function accessRequest(method='GET',body=null){
@@ -109,23 +109,29 @@
       const response=await fetch('/api/beta-access',{method,headers:{Authorization:`Bearer ${currentSession.access_token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
       const data=await response.json(); if(!response.ok) throw new Error(data.error||'Could not verify access'); return data;
     }
-    function showUnlocked(){ document.getElementById('access-form').style.display='none'; document.getElementById('unlocked').style.display='block'; document.getElementById('gate-title').textContent='Welcome, founding member'; document.getElementById('gate-copy').textContent='Your invitation has been verified. Continue when you’re ready to build your plan.'; }
-    async function redeem(code){ const state=await accessRequest('POST',{action:'redeem',code}); localStorage.removeItem(PENDING_CODE_KEY); if(state.allowed) showUnlocked(); }
+    function showCodeForm(){ document.getElementById('signin-panel').style.display='none'; document.getElementById('access-form').style.display='block'; document.getElementById('gate-title').textContent='Enter your invitation code'; document.getElementById('gate-copy').textContent='You’re signed in. Verify the private-beta code from your bootcamp or community leader to continue.'; }
+    function showUnlocked(){ document.getElementById('signin-panel').style.display='none'; document.getElementById('access-form').style.display='none'; document.getElementById('unlocked').style.display='block'; document.getElementById('gate-title').textContent='Welcome, founding member'; document.getElementById('gate-copy').textContent='Your invitation has been verified. Continue when you’re ready to build your plan.'; }
+    async function redeem(code){ const state=await accessRequest('POST',{action:'redeem',code}); if(state.allowed) showUnlocked(); }
+
+    document.getElementById('bootcamp-google-sign-in').addEventListener('click',async event=>{
+      const button=event.currentTarget; button.disabled=true; button.textContent='Redirecting…';
+      await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/bootcamp'}});
+    });
 
     document.getElementById('access-form').addEventListener('submit',async event=>{
       event.preventDefault(); const code=document.getElementById('invite-code').value.trim().toUpperCase(), button=document.getElementById('access-button'), error=document.getElementById('access-error'); error.textContent=''; button.disabled=true;
       try {
-        if(!currentSession){ localStorage.setItem(PENDING_CODE_KEY,code); button.textContent='Redirecting…'; await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/bootcamp'}}); return; }
+        if(!currentSession) throw new Error('Please sign in before entering an invitation code.');
         button.textContent='Checking code…'; await redeem(code);
-      } catch(err){ error.textContent=err.message; button.disabled=false; button.textContent=currentSession?'Unlock cohort access':'Continue with Google'; }
+      } catch(err){ error.textContent=err.message; button.disabled=false; button.textContent='Verify invitation code'; }
     });
 
     async function init(){
       const result=await sb.auth.getSession(); currentSession=result.data.session;
-      const button=document.getElementById('access-button'); button.textContent=currentSession?'Unlock cohort access':'Continue with Google';
       if(!currentSession) return;
-      try { const state=await accessRequest(); if(state.allowed){ showUnlocked(); return; } const pending=localStorage.getItem(PENDING_CODE_KEY); if(pending){ button.disabled=true; button.textContent='Verifying invitation…'; await redeem(pending); } }
-      catch(err){ document.getElementById('access-error').textContent=err.message; button.disabled=false; button.textContent='Unlock cohort access'; }
+      showCodeForm();
+      try { const state=await accessRequest(); if(state.allowed) showUnlocked(); }
+      catch(err){ document.getElementById('access-error').textContent=err.message; document.getElementById('access-button').disabled=false; document.getElementById('access-button').textContent='Verify invitation code'; }
     }
     init();
   </script>
