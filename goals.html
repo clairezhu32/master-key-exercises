@@ -394,6 +394,10 @@
       Object.keys(selectedOptions).forEach(key=>{ selectedOptions[key]=Array.isArray(selectedOptions[key])?[]:''; });
       document.querySelectorAll('#wizard .choice.selected').forEach(button=>button.classList.remove('selected'));
     }
+    function clearBranchAnswers() {
+      ['baseline','goal','why','process-vision','limiting-belief','resources','reframe','future-self','schedule','constraints','obstacle','first-week'].forEach(id=>{ document.getElementById(id).value=''; });
+      document.getElementById('start-week').value='1'; document.getElementById('review-cadence').value='Weekly';
+    }
     async function loadQuestionTree(branch) {
       const session=(await sb.auth.getSession()).data.session||currentSession;
       if(!session?.access_token) throw new Error('Sign in before loading your question path.');
@@ -405,9 +409,11 @@
     document.getElementById('category-choices').addEventListener('click',async event=>{
       const button=event.target.closest('.choice'); if(!button) return;
       const next=document.getElementById('next-1'), status=document.getElementById('branch-status'), branch=button.dataset.value;
+      if(branch===selectedBranch&&questionTree) return;
+      const changedExistingBranch=!!selectedBranch&&selectedBranch!==branch;
       document.querySelectorAll('#category-choices .choice').forEach(item=>item.classList.toggle('selected',item===button));
       const requestId=++questionRequestId;
-      selectedBranch=branch; questionTree=null; resetBranchSelections(); button.classList.add('selected'); next.disabled=true; status.textContent='Preparing questions for this goal…';
+      selectedBranch=branch; questionTree=null; resetBranchSelections(); if(changedExistingBranch) clearBranchAnswers(); button.classList.add('selected'); next.disabled=true; status.textContent='Preparing questions for this goal…';
       try {
         const tree=await loadQuestionTree(branch); if(requestId!==questionRequestId||selectedBranch!==branch) return;
         questionTree=tree; selectedCategory=tree.label; applyQuestionTree(tree); next.disabled=false; status.textContent=`${selectedCategory} question path ready.`;
