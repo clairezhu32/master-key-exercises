@@ -27,15 +27,15 @@ const RATE_MAX = 10;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-// Part themes are embedded in the prompt so the model grounds its exercise
-// picks in the real course instead of guessing at what each part covers.
+// The six Lucky Method themes are embedded in the prompt so weekly exercise
+// recommendations stay aligned with the product's vision-to-action framework.
 const PART_THEMES = [
-  'Physical Stillness', 'Mental Quiet', 'Complete Relaxation', "The True 'I'",
-  'The Mental Home', 'Concentration on Harmony', 'Visualization', 'The Core Affirmation',
-  'The Greatest Good', 'The Law of Abundance', 'Universal Connection', 'The Creative Power',
-  'Oneness', 'Inner Radiance', 'The Law of Growth', 'The Power of Insight',
-  'The Law of Vibration', 'The Power of Attention', 'Truth', 'Inspiration',
-  'Money Consciousness', 'Perfect Health', 'The Large Idea', 'The Master Key',
+  'Clarify What You Truly Want',
+  'Visualize the Lived Process',
+  'Reframe a Limiting Belief',
+  'Ask Your Future Self',
+  'Take One Real-World Action',
+  'Commit to the Goal, Release the Route',
 ];
 
 function isAllowedOrigin(origin) {
@@ -123,6 +123,20 @@ const PLAN_SCHEMA = {
     summary: { type: 'STRING', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
     insight: { type: 'STRING', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
     milestone_90day: { type: 'STRING', description: 'The single concrete, measurable outcome that defines success at day 90.' },
+    lucky_method: {
+      type: 'ARRAY',
+      description: 'Exactly 6 personalized guidance steps, in the canonical Lucky Method order. Each step must connect directly to this person’s goal, obstacle and plan—not repeat generic manifestation language.',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          step: { type: 'INTEGER', description: '1 through 6.' },
+          title: { type: 'STRING', description: 'Use the exact canonical Lucky Method title for this step.' },
+          guidance: { type: 'STRING', description: 'One concise, personalized explanation of how this step applies to the person’s goal and current situation.' },
+          action: { type: 'STRING', description: 'One concrete, observable action or reflection prompt the person can complete.' },
+        },
+        required: ['step', 'title', 'guidance', 'action'],
+      },
+    },
     funnel: {
       type: 'OBJECT',
       description: 'A 7-stage strategic funnel adapted to this specific goal domain, modeled on: targets -> access points -> outreach -> gap-closing -> core preparation -> funnel metrics/iteration -> close.',
@@ -262,7 +276,7 @@ const PLAN_SCHEMA = {
             items: { type: 'STRING' },
             description: 'Exactly 3 concrete, doable-today actions for this week.',
           },
-          exercise_part: { type: 'INTEGER', description: 'The most relevant Master Key System exercise part for this specific week, from 1 through 24.' },
+          exercise_part: { type: 'INTEGER', description: 'The most relevant Lucky Method exercise step for this specific week, from 1 through 6.' },
           exercise_reason: { type: 'STRING', description: 'One concise sentence connecting this exercise to the week’s target, actions, or likely execution obstacle.' },
         },
         required: ['week', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
@@ -274,14 +288,14 @@ const PLAN_SCHEMA = {
       items: {
         type: 'OBJECT',
         properties: {
-          part: { type: 'INTEGER', description: '1 through 24, matching the course part number.' },
+          part: { type: 'INTEGER', description: '1 through 6, matching the Lucky Method exercise step.' },
           reason: { type: 'STRING', description: "Why this specific part's theme addresses this person's stated obstacle." },
         },
         required: ['part', 'reason'],
       },
     },
   },
-  required: ['domain_label', 'summary', 'insight', 'milestone_90day', 'funnel', 'weeks', 'exercises'],
+  required: ['domain_label', 'summary', 'insight', 'milestone_90day', 'lucky_method', 'funnel', 'weeks', 'exercises'],
 };
 
 function buildSystemPrompt() {
@@ -297,11 +311,21 @@ The 7 stages, in order:
 6. funnel_metrics — the conversion funnel for this goal with realistic benchmarks, plus how to review and iterate on the weakest step
 7. close — the specific checklist to actually land the outcome
 
+Use the six-step Lucky Method as an equally important decision framework throughout the plan:
+1. Clarify What You Truly Want — distinguish the person’s own meaningful desire from comparison, status pressure or avoidance; make the day-90 outcome concrete.
+2. Visualize the Lived Process — describe the ordinary behaviors, difficult moments and responses that would make progress real; never rely on outcome-only fantasy.
+3. Reframe a Limiting Belief — identify the belief most likely to distort behavior, separate facts from assumptions and turn it into a testable, believable alternative.
+4. Ask Your Future Self — translate the desired identity into repeated choices the person can make now, without pretending the outcome is guaranteed.
+5. Take One Real-World Action — make every week lead to observable behavior, with a small first action that can begin immediately.
+6. Commit to the Goal, Release the Route — use funnel metrics and weekly feedback to adjust tactics, timing or path while protecting the meaningful intention behind the goal.
+
+Return all six in lucky_method, in this exact order, personalized to the person’s answers. The plan must never imply that thoughts control external outcomes. Prefer controllable actions, honest experiments and reality-based feedback.
+
 Ground everything in the person's measurable outcome, baseline, reason, stated gap, previous attempts, resources, constraints, obstacle, schedule, and first-week success test — never output advice generic enough to apply to any goal in the category. Reference their own numbers, assets, and wording wherever possible.
 
 Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
 
-The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Master Key System exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 24 parts of the course are:
+The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 6 Lucky Exercises are:
 ${partList}
 
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;

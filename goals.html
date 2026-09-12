@@ -43,6 +43,14 @@
     .summary { margin-top:14px; color:var(--muted); line-height:1.65; }
     .milestone { display:inline-block; margin-top:17px; padding:8px 13px; border:1px solid rgba(113,229,193,.25); border-radius:999px; color:var(--mint); background:rgba(113,229,193,.06); font-size:12px; }
     .insight { margin:22px 0; padding:17px; border-left:2px solid var(--violet); color:#c5cbe0; background:rgba(157,140,255,.06); line-height:1.65; }
+    .lucky-method { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .method-step { padding:16px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.025); }
+    .method-step-head { display:flex; align-items:center; gap:9px; margin-bottom:8px; }
+    .method-step-number { width:25px; height:25px; flex:0 0 auto; display:grid; place-items:center; border-radius:50%; color:#08110e; background:var(--mint); font-size:10px; font-weight:800; }
+    .method-step h3 { font-size:14px; }
+    .method-step p { color:var(--muted); font-size:12px; line-height:1.55; }
+    .method-step-action { margin-top:9px; color:#dce0ef !important; }
+    .method-step-action strong { color:var(--violet); }
     .first-action { margin:18px 0 22px; padding:18px; border:1px solid rgba(113,229,193,.28); border-radius:13px; background:linear-gradient(135deg,rgba(113,229,193,.09),rgba(157,140,255,.06)); }
     .first-action span { display:block; margin-bottom:7px; color:var(--mint); font-size:10px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
     .first-action strong { display:block; font-size:16px; line-height:1.5; }
@@ -140,7 +148,7 @@
     .modal-actions .primary { flex:1; }
     .modal-actions .secondary { flex:0 0 auto; }
     .thank-you { color:var(--mint); font-size:13px; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%} }
   </style>
   <style>
     :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
@@ -296,6 +304,34 @@
     function visiblePlanWeeks(saved) { const weeks=saved.plan?.weeks||[]; return saved.access?.unlocked ? weeks : weeks.slice(0,1); }
     function updateProgressSummary(saved) { const actions=visiblePlanWeeks(saved).flatMap(week=>week.actions || []); const visibleKeys=new Set(visiblePlanWeeks(saved).flatMap((week,index)=>(week.actions||[]).map((_,actionIndex)=>`week-${week.week||index+1}-task-${actionIndex}`))); const completed=Object.entries(saved.progress?.completed||{}).filter(([key,value])=>value&&visibleKeys.has(key)).length; document.getElementById('progress-count').textContent=`${completed} of ${actions.length} tasks complete`; document.getElementById('progress-fill').style.width=`${actions.length ? Math.round(completed/actions.length*100) : 0}%`; }
 
+    const LUCKY_METHOD_FALLBACK = [
+      ['Clarify What You Truly Want','Define a concrete 90-day outcome that reflects what matters to you.'],
+      ['Visualize the Lived Process','Rehearse the ordinary behaviors and difficult moments—not only the result.'],
+      ['Reframe a Limiting Belief','Separate facts from assumptions and choose a more accurate belief to test.'],
+      ['Ask Your Future Self','Use the person you are becoming as a guide for today’s choice.'],
+      ['Take One Real-World Action','Make the next step small, observable and possible to begin now.'],
+      ['Commit to the Goal, Release the Route','Use feedback to adjust the path without abandoning the meaningful intention.'],
+    ];
+
+    function renderLuckyMethod(plan) {
+      const firstAction=document.querySelector('#result .first-action');
+      let title=document.getElementById('lucky-method-title'), container=document.getElementById('result-lucky-method');
+      if(!title){ title=document.createElement('div'); title.id='lucky-method-title'; title.className='section-title'; title.textContent='Your six-step Lucky guideline'; firstAction.before(title); }
+      if(!container){ container=document.createElement('div'); container.id='result-lucky-method'; container.className='lucky-method'; firstAction.before(container); }
+      container.replaceChildren();
+      const generated=Array.isArray(plan.lucky_method)?plan.lucky_method:[];
+      LUCKY_METHOD_FALLBACK.forEach(([fallbackTitle,fallbackGuidance],index)=>{
+        const item=generated.find(entry=>Number(entry.step)===index+1)||generated[index]||{};
+        const card=document.createElement('article'); card.className='method-step';
+        const head=document.createElement('div'); head.className='method-step-head';
+        const number=document.createElement('span'); number.className='method-step-number'; number.textContent=index+1;
+        const heading=document.createElement('h3'); heading.textContent=item.title||fallbackTitle; head.append(number,heading);
+        const guidance=document.createElement('p'); guidance.textContent=item.guidance||fallbackGuidance; card.append(head,guidance);
+        if(item.action){ const action=document.createElement('p'); action.className='method-step-action'; const label=document.createElement('strong'); label.textContent='Try: '; action.append(label,document.createTextNode(item.action)); card.appendChild(action); }
+        container.appendChild(card);
+      });
+    }
+
     function renderPlan(saved) {
       const plan = saved.plan || {}, answers = saved.answers || {};
       activeSavedPlan = saved;
@@ -308,6 +344,7 @@
       document.getElementById('result-summary').textContent = plan.summary || '';
       document.getElementById('result-milestone').textContent = `90-day milestone: ${plan.milestone_90day || answers.goal || ''}`;
       document.getElementById('result-insight').textContent = plan.insight || 'Begin with the first small action and let execution create clarity.';
+      renderLuckyMethod(plan);
       const firstAction=plan.weeks?.[0]?.actions?.[0] || answers.first_week || 'Choose one small action you can complete today.';
       document.getElementById('result-first-action').textContent=firstAction;
       document.getElementById('saved-state').textContent=currentSession?.user?.email ? `✓ Plan saved to ${currentSession.user.email}. Progress is saved in this browser.` : '✓ Your plan is saved. Progress is saved in this browser.';
@@ -328,9 +365,9 @@
           checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); const completed=Object.values(saved.progress.completed).filter(Boolean).length; if(checkbox.checked){ trackEvent('task_completed',{week:weekNumber,completed_count:completed}); } if(checkbox.checked&&completed===1) maybePromptFeedback('first_action',saved); });
           list.appendChild(item);
         });
-        const fallbackExercises=plan.exercises || []; const recommended=week.exercise_part ? {part:week.exercise_part,reason:week.exercise_reason} : fallbackExercises.length ? fallbackExercises[Math.min(Math.floor(index/4),fallbackExercises.length-1)] : null;
+        const fallbackExercises=(plan.exercises || []).filter(ex=>Number(ex.part)>=1&&Number(ex.part)<=6); const weekPart=Number(week.exercise_part); const recommended=weekPart>=1&&weekPart<=6 ? {part:weekPart,reason:week.exercise_reason} : fallbackExercises.length ? fallbackExercises[Math.min(Math.floor(index/4),fallbackExercises.length-1)] : null;
         const weekExercise=recommended ? document.createElement('a') : null;
-        if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises?part=${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Part ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this Lucky Exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this Lucky Exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
+        if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises?part=${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Step ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this Lucky Exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this Lucky Exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
         const feedback=document.createElement('div'); feedback.className='week-feedback';
         const feedbackLabel=document.createElement('span'); feedbackLabel.className='feedback-label'; feedbackLabel.textContent='Weekly check-in';
         const statuses=document.createElement('div'); statuses.className='feedback-status';
@@ -343,7 +380,7 @@
       });
       updateProgressSummary(saved);
       const upgradeCard=document.getElementById('upgrade-card'); upgradeCard.style.display=planAccess.unlocked?'none':'block'; if(!planAccess.unlocked){ loadUpgradeState(); if(!upgradeViewTracked){ upgradeViewTracked=true; trackEvent('upgrade_viewed',{preview_weeks:visibleWeeks.length}); } }
-      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); const visibleExerciseParts=new Set(visibleWeeks.map(week=>Number(week.exercise_part)).filter(Boolean)); (plan.exercises || []).filter(ex=>planAccess.unlocked||visibleExerciseParts.has(Number(ex.part))).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?part=${ex.part}`; link.textContent=`Part ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
+      const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); const visibleExerciseParts=new Set(visibleWeeks.map(week=>Number(week.exercise_part)).filter(Boolean)); (plan.exercises || []).filter(ex=>Number(ex.part)>=1&&Number(ex.part)<=6).filter(ex=>planAccess.unlocked||visibleExerciseParts.has(Number(ex.part))).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?part=${ex.part}`; link.textContent=`Step ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)});
       const usage=saved.usage; const buildAnother=document.getElementById('build-another'); const allowance=document.getElementById('plan-allowance');
       if(usage){ allowance.textContent=usage.remaining>0 ? `${usage.remaining} of ${usage.limit} plan generations remaining` : 'You have used all 3 plan generations for this account.'; buildAnother.disabled=usage.remaining<=0; buildAnother.textContent=usage.remaining>0 ? 'Build another plan' : 'Plan limit reached'; }
       showView('result'); window.scrollTo({top:0}); loadAccountabilityState(); if(Date.now()-(saved.savedAt||Date.now())>=7*86400000) setTimeout(()=>maybePromptFeedback('seven_day',saved),500);

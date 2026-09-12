@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="12 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
-  <meta property="og:title" content="Lucky Exercises — 12 Rewiring Practices for Real-World Action">
-  <meta property="og:description" content="12 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
+  <meta name="description" content="Six guided Lucky Exercises that connect clear vision, believable thinking and real-world action. Watch, reflect and choose your next step.">
+  <meta property="og:title" content="Lucky Exercises — Six Steps from Vision to Action">
+  <meta property="og:description" content="Six guided Lucky Exercises that connect clear vision, believable thinking and real-world action. Watch, reflect and choose your next step.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lucky-action-plan.vercel.app/exercises">
   <meta property="og:image" content="https://lucky-action-plan.vercel.app/og-exercises.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://lucky-action-plan.vercel.app/og-exercises.jpg">
-  <meta name="twitter:title" content="Lucky Exercises — 12 Rewiring Practices for Real-World Action">
-  <meta name="twitter:description" content="12 guided Lucky Exercises for mindset and reflection. Apply each practice to your own goal, journal your answers, and leave with one concrete next action.">
+  <meta name="twitter:title" content="Lucky Exercises — Six Steps from Vision to Action">
+  <meta name="twitter:description" content="Six guided Lucky Exercises that connect clear vision, believable thinking and real-world action. Watch, reflect and choose your next step.">
   <link rel="canonical" href="https://lucky-action-plan.vercel.app/exercises">
   <title>Lucky Exercises</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1278,7 +1278,7 @@
 
   <div class="header-progress">
     <div class="progress-label">Progress</div>
-    <div class="progress-count" id="progress-count">0 / 12</div>
+    <div class="progress-count" id="progress-count">0 / 6</div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
     </div>
@@ -1288,8 +1288,8 @@
 <!-- ── List View ─────────────────────────────── -->
 <div id="view-list" class="active">
   <div class="list-hero">
-    <h1>Exercises for when you know what to do—<em>but aren’t doing it.</em></h1>
-    <p>General practices for belief reframing, compassionate self-inquiry, body awareness, courage and curiosity. Apply each Lucky Exercise to whatever situation matters today, then use the structured Reflection Session to capture your own answers and next action. Lucky Exercises are coaching and reflection practices—not therapy or medical treatment. If a prompt feels overwhelming, stop and seek support from a qualified professional.</p>
+    <h1>Turn a meaningful vision into <em>something you do.</em></h1>
+    <p>Move through six practical steps: clarify what you want, rehearse the lived process, examine limiting beliefs, consult your future self, take one real-world action, and stay open to feedback. Each exercise uses the official YouTube player and gives you questions to connect the idea to your own 90-day plan. These are coaching and reflection practices—not therapy, medical treatment, or a guarantee of outcomes.</p>
   </div>
   <div class="exercises-grid" id="exercises-grid"></div>
 </div>
@@ -1325,6 +1325,7 @@
         <div class="audio-embed-wrap">
           <iframe id="ex-audio-frame" src="" title="Guided audio" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
+        <p class="youtube-attribution">Video remains hosted by its creator on YouTube. Lucky uses the official player and keeps YouTube branding, controls, creator information and ads intact. <a href="https://www.youtube.com/static?template=terms" target="_blank" rel="noopener noreferrer">YouTube Terms</a></p>
       </div>
       <div class="ex-section">
         <div class="ex-section-label">Answer</div>
@@ -1623,7 +1624,7 @@ async function cloudLoadAll() {
 async function syncLocalToCloud() {
   if (!currentUser) return;
   const store = loadStore();
-  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 12);
+  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 6);
   if (!parts.length) return;
   await Promise.all(parts.map(part => cloudUpsertProgress(part)));
 }
@@ -2351,119 +2352,65 @@ const SESSION_SUPPORT = [
 
 SESSION_SUPPORT.forEach((support, index) => Object.assign(EXERCISES[index], support));
 
-// "Listen, then answer" simple format for Exercises 1–12 (meditation &
-// manifestation). audioEmbedId set → openExercise() swaps the full classic
+// "Watch, then answer" simple format for the six-step Lucky method.
+// audioEmbedId set → openExercise() swaps the full classic
 // flow for just the audio + these questions (see simple-exercise-body).
-// The grid, progress counters and navigation only surface parts 1-12
-// (see renderGrid/updateHeader/openExercise). Parts 13-24 keep their
+// The grid, progress counters and navigation only surface parts 1-6
+// (see renderGrid/updateHeader/openExercise). Parts 7-24 keep their
 // original classic-format data in EXERCISES but are no longer shown.
 const SIMPLE_MEDITATION_EXERCISES = [
   {
-    part: 1, title: 'I Am Lucky', theme: 'A five-minute luck affirmation',
-    audioEmbedId: 'TqD1KjETwuM', audioStartSeconds: 84,
+    part: 1, title: 'Clarify What You Truly Want', theme: 'Mel Robbins · turn a vague wish into a clear direction',
+    audioEmbedId: '1S1LEoZ_KOg',
     simpleQuestions: [
-      'What did you notice in your body while you listened?',
-      'What is one thought that came up during the audio?',
-      'Name one thing you feel lucky for today.',
+      'What do you want your life to look and feel like—not only what result do you want?',
+      'Why does this matter to you beyond status, comparison or fear?',
+      'Write one concrete 90-day outcome that would prove meaningful progress.',
     ],
   },
   {
-    part: 2, title: 'I Am Grateful', theme: 'A ten-minute abundance and gratitude practice',
-    audioEmbedId: 'P9Y3I8PiGpI',
+    part: 2, title: 'Visualize the Lived Process', theme: 'Dr. Daniel Amen · use mental rehearsal to prepare for action',
+    audioEmbedId: 'FHm7JBKLX3s',
     simpleQuestions: [
-      'What are three things you feel grateful for right now?',
-      'Where did you feel that gratitude in your body?',
-      'What is one small sign of abundance you can notice today?',
+      'Picture an ordinary day when you are living closer to this goal. What are you doing differently?',
+      'What obstacle appears in the scene, and how do you want to respond?',
+      'Which behavior from that rehearsal can you schedule this week?',
     ],
   },
   {
-    part: 3, title: 'I Choose Positivity', theme: 'A five-minute gratitude and positivity practice',
-    audioEmbedId: 'uEwppoJVfEs',
+    part: 3, title: 'Reframe a Limiting Belief', theme: 'Therapy in a Nutshell · examine the belief shaping your behavior',
+    audioEmbedId: '8C6u90ltkSM',
     simpleQuestions: [
-      'What shifted in your mood during this practice?',
-      'What is one positive thought you want to carry with you today?',
-      'What is one thing going right in your life right now?',
+      'What belief could keep you from following through on this goal?',
+      'What facts support it, and what facts make it incomplete or too absolute?',
+      'What more accurate, believable statement will you test through action?',
     ],
   },
   {
-    part: 4, title: 'Morning Gratitude', theme: 'A guided morning practice to attract abundance',
-    audioEmbedId: 'dxqeQ46ybY8',
+    part: 4, title: 'Ask Your Future Self', theme: 'Tara Brach · use your future self as a compassionate decision guide',
+    audioEmbedId: 'g5XXQPQofxk',
     simpleQuestions: [
-      'How did you feel at the start versus the end of this practice?',
-      'What affirmation stood out to you the most?',
-      'What is one intention you want to set for today?',
+      'What does your future self understand that you are forgetting right now?',
+      'Which repeated behavior—not guaranteed outcome—would make that identity believable?',
+      'What would that version of you choose in the next 24 hours?',
     ],
   },
   {
-    part: 5, title: 'Visualize It', theme: 'A five-minute manifestation visualization',
-    audioEmbedId: 'Rk6BOZbYxKM',
+    part: 5, title: 'Take One Real-World Action', theme: 'BJ Fogg · make change small enough to begin and repeat',
+    audioEmbedId: 'AdKUJxjn-R8',
     simpleQuestions: [
-      'What did you visualize during this practice?',
-      'What emotion came up as you imagined it?',
-      'What is one action that would move you closer to what you visualized?',
+      'What action are you currently making too large, vague or difficult?',
+      'What is the smallest useful version you can complete today?',
+      'When and where will you do it, and what cue will help you begin?',
     ],
   },
   {
-    part: 6, title: 'Abundance Mindset', theme: 'A ten-minute gratitude meditation for wealth and abundance',
-    audioEmbedId: 'sC6TiA2A2_U',
+    part: 6, title: 'Commit to the Goal, Release the Route', theme: 'Tara Brach · let go of over-control and listen to reality',
+    audioEmbedId: '-40Tgg07J9A',
     simpleQuestions: [
-      'What does abundance mean to you personally?',
-      'What belief about money or abundance came up during this practice?',
-      'What is one small step you can take today toward more abundance?',
-    ],
-  },
-  {
-    part: 7, title: 'Abundant Morning', theme: 'A five-minute morning meditation for abundance',
-    audioEmbedId: '8bBPJ1EEUCc',
-    simpleQuestions: [
-      'How do you want to feel for the rest of today?',
-      'What is one thing you already have that feels abundant?',
-      'What is one small win you can create today?',
-    ],
-  },
-  {
-    part: 8, title: 'Raise My Vibration', theme: 'A ten-minute practice for positivity, gratitude and joy',
-    audioEmbedId: '-9KLB2HI9BI',
-    simpleQuestions: [
-      'What brought you a moment of joy during this practice?',
-      'What is one thing you are proud of this week?',
-      'How can you carry this feeling into the rest of your day?',
-    ],
-  },
-  {
-    part: 9, title: 'Manifest It', theme: 'A ten-minute powerful manifestation visualization',
-    audioEmbedId: 'NVPrxcR_RZI',
-    simpleQuestions: [
-      'What did you picture yourself achieving during this practice?',
-      'What feeling did you attach to that outcome?',
-      'What is one belief you need to let go of to get there?',
-    ],
-  },
-  {
-    part: 10, title: 'I Am Enough', theme: 'A ten-minute meditation for self-love and confidence',
-    audioEmbedId: 'LL5j1cL6FmE',
-    simpleQuestions: [
-      'What did you notice about how you speak to yourself?',
-      'What is one thing you appreciate about yourself?',
-      'What is one way you can be kinder to yourself today?',
-    ],
-  },
-  {
-    part: 11, title: 'Attract My Dreams', theme: 'A ten-minute law of attraction meditation',
-    audioEmbedId: '78TKdgxG_K8',
-    simpleQuestions: [
-      'What dream or desire did you focus on during this practice?',
-      'What does it feel like to already have it?',
-      'What is one action you can take today as if it is already true?',
-    ],
-  },
-  {
-    part: 12, title: 'Love Myself', theme: 'A five-minute power meditation for self-love',
-    audioEmbedId: 'KD6Zr1V5CzQ',
-    simpleQuestions: [
-      'What did it feel like to say kind words to yourself?',
-      'What is one part of yourself you want to accept more fully?',
-      'What is one loving action you can take for yourself today?',
+      'What are you trying to control that is not fully under your control?',
+      'What feedback from reality deserves your attention rather than resistance?',
+      'What will you keep, change or release in the next week?',
     ],
   },
 ];
@@ -2720,21 +2667,21 @@ function getCompletedParts() {
 // ── Render helpers ────────────────────────────
 function updateHeader() {
   const completed = getCompletedParts();
-  const count = completed.filter(p => p <= 12).length;
-  document.getElementById('progress-count').textContent = `${count} / 12`;
-  document.getElementById('progress-bar').style.width = `${(count / 12) * 100}%`;
+  const count = completed.filter(p => p <= 6).length;
+  document.getElementById('progress-count').textContent = `${count} / 6`;
+  document.getElementById('progress-bar').style.width = `${(count / 6) * 100}%`;
 }
 
 function renderGrid() {
   const grid = document.getElementById('exercises-grid');
   const completed = getCompletedParts();
-  grid.innerHTML = EXERCISES.filter(ex => ex.part <= 12).map(ex => {
+  grid.innerHTML = EXERCISES.filter(ex => ex.part <= 6).map(ex => {
     const done = completed.includes(ex.part);
     const data = getExData(ex.part);
     const sessionCount = data.sessions.length;
     return `
       <div class="exercise-card ${done ? 'completed' : ''}" data-part="${ex.part}">
-        <div class="card-part">Part <span>${String(ex.part).padStart(2, '0')}</span></div>
+        <div class="card-part">Step <span>${String(ex.part).padStart(2, '0')}</span></div>
         <div class="card-title">${ex.title}</div>
         <div class="card-theme">${ex.theme}</div>
         <div class="card-footer">
@@ -2928,7 +2875,7 @@ function openExercise(part) {
   const data = getExData(part);
 
   // Populate content
-  document.getElementById('ex-eyebrow').textContent = `Part ${part} of 12`;
+  document.getElementById('ex-eyebrow').textContent = `Step ${part} of 6`;
   document.getElementById('ex-title').textContent = ex.title;
   document.getElementById('ex-theme').textContent = ex.theme;
   document.getElementById('ex-lesson').textContent = ex.lesson;
@@ -3022,7 +2969,7 @@ function openExercise(part) {
   if (part > 1) {
     const prev = EXERCISES[part - 2];
     prevBtn.disabled = false;
-    document.getElementById('prev-part').textContent = `Part ${prev.part}`;
+    document.getElementById('prev-part').textContent = `Step ${prev.part}`;
     document.getElementById('prev-title').textContent = prev.title;
     prevBtn.onclick = () => openExercise(prev.part);
   } else {
@@ -3030,10 +2977,10 @@ function openExercise(part) {
     document.getElementById('prev-part').textContent = '';
     document.getElementById('prev-title').textContent = '';
   }
-  if (part < 12) {
+  if (part < 6) {
     const next = EXERCISES[part];
     nextBtn.disabled = false;
-    document.getElementById('next-part').textContent = `Part ${next.part}`;
+    document.getElementById('next-part').textContent = `Step ${next.part}`;
     document.getElementById('next-title').textContent = next.title;
     nextBtn.onclick = () => openExercise(next.part);
   } else {
@@ -3111,7 +3058,7 @@ document.getElementById('share-exercise').addEventListener('click', async () => 
   const url = `${location.origin}/exercises?part=${currentPart || 1}`;
   const text = ex
     ? `${ex.title}\n\n${ex.lesson}\n\n${url}`
-    : `Lucky Exercises — 12 rewiring practices for real-world action. ${url}`;
+    : `Lucky Exercises — six practical steps from vision to action. ${url}`;
   const status = document.getElementById('share-status');
   try {
     if (navigator.share) {
@@ -3398,7 +3345,7 @@ function showToast(msg, durationMs = 3500) {
 (function handlePartParam() {
   const params = new URLSearchParams(location.search);
   const part = parseInt(params.get('part'));
-  if (part >= 1 && part <= 12) {
+  if (part >= 1 && part <= 6) {
     history.replaceState(null, '', location.pathname);
     openExercise(part);
   } else {
