@@ -1,6 +1,9 @@
 const TTS_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts';
-const VOICE = 'Sulafat'; // documented as a "Warm" prebuilt voice — closest match to the prior narrator
-const STYLE_PREFIX = 'Say in a warm, gentle, unhurried voice, as if calmly guiding someone through a meditation exercise: ';
+const VOICES = { en: 'Sulafat', zh: 'Achernar' };
+const STYLE_PREFIXES = {
+  en: 'Say in a warm, gentle, unhurried voice, as if calmly guiding someone through a meditation exercise: ',
+  zh: 'Say the following Mandarin Chinese text in a warm, soothing, unhurried voice, as if calmly guiding someone through a meditation exercise: ',
+};
 const MAX_CHARS = 4096;
 
 const rateLimitMap = new Map(); // ip → { count, windowStart }
@@ -96,7 +99,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON body' });
   }
 
-  const { text } = body ?? {};
+  const { text, language } = body ?? {};
+  const selectedLanguage = language === 'zh' ? 'zh' : 'en';
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
     return res.status(400).json({ error: 'text is required' });
   }
@@ -119,10 +123,10 @@ export default async function handler(req, res) {
         'x-goog-api-key': apiKey,
       },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: STYLE_PREFIX + text.trim() }] }],
+        contents: [{ parts: [{ text: STYLE_PREFIXES[selectedLanguage] + text.trim() }] }],
         generationConfig: {
           responseModalities: ['AUDIO'],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } },
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICES[selectedLanguage] } } },
         },
       }),
     });

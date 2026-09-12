@@ -1440,10 +1440,10 @@ async function speakExercise(ex) {
       if (cached[i]) {
         buffers.push(cached[i]);
       } else {
-        const res = await fetch('/api/speak-zh', {
+        const res = await fetch('/api/speak', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: segments[i].text }),
+          body: JSON.stringify({ text: segments[i].text, language: 'zh' }),
         });
         if (!res.ok) {
           const err = await res.json().catch(() => ({ error: res.statusText }));
