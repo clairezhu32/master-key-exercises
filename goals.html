@@ -26,6 +26,13 @@
     .choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .choice { padding:15px; border:1px solid var(--line); border-radius:10px; color:var(--muted); background:var(--panel2); text-align:left; }
     .choice.selected { border-color:var(--violet); color:var(--text); background:rgba(157,140,255,.12); }
+    .choices.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .choice-instruction { margin:0 0 10px; color:var(--muted); font-size:12px; font-weight:700; }
+    .field-label { display:block; margin:22px 0 8px; color:var(--text); font-size:13px; font-weight:700; }
+    .answer-guide { margin:0 0 18px; padding:14px 16px; border-left:2px solid var(--mint); color:var(--muted); background:rgba(113,229,193,.045); font-size:13px; line-height:1.55; }
+    .answer-guide strong { color:var(--text); }
+    .answer-guide span { display:block; margin-top:5px; color:#858da8; }
+    textarea.short-answer { min-height:105px; }
     .nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:24px; }
     .back { border:0; color:var(--muted); background:none; }
     .primary { min-height:46px; padding:0 22px; border:0; border-radius:9px; color:#07140f; background:linear-gradient(110deg,var(--mint),var(--violet)); font-weight:700; }
@@ -148,7 +155,7 @@
     .modal-actions .primary { flex:1; }
     .modal-actions .secondary { flex:0 0 auto; }
     .thank-you { color:var(--mint); font-size:13px; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%} }
   </style>
   <style>
     :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
@@ -198,24 +205,75 @@
     <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your plan…</h2><p>Checking your Lucky account for a saved plan.</p></section>
     <section class="card" id="wizard">
       <div class="step active" id="step-1">
-        <div class="num">Question 1 of 9</div><div class="question">What area of your life is this goal in?</div>
-        <div class="hint">Choose the area where focused action over the next 90 days would matter most.</div>
+        <div class="num">Question 1 of 9 · Choose your focus</div><div class="question">Which part of your life do you most want to change in the next 90 days?</div>
+        <div class="hint">Choose one area—even if other parts of your life matter too. A focused plan is easier to act on and measure.</div>
         <div class="choices" id="category-choices">
-          <button class="choice" data-category="Career breakthrough">Career</button><button class="choice" data-category="Financial abundance">Money &amp; finances</button>
-          <button class="choice" data-category="Relationship & connection">Relationship &amp; connection</button><button class="choice" data-category="Health & energy">Health &amp; energy</button>
-          <button class="choice" data-category="Launching something of my own">Launching something of my own</button><button class="choice" data-category="Inner peace">Inner peace</button>
-          <button class="choice" data-category="Something else">Something else</button>
+          <button type="button" class="choice" data-value="Career breakthrough">Career or job search</button><button type="button" class="choice" data-value="Financial progress">Money &amp; finances</button>
+          <button type="button" class="choice" data-value="Relationships and social connection">Relationships &amp; social life</button><button type="button" class="choice" data-value="Health and energy">Health &amp; energy</button>
+          <button type="button" class="choice" data-value="Launching something of my own">Business or creative launch</button><button type="button" class="choice" data-value="Personal growth and inner wellbeing">Personal growth &amp; wellbeing</button>
+          <button type="button" class="choice" data-value="Something else">Something else</button>
         </div>
         <div class="nav"><span class="progress">1 / 9</span><button class="primary" id="next-1" disabled>Continue →</button></div>
       </div>
-      <div class="step" id="step-2"><div class="num">Question 2 of 9</div><div class="question">What measurable result do you want by the end of 90 days?</div><div class="hint">Name the number, observable result, or clear evidence that will show meaningful progress.</div><textarea id="goal" placeholder="In 90 days, I will have…"></textarea><div class="nav"><button class="back" data-back="1">← Back</button><span class="progress">2 / 9</span><button class="primary" data-next="3" data-require="goal">Continue →</button></div><div class="error-inline"></div></div>
-      <div class="step" id="step-3"><div class="num">Question 3 of 9</div><div class="question">Where are you today?</div><div class="hint">Describe your starting point: what is working, what is unfinished, and what is currently true.</div><textarea id="baseline" placeholder="Today, my situation is…"></textarea><div class="nav"><button class="back" data-back="2">← Back</button><span class="progress">3 / 9</span><button class="primary" data-next="4" data-require="baseline">Continue →</button></div><div class="error-inline"></div></div>
-      <div class="step" id="step-4"><div class="num">Question 4 of 9</div><div class="question">What needs to change to get from here to there?</div><div class="hint">Consider the real gap: skills, habits, relationships, resources, decisions, opportunities, or beliefs.</div><textarea id="gap" placeholder="The biggest changes I need are…"></textarea><div class="nav"><button class="back" data-back="3">← Back</button><span class="progress">4 / 9</span><button class="primary" data-next="5">Continue →</button></div></div>
-      <div class="step" id="step-5"><div class="num">Question 5 of 9</div><div class="question">What have you already tried—and what happened?</div><div class="hint">This keeps your plan from repeating strategies that have already failed or been exhausted.</div><textarea id="tried" placeholder="I tried… The result was…"></textarea><div class="nav"><button class="back" data-back="4">← Back</button><span class="progress">5 / 9</span><button class="primary" data-next="6">Continue →</button></div></div>
-      <div class="step" id="step-6"><div class="num">Question 6 of 9</div><div class="question">What strengths, resources, or opportunities can you leverage?</div><div class="hint">Build from what you already have, then choose a realistic weekly commitment.</div><textarea id="resources" placeholder="I can leverage…"></textarea><div class="choices" id="hour-choices"><button class="choice" data-hours="1-2">1–2 hours</button><button class="choice" data-hours="3-5">3–5 hours</button><button class="choice" data-hours="5-10">5–10 hours</button><button class="choice" data-hours="10+">10+ hours</button></div><input id="schedule" placeholder="Which days or time blocks can you protect?"><select id="start-week"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select><div class="nav"><button class="back" data-back="5">← Back</button><span class="progress">6 / 9</span><button class="primary" id="next-6" disabled>Continue →</button></div></div>
-      <div class="step" id="step-7"><div class="num">Question 7 of 9</div><div class="question">What can you realistically commit—and what must you protect?</div><div class="hint">Name the constraints the plan must respect: family, health, money, work, relationships, or other non-negotiables.</div><textarea id="constraints" placeholder="I can commit to… I need to protect…"></textarea><div class="nav"><button class="back" data-back="6">← Back</button><span class="progress">7 / 9</span><button class="primary" data-next="8">Continue →</button></div></div>
-      <div class="step" id="step-8"><div class="num">Question 8 of 9</div><div class="question">Why does this matter—and what could realistically derail you?</div><div class="hint">Connect the goal to what matters most, then name the failure modes the plan should anticipate.</div><textarea id="why" placeholder="This matters because…"></textarea><textarea id="obstacle" placeholder="What could derail me is…"></textarea><div class="nav"><button class="back" data-back="7">← Back</button><span class="progress">8 / 9</span><button class="primary" data-next="9">Continue →</button></div></div>
-      <div class="step" id="step-9"><div class="num">Question 9 of 9</div><div class="question">What would make the first seven days a success?</div><div class="hint">Choose one small result you can see or measure. Your personalized first week is free; the remaining 11 weeks are available as a paid upgrade.</div><textarea id="first-week" placeholder="In the first seven days, I will…"></textarea><div class="nav"><button class="back" data-back="8">← Back</button><span class="progress">9 / 9</span><button class="primary" id="finish">Build my plan →</button></div><div class="error-inline" id="finish-error"></div></div>
+      <div class="step" id="step-2">
+        <div class="num">Question 2 of 9 · Define success</div><div class="question">By Day 90, what result would make this effort worthwhile?</div>
+        <div class="hint">Choose the kind of evidence you want, then describe a result another person could recognize as complete.</div>
+        <div class="choice-instruction">Choose the closest result type</div><div class="choices three" id="outcome-choices"><button type="button" class="choice" data-value="A finished deliverable">Finish or launch something</button><button type="button" class="choice" data-value="A measurable number reached">Reach a measurable number</button><button type="button" class="choice" data-value="A new opportunity created">Create an opportunity</button><button type="button" class="choice" data-value="A consistent habit established">Build a consistent habit</button><button type="button" class="choice" data-value="A decision made and acted on">Make and act on a decision</button><button type="button" class="choice" data-value="Another form of evidence">Something else</button></div>
+        <label class="field-label" for="goal">Describe your 90-day outcome</label><div class="answer-guide"><strong>A useful answer is specific, observable and realistic enough to influence.</strong><span>Example: “Build two PM case studies, have 15 conversations with product leaders, and reach three interview processes for product roles in tech.”</span></div><textarea id="goal" placeholder="By Day 90, I will…"></textarea>
+        <div class="nav"><button class="back" data-back="1">← Back</button><span class="progress">2 / 9</span><button class="primary" data-next="3" data-require="goal" data-require-selection="outcomeType">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-3">
+        <div class="num">Question 3 of 9 · Name your starting point</div><div class="question">Where are you now in relation to this goal?</div>
+        <div class="hint">A plan can only be realistic when Lucky understands the distance between today and Day 90.</div>
+        <div class="choice-instruction">Choose your current stage</div><div class="choices" id="stage-choices"><button type="button" class="choice" data-value="Not started yet">I haven’t started</button><button type="button" class="choice" data-value="Started, but without a clear plan">I’ve started without a plan</button><button type="button" class="choice" data-value="Taking action inconsistently">My action is inconsistent</button><button type="button" class="choice" data-value="Making steady progress">I’m making steady progress</button><button type="button" class="choice" data-value="Stuck after a setback">I’m stuck or restarting</button></div>
+        <label class="field-label" for="baseline">Give Lucky the facts</label><div class="answer-guide"><strong>Include what already exists, any relevant numbers, and what is missing.</strong><span>Example: “I have 10 years in product analytics but no PM title. My resume is updated; I have not built a PM portfolio or begun outreach.”</span></div><textarea id="baseline" placeholder="Today, I have… I have not yet…"></textarea>
+        <div class="nav"><button class="back" data-back="2">← Back</button><span class="progress">3 / 9</span><button class="primary" data-next="4" data-require="baseline" data-require-selection="currentStage">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-4">
+        <div class="num">Question 4 of 9 · Find the gap</div><div class="question">What needs to change for this goal to become possible?</div>
+        <div class="hint">Select up to three gaps. Think about the real bottleneck, not everything that could be improved.</div>
+        <div class="choice-instruction">Choose all that apply</div><div class="choices three" id="gap-choices"><button type="button" class="choice" data-value="Clarity or strategy">Clarity or strategy</button><button type="button" class="choice" data-value="Skills or knowledge">Skills or knowledge</button><button type="button" class="choice" data-value="Portfolio or proof">Portfolio or proof</button><button type="button" class="choice" data-value="Relationships or access">Relationships or access</button><button type="button" class="choice" data-value="Time or consistency">Time or consistency</button><button type="button" class="choice" data-value="Confidence or beliefs">Confidence or beliefs</button><button type="button" class="choice" data-value="Money or tools">Money or tools</button><button type="button" class="choice" data-value="Accountability or support">Accountability or support</button></div>
+        <label class="field-label" for="gap">What is the most important gap?</label><div class="answer-guide"><strong>Explain why this gap is limiting progress right now.</strong><span>Example: “My analytics background is strong, but I need proof that I can define product direction and lead execution beyond analysis.”</span></div><textarea class="short-answer" id="gap" placeholder="The most important gap is… because…"></textarea>
+        <div class="nav"><button class="back" data-back="3">← Back</button><span class="progress">4 / 9</span><button class="primary" data-next="5" data-require-selection="gapTypes">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-5">
+        <div class="num">Question 5 of 9 · Learn from experience</div><div class="question">What have you already tried, and what did it teach you?</div>
+        <div class="hint">Lucky should build on what helped and avoid repeating an approach that did not fit.</div>
+        <div class="choice-instruction">Which best describes the result so far?</div><div class="choices" id="tried-choices"><button type="button" class="choice" data-value="I have not tried a focused approach yet">I haven’t tried yet</button><button type="button" class="choice" data-value="I planned but struggled to begin">I planned but didn’t begin</button><button type="button" class="choice" data-value="I started and then stopped">I started, then stopped</button><button type="button" class="choice" data-value="It helped partly but needs adjustment">It helped somewhat</button><button type="button" class="choice" data-value="It worked and I want to build on it">It worked—build on it</button></div>
+        <label class="field-label" for="tried">Tell us what happened</label><div class="answer-guide"><strong>Name the action, the result and your best explanation.</strong><span>Example: “I applied to PM roles using my data-science resume. I received few interviews, so I likely need clearer PM positioning and referrals.”</span></div><textarea class="short-answer" id="tried" placeholder="I tried… The result was… I learned…"></textarea>
+        <div class="nav"><button class="back" data-back="4">← Back</button><span class="progress">5 / 9</span><button class="primary" data-next="6" data-require-selection="triedResult">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-6">
+        <div class="num">Question 6 of 9 · Use what you have</div><div class="question">What strengths or resources can help you move faster?</div>
+        <div class="hint">You do not need to start from zero. Select the assets you can genuinely use during these 90 days.</div>
+        <div class="choice-instruction">Choose all that apply</div><div class="choices three" id="resource-choices"><button type="button" class="choice" data-value="Relevant experience or transferable skills">Experience or skills</button><button type="button" class="choice" data-value="People who may advise, introduce or support me">Helpful relationships</button><button type="button" class="choice" data-value="A portfolio, audience or body of work">Portfolio or audience</button><button type="button" class="choice" data-value="Money, tools or paid support">Money or tools</button><button type="button" class="choice" data-value="A community, coach or program">Community or coach</button><button type="button" class="choice" data-value="Energy, persistence or a personal strength">Personal strengths</button></div>
+        <label class="field-label" for="resources">Make the assets concrete</label><div class="answer-guide"><strong>Name people, experience, tools or opportunities you could use.</strong><span>Example: “I have 10 years of product-data experience, former PM colleagues, a work portfolio, and two weekdays I can protect for outreach and case studies.”</span></div><textarea class="short-answer" id="resources" placeholder="I can build on…"></textarea>
+        <div class="nav"><button class="back" data-back="5">← Back</button><span class="progress">6 / 9</span><button class="primary" data-next="7" data-require-selection="resourceTypes">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-7">
+        <div class="num">Question 7 of 9 · Set a sustainable pace</div><div class="question">What can you realistically commit each week?</div>
+        <div class="hint">Choose the time you can sustain on an ordinary week—not your most motivated week. Lucky will size the plan to fit.</div>
+        <div class="choice-instruction">Weekly time available</div><div class="choices" id="hour-choices"><button type="button" class="choice" data-value="1-2">1–2 hours</button><button type="button" class="choice" data-value="3-5">3–5 hours</button><button type="button" class="choice" data-value="5-10">5–10 hours</button><button type="button" class="choice" data-value="10+">10+ hours</button></div>
+        <label class="field-label" for="schedule">When can this work happen?</label><input id="schedule" placeholder="Example: Thursday and Friday mornings, 9:00–11:00">
+        <label class="field-label" for="constraints">What must the plan respect?</label><div class="answer-guide"><strong>Include work, family, health, money or other non-negotiables.</strong><span>Example: “No work on Friday evenings; keep tasks under two hours; spend no more than $200 this month.”</span></div><textarea class="short-answer" id="constraints" placeholder="The plan needs to respect…"></textarea>
+        <label class="field-label" for="start-week">Where should your saved plan begin?</label><select id="start-week"><option value="1">Week 1 — starting fresh</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option></select>
+        <div class="nav"><button class="back" data-back="6">← Back</button><span class="progress">7 / 9</span><button class="primary" data-next="8" data-require-selection="hours">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-8">
+        <div class="num">Question 8 of 9 · Prepare for resistance</div><div class="question">Why is this worth the effort—and what usually gets in the way?</div>
+        <div class="hint">Your reason helps Lucky keep the plan meaningful. Naming likely resistance helps it design around the hard days.</div>
+        <label class="field-label" for="why">Why does this matter now?</label><textarea class="short-answer" id="why" placeholder="This matters now because… If I make progress, it will change…"></textarea>
+        <div class="choice-instruction">What is most likely to derail you? Choose all that apply.</div><div class="choices three" id="obstacle-choices"><button type="button" class="choice" data-value="Procrastination or avoidance">Procrastination</button><button type="button" class="choice" data-value="Self-doubt or fear of failure">Self-doubt</button><button type="button" class="choice" data-value="Perfectionism or overthinking">Perfectionism</button><button type="button" class="choice" data-value="Too many competing priorities">Too many priorities</button><button type="button" class="choice" data-value="Low energy or inconsistent routines">Low energy</button><button type="button" class="choice" data-value="Unclear next steps">Unclear next steps</button><button type="button" class="choice" data-value="Limited support or accountability">Limited support</button><button type="button" class="choice" data-value="An external constraint outside my control">External constraints</button></div>
+        <label class="field-label" for="obstacle">What does that look like for you?</label><textarea class="short-answer" id="obstacle" placeholder="I tend to get stuck when… A realistic warning sign is…"></textarea>
+        <div class="nav"><button class="back" data-back="7">← Back</button><span class="progress">8 / 9</span><button class="primary" data-next="9" data-require="why" data-require-selection="obstacleTypes">Continue →</button></div><div class="error-inline"></div>
+      </div>
+      <div class="step" id="step-9">
+        <div class="num">Question 9 of 9 · Create momentum</div><div class="question">What is one meaningful win you can complete in the first seven days?</div>
+        <div class="hint">Choose a result you control and can verify. It should create evidence or momentum—not complete the whole 90-day goal.</div>
+        <div class="choice-instruction">Choose the closest kind of first win</div><div class="choices three" id="first-week-choices"><button type="button" class="choice" data-value="Make a decision or choose a direction">Make a decision</button><button type="button" class="choice" data-value="Research and create a short target list">Build a target list</button><button type="button" class="choice" data-value="Create a first draft or prototype">Create a first draft</button><button type="button" class="choice" data-value="Contact specific people">Reach out to people</button><button type="button" class="choice" data-value="Complete the first scheduled practice">Complete a practice</button><button type="button" class="choice" data-value="Measure my baseline">Measure a baseline</button></div>
+        <label class="field-label" for="first-week">Make it specific</label><div class="answer-guide"><strong>Use a number, deliverable or scheduled action.</strong><span>Example: “Choose 10 high-fit PM roles, ask five relevant contacts for advice or referrals, and outline my first PM case study.”</span></div><textarea id="first-week" placeholder="In the first seven days, I will…"></textarea>
+        <div class="hint">Your personalized first week is free; the remaining 11 weeks are available as a paid upgrade.</div><div class="nav"><button class="back" data-back="8">← Back</button><span class="progress">9 / 9</span><button class="primary" id="finish">Build my plan →</button></div><div class="error-inline" id="finish-error"></div>
+      </div>
     </section>
 
     <section class="card center" id="generating"><div class="spinner"></div><h2>Building your plan…</h2><p>Lucky is organizing your answers into 12 weeks of focused actions. This can take up to a minute.</p></section>
@@ -238,6 +296,7 @@
     const VISITOR_KEY = 'lucky_visitor_id';
     const BUDDY_LINK_KEY = 'lucky_accountability_buddy_link';
     let currentStep = 1, selectedCategory = '', selectedHours = '', currentSession = null, generationInFlight = false, betaState = null, feedbackStage = null, activeSavedPlan = null, quizStartedTracked = false, accountabilitySyncTimer = null, planAccess = {unlocked:false,source:'free'}, upgradeViewTracked = false, checkoutNotice = '';
+    const selectedOptions = { outcomeType:'', currentStage:'', gapTypes:[], triedResult:'', resourceTypes:[], obstacleTypes:[], firstWeekType:'' };
     if(cohortMode) { document.querySelector('.beta-note').style.display='flex'; document.title='Lucky — Job Search Founding Cohort'; }
 
     function visitorId(){ let id=localStorage.getItem(VISITOR_KEY); if(!id){ id=crypto.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`; localStorage.setItem(VISITOR_KEY,id); } return id; }
@@ -246,15 +305,51 @@
     function showStep(number) { document.getElementById(`step-${currentStep}`).classList.remove('active'); currentStep = number; document.getElementById(`step-${number}`).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
     function showView(id) { ['account-loading','wizard','generating','result','error-view'].forEach(name => document.getElementById(name).style.display = name === id ? 'block' : 'none'); }
     function value(id) { return document.getElementById(id).value.trim(); }
-    function collectAnswers() { const startWeek = Number(document.getElementById('start-week').value) || 1; return { category:selectedCategory, goal:value('goal'), baseline:value('baseline'), gap:value('gap'), tried:value('tried'), resources:value('resources'), constraints:value('constraints'), why:value('why'), obstacle:value('obstacle'), hours:selectedHours, schedule:value('schedule'), first_week:value('first-week'), start_week:startWeek, progress:`90-DAY OUTCOME: ${value('goal')}\n\nGAP TO CLOSE: ${value('gap')}`, createdAt:Date.now()-(startWeek-1)*7*86400000 }; }
+    function collectAnswers() { const startWeek = Number(document.getElementById('start-week').value) || 1; return { category:selectedCategory, goal:value('goal'), outcome_type:selectedOptions.outcomeType, baseline:value('baseline'), current_stage:selectedOptions.currentStage, gap:value('gap'), gap_types:selectedOptions.gapTypes, tried:value('tried'), tried_result:selectedOptions.triedResult, resources:value('resources'), resource_types:selectedOptions.resourceTypes, constraints:value('constraints'), why:value('why'), obstacle:value('obstacle'), obstacle_types:selectedOptions.obstacleTypes, hours:selectedHours, schedule:value('schedule'), first_week:value('first-week'), first_week_type:selectedOptions.firstWeekType, start_week:startWeek, progress:`90-DAY OUTCOME: ${value('goal')}\n\nGAP TO CLOSE: ${value('gap')}`, createdAt:Date.now()-(startWeek-1)*7*86400000 }; }
     function setInlineError(button, message) { const step = button.closest('.step'); const target = step.querySelector('.error-inline'); if(target) target.textContent = message; }
 
-    document.querySelectorAll('#category-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#category-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedCategory = button.dataset.category; document.getElementById('next-1').disabled = false; if(!quizStartedTracked){ quizStartedTracked=true; trackEvent('quiz_started',{category:selectedCategory,source:new URLSearchParams(location.search).get('source')||'direct'}); } }));
-    document.querySelectorAll('#hour-choices .choice').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('#hour-choices .choice').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); selectedHours = button.dataset.hours; document.getElementById('next-6').disabled = false; }));
+    function bindSingleChoice(containerId, key) {
+      const container=document.getElementById(containerId);
+      container.querySelectorAll('.choice').forEach(button=>button.addEventListener('click',()=>{
+        container.querySelectorAll('.choice').forEach(item=>item.classList.remove('selected'));
+        button.classList.add('selected');
+        const choice=button.dataset.value;
+        if(key==='category') {
+          selectedCategory=choice;
+          document.getElementById('next-1').disabled=false;
+          if(!quizStartedTracked){ quizStartedTracked=true; trackEvent('quiz_started',{category:selectedCategory,source:new URLSearchParams(location.search).get('source')||'direct'}); }
+        } else if(key==='hours') selectedHours=choice;
+        else selectedOptions[key]=choice;
+        const error=button.closest('.step')?.querySelector('.error-inline'); if(error) error.textContent='';
+      }));
+    }
+    function bindMultiChoice(containerId, key, max=Infinity) {
+      const container=document.getElementById(containerId);
+      container.querySelectorAll('.choice').forEach(button=>button.addEventListener('click',()=>{
+        const values=selectedOptions[key];
+        const choice=button.dataset.value;
+        const error=button.closest('.step')?.querySelector('.error-inline');
+        if(values.includes(choice)) { selectedOptions[key]=values.filter(item=>item!==choice); button.classList.remove('selected'); if(error) error.textContent=''; }
+        else if(values.length<max) { selectedOptions[key]=[...values,choice]; button.classList.add('selected'); if(error) error.textContent=''; }
+        else if(error) error.textContent=`Choose up to ${max} options, then describe the most important one.`;
+      }));
+    }
+    function hasSelection(key) {
+      const selection=key==='hours'?selectedHours:selectedOptions[key];
+      return Array.isArray(selection)?selection.length>0:!!selection;
+    }
+    bindSingleChoice('category-choices','category');
+    bindSingleChoice('outcome-choices','outcomeType');
+    bindSingleChoice('stage-choices','currentStage');
+    bindMultiChoice('gap-choices','gapTypes',3);
+    bindSingleChoice('tried-choices','triedResult');
+    bindMultiChoice('resource-choices','resourceTypes');
+    bindSingleChoice('hour-choices','hours');
+    bindMultiChoice('obstacle-choices','obstacleTypes');
+    bindSingleChoice('first-week-choices','firstWeekType');
     document.getElementById('next-1').addEventListener('click', () => { trackEvent('quiz_step_completed',{step:1}); showStep(2); });
-    document.getElementById('next-6').addEventListener('click', () => { trackEvent('quiz_step_completed',{step:6}); showStep(7); });
     document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
-    document.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => { const required = button.dataset.require; if(required && !value(required)) { setInlineError(button,'Please answer this question so the plan has enough context.'); return; } trackEvent('quiz_step_completed',{step:Number(button.dataset.next)-1}); showStep(Number(button.dataset.next)); }));
+    document.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => { const required = button.dataset.require; const requiredSelection=button.dataset.requireSelection; if(required && !value(required)) { setInlineError(button,'Add a short answer so Lucky can make the plan specific to you.'); return; } if(requiredSelection && !hasSelection(requiredSelection)) { setInlineError(button,'Choose at least one option before continuing.'); return; } setInlineError(button,''); trackEvent('quiz_step_completed',{step:Number(button.dataset.next)-1}); showStep(Number(button.dataset.next)); }));
 
     function openAuth() { document.getElementById('auth-overlay').style.display = 'grid'; }
     function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
@@ -286,7 +381,7 @@
       finally { button.disabled=false; button.textContent='Unlock Lucky'; }
     });
 
-    document.getElementById('finish').addEventListener('click', async () => { if(!value('first-week')) { document.getElementById('finish-error').textContent = 'Define one concrete first-week result before generating the plan.'; return; } trackEvent('quiz_step_completed',{step:9}); trackEvent('quiz_completed',{category:selectedCategory}); const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
+    document.getElementById('finish').addEventListener('click', async () => { const error=document.getElementById('finish-error'); if(!selectedOptions.firstWeekType) { error.textContent='Choose the kind of first-week win you want to complete.'; return; } if(!value('first-week')) { error.textContent = 'Define one concrete first-week result before generating the plan.'; return; } error.textContent=''; trackEvent('quiz_step_completed',{step:9}); trackEvent('quiz_completed',{category:selectedCategory}); const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); if(!currentSession) { openAuth(); return; } await generatePlan(answers); });
 
     async function generatePlan(answers) {
       if(generationInFlight) return; if(cohortMode && !await ensureBetaAccess()) return; generationInFlight = true; closeAuth(); closeInvite(); showView('generating');

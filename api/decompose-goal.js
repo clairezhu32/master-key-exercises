@@ -331,18 +331,26 @@ ${partList}
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
-function buildUserPrompt({ goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, intensity, category }) {
+function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, gap, gap_types, tried, tried_result, resources, resource_types, constraints, obstacle, obstacle_types, hours, schedule, first_week, first_week_type, intensity, category }) {
+  const choiceList = value => Array.isArray(value) && value.length ? value.join(', ') : '(not specified)';
   return `Goal category: ${category || '(not specified)'}
 Measurable 90-day outcome: ${goal}
+Type of success evidence they selected: ${outcome_type || '(not specified)'}
+Current stage they selected: ${current_stage || '(not specified)'}
 Current baseline: ${baseline || '(not specified)'}
 Why it matters to them: ${why || '(not specified)'}
+Gap categories they selected: ${choiceList(gap_types)}
 The gap they believe must close: ${gap || '(not specified)'}
+Result of previous attempts: ${tried_result || '(not specified)'}
 What they already tried and what happened: ${tried || '(nothing specified)'}
+Resource categories they selected: ${choiceList(resource_types)}
 Resources and advantages already available: ${resources || '(none specified)'}
 Constraints the plan must protect: ${constraints || '(none specified)'}
+Likely derailers they selected: ${choiceList(obstacle_types)}
 Their biggest obstacle right now: ${obstacle || '(not specified)'}
 Hours per week they can commit: ${hours || 'unspecified'} (${intensity} intensity)
 Realistic days or time blocks: ${schedule || '(not specified)'}
+Type of first-week win they selected: ${first_week_type || '(not specified)'}
 What would make the first seven days successful: ${first_week || '(not specified)'}
 
 Build their strategic plan now. Week 1 must directly deliver the first-week success test, and the later weeks must credibly bridge their baseline to the measurable 90-day outcome within the stated time and constraints.`;
@@ -512,7 +520,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, category } = body ?? {};
+  const { goal, outcome_type, baseline, current_stage, why, gap, gap_types, tried, tried_result, resources, resource_types, constraints, obstacle, obstacle_types, hours, schedule, first_week, first_week_type, category } = body ?? {};
   if (!goal?.trim()) return res.status(400).json({ error: 'Goal is required' });
 
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
@@ -525,7 +533,7 @@ export default async function handler(req, res) {
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {
-    const plan = await callGemini({ goal, baseline, why, gap, tried, resources, constraints, obstacle, hours, schedule, first_week, intensity, category }, deadlineAt);
+    const plan = await callGemini({ goal, outcome_type, baseline, current_stage, why, gap, gap_types, tried, tried_result, resources, resource_types, constraints, obstacle, obstacle_types, hours, schedule, first_week, first_week_type, intensity, category }, deadlineAt);
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
     const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);
