@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Six guided Lucky Exercises that connect clear vision, believable thinking and real-world action. Watch, reflect and choose your next step.">
+  <meta name="description" content="Twelve guided Lucky Exercises—two practical 5–10 minute sessions for each step from clear vision to real-world action.">
   <meta property="og:title" content="Lucky Exercises — Six Steps from Vision to Action">
-  <meta property="og:description" content="Six guided Lucky Exercises that connect clear vision, believable thinking and real-world action. Watch, reflect and choose your next step.">
+  <meta property="og:description" content="Twelve guided Lucky Exercises—two practical 5–10 minute sessions for each step from clear vision to real-world action.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lucky-action-plan.vercel.app/exercises">
   <meta property="og:image" content="https://lucky-action-plan.vercel.app/og-exercises.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://lucky-action-plan.vercel.app/og-exercises.jpg">
   <meta name="twitter:title" content="Lucky Exercises — Six Steps from Vision to Action">
-  <meta name="twitter:description" content="Six guided Lucky Exercises that connect clear vision, believable thinking and real-world action. Watch, reflect and choose your next step.">
+  <meta name="twitter:description" content="Twelve guided Lucky Exercises—two practical 5–10 minute sessions for each step from clear vision to real-world action.">
   <link rel="canonical" href="https://lucky-action-plan.vercel.app/exercises">
   <title>Lucky Exercises</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1278,7 +1278,7 @@
 
   <div class="header-progress">
     <div class="progress-label">Progress</div>
-    <div class="progress-count" id="progress-count">0 / 6</div>
+    <div class="progress-count" id="progress-count">0 / 12</div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
     </div>
@@ -1289,7 +1289,7 @@
 <div id="view-list" class="active">
   <div class="list-hero">
     <h1>Turn a meaningful vision into <em>something you do.</em></h1>
-    <p>Move through six practical steps: clarify what you want, rehearse the lived process, examine limiting beliefs, consult your future self, take one real-world action, and stay open to feedback. Each exercise uses the official YouTube player and gives you questions to connect the idea to your own 90-day plan. These are coaching and reflection practices—not therapy, medical treatment, or a guarantee of outcomes.</p>
+    <p>Move through six practical steps: clarify what you want, rehearse the lived process, examine limiting beliefs, consult your future self, take one real-world action, and stay open to feedback. Each step now includes two guided 5–10 minute practices, followed by questions that connect the session to your 90-day plan. Videos play in the official YouTube player. These are coaching and reflection practices—not therapy, medical treatment, or a guarantee of outcomes.</p>
   </div>
   <div class="exercises-grid" id="exercises-grid"></div>
 </div>
@@ -1624,7 +1624,7 @@ async function cloudLoadAll() {
 async function syncLocalToCloud() {
   if (!currentUser) return;
   const store = loadStore();
-  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 6);
+  const parts = Object.keys(store).map(Number).filter(p => p >= 1 && p <= 12);
   if (!parts.length) return;
   await Promise.all(parts.map(part => cloudUpsertProgress(part)));
 }
@@ -2352,65 +2352,131 @@ const SESSION_SUPPORT = [
 
 SESSION_SUPPORT.forEach((support, index) => Object.assign(EXERCISES[index], support));
 
-// "Watch, then answer" simple format for the six-step Lucky method.
+// "Watch, then answer" format: two guided practices for every Lucky method step.
 // audioEmbedId set → openExercise() swaps the full classic
 // flow for just the audio + these questions (see simple-exercise-body).
-// The grid, progress counters and navigation only surface parts 1-6
+// The grid, progress counters and navigation only surface parts 1-12
 // (see renderGrid/updateHeader/openExercise). Parts 7-24 keep their
-// original classic-format data in EXERCISES but are no longer shown.
+// original classic-format data underneath these overrides.
 const SIMPLE_MEDITATION_EXERCISES = [
   {
-    part: 1, title: 'Clarify What You Truly Want', theme: 'Mel Robbins · turn a vague wish into a clear direction',
-    audioEmbedId: '1S1LEoZ_KOg',
+    part: 1, methodStep: 1, practiceNumber: 1,
+    title: 'Set a Clear Intention', theme: '5:34 · YogaEasy · guided intention-setting practice',
+    audioEmbedId: 'Ev8jCxyiZBc',
     simpleQuestions: [
-      'What do you want your life to look and feel like—not only what result do you want?',
-      'Why does this matter to you beyond status, comparison or fear?',
-      'Write one concrete 90-day outcome that would prove meaningful progress.',
+      'What intention felt most honest during the practice?',
+      'Why does it matter to you beyond status, comparison or fear?',
+      'How could that intention shape one choice you make today?',
     ],
   },
   {
-    part: 2, title: 'Visualize the Lived Process', theme: 'Dr. Daniel Amen · use mental rehearsal to prepare for action',
-    audioEmbedId: 'FHm7JBKLX3s',
+    part: 2, methodStep: 1, practiceNumber: 2,
+    title: 'Clarify Today’s Direction', theme: '5:12 · Blissful Meditations · daily intention practice',
+    audioEmbedId: 'O0Bn4EDPhFc',
     simpleQuestions: [
-      'Picture an ordinary day when you are living closer to this goal. What are you doing differently?',
-      'What obstacle appears in the scene, and how do you want to respond?',
-      'Which behavior from that rehearsal can you schedule this week?',
+      'What do you truly want to move toward in the next 90 days?',
+      'What would meaningful progress look like in observable terms?',
+      'Complete this sentence: Today, I intend to…',
     ],
   },
   {
-    part: 3, title: 'Reframe a Limiting Belief', theme: 'Therapy in a Nutshell · examine the belief shaping your behavior',
-    audioEmbedId: '8C6u90ltkSM',
+    part: 3, methodStep: 2, practiceNumber: 1,
+    title: 'Rehearse Goal Achievement', theme: '6:46 · Bernadette Logue · guided goal visualization',
+    audioEmbedId: 'XA_m2_uKlJo',
     simpleQuestions: [
-      'What belief could keep you from following through on this goal?',
-      'What facts support it, and what facts make it incomplete or too absolute?',
-      'What more accurate, believable statement will you test through action?',
+      'What did you see yourself doing—not only receiving—in the visualization?',
+      'Which ordinary habit made the imagined outcome feel believable?',
+      'What part of that process can you rehearse in real life this week?',
     ],
   },
   {
-    part: 4, title: 'Ask Your Future Self', theme: 'Tara Brach · use your future self as a compassionate decision guide',
-    audioEmbedId: 'g5XXQPQofxk',
+    part: 4, methodStep: 2, practiceNumber: 2,
+    title: 'See the Life You’re Building', theme: '5:16 · Lisa Kelly · guided manifestation visualization',
+    audioEmbedId: 'Rk6BOZbYxKM',
+    simpleQuestions: [
+      'What did an ordinary day in that future look and feel like?',
+      'What obstacle might arise, and how did the future version of you respond?',
+      'Which detail from the scene can become a calendar commitment now?',
+    ],
+  },
+  {
+    part: 5, methodStep: 3, practiceNumber: 1,
+    title: 'Release a Limiting Belief', theme: '5:01 · Zenful Life Meditation · guided belief-release practice',
+    audioEmbedId: 'XvU1v1PSc1s',
+    simpleQuestions: [
+      'Which limiting belief became most noticeable during the practice?',
+      'How has that belief affected your choices or follow-through?',
+      'What evidence shows the belief is incomplete rather than an absolute truth?',
+    ],
+  },
+  {
+    part: 6, methodStep: 3, practiceNumber: 2,
+    title: 'Choose a More Helpful Belief', theme: '6:12 · Selene Delio · guided limiting-belief meditation',
+    audioEmbedId: 'EKwFgJLvicY',
+    simpleQuestions: [
+      'What old belief are you ready to question?',
+      'What more accurate and believable statement could replace it?',
+      'What small action would help you test the new belief in reality?',
+    ],
+  },
+  {
+    part: 7, methodStep: 4, practiceNumber: 1,
+    title: 'Meet Your Future Self', theme: '5:40 · Teni Meditations · guided future-self practice',
+    audioEmbedId: 'HHlXMt82P_E',
     simpleQuestions: [
       'What does your future self understand that you are forgetting right now?',
-      'Which repeated behavior—not guaranteed outcome—would make that identity believable?',
-      'What would that version of you choose in the next 24 hours?',
+      'Which repeated behavior helped that version of you grow?',
+      'What advice did you receive about your next decision?',
     ],
   },
   {
-    part: 5, title: 'Take One Real-World Action', theme: 'BJ Fogg · make change small enough to begin and repeat',
-    audioEmbedId: 'AdKUJxjn-R8',
+    part: 8, methodStep: 4, practiceNumber: 2,
+    title: 'Ask Future You', theme: '5:58 · Sheena · guided future-self visualization',
+    audioEmbedId: 'Dm-jYVF9Cns',
     simpleQuestions: [
-      'What action are you currently making too large, vague or difficult?',
-      'What is the smallest useful version you can complete today?',
-      'When and where will you do it, and what cue will help you begin?',
+      'What quality did your future self embody that you can practice now?',
+      'What did that version of you stop doing or carrying?',
+      'What would future you choose in the next 24 hours?',
     ],
   },
   {
-    part: 6, title: 'Commit to the Goal, Release the Route', theme: 'Tara Brach · let go of over-control and listen to reality',
-    audioEmbedId: '-40Tgg07J9A',
+    part: 9, methodStep: 5, practiceNumber: 1,
+    title: 'Move Through Procrastination', theme: '5:55 · Lavendaire · guided focus and clarity meditation',
+    audioEmbedId: 'suGx3T1QtLc',
     simpleQuestions: [
-      'What are you trying to control that is not fully under your control?',
-      'What feedback from reality deserves your attention rather than resistance?',
-      'What will you keep, change or release in the next week?',
+      'What useful action have you been avoiding?',
+      'What is the smallest version you can complete today?',
+      'When and where will you begin it?',
+    ],
+  },
+  {
+    part: 10, methodStep: 5, practiceNumber: 2,
+    title: 'Begin with Focus', theme: '5:17 · Great Meditation · guided productivity meditation',
+    audioEmbedId: 'tI16SNCtMrQ',
+    simpleQuestions: [
+      'What single action deserves your attention after this practice?',
+      'What distraction will you remove before you start?',
+      'What five-minute opening move will create momentum?',
+    ],
+  },
+  {
+    part: 11, methodStep: 6, practiceNumber: 1,
+    title: 'Practice Letting Go', theme: '5:31 · 5 Minutes by Great Meditation · guided letting-go meditation',
+    audioEmbedId: 'kdvXOVBvtxc',
+    simpleQuestions: [
+      'What outcome or route are you trying to control too tightly?',
+      'What remains fully within your control?',
+      'What can you release while still honoring the goal?',
+    ],
+  },
+  {
+    part: 12, methodStep: 6, practiceNumber: 2,
+    title: 'Trust the Unfolding', theme: '10:01 · Gabby Bernstein · guided trust and release meditation',
+    audioEmbedId: '-tstMnoMpIo',
+    simpleQuestions: [
+      'What feedback from reality deserves curiosity rather than resistance?',
+      'Where could a different route serve the same meaningful goal?',
+      'What will you keep, change or release this week?',
     ],
   },
 ];
@@ -2667,21 +2733,21 @@ function getCompletedParts() {
 // ── Render helpers ────────────────────────────
 function updateHeader() {
   const completed = getCompletedParts();
-  const count = completed.filter(p => p <= 6).length;
-  document.getElementById('progress-count').textContent = `${count} / 6`;
-  document.getElementById('progress-bar').style.width = `${(count / 6) * 100}%`;
+  const count = completed.filter(p => p <= 12).length;
+  document.getElementById('progress-count').textContent = `${count} / 12`;
+  document.getElementById('progress-bar').style.width = `${(count / 12) * 100}%`;
 }
 
 function renderGrid() {
   const grid = document.getElementById('exercises-grid');
   const completed = getCompletedParts();
-  grid.innerHTML = EXERCISES.filter(ex => ex.part <= 6).map(ex => {
+  grid.innerHTML = EXERCISES.filter(ex => ex.part <= 12).map(ex => {
     const done = completed.includes(ex.part);
     const data = getExData(ex.part);
     const sessionCount = data.sessions.length;
     return `
       <div class="exercise-card ${done ? 'completed' : ''}" data-part="${ex.part}">
-        <div class="card-part">Step <span>${String(ex.part).padStart(2, '0')}</span></div>
+        <div class="card-part">Step <span>${ex.methodStep}</span> · Practice ${ex.practiceNumber}</div>
         <div class="card-title">${ex.title}</div>
         <div class="card-theme">${ex.theme}</div>
         <div class="card-footer">
@@ -2875,7 +2941,7 @@ function openExercise(part) {
   const data = getExData(part);
 
   // Populate content
-  document.getElementById('ex-eyebrow').textContent = `Step ${part} of 6`;
+  document.getElementById('ex-eyebrow').textContent = `Lucky Step ${ex.methodStep} · Practice ${ex.practiceNumber} of 2`;
   document.getElementById('ex-title').textContent = ex.title;
   document.getElementById('ex-theme').textContent = ex.theme;
   document.getElementById('ex-lesson').textContent = ex.lesson;
@@ -2969,7 +3035,7 @@ function openExercise(part) {
   if (part > 1) {
     const prev = EXERCISES[part - 2];
     prevBtn.disabled = false;
-    document.getElementById('prev-part').textContent = `Step ${prev.part}`;
+    document.getElementById('prev-part').textContent = `Step ${prev.methodStep} · Practice ${prev.practiceNumber}`;
     document.getElementById('prev-title').textContent = prev.title;
     prevBtn.onclick = () => openExercise(prev.part);
   } else {
@@ -2977,10 +3043,10 @@ function openExercise(part) {
     document.getElementById('prev-part').textContent = '';
     document.getElementById('prev-title').textContent = '';
   }
-  if (part < 6) {
+  if (part < 12) {
     const next = EXERCISES[part];
     nextBtn.disabled = false;
-    document.getElementById('next-part').textContent = `Step ${next.part}`;
+    document.getElementById('next-part').textContent = `Step ${next.methodStep} · Practice ${next.practiceNumber}`;
     document.getElementById('next-title').textContent = next.title;
     nextBtn.onclick = () => openExercise(next.part);
   } else {
@@ -3057,8 +3123,8 @@ document.getElementById('share-exercise').addEventListener('click', async () => 
   const ex = currentPart ? EXERCISES[currentPart - 1] : null;
   const url = `${location.origin}/exercises?part=${currentPart || 1}`;
   const text = ex
-    ? `${ex.title}\n\n${ex.lesson}\n\n${url}`
-    : `Lucky Exercises — six practical steps from vision to action. ${url}`;
+    ? `${ex.title}\n\n${ex.theme}\n\n${url}`
+    : `Lucky Exercises — 12 guided practices across six steps from vision to action. ${url}`;
   const status = document.getElementById('share-status');
   try {
     if (navigator.share) {
@@ -3341,13 +3407,17 @@ function showToast(msg, durationMs = 3500) {
   toast._timer = setTimeout(() => toast.classList.remove('show'), durationMs);
 }
 
-// Open a specific part if ?part=N is in the URL (linked from intro page)
+// Open a specific practice with ?part=N, or the first practice for a method step with ?step=N.
 (function handlePartParam() {
   const params = new URLSearchParams(location.search);
   const part = parseInt(params.get('part'));
-  if (part >= 1 && part <= 6) {
+  const step = parseInt(params.get('step'));
+  const requestedPart = part >= 1 && part <= 12
+    ? part
+    : (step >= 1 && step <= 6 ? ((step - 1) * 2) + 1 : null);
+  if (requestedPart) {
     history.replaceState(null, '', location.pathname);
-    openExercise(part);
+    openExercise(requestedPart);
   } else {
     renderGrid();
     updateHeader();
