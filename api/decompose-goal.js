@@ -48,6 +48,14 @@ function isAllowedOrigin(origin) {
   return false;
 }
 
+function getRequestOrigin(req) {
+  if (req.headers.origin) return req.headers.origin;
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  const fallbackProtocol = host.startsWith('localhost') ? 'http' : 'https';
+  const protocol = String(req.headers['x-forwarded-proto'] || fallbackProtocol).split(',')[0].trim();
+  return host ? `${protocol}://${host}` : '';
+}
+
 function getClientIp(req) {
   return req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0].trim() || 'unknown';
 }
@@ -500,7 +508,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const origin = req.headers.origin || '';
+  // Same-origin GET requests commonly omit Origin. In that case, reconstruct
+  // the request origin from Vercel's trusted forwarded host/protocol headers.
+  const origin = getRequestOrigin(req);
   if (!isAllowedOrigin(origin)) return res.status(403).json({ error: 'Forbidden' });
 
   const ip = getClientIp(req);
