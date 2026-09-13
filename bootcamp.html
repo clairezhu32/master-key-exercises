@@ -118,7 +118,7 @@
 
     document.getElementById('bootcamp-google-sign-in').addEventListener('click',async event=>{
       const button=event.currentTarget; button.disabled=true; button.textContent='Redirecting…';
-      await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/bootcamp'}});
+      await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/goals'}});
     });
 
     document.getElementById('access-form').addEventListener('submit',async event=>{

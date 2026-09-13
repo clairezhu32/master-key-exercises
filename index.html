@@ -522,7 +522,15 @@
     const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const PENDING_INVITE_KEY = 'lucky_pending_invite_code';
     let currentUser = null;
+    let resumingInvite = false;
+
+    function resumeVerifiedInvite(session) {
+      if(resumingInvite || !session?.user || !sessionStorage.getItem(PENDING_INVITE_KEY)) return;
+      resumingInvite = true;
+      window.location.replace('/goals');
+    }
 
     function updateAuthUI() {
       const signinBtn = document.getElementById('auth-signin-btn');
@@ -585,7 +593,9 @@
     sb.auth.onAuthStateChange((event, session) => {
       currentUser = session?.user ?? null;
       updateAuthUI();
+      resumeVerifiedInvite(session);
     });
+    sb.auth.getSession().then(({data})=>resumeVerifiedInvite(data.session));
 
     document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
     document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
