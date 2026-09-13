@@ -4,12 +4,33 @@ const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const BUILT_IN_CODES = new Map([
   ['2f393d2e18a37dbbe6dca3414b057b117f8a25bdc54753d1d81ee305dbdfc2d0', { campaign: 'bootcamp-job-search', maxUses: 100, expiresAt: '2026-12-31T23:59:59Z' }],
 ]);
+const validationAttempts = new Map();
+const VALIDATION_WINDOW_MS = 60 * 60 * 1000;
+const VALIDATION_MAX_ATTEMPTS = 20;
 
 function isAllowedOrigin(origin) {
   if (!origin) return false;
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
   if (/^https:\/\/(master-key-exercises|lucky-action-plan)[^.]*\.vercel\.app$/.test(origin)) return true;
   return Boolean(process.env.ALLOWED_ORIGIN && origin === process.env.ALLOWED_ORIGIN);
+}
+
+function getRequestOrigin(req) {
+  if (req.headers.origin) return req.headers.origin;
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  const fallbackProtocol = host.startsWith('localhost') ? 'http' : 'https';
+  const protocol = String(req.headers['x-forwarded-proto'] || fallbackProtocol).split(',')[0].trim();
+  return host ? `${protocol}://${host}` : '';
+}
+
+function validationAllowed(req) {
+  const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
+  const now = Date.now();
+  const entry = validationAttempts.get(ip) || { count: 0, startedAt: now };
+  if (now - entry.startedAt > VALIDATION_WINDOW_MS) { entry.count = 0; entry.startedAt = now; }
+  entry.count += 1;
+  validationAttempts.set(ip, entry);
+  return entry.count <= VALIDATION_MAX_ATTEMPTS;
 }
 
 async function getUser(authHeader, serviceRoleKey) {
@@ -82,11 +103,33 @@ function cleanAnswers(value) {
 }
 
 export default async function handler(req, res) {
-  if (!isAllowedOrigin(req.headers.origin || '')) return res.status(403).json({ error: 'Forbidden' });
+  if (!isAllowedOrigin(getRequestOrigin(req))) return res.status(403).json({ error: 'Forbidden' });
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
 
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) return res.status(500).json({ error: 'Beta access is not configured' });
+
+  let body = {};
+  if (req.method === 'POST') {
+    try { body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {}); }
+    catch { return res.status(400).json({ error: 'Invalid request body' }); }
+  }
+
+  // Code validation intentionally happens before Google sign-in so the user
+  // sees the access requirement first. Redemption still requires an account.
+  if (req.method === 'POST' && body.action === 'validate') {
+    if (!validationAllowed(req)) return res.status(429).json({ error: 'Too many code attempts. Please wait before trying again.' });
+    try {
+      const config = codeConfig(body.code);
+      if (!config) return res.status(403).json({ error: 'That invitation code is not valid. Please check it and try again.' });
+      if (config.expiresAt && Date.now() > new Date(config.expiresAt).getTime()) return res.status(403).json({ error: 'That invitation code has expired.' });
+      if (await campaignUseCount(config.campaign, serviceRoleKey) >= config.maxUses) return res.status(403).json({ error: 'That invitation group is full. Please contact Claire for another code.' });
+      return res.status(200).json({ valid: true, campaign: config.campaign });
+    } catch (error) {
+      return res.status(500).json({ error: error.message || 'Could not validate invitation code' });
+    }
+  }
+
   const user = await getUser(req.headers.authorization, serviceRoleKey);
   if (!user) return res.status(401).json({ error: 'Sign in required' });
 
@@ -100,7 +143,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ allowed: Boolean(access), access, feedback: Object.keys(feedback) });
     }
 
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     if (body.action === 'redeem') {
       if (access) return res.status(200).json({ allowed: true, access });
       const config = codeConfig(body.code);

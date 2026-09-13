@@ -213,9 +213,9 @@
 
     <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your plan…</h2><p>Checking your Lucky account and access.</p></section>
     <section class="card center" id="access-gate">
-      <div class="access-steps"><span class="access-step active" id="access-step-signin">1 · Sign in</span><span class="access-step" id="access-step-code">2 · Invitation</span><span class="access-step">3 · Build</span></div>
-      <div id="access-signin-panel"><div class="eyebrow">Your Lucky account</div><h2>Sign in before building your plan.</h2><p>Lucky saves your answers and plan to one account, so you can return to your weekly actions and progress.</p><div class="access-panel"><button class="google" id="gate-google-sign-in">Continue with Google</button><div class="access-note">After signing in, you’ll enter your private-beta invitation code before answering the onboarding questions.</div></div></div>
-      <div id="access-code-panel" style="display:none"><div class="eyebrow">Lucky private beta</div><h2>Enter your invitation code.</h2><p>An invitation is required before you can answer the onboarding questions and generate a plan.</p><form class="access-panel" id="gate-invite-form"><label for="gate-invite-code">Invitation code</label><input id="gate-invite-code" autocomplete="off" placeholder="LUCKY-…" required><div class="modal-error" id="gate-invite-error"></div><button class="primary" id="gate-redeem-code" type="submit" style="width:100%">Continue to onboarding →</button><div class="access-note">Don’t have a code? Contact Claire or the community leader who invited you.</div></form></div>
+      <div class="access-steps"><span class="access-step active" id="access-step-code">1 · Invitation</span><span class="access-step" id="access-step-signin">2 · Sign in</span><span class="access-step">3 · Build</span></div>
+      <div id="access-code-panel"><div class="eyebrow">Lucky private beta</div><h2>Enter your invitation code.</h2><p>Verify your invitation first. Then sign in with Google so Lucky can save your plan and progress.</p><form class="access-panel" id="gate-invite-form"><label for="gate-invite-code">Invitation code</label><input id="gate-invite-code" autocomplete="off" placeholder="LUCKY-…" required><div class="modal-error" id="gate-invite-error"></div><button class="primary" id="gate-redeem-code" type="submit" style="width:100%">Verify invitation →</button><div class="access-note">Don’t have a code? Contact Claire or the community leader who invited you.</div></form></div>
+      <div id="access-signin-panel" style="display:none"><div class="eyebrow">Invitation verified</div><h2>Now sign in to build your plan.</h2><p>Lucky connects your answers, action plan and progress to one Google account so you can return later.</p><div class="access-panel"><button class="google" id="gate-google-sign-in">Continue with Google</button><div class="access-note">After signing in, you’ll go directly to the onboarding questions.</div></div></div>
     </section>
     <section class="card" id="wizard">
       <div class="step active" id="step-1">
@@ -314,6 +314,7 @@
     const DRAFT_KEY = 'lucky_builder_draft_v1';
     const PLAN_KEY = 'lucky_builder_plan_v1';
     const PENDING_KEY = 'lucky_builder_generation_pending';
+    const PENDING_INVITE_KEY = 'lucky_pending_invite_code';
     const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp' || new URLSearchParams(window.location.search).get('cohort') === 'bootcamp';
     const VISITOR_KEY = 'lucky_visitor_id';
     const BUDDY_LINK_KEY = 'lucky_accountability_buddy_link';
@@ -403,7 +404,7 @@
       if(!session?.access_token) throw new Error('Sign in before loading your question path.');
       const response=await fetch(`/api/decompose-goal?mode=questions&category=${encodeURIComponent(branch)}`,{headers:{Authorization:`Bearer ${session.access_token}`}});
       const data=await response.json();
-      if(!response.ok) throw new Error(data.error||'Lucky could not prepare this question path.');
+      if(!response.ok) { const error=new Error(data.error||'Lucky could not prepare this question path.'); error.status=response.status; throw error; }
       return data.tree;
     }
     document.getElementById('category-choices').addEventListener('click',async event=>{
@@ -418,7 +419,7 @@
         const tree=await loadQuestionTree(branch); if(requestId!==questionRequestId||selectedBranch!==branch) return;
         questionTree=tree; selectedCategory=tree.label; applyQuestionTree(tree); next.disabled=false; status.textContent=`${selectedCategory} question path ready.`;
         if(!quizStartedTracked){ quizStartedTracked=true; trackEvent('quiz_started',{category:selectedCategory,category_key:selectedBranch,source:new URLSearchParams(location.search).get('source')||'direct'}); }
-      } catch(error) { questionTree=null; status.textContent=error.message; }
+      } catch(error) { questionTree=null; if(error.status===401){ showAccessSignIn(); return; } status.textContent=error.message; }
     });
     bindSingleChoice('stage-choices','currentStage');
     bindSingleChoice('outcome-choices','outcomeType');
@@ -439,19 +440,19 @@
       document.getElementById('access-signin-panel').style.display='block';
       document.getElementById('access-code-panel').style.display='none';
       document.getElementById('access-step-signin').className='access-step active';
-      document.getElementById('access-step-code').className='access-step';
+      document.getElementById('access-step-code').className='access-step done';
     }
     function showAccessCode() {
       showView('access-gate');
       document.getElementById('access-signin-panel').style.display='none';
       document.getElementById('access-code-panel').style.display='block';
-      document.getElementById('access-step-signin').className='access-step done';
+      document.getElementById('access-step-signin').className='access-step';
       document.getElementById('access-step-code').className='access-step active';
       setTimeout(()=>document.getElementById('gate-invite-code').focus(),50);
     }
     async function signInWithGoogle(button) {
       button.disabled=true; button.textContent='Redirecting…';
-      await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+(cohortMode?'/bootcamp':'/goals')}});
+      await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname+window.location.search}});
     }
     document.getElementById('gate-google-sign-in').addEventListener('click',event=>signInWithGoogle(event.currentTarget));
 
@@ -461,19 +462,32 @@
       const response=await fetch('/api/beta-access',{method,headers:{Authorization:`Bearer ${currentSession.access_token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
       const data=await response.json(); if(!response.ok) { const error=new Error(data.error || 'Could not verify beta access'); error.code=data.code; throw error; } return data;
     }
+    async function validateInviteCode(code) {
+      const response=await fetch('/api/beta-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'validate',code})});
+      const data=await response.json(); if(!response.ok) throw new Error(data.error||'Could not verify invitation code'); return data;
+    }
+    async function redeemInviteCode(code) {
+      betaState=await betaRequest('POST',{action:'redeem',code});
+      if(betaState.allowed) sessionStorage.removeItem(PENDING_INVITE_KEY);
+      return betaState;
+    }
     async function refreshBetaAccess() { betaState=await betaRequest(); return betaState; }
     async function ensureBetaAccess() {
-      if(!currentSession) { showAccessSignIn(); return false; }
+      if(!currentSession) { sessionStorage.getItem(PENDING_INVITE_KEY)?showAccessSignIn():showAccessCode(); return false; }
       if(betaState?.allowed) return true;
       try { const state=await refreshBetaAccess(); if(state.allowed) return true; showAccessCode(); return false; }
       catch(error) { showAccessCode(); document.getElementById('gate-invite-error').textContent=error.message; return false; }
     }
-    document.getElementById('enter-code').addEventListener('click',()=>{ if(!currentSession) showAccessSignIn(); else showAccessCode(); });
+    document.getElementById('enter-code').addEventListener('click',showAccessCode);
     document.getElementById('gate-invite-form').addEventListener('submit',async event=>{
-      event.preventDefault(); const button=document.getElementById('gate-redeem-code'), error=document.getElementById('gate-invite-error'); button.disabled=true; button.textContent='Checking…'; error.textContent='';
-      try { betaState=await betaRequest('POST',{action:'redeem',code:document.getElementById('gate-invite-code').value}); document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>'; const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(localStorage.getItem(PENDING_KEY)==='1'&&draft) await generatePlan(draft); else showView('wizard'); }
+      event.preventDefault(); const button=document.getElementById('gate-redeem-code'), error=document.getElementById('gate-invite-error'), code=document.getElementById('gate-invite-code').value.trim().toUpperCase(); button.disabled=true; button.textContent='Verifying…'; error.textContent='';
+      try {
+        await validateInviteCode(code); sessionStorage.setItem(PENDING_INVITE_KEY,code);
+        if(!currentSession){ showAccessSignIn(); return; }
+        await redeemInviteCode(code); document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>'; const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(localStorage.getItem(PENDING_KEY)==='1'&&draft) await generatePlan(draft); else showView('wizard');
+      }
       catch(err) { error.textContent=err.message; }
-      finally { button.disabled=false; button.textContent='Continue to onboarding →'; }
+      finally { button.disabled=false; button.textContent='Verify invitation →'; }
     });
 
     document.getElementById('finish').addEventListener('click', async () => { const error=document.getElementById('finish-error'); if(!selectedOptions.firstWeekType) { error.textContent='Choose the kind of first-week win you want to complete.'; return; } if(!value('first-week')) { error.textContent = 'Define one concrete first-week result before generating the plan.'; return; } error.textContent=''; trackEvent('quiz_step_completed',{step:10}); trackEvent('quiz_completed',{category:selectedCategory,category_key:selectedBranch}); const answers = collectAnswers(); localStorage.setItem(DRAFT_KEY,JSON.stringify(answers)); localStorage.setItem(PENDING_KEY,'1'); await generatePlan(answers); });
@@ -700,13 +714,17 @@
         else if(saved&&!localBelongsToUser){ saved=null; }
       }
       if(saved && currentSession && saved.ownerId === currentSession.user.id){ trackEvent('returning_user',{has_saved_plan:true}); renderPlan(saved); return; }
-      if(!currentSession){ showAccessSignIn(); return; }
+      if(!currentSession){ sessionStorage.getItem(PENDING_INVITE_KEY)?showAccessSignIn():showAccessCode(); return; }
       try {
         await refreshBetaAccess();
-        if(!betaState.allowed){ showAccessCode(); return; }
+        if(!betaState.allowed){
+          const pendingInvite=sessionStorage.getItem(PENDING_INVITE_KEY);
+          if(!pendingInvite){ showAccessCode(); return; }
+          await redeemInviteCode(pendingInvite);
+        }
         if(cohortMode) document.querySelector('.beta-note').innerHTML='<span><strong>Founding member access unlocked</strong> · Thank you for helping improve Lucky.</span>';
       } catch(error) {
-        showAccessCode(); document.getElementById('gate-invite-error').textContent=error.message; return;
+        sessionStorage.removeItem(PENDING_INVITE_KEY); showAccessCode(); document.getElementById('gate-invite-error').textContent=error.message; return;
       }
       if(localStorage.getItem(PENDING_KEY) === '1' && draft) { await generatePlan(draft); return; }
       showView('wizard');
