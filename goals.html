@@ -684,7 +684,17 @@
     document.getElementById('feedback-close').addEventListener('click',deferFeedback); document.getElementById('feedback-later').addEventListener('click',deferFeedback);
     document.getElementById('feedback-form').addEventListener('submit',async event=>{ event.preventDefault(); const button=document.getElementById('feedback-submit'), error=document.getElementById('feedback-error'); const answers=Object.fromEntries(new FormData(event.target).entries()); button.disabled=true; button.textContent='Sending…'; try { betaState=await betaRequest('POST',{action:'feedback',stage:feedbackStage,answers}); document.getElementById('feedback-intro').innerHTML='<span class="thank-you">Thank you—your feedback has been saved.</span>'; document.getElementById('feedback-form').style.display='none'; setTimeout(()=>{ document.getElementById('feedback-overlay').style.display='none'; document.getElementById('feedback-form').style.display='block'; button.textContent='Send feedback'; button.disabled=false; },1200); } catch(err){ error.textContent=err.message; button.disabled=false; button.textContent='Send feedback'; } });
 
-    document.getElementById('retry').addEventListener('click', async () => { const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); if(draft) generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard'); });
+    document.getElementById('retry').addEventListener('click', async event => {
+      const button=event.currentTarget, draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); button.disabled=true; button.textContent='Recovering your plan…';
+      try {
+        const account=await fetchAccountState();
+        if(account?.savedPlan&&currentSession){
+          const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+          localStorage.setItem(PLAN_KEY,JSON.stringify(recovered)); localStorage.removeItem(PENDING_KEY); renderPlan(recovered); return;
+        }
+        if(draft) await generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard');
+      } finally { button.disabled=false; button.textContent='Try again'; }
+    });
     document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
 
     async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/saved-plan',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
