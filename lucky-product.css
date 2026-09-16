@@ -48,6 +48,154 @@ body.exercises-page {
   grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
   gap: 68px;
 }
+.home-page .hero-editorial {
+  position: relative;
+  min-height: 760px;
+  padding: 64px 0 78px;
+  grid-template-columns: minmax(0, .94fr) minmax(500px, 1.06fr);
+  gap: 62px;
+}
+.home-page .hero-editorial::before {
+  content: "";
+  position: absolute;
+  left: -18%;
+  bottom: 5%;
+  width: 58%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(215, 255, 88, .1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.home-page .hero-editorial::after {
+  content: "";
+  position: absolute;
+  left: 39%;
+  bottom: 18%;
+  width: 6px;
+  height: 6px;
+  background: var(--mint);
+  box-shadow: 0 0 18px 5px rgba(215, 255, 88, .42);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.home-page .hero-editorial .hero-copy,
+.home-page .plan-showcase { position: relative; z-index: 1; }
+.home-page .hero-editorial .eyebrow {
+  max-width: 360px;
+  margin-bottom: 34px;
+  color: #cbc9bd;
+  font-size: 14px;
+}
+.home-page .hero.hero-editorial h1 {
+  max-width: 760px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(62px, 7.2vw, 106px);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.065em;
+}
+.home-page .hero.hero-editorial h1 span { color: var(--mint); }
+.home-page .hero-editorial .hero-copy > p {
+  max-width: 520px;
+  margin-top: 36px;
+  color: #c4c3b9;
+  font-size: 19px;
+  line-height: 1.55;
+}
+.home-page .hero-signature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 42px;
+  color: #c4c3b9;
+  font-size: 14px;
+  letter-spacing: .02em;
+}
+.home-page .hero-signature span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  color: var(--mint);
+}
+.home-page .plan-showcase {
+  overflow: hidden;
+  border: 1px solid #4b4b42;
+  border-radius: 4px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(215, 255, 88, .1), transparent 42%),
+    var(--panel);
+  box-shadow: 0 0 70px rgba(215, 255, 88, .06);
+}
+.home-page .plan-showcase-head {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  padding: 30px 34px 26px;
+}
+.home-page .plan-target {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  color: var(--mint);
+  background: #20201b;
+  font-size: 30px;
+}
+.home-page .plan-showcase-head span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--mint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.home-page .plan-showcase-head h2 {
+  max-width: 390px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.32;
+  letter-spacing: -.015em;
+}
+.home-page .plan-week-list { padding: 0 34px; }
+.home-page .plan-week {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 64px 25px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+.home-page .plan-week strong {
+  color: #aaa99e;
+  font-size: 10px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.home-page .plan-week i {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #11110f;
+  background: var(--mint);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+.home-page .plan-week span { color: #deddd3; font-size: 13px; line-height: 1.35; }
+.home-page .plan-showcase-note {
+  margin: 0 34px;
+  padding: 20px 0 24px;
+  border-top: 1px solid var(--line);
+  color: #77776e;
+  font-size: 11px;
+}
 .home-page .eyebrow,
 .home-page .section-kicker {
   color: var(--mint);
@@ -200,12 +348,29 @@ body.exercises-page {
 
 @media (max-width: 800px) {
   .home-page .hero { grid-template-columns: 1fr; }
+  .home-page .hero-editorial { min-height: auto; gap: 56px; }
+  .home-page .hero-editorial::before,
+  .home-page .hero-editorial::after { display: none; }
+  .home-page .plan-showcase { width: min(100%, 620px); }
   .home-page .step-card,
   .home-page .step-card + .step-card { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
 }
 
 @media (max-width: 700px) {
   .home-page .hero h1 { font-size: 44px; }
+  .home-page .hero-editorial { padding-top: 48px; }
+  .home-page .hero.hero-editorial h1 { font-size: clamp(52px, 15vw, 72px); }
+  .home-page .hero-editorial .hero-copy > p { margin-top: 28px; font-size: 17px; }
+  .home-page .hero-editorial .hero-actions { align-items: stretch; flex-direction: column; }
+  .home-page .hero-editorial .button { width: 100%; }
+  .home-page .plan-showcase-head { grid-template-columns: 52px minmax(0, 1fr); padding: 24px 20px 20px; }
+  .home-page .plan-target { width: 48px; height: 48px; font-size: 23px; }
+  .home-page .plan-showcase-head h2 { font-size: 17px; }
+  .home-page .plan-week-list { padding: 0 20px; }
+  .home-page .plan-week { grid-template-columns: 50px 21px minmax(0, 1fr); gap: 10px; }
+  .home-page .plan-week i { width: 19px; height: 19px; }
+  .home-page .plan-week span { font-size: 12px; }
+  .home-page .plan-showcase-note { margin: 0 20px; }
   .home-page .nav-links { gap: 10px; font-size: 11px; }
   .home-page .feature-grid,
   .home-page .paths-grid { grid-template-columns: 1fr; }
