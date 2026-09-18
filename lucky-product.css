@@ -355,42 +355,14 @@ body.exercises-page {
   letter-spacing: .12em;
   text-transform: uppercase;
 }
-.exercises-page .library-modules {
-  width: min(1120px, calc(100% - 64px));
-  margin: 0 auto 72px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.exercises-page .library-module-card {
-  min-height: 230px;
-  padding: 26px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border: 0;
-  border-right: 1px solid var(--border);
-  color: var(--text);
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-.exercises-page .library-module-card:last-child { border-right: 0; }
-.exercises-page .library-module-card:hover,
-.exercises-page .library-module-card.active { background: #1d1d18; }
-.exercises-page .library-module-card.active { box-shadow: inset 0 3px 0 var(--gold); }
-.exercises-page .library-module-number { color: var(--gold); font-size: .74rem; font-weight: 700; }
-.exercises-page .library-module-card strong { margin-top: 42px; font-size: 1.35rem; letter-spacing: -.025em; }
-.exercises-page .library-module-card small { margin-top: 7px; color: var(--text-dim); font-size: .85rem; }
-.exercises-page .library-module-arrow { margin-top: auto; color: var(--text); font-size: .8rem; font-weight: 700; }
 .exercises-page .library-panel {
-  display: none;
+  display: block;
   width: min(1120px, calc(100% - 64px));
-  margin: 0 auto 96px;
+  margin: 0 auto 110px;
+  padding-top: 34px;
+  border-top: 1px solid var(--border);
   scroll-margin-top: 96px;
 }
-.exercises-page .library-panel.active { display: block; }
 .exercises-page .library-panel-head {
   margin-bottom: 24px;
   display: grid;
@@ -447,10 +419,6 @@ body.exercises-page {
   .home-page .plan-showcase { width: min(100%, 620px); }
   .home-page .step-card,
   .home-page .step-card + .step-card { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
-  .exercises-page .library-modules { grid-template-columns: 1fr; }
-  .exercises-page .library-module-card { min-height: 170px; border-right: 0; border-bottom: 1px solid var(--border); }
-  .exercises-page .library-module-card:last-child { border-bottom: 0; }
-  .exercises-page .library-module-card strong { margin-top: 24px; }
   .exercises-page .library-panel-head { grid-template-columns: 1fr; gap: 18px; }
   .exercises-page .placeholder-grid { grid-template-columns: 1fr; }
   .exercises-page .placeholder-card { min-height: 180px; border-right: 0; }
@@ -485,7 +453,6 @@ body.exercises-page {
   .exercises-page .exercises-grid { padding: 0 20px; }
   .exercises-page .exercise-card { grid-template-columns: 58px minmax(0, 1fr); gap: 12px; }
   .exercises-page .card-footer { display: none; }
-  .exercises-page .library-modules,
   .exercises-page .library-panel { width: calc(100% - 40px); }
   .exercises-page .sleep-track-card { grid-template-columns: 38px minmax(0, 1fr); gap: 12px; }
   .exercises-page .sleep-track-duration { grid-column: 2; align-items: flex-start; flex-direction: row; }

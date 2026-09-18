@@ -1293,27 +1293,6 @@
     <p>Choose a guided practice for focused action, a short affirmation for a more supportive mindset, or a calming sleep track for the end of the day. These practices support reflection and consistency; they do not guarantee outcomes or replace professional care.</p>
   </div>
 
-  <div class="library-modules" aria-label="Lucky Library modules">
-    <button class="library-module-card active" type="button" data-module="exercises">
-      <span class="library-module-number">01</span>
-      <strong>Lucky Exercises</strong>
-      <small>12 guided practices</small>
-      <span class="library-module-arrow">Open module →</span>
-    </button>
-    <button class="library-module-card" type="button" data-module="affirmations">
-      <span class="library-module-number">02</span>
-      <strong>Personal Affirmations</strong>
-      <small>Mindset practices · coming soon</small>
-      <span class="library-module-arrow">Preview module →</span>
-    </button>
-    <button class="library-module-card" type="button" data-module="sleep">
-      <span class="library-module-number">03</span>
-      <strong>Sleep Tracks</strong>
-      <small>3 bedtime affirmation tracks</small>
-      <span class="library-module-arrow">Open module →</span>
-    </button>
-  </div>
-
   <section class="library-panel active" id="module-exercises">
     <div class="library-panel-head">
       <div><span>Module 01</span><h2>Lucky Exercises</h2></div>
@@ -1322,7 +1301,7 @@
     <div class="exercises-grid" id="exercises-grid"></div>
   </section>
 
-  <section class="library-panel" id="module-affirmations">
+  <section class="library-panel active" id="module-affirmations">
     <div class="library-panel-head">
       <div><span>Module 02 · In development</span><h2>Personal Affirmations</h2></div>
       <p>Short, grounded practices designed to help you rehearse supportive beliefs before taking action.</p>
@@ -1334,7 +1313,7 @@
     </div>
   </section>
 
-  <section class="library-panel" id="module-sleep">
+  <section class="library-panel active" id="module-sleep">
     <div class="library-panel-head">
       <div><span>Module 03</span><h2>Sleep Tracks</h2></div>
       <p>Gentle before-sleep affirmations for calm, confidence, success, and abundance. Choose a track and let the words close your day.</p>
@@ -3465,7 +3444,6 @@ const SLEEP_TRACKS = [
   }
 ];
 
-let activeLibraryModule = 'exercises';
 let activeSleepTrack = null;
 
 function renderSleepTracks() {
@@ -3478,14 +3456,6 @@ function renderSleepTracks() {
     </button>
   `).join('');
   grid.querySelectorAll('.sleep-track-card').forEach(card => card.addEventListener('click', () => openSleepTrack(card.dataset.track)));
-}
-
-function selectLibraryModule(name, shouldScroll = true) {
-  activeLibraryModule = name;
-  document.querySelectorAll('.library-module-card').forEach(card => card.classList.toggle('active', card.dataset.module === name));
-  document.querySelectorAll('.library-panel').forEach(panel => panel.classList.toggle('active', panel.id === `module-${name}`));
-  if (name === 'sleep' && !document.getElementById('sleep-track-grid').children.length) renderSleepTracks();
-  if (shouldScroll) document.getElementById(`module-${name}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function stopSleepVideo() {
@@ -3505,11 +3475,10 @@ function openSleepTrack(id) {
   showView('library-item');
 }
 
-document.querySelectorAll('.library-module-card').forEach(card => card.addEventListener('click', () => selectLibraryModule(card.dataset.module)));
 document.getElementById('library-item-back').addEventListener('click', () => {
   stopSleepVideo();
   showView('list');
-  selectLibraryModule('sleep', false);
+  requestAnimationFrame(() => document.getElementById('module-sleep').scrollIntoView({ block: 'start' }));
 });
 document.querySelectorAll('#view-exercise textarea').forEach(field => {
   field.disabled = true;
@@ -3531,7 +3500,6 @@ function goToList() {
   updateHeader();
   renderGoalUI();
   showView('list');
-  selectLibraryModule(activeLibraryModule, false);
 }
 
 // Header logo → exercises list
