@@ -345,6 +345,113 @@ body.exercises-page {
 .exercises-page select { border-radius: 3px; box-shadow: none; }
 .exercises-page .goal-banner { display: none !important; }
 .exercises-page .timer-card { display: none; }
+.exercises-page #view-library-item { display: none; }
+.exercises-page #view-library-item.active { display: block; }
+.exercises-page .library-kicker {
+  margin-bottom: 15px;
+  color: var(--gold);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.exercises-page .library-modules {
+  width: min(1120px, calc(100% - 64px));
+  margin: 0 auto 72px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.exercises-page .library-module-card {
+  min-height: 230px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 0;
+  border-right: 1px solid var(--border);
+  color: var(--text);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.exercises-page .library-module-card:last-child { border-right: 0; }
+.exercises-page .library-module-card:hover,
+.exercises-page .library-module-card.active { background: #1d1d18; }
+.exercises-page .library-module-card.active { box-shadow: inset 0 3px 0 var(--gold); }
+.exercises-page .library-module-number { color: var(--gold); font-size: .74rem; font-weight: 700; }
+.exercises-page .library-module-card strong { margin-top: 42px; font-size: 1.35rem; letter-spacing: -.025em; }
+.exercises-page .library-module-card small { margin-top: 7px; color: var(--text-dim); font-size: .85rem; }
+.exercises-page .library-module-arrow { margin-top: auto; color: var(--text); font-size: .8rem; font-weight: 700; }
+.exercises-page .library-panel {
+  display: none;
+  width: min(1120px, calc(100% - 64px));
+  margin: 0 auto 96px;
+  scroll-margin-top: 96px;
+}
+.exercises-page .library-panel.active { display: block; }
+.exercises-page .library-panel-head {
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr);
+  gap: 50px;
+  align-items: end;
+}
+.exercises-page .library-panel-head span { color: var(--gold); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.exercises-page .library-panel-head h2 { margin-top: 8px; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1; letter-spacing: -.05em; }
+.exercises-page .library-panel-head p { color: var(--text-dim); font-size: .94rem; line-height: 1.65; }
+.exercises-page .library-panel .exercises-grid { max-width: none; padding: 0; }
+.exercises-page .placeholder-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--border); }
+.exercises-page .placeholder-card { min-height: 220px; padding: 26px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.exercises-page .placeholder-card:last-child { border-right: 0; }
+.exercises-page .placeholder-card > span { color: var(--text-faint); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.exercises-page .placeholder-card h3 { margin-top: 58px; font-size: 1.18rem; }
+.exercises-page .placeholder-card p { margin-top: 10px; color: var(--text-dim); font-size: .86rem; line-height: 1.55; }
+.exercises-page .sleep-track-grid { border-top: 1px solid var(--border); }
+.exercises-page .sleep-track-card {
+  width: 100%;
+  min-height: 116px;
+  padding: 22px 0;
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 100px;
+  gap: 22px;
+  align-items: center;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.exercises-page .sleep-track-card:hover { background: #1d1d18; }
+.exercises-page .sleep-track-index { color: var(--gold); font-size: .74rem; font-weight: 700; }
+.exercises-page .sleep-track-copy { display: flex; flex-direction: column; gap: 7px; }
+.exercises-page .sleep-track-copy strong { font-size: 1.15rem; }
+.exercises-page .sleep-track-copy small { max-width: 650px; color: var(--text-dim); font-size: .85rem; line-height: 1.5; }
+.exercises-page .sleep-track-duration { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; color: var(--text-faint); font-size: .75rem; }
+.exercises-page .sleep-track-duration b { color: var(--text); font-size: .8rem; }
+.exercises-page .reflection-prompts { padding-left: 22px; color: var(--text-dim); }
+.exercises-page .reflection-prompts li { padding: 8px 0 8px 8px; line-height: 1.55; }
+.exercises-page .intention-wrap,
+.exercises-page .journal-wrap { display: none !important; }
+.exercises-page .library-item-view { padding-bottom: 96px; }
+.exercises-page .sleep-player-card {
+  margin: 34px 0 42px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.exercises-page .sleep-player-card span { color: var(--gold); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.exercises-page .sleep-player-card p { margin-top: 7px; color: var(--text-dim); font-size: .85rem; }
+.exercises-page .sleep-play-button { min-width: 150px; }
+.exercises-page .sleep-script { padding: 8px 0; }
+.exercises-page .sleep-script p { padding: 14px 0; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; line-height: 1.55; }
+.exercises-page .library-safety-note { margin-top: 32px; color: var(--text-faint); font-size: .76rem; line-height: 1.55; }
 
 @media (max-width: 800px) {
   .home-page .hero { grid-template-columns: 1fr; }
@@ -354,6 +461,14 @@ body.exercises-page {
   .home-page .plan-showcase { width: min(100%, 620px); }
   .home-page .step-card,
   .home-page .step-card + .step-card { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+  .exercises-page .library-modules { grid-template-columns: 1fr; }
+  .exercises-page .library-module-card { min-height: 170px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .exercises-page .library-module-card:last-child { border-bottom: 0; }
+  .exercises-page .library-module-card strong { margin-top: 24px; }
+  .exercises-page .library-panel-head { grid-template-columns: 1fr; gap: 18px; }
+  .exercises-page .placeholder-grid { grid-template-columns: 1fr; }
+  .exercises-page .placeholder-card { min-height: 180px; border-right: 0; }
+  .exercises-page .placeholder-card h3 { margin-top: 36px; }
 }
 
 @media (max-width: 700px) {
@@ -384,4 +499,10 @@ body.exercises-page {
   .exercises-page .exercises-grid { padding: 0 20px; }
   .exercises-page .exercise-card { grid-template-columns: 58px minmax(0, 1fr); gap: 12px; }
   .exercises-page .card-footer { display: none; }
+  .exercises-page .library-modules,
+  .exercises-page .library-panel { width: calc(100% - 40px); }
+  .exercises-page .sleep-track-card { grid-template-columns: 38px minmax(0, 1fr); gap: 12px; }
+  .exercises-page .sleep-track-duration { grid-column: 2; align-items: flex-start; flex-direction: row; }
+  .exercises-page .sleep-player-card { align-items: stretch; flex-direction: column; }
+  .exercises-page .sleep-play-button { width: 100%; }
 }
