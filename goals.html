@@ -12,8 +12,11 @@
     button, input, textarea, select { font:inherit; }
     button { cursor:pointer; }
     .shell { width:min(900px,calc(100% - 32px)); margin:0 auto; padding:28px 0 80px; }
-    .brand { display:flex; align-items:center; gap:10px; width:max-content; margin-bottom:26px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
+    .plan-topbar { min-height:46px; margin-bottom:26px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+    .brand { display:flex; align-items:center; gap:10px; width:max-content; color:var(--text); text-decoration:none; font-size:18px; font-weight:700; }
     .brand-mark { width:32px; height:32px; display:grid; place-items:center; border-radius:9px; color:var(--bg); background:linear-gradient(135deg,var(--mint),var(--violet)); font-family:'Playfair Display',serif; }
+    .top-library-link { display:none; align-items:center; min-height:40px; padding:0 15px; border:1px solid var(--line); border-radius:3px; color:#11110f; background:var(--mint); text-decoration:none; font-size:13px; font-weight:800; }
+    .top-library-link:hover { background:#e1ff7b; }
     .card { padding:36px; border:1px solid var(--line); border-radius:22px; background:rgba(19,26,51,.92); box-shadow:0 30px 80px rgba(0,0,0,.28); }
     .step { display:none; }
     .step.active { display:block; }
@@ -106,6 +109,7 @@
     .upgrade-error { width:100%; min-height:17px; color:#ff9d9d; font-size:11px; }
     .checkout-message { display:none; margin:0 0 14px; padding:11px 13px; border:1px solid rgba(157,140,255,.25); border-radius:9px; color:#cfd3e4; background:rgba(157,140,255,.07); font-size:12px; }
     .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+    .result-actions > a[href="/exercises"] { display:none !important; }
     .plan-allowance { width:100%; color:var(--muted); font-size:12px; }
     .saved-state { width:100%; padding:11px 13px; border:1px solid rgba(113,229,193,.2); border-radius:9px; color:var(--mint); background:rgba(113,229,193,.05); font-size:12px; }
     .share-status { width:100%; min-height:18px; color:var(--mint); font-size:11px; }
@@ -164,7 +168,7 @@
     .access-panel label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; font-weight:700; }
     .access-panel input { margin:0 0 10px; }
     .access-note { margin-top:14px; color:#85857c; font-size:11px; line-height:1.5; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px} }
   </style>
   <style>
     :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
@@ -208,7 +212,10 @@
 </head>
 <body>
   <main class="shell">
-    <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
+    <div class="plan-topbar">
+      <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
+      <a class="top-library-link" id="top-library-link" href="/exercises">Lucky Library →</a>
+    </div>
     <div class="beta-note"><span><strong>Job Search Founding Cohort</strong> · Enter your invitation code to join and share structured feedback.</span><button type="button" id="enter-code">Enter code</button></div>
 
     <section class="card center" id="account-loading"><div class="spinner"></div><h2>Loading your plan…</h2><p>Checking your Lucky account and access.</p></section>
@@ -705,6 +712,7 @@
 
     async function init() {
       const sessionResult = await sb.auth.getSession(); currentSession = sessionResult.data.session;
+      document.getElementById('top-library-link').style.display = currentSession ? 'inline-flex' : 'none';
       const checkoutParams=new URLSearchParams(location.search), checkoutStatus=checkoutParams.get('checkout'), checkoutSession=checkoutParams.get('session_id');
       if(checkoutStatus==='success'&&checkoutSession) sessionStorage.setItem('lucky_checkout_session',checkoutSession);
       const pendingCheckoutSession=checkoutSession||sessionStorage.getItem('lucky_checkout_session');
