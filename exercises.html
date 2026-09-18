@@ -2788,15 +2788,15 @@ function renderGrid() {
     const data = getExData(ex.part);
     const sessionCount = data.sessions.length;
     return `
-      <div class="exercise-card ${done ? 'completed' : ''}" data-part="${ex.part}">
-        <div class="card-part">Step <span>${ex.methodStep}</span> · Practice ${ex.practiceNumber}</div>
-        <div class="card-title">${ex.title}</div>
-        <div class="card-theme">${ex.theme}</div>
-        <div class="card-footer">
+      <button class="exercise-card ${done ? 'completed' : ''}" type="button" data-part="${ex.part}" aria-label="Open ${ex.title}">
+        <span class="card-part">Step <span>${ex.methodStep}</span> · Practice ${ex.practiceNumber}</span>
+        <span class="card-title">${ex.title}</span>
+        <span class="card-theme">${ex.theme}</span>
+        <span class="card-footer">
           <span class="card-sessions">${sessionCount > 0 ? `${sessionCount} session${sessionCount > 1 ? 's' : ''}` : ''}</span>
-          <span class="card-status ${done ? 'done' : 'pending'}">${done ? '✓ done' : 'begin'}</span>
-        </div>
-      </div>`;
+          <span class="card-status ${done ? 'done' : 'pending'}">${done ? '✓ Completed' : 'Play →'}</span>
+        </span>
+      </button>`;
   }).join('');
 
   grid.querySelectorAll('.exercise-card').forEach(card => {
@@ -3002,8 +3002,9 @@ function openExercise(part) {
   document.getElementById('classic-exercise-body').style.display = simpleMode ? 'none' : '';
   document.getElementById('simple-exercise-body').style.display = simpleMode ? '' : 'none';
   if (simpleMode) {
-    const startParam = ex.audioStartSeconds ? `?start=${ex.audioStartSeconds}` : '';
-    document.getElementById('ex-audio-frame').src = `https://www.youtube.com/embed/${ex.audioEmbedId}${startParam}`;
+    const videoParams = new URLSearchParams({ autoplay: '1', rel: '0' });
+    if (ex.audioStartSeconds) videoParams.set('start', ex.audioStartSeconds);
+    document.getElementById('ex-audio-frame').src = `https://www.youtube.com/embed/${ex.audioEmbedId}?${videoParams}`;
     renderSimpleQuestions(ex, part, data);
   } else {
     document.getElementById('ex-audio-frame').src = '';
@@ -3471,7 +3472,7 @@ function openSleepTrack(id) {
   document.getElementById('library-item-title').textContent = track.title;
   document.getElementById('library-item-theme').textContent = track.theme;
   document.getElementById('library-item-description').textContent = track.description;
-  document.getElementById('library-item-video').src = `https://www.youtube.com/embed/${track.youtubeId}?rel=0`;
+  document.getElementById('library-item-video').src = `https://www.youtube.com/embed/${track.youtubeId}?autoplay=1&rel=0`;
   showView('library-item');
 }
 

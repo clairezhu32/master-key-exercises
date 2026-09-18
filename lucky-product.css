@@ -307,27 +307,33 @@ body.exercises-page {
 .exercises-page .list-hero h1 { max-width: 800px; font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; line-height: 1.02; letter-spacing: -.055em; }
 .exercises-page .list-hero h1 em { font-style: normal; }
 .exercises-page .list-hero p { max-width: 670px; margin: 0; font-size: 1rem; }
-.exercises-page .exercises-grid { display: block; max-width: 920px; padding: 0 32px; }
+.exercises-page .exercises-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 920px; padding: 0 32px; }
 .exercises-page .exercise-card {
-  display: grid;
-  grid-template-columns: 90px minmax(0, 1fr) auto;
-  gap: 20px;
-  align-items: center;
-  padding: 22px 0;
-  border: 0;
-  border-top: 1px solid var(--border);
-  border-radius: 0;
-  background: transparent;
+  width: 100%;
+  min-height: 236px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
 }
-.exercises-page .exercise-card:last-child { border-bottom: 1px solid var(--border); }
-.exercises-page .exercise-card:hover { border-color: var(--text-dim); background: transparent; transform: none; }
+.exercises-page .exercise-card:hover { border-color: var(--gold); background: #1d1d18; transform: translateY(-2px); }
+.exercises-page .exercise-card.completed { border-color: rgba(215,255,88,.45); }
 .exercises-page .exercise-card.completed::after { display: none; }
 .exercises-page .card-part,
 .exercises-page .card-title,
 .exercises-page .card-theme,
 .exercises-page .card-footer { margin: 0; }
-.exercises-page .card-title { font-size: 1.05rem; font-weight: 700; }
-.exercises-page .card-footer { justify-self: end; gap: 18px; }
+.exercises-page .card-part { color: var(--gold); font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.exercises-page .card-title { margin-top: 32px; font-size: 1.08rem; font-weight: 700; line-height: 1.28; }
+.exercises-page .card-theme { margin-top: 9px; color: var(--text-dim); font-size: .78rem; line-height: 1.5; }
+.exercises-page .card-footer { width: 100%; margin-top: auto; padding-top: 24px; display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); }
+.exercises-page .card-status { color: var(--text); font-size: .76rem; font-weight: 700; }
 .exercises-page .exercise-view { max-width: 760px; padding-top: 48px; }
 .exercises-page .ex-title { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; letter-spacing: -.05em; }
 .exercises-page .ex-lesson { font-weight: 400; border-left-color: var(--gold); }
@@ -380,28 +386,26 @@ body.exercises-page {
 .exercises-page .placeholder-card > span { color: var(--text-faint); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .exercises-page .placeholder-card h3 { margin-top: 58px; font-size: 1.18rem; }
 .exercises-page .placeholder-card p { margin-top: 10px; color: var(--text-dim); font-size: .86rem; line-height: 1.55; }
-.exercises-page .sleep-track-grid { border-top: 1px solid var(--border); }
+.exercises-page .sleep-track-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .exercises-page .sleep-track-card {
   width: 100%;
-  min-height: 116px;
-  padding: 22px 0;
-  display: grid;
-  grid-template-columns: 70px minmax(0, 1fr) 100px;
-  gap: 22px;
-  align-items: center;
-  border: 0;
-  border-bottom: 1px solid var(--border);
+  min-height: 236px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid var(--border);
   color: var(--text);
-  background: transparent;
+  background: var(--surface);
   text-align: left;
   cursor: pointer;
 }
-.exercises-page .sleep-track-card:hover { background: #1d1d18; }
+.exercises-page .sleep-track-card:hover { border-color: var(--gold); background: #1d1d18; transform: translateY(-2px); }
 .exercises-page .sleep-track-index { color: var(--gold); font-size: .74rem; font-weight: 700; }
-.exercises-page .sleep-track-copy { display: flex; flex-direction: column; gap: 7px; }
-.exercises-page .sleep-track-copy strong { font-size: 1.15rem; }
+.exercises-page .sleep-track-copy { margin-top: 32px; display: flex; flex-direction: column; gap: 8px; }
+.exercises-page .sleep-track-copy strong { font-size: 1.08rem; line-height: 1.3; }
 .exercises-page .sleep-track-copy small { max-width: 650px; color: var(--text-dim); font-size: .85rem; line-height: 1.5; }
-.exercises-page .sleep-track-duration { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; color: var(--text-faint); font-size: .75rem; }
+.exercises-page .sleep-track-duration { width: 100%; margin-top: auto; padding-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: .75rem; }
 .exercises-page .sleep-track-duration b { color: var(--text); font-size: .8rem; }
 .exercises-page .reflection-prompts { padding-left: 22px; color: var(--text-dim); }
 .exercises-page .reflection-prompts li { padding: 8px 0 8px 8px; line-height: 1.55; }
@@ -420,6 +424,8 @@ body.exercises-page {
   .home-page .step-card,
   .home-page .step-card + .step-card { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .exercises-page .library-panel-head { grid-template-columns: 1fr; gap: 18px; }
+  .exercises-page .exercises-grid,
+  .exercises-page .sleep-track-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .exercises-page .placeholder-grid { grid-template-columns: 1fr; }
   .exercises-page .placeholder-card { min-height: 180px; border-right: 0; }
   .exercises-page .placeholder-card h3 { margin-top: 36px; }
@@ -451,9 +457,9 @@ body.exercises-page {
   .exercises-page .list-hero { margin: 44px auto 30px; }
   .exercises-page .list-hero h1 { font-size: 2.5rem; }
   .exercises-page .exercises-grid { padding: 0 20px; }
-  .exercises-page .exercise-card { grid-template-columns: 58px minmax(0, 1fr); gap: 12px; }
-  .exercises-page .card-footer { display: none; }
+  .exercises-page .exercises-grid,
+  .exercises-page .sleep-track-grid { grid-template-columns: 1fr; }
+  .exercises-page .exercise-card,
+  .exercises-page .sleep-track-card { min-height: 210px; }
   .exercises-page .library-panel { width: calc(100% - 40px); }
-  .exercises-page .sleep-track-card { grid-template-columns: 38px minmax(0, 1fr); gap: 12px; }
-  .exercises-page .sleep-track-duration { grid-column: 2; align-items: flex-start; flex-direction: row; }
 }
