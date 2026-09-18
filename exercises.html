@@ -1544,16 +1544,16 @@
     <div class="ex-eyebrow" id="library-item-eyebrow"></div>
     <h2 class="ex-title" id="library-item-title"></h2>
     <p class="ex-theme" id="library-item-theme"></p>
-    <div class="sleep-player-card">
-      <div>
-        <span>Bedtime narration</span>
-        <p>Get comfortable, lower the lights, and listen without trying to force a particular feeling.</p>
+    <div class="ex-section">
+      <div class="ex-section-label">Watch or listen</div>
+      <div class="audio-embed-wrap sleep-video-wrap">
+        <iframe id="library-item-video" src="" title="Guided sleep affirmation video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
-      <button class="btn sleep-play-button" id="library-item-play" type="button">Play narration</button>
+      <p class="youtube-attribution">Video remains hosted by its creator on YouTube. Lucky uses the official player and keeps YouTube branding, controls, creator information and ads intact. <a href="https://www.youtube.com/static?template=terms" target="_blank" rel="noopener noreferrer">YouTube Terms</a></p>
     </div>
     <div class="ex-section">
-      <div class="ex-section-label">Affirmation script</div>
-      <div class="sleep-script" id="library-item-script"></div>
+      <div class="ex-section-label">About this track</div>
+      <div class="guidance-card" id="library-item-description"></div>
     </div>
     <p class="library-safety-note">This is a relaxation and mindset practice, not a promise of financial or professional outcomes. Do not play while driving or operating equipment.</p>
   </div>
@@ -3441,72 +3441,32 @@ async function speakExercise(ex) {
 const SLEEP_TRACKS = [
   {
     id: 'rest-into-success',
-    title: 'Rest Into Success',
-    theme: 'Before sleep · calm confidence and tomorrow’s next step',
-    duration: '4–6 min',
-    description: 'Release the pressure to solve everything tonight and reconnect success with steady, sustainable action.',
-    lines: [
-      'I let this day be complete.',
-      'I do not need to solve everything tonight.',
-      'Rest is part of the life I am building.',
-      'My mind can become quiet while my body restores itself.',
-      'Success does not require panic, force, or perfection.',
-      'Success grows through clear choices and consistent action.',
-      'I honor the progress I made today, including the progress no one else can see.',
-      'I release the mistakes I cannot change and keep the lessons they offered.',
-      'Tomorrow, I will recognize the next useful step.',
-      'I trust myself to begin that step with calm attention.',
-      'I am becoming someone who follows through without abandoning rest.',
-      'For now, my only task is to sleep.'
-    ]
+    title: 'Positive Affirmations While You Sleep',
+    theme: 'Bob Baker · positive mindset before sleep',
+    duration: '25 min',
+    youtubeId: 'MjGhJn1qcyU',
+    description: 'A gentle collection of positive affirmations designed for bedtime listening and a calmer transition into sleep.'
   },
   {
     id: 'welcome-abundance',
-    title: 'Welcome Abundance',
-    theme: 'Before sleep · opportunity, support and enoughness',
-    duration: '4–6 min',
-    description: 'Practice noticing the opportunities, relationships, ideas, and resources already available to you.',
-    lines: [
-      'I soften the belief that there is never enough.',
-      'Abundance can appear as an idea, a relationship, an opportunity, a resource, or a new path.',
-      'I notice what is already supporting me.',
-      'I am grateful for the abilities, experience, and people I can draw upon.',
-      'I do not have to chase every opportunity to trust that opportunities exist.',
-      'I can choose what fits my values and release what does not.',
-      'I am open to receiving help, feedback, generosity, and collaboration.',
-      'I am also capable of creating value for other people.',
-      'My attention is learning to recognize possibility instead of only scarcity.',
-      'When opportunity appears, I will meet it with preparation and courage.',
-      'I have enough for this moment, and I can build from here.',
-      'Tonight, I rest in gratitude and openness.'
-    ]
+    title: 'Sleep Affirmations for Manifestation',
+    theme: 'Rising Higher Meditation · health, wealth and happiness',
+    duration: '8 hours',
+    youtubeId: 'QvsFVaaCN4A',
+    description: 'An overnight affirmation track centered on health, wealth, happiness, and a more abundant view of possibility.'
   },
   {
     id: 'trust-the-next-chapter',
-    title: 'Trust the Next Chapter',
-    theme: 'Before sleep · release control and stay open to the route',
-    duration: '4–6 min',
-    description: 'Hold your goal with intention while releasing the demand that it arrive through one exact route.',
-    lines: [
-      'I can care deeply about my goal without controlling every detail.',
-      'I release the timetable I cannot command.',
-      'I release the routes that are no longer working.',
-      'A changed path does not mean a failed goal.',
-      'Feedback can guide me without defining my worth.',
-      'I am allowed to learn, adjust, and begin again.',
-      'The right next step may be smaller and simpler than I expected.',
-      'I am open to useful surprises and support from unexpected places.',
-      'I trust myself to recognize what deserves a yes and what deserves a no.',
-      'I carry forward my courage, curiosity, and capacity to act.',
-      'Tomorrow will bring new information and another chance to move.',
-      'Tonight, I release the outcome and allow myself to rest.'
-    ]
+    title: 'Become Your Higher Self',
+    theme: 'Rising Higher Meditation · affirmations for your best life',
+    duration: 'Overnight',
+    youtubeId: 'A9lUlWi05yQ',
+    description: 'A longer before-sleep affirmation practice focused on the beliefs and identity of the person you are becoming.'
   }
 ];
 
 let activeLibraryModule = 'exercises';
 let activeSleepTrack = null;
-let sleepUtterance = null;
 
 function renderSleepTracks() {
   const grid = document.getElementById('sleep-track-grid');
@@ -3528,11 +3488,9 @@ function selectLibraryModule(name, shouldScroll = true) {
   if (shouldScroll) document.getElementById(`module-${name}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function stopSleepNarration() {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  sleepUtterance = null;
-  const button = document.getElementById('library-item-play');
-  if (button) button.textContent = 'Play narration';
+function stopSleepVideo() {
+  const frame = document.getElementById('library-item-video');
+  if (frame) frame.src = '';
 }
 
 function openSleepTrack(id) {
@@ -3542,31 +3500,14 @@ function openSleepTrack(id) {
   document.getElementById('library-item-eyebrow').textContent = `Sleep Track · ${track.duration}`;
   document.getElementById('library-item-title').textContent = track.title;
   document.getElementById('library-item-theme').textContent = track.theme;
-  document.getElementById('library-item-script').innerHTML = track.lines.map(line => `<p>${line}</p>`).join('');
-  stopSleepNarration();
+  document.getElementById('library-item-description').textContent = track.description;
+  document.getElementById('library-item-video').src = `https://www.youtube.com/embed/${track.youtubeId}?rel=0`;
   showView('library-item');
 }
 
-function toggleSleepNarration() {
-  if (!activeSleepTrack || !('speechSynthesis' in window)) return;
-  if (window.speechSynthesis.speaking) {
-    stopSleepNarration();
-    return;
-  }
-  sleepUtterance = new SpeechSynthesisUtterance(activeSleepTrack.lines.join(' ... '));
-  sleepUtterance.rate = .78;
-  sleepUtterance.pitch = .92;
-  sleepUtterance.volume = .9;
-  sleepUtterance.onend = stopSleepNarration;
-  sleepUtterance.onerror = stopSleepNarration;
-  document.getElementById('library-item-play').textContent = 'Stop narration';
-  window.speechSynthesis.speak(sleepUtterance);
-}
-
 document.querySelectorAll('.library-module-card').forEach(card => card.addEventListener('click', () => selectLibraryModule(card.dataset.module)));
-document.getElementById('library-item-play').addEventListener('click', toggleSleepNarration);
 document.getElementById('library-item-back').addEventListener('click', () => {
-  stopSleepNarration();
+  stopSleepVideo();
   showView('list');
   selectLibraryModule('sleep', false);
 });
@@ -3585,7 +3526,7 @@ function showView(name) {
 }
 
 function goToList() {
-  stopSleepNarration();
+  stopSleepVideo();
   renderGrid();
   updateHeader();
   renderGoalUI();
