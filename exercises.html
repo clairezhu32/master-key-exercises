@@ -2787,36 +2787,25 @@ function renderGrid() {
     const done = completed.includes(ex.part);
     const data = getExData(ex.part);
     const sessionCount = data.sessions.length;
+    const startParam = ex.audioStartSeconds ? `&start=${ex.audioStartSeconds}` : '';
     return `
-      <article class="playable-shell" data-exercise-shell="${ex.part}">
-        <button class="exercise-card ${done ? 'completed' : ''}" type="button" data-part="${ex.part}" aria-label="Play ${ex.title}" aria-expanded="false">
+      <article class="library-video-card ${done ? 'completed' : ''}" data-exercise-shell="${ex.part}">
+        <div class="library-video-heading">
           <span class="card-part">Step <span>${ex.methodStep}</span> · Practice ${ex.practiceNumber}</span>
-          <span class="card-title">${ex.title}</span>
-          <span class="card-theme">${ex.theme}</span>
-          <span class="card-footer">
-            <span class="card-sessions">${sessionCount > 0 ? `${sessionCount} session${sessionCount > 1 ? 's' : ''}` : ''}</span>
-            <span class="card-status ${done ? 'done' : 'pending'}">${done ? '✓ Completed · Play' : 'Play →'}</span>
-          </span>
-        </button>
-        <div class="inline-player" hidden>
-          <div class="inline-video-wrap">
-            <iframe title="${ex.title}" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-          </div>
-          <p class="inline-player-note">Played through the official YouTube player with creator information, controls and ads intact.</p>
-          <div class="inline-player-actions">
-            <button class="inline-complete-btn" type="button" data-complete-part="${ex.part}">${done ? '✓ Session completed' : 'Mark session complete'}</button>
-            <button class="inline-close-btn" type="button">Close</button>
-          </div>
+          <h3>${ex.title}</h3>
+          <p>${ex.theme}</p>
+        </div>
+        <div class="inline-video-wrap">
+          <iframe title="${ex.title}" src="https://www.youtube.com/embed/${ex.audioEmbedId}?rel=0${startParam}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+        <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
+        <div class="library-video-footer">
+          <span>${sessionCount > 0 ? `${sessionCount} session${sessionCount > 1 ? 's' : ''}` : 'Not completed yet'}</span>
+          <button class="inline-complete-btn" type="button" data-complete-part="${ex.part}">${done ? '✓ Completed' : 'Mark complete'}</button>
         </div>
       </article>`;
   }).join('');
 
-  grid.querySelectorAll('.exercise-card').forEach(card => {
-    card.addEventListener('click', () => toggleInlineExercise(parseInt(card.dataset.part), card.closest('.playable-shell')));
-  });
-  grid.querySelectorAll('.inline-close-btn').forEach(button => {
-    button.addEventListener('click', () => closeInlinePlayers());
-  });
   grid.querySelectorAll('[data-complete-part]').forEach(button => {
     button.addEventListener('click', () => {
       saveSession(parseInt(button.dataset.completePart));
@@ -2825,43 +2814,6 @@ function renderGrid() {
       showToast('Session completed');
     });
   });
-}
-
-function closeInlinePlayers(exceptShell = null) {
-  document.querySelectorAll('.playable-shell').forEach(shell => {
-    if (shell === exceptShell) return;
-    const panel = shell.querySelector('.inline-player');
-    const frame = panel?.querySelector('iframe');
-    const trigger = shell.querySelector('.exercise-card, .sleep-track-card');
-    if (frame) frame.src = '';
-    if (panel) {
-      panel.hidden = true;
-      panel.classList.remove('is-open');
-    }
-    shell.classList.remove('is-playing');
-    trigger?.setAttribute('aria-expanded', 'false');
-  });
-}
-
-function toggleInlineExercise(part, shell) {
-  const ex = EXERCISES[part - 1];
-  const panel = shell?.querySelector('.inline-player');
-  const frame = panel?.querySelector('iframe');
-  const trigger = shell?.querySelector('.exercise-card');
-  if (!ex || !panel || !frame || !trigger) return;
-  if (!panel.hidden) {
-    closeInlinePlayers();
-    return;
-  }
-  closeInlinePlayers(shell);
-  const videoParams = new URLSearchParams({ autoplay: '1', rel: '0' });
-  if (ex.audioStartSeconds) videoParams.set('start', ex.audioStartSeconds);
-  frame.src = `https://www.youtube.com/embed/${ex.audioEmbedId}?${videoParams}`;
-  panel.hidden = false;
-  panel.classList.add('is-open');
-  shell.classList.add('is-playing');
-  trigger.setAttribute('aria-expanded', 'true');
-  requestAnimationFrame(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 }
 
 // ── Exercise view ─────────────────────────────
@@ -3510,42 +3462,19 @@ let activeSleepTrack = null;
 function renderSleepTracks() {
   const grid = document.getElementById('sleep-track-grid');
   grid.innerHTML = SLEEP_TRACKS.map((track, index) => `
-    <article class="playable-shell" data-sleep-shell="${track.id}">
-      <button class="sleep-track-card" type="button" data-track="${track.id}" aria-label="Play ${track.title}" aria-expanded="false">
-        <span class="sleep-track-index">0${index + 1}</span>
-        <span class="sleep-track-copy"><strong>${track.title}</strong><small>${track.description}</small></span>
-        <span class="sleep-track-duration">${track.duration}<b>Listen →</b></span>
-      </button>
-      <div class="inline-player" hidden>
-        <div class="inline-video-wrap">
-          <iframe title="${track.title}" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        </div>
-        <p class="inline-player-note">Played through the official YouTube player with creator information, controls and ads intact.</p>
-        <button class="inline-close-btn" type="button">Close</button>
+    <article class="library-video-card" data-sleep-shell="${track.id}">
+      <div class="library-video-heading">
+        <span class="card-part">Sleep Track 0${index + 1} · ${track.duration}</span>
+        <h3>${track.title}</h3>
+        <p>${track.theme}</p>
       </div>
+      <div class="inline-video-wrap">
+        <iframe title="${track.title}" src="https://www.youtube.com/embed/${track.youtubeId}?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+      <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
+      <p class="library-video-description">${track.description}</p>
     </article>
   `).join('');
-  grid.querySelectorAll('.sleep-track-card').forEach(card => card.addEventListener('click', () => toggleInlineSleepTrack(card.dataset.track, card.closest('.playable-shell'))));
-  grid.querySelectorAll('.inline-close-btn').forEach(button => button.addEventListener('click', () => closeInlinePlayers()));
-}
-
-function toggleInlineSleepTrack(id, shell) {
-  const track = SLEEP_TRACKS.find(item => item.id === id);
-  const panel = shell?.querySelector('.inline-player');
-  const frame = panel?.querySelector('iframe');
-  const trigger = shell?.querySelector('.sleep-track-card');
-  if (!track || !panel || !frame || !trigger) return;
-  if (!panel.hidden) {
-    closeInlinePlayers();
-    return;
-  }
-  closeInlinePlayers(shell);
-  frame.src = `https://www.youtube.com/embed/${track.youtubeId}?autoplay=1&rel=0`;
-  panel.hidden = false;
-  panel.classList.add('is-open');
-  shell.classList.add('is-playing');
-  trigger.setAttribute('aria-expanded', 'true');
-  requestAnimationFrame(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 }
 
 function stopSleepVideo() {
@@ -3626,7 +3555,7 @@ function showToast(msg, durationMs = 3500) {
   if (requestedPart) {
     history.replaceState(null, '', location.pathname);
     const shell = document.querySelector(`[data-exercise-shell="${requestedPart}"]`);
-    if (shell) toggleInlineExercise(requestedPart, shell);
+    if (shell) requestAnimationFrame(() => shell.scrollIntoView({ behavior: 'smooth', block: 'center' }));
   }
 })();
 </script>
