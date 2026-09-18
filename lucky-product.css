@@ -308,6 +308,7 @@ body.exercises-page {
 .exercises-page .list-hero h1 em { font-style: normal; }
 .exercises-page .list-hero p { max-width: 670px; margin: 0; font-size: 1rem; }
 .exercises-page .exercises-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 920px; padding: 0 32px; }
+.exercises-page .playable-shell { min-width: 0; }
 .exercises-page .exercise-card {
   width: 100%;
   min-height: 236px;
@@ -323,6 +324,8 @@ body.exercises-page {
   cursor: pointer;
 }
 .exercises-page .exercise-card:hover { border-color: var(--gold); background: #1d1d18; transform: translateY(-2px); }
+.exercises-page .playable-shell.is-playing .exercise-card,
+.exercises-page .playable-shell.is-playing .sleep-track-card { border-color: var(--gold); background: #1d1d18; transform: none; }
 .exercises-page .exercise-card.completed { border-color: rgba(215,255,88,.45); }
 .exercises-page .exercise-card.completed::after { display: none; }
 .exercises-page .card-part,
@@ -334,6 +337,33 @@ body.exercises-page {
 .exercises-page .card-theme { margin-top: 9px; color: var(--text-dim); font-size: .78rem; line-height: 1.5; }
 .exercises-page .card-footer { width: 100%; margin-top: auto; padding-top: 24px; display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); }
 .exercises-page .card-status { color: var(--text); font-size: .76rem; font-weight: 700; }
+.exercises-page .inline-player {
+  margin-top: 8px;
+  padding: 14px;
+  border: 1px solid var(--gold);
+  background: #0b0b0a;
+}
+.exercises-page .inline-player[hidden] { display: none; }
+.exercises-page .inline-video-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
+.exercises-page .inline-video-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+.exercises-page .inline-player-note { margin: 12px 0 0; color: var(--text-faint); font-size: .68rem; line-height: 1.45; }
+.exercises-page .inline-player-actions { margin-top: 14px; display: flex; gap: 8px; }
+.exercises-page .inline-complete-btn,
+.exercises-page .inline-close-btn {
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: transparent;
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.exercises-page .inline-complete-btn { flex: 1; border-color: var(--gold); color: var(--gold); }
+.exercises-page .inline-close-btn { margin-top: 14px; }
+.exercises-page .inline-player-actions .inline-close-btn { margin-top: 0; }
+.exercises-page .inline-complete-btn:hover,
+.exercises-page .inline-close-btn:hover { background: #1d1d18; }
 .exercises-page .exercise-view { max-width: 760px; padding-top: 48px; }
 .exercises-page .ex-title { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 700; letter-spacing: -.05em; }
 .exercises-page .ex-lesson { font-weight: 400; border-left-color: var(--gold); }
