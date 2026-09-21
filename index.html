@@ -277,7 +277,7 @@
     .waitlist-status.error { color: #ff8a8a; }
 
     .goal-paths { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; padding: 100px 0; }
-    .goal-paths .section-heading { text-align: center; margin-bottom: 44px; }
+    .goal-paths .section-heading { text-align: left; margin-bottom: 44px; }
     .paths-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
     .path-card {
       padding: 26px 22px; border: 1px solid var(--line); border-radius: 16px;
@@ -335,7 +335,7 @@
     <nav class="nav-links" aria-label="Primary navigation">
       <a href="#how">How it works</a>
       <a class="nav-cta" href="/goals">My plan</a>
-      <a href="/exercises">Lucky Library</a>
+      <a href="/exercises">Lucky Exercises</a>
       <div class="auth-area">
         <button class="auth-signin-btn" id="auth-signin-btn">Sign in</button>
         <div class="auth-user-area" id="auth-user-area" style="display:none">
@@ -344,7 +344,7 @@
             <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
             <div class="auth-dropdown-actions">
               <a href="/goals">Open my plan</a>
-              <a href="/exercises">Open Lucky Library</a>
+              <a href="/exercises">Open Lucky Exercises</a>
               <button id="auth-signout-btn">Sign out</button>
             </div>
           </div>
@@ -357,7 +357,7 @@
   <div class="auth-modal" id="auth-modal">
     <button class="auth-modal-close" id="auth-modal-close">✕</button>
     <h3>Sign in to Lucky</h3>
-    <p>Sign in with Google to save your 90-day plan and Lucky Library progress, and pick up where you left off on any device.</p>
+    <p>Sign in with Google to save your 90-day plan and Lucky Exercises progress, and pick up where you left off on any device.</p>
     <button class="google-btn" id="google-sign-in-btn">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
         <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -418,7 +418,7 @@
     </section>
 
     <section class="waitlist-section" aria-labelledby="waitlist-title">
-      <h2 id="waitlist-title">Get early access to new Lucky Library practices</h2>
+      <h2 id="waitlist-title">Get early access to new practices in Lucky Exercises</h2>
       <p>Join the waitlist for new practices, habit templates, and the accountability features coming next. No spam.</p>
       <form class="waitlist-form" id="waitlist-form" novalidate>
         <input type="email" id="waitlist-email" name="email" placeholder="you@example.com" autocomplete="email" required aria-label="Email address">
@@ -521,7 +521,7 @@
 
     <section class="final-cta">
       <h2>Give your goal a plan—and your mindset a practice.</h2>
-      <p>Build your 90-day roadmap, then use the Lucky Library to support the person executing it.</p>
+      <p>Build your 90-day roadmap, then use Lucky Exercises to support the person executing it.</p>
       <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
     </section>
 
@@ -530,7 +530,7 @@
   <footer class="footer">
     <a class="brand" href="/"><span class="brand-mark">L</span><span>Lucky</span></a>
     <span>Personalized direction. Mindset practice. Measurable action.</span>
-    <div class="footer-links"><a href="/exercises">Lucky Library</a><a href="/goals">Master Plan</a></div>
+    <div class="footer-links"><a href="/exercises">Lucky Exercises</a><a href="/goals">Master Plan</a></div>
   </footer>
 
   <script>
