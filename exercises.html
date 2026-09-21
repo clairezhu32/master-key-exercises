@@ -1309,12 +1309,12 @@
     <div class="affirmation-feature-grid">
       <article class="library-video-card">
         <div class="library-video-heading">
-          <span class="card-part">Interview practice · 10 min</span>
+          <span class="card-part">Interview practice · 6 min</span>
           <h3>Job Interview Success Visualization</h3>
-          <p>Leonie Lam · guided confidence and interview rehearsal</p>
+          <p>Meditation Escapes · guided confidence and clarity</p>
         </div>
         <div class="inline-video-wrap">
-          <iframe title="Job Interview Success Visualization" src="https://www.youtube.com/embed/j5CEcbqyWXk?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          <iframe title="Job Interview Success Visualization" src="https://www.youtube.com/embed/V-jY7tajNxE?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
         <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
       </article>
@@ -3464,6 +3464,7 @@ const SLEEP_TRACKS = [
     theme: 'Affirmation Pod · guided opportunity affirmations',
     duration: '10 min',
     youtubeId: 'V5Z-wBUdRP4',
+    startSeconds: 150,
     description: 'Listen before sleep and remind yourself that new offers, helpful people, and meaningful possibilities may already be making their way toward you.'
   },
   {
@@ -3488,7 +3489,7 @@ function renderSleepTracks() {
         <p>${track.theme}</p>
       </div>
       <div class="inline-video-wrap">
-        <iframe title="${track.title}" src="https://www.youtube.com/embed/${track.youtubeId}?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe title="${track.title}" src="https://www.youtube.com/embed/${track.youtubeId}?rel=0${track.startSeconds ? `&start=${track.startSeconds}` : ''}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
       <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
       <p class="library-video-description">${track.description}</p>
