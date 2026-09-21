@@ -99,10 +99,14 @@
       margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
       color: var(--muted); font-size: 11px; line-height: 1.5; word-break: break-all;
     }
+    .auth-dropdown-actions { display: grid; gap: 10px; }
+    .auth-dropdown a,
     .auth-dropdown button {
       padding: 0; border: 0; background: none; color: var(--muted); font: 600 12px "DM Sans", sans-serif;
+      text-align: left;
       cursor: pointer; transition: color .2s;
     }
+    .auth-dropdown a:hover,
     .auth-dropdown button:hover { color: var(--text); }
 
     .auth-modal-overlay {
@@ -166,7 +170,7 @@
     .hero-actions { display: flex; align-items: center; gap: 14px; margin-top: 36px; }
     .button {
       min-height: 52px; padding: 0 21px; display: inline-flex; align-items: center; justify-content: center;
-      gap: 24px; border-radius: 10px; font-size: 14px; font-weight: 700; transition: .2s ease;
+      gap: 24px; border-radius: 10px; font: 700 14px "DM Sans", sans-serif; cursor: pointer; transition: .2s ease;
     }
     .button-primary {
       color: #0a0d18; background: linear-gradient(100deg, var(--mint), #a99bff);
@@ -338,7 +342,11 @@
           <div class="auth-avatar" id="auth-avatar" title="Account"></div>
           <div class="auth-dropdown" id="auth-dropdown" style="display:none">
             <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
-            <button id="auth-signout-btn">Sign out</button>
+            <div class="auth-dropdown-actions">
+              <a href="/goals">Open my plan</a>
+              <a href="/exercises">Open Lucky Library</a>
+              <button id="auth-signout-btn">Sign out</button>
+            </div>
           </div>
         </div>
       </div>
@@ -370,7 +378,7 @@
         <p>Turn the goal that matters most into clear weekly actions, guided mindset practices, and progress you can see.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="/goals">Build my 90-day plan <span>→</span></a>
-          <a class="button button-secondary" href="#how">See how it works</a>
+          <button class="button button-secondary" id="hero-auth-btn" type="button">Sign in to Lucky</button>
         </div>
         <div class="hero-signature"><span aria-hidden="true">✦</span> Focus. Progress. Momentum.</div>
       </div>
@@ -545,15 +553,18 @@
       const userArea = document.getElementById('auth-user-area');
       const avatar = document.getElementById('auth-avatar');
       const emailEl = document.getElementById('auth-dropdown-email');
+      const heroAuthBtn = document.getElementById('hero-auth-btn');
       if (currentUser) {
         signinBtn.style.display = 'none';
         userArea.style.display = 'flex';
         const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email || '?';
         avatar.textContent = name[0].toUpperCase();
         if (emailEl) emailEl.textContent = currentUser.email || '';
+        if (heroAuthBtn) heroAuthBtn.textContent = 'Open my saved plan →';
       } else {
         signinBtn.style.display = 'block';
         userArea.style.display = 'none';
+        if (heroAuthBtn) heroAuthBtn.textContent = 'Sign in to Lucky';
       }
     }
 
@@ -606,6 +617,10 @@
     sb.auth.getSession().then(({data})=>resumeVerifiedInvite(data.session));
 
     document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+    document.getElementById('hero-auth-btn').addEventListener('click', () => {
+      if (currentUser) window.location.href = '/goals';
+      else openAuthModal();
+    });
     document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
     document.getElementById('auth-modal-overlay').addEventListener('click', closeAuthModal);
     document.getElementById('google-sign-in-btn').addEventListener('click', signInWithGoogle);
