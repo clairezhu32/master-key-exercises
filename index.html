@@ -334,7 +334,7 @@
     </a>
     <nav class="nav-links" aria-label="Primary navigation">
       <a href="#how">How it works</a>
-      <a class="nav-cta" href="/goals">My plan</a>
+      <a class="nav-cta" id="nav-plan-link" href="/goals">My plan</a>
       <a href="/exercises">Lucky Exercises</a>
       <div class="auth-area">
         <button class="auth-signin-btn" id="auth-signin-btn">Sign in</button>
@@ -539,12 +539,16 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const PENDING_INVITE_KEY = 'lucky_pending_invite_code';
+    const PENDING_PLAN_RETURN_KEY = 'lucky_return_to_plan_after_signin';
     let currentUser = null;
     let resumingInvite = false;
 
     function resumeVerifiedInvite(session) {
-      if(resumingInvite || !session?.user || !sessionStorage.getItem(PENDING_INVITE_KEY)) return;
+      const shouldResumeInvite = sessionStorage.getItem(PENDING_INVITE_KEY);
+      const shouldOpenPlan = sessionStorage.getItem(PENDING_PLAN_RETURN_KEY);
+      if(resumingInvite || !session?.user || (!shouldResumeInvite && !shouldOpenPlan)) return;
       resumingInvite = true;
+      sessionStorage.removeItem(PENDING_PLAN_RETURN_KEY);
       window.location.replace('/goals');
     }
 
@@ -575,6 +579,7 @@
     function closeAuthModal() {
       document.getElementById('auth-modal-overlay').style.display = 'none';
       document.getElementById('auth-modal').style.display = 'none';
+      sessionStorage.removeItem(PENDING_PLAN_RETURN_KEY);
     }
     function toggleUserMenu() {
       const dd = document.getElementById('auth-dropdown');
@@ -617,6 +622,17 @@
     sb.auth.getSession().then(({data})=>resumeVerifiedInvite(data.session));
 
     document.getElementById('auth-signin-btn').addEventListener('click', openAuthModal);
+    document.getElementById('nav-plan-link').addEventListener('click', async event => {
+      if (currentUser) return;
+      event.preventDefault();
+      const session = (await sb.auth.getSession()).data.session;
+      if (session?.user) {
+        window.location.href = '/goals';
+        return;
+      }
+      sessionStorage.setItem(PENDING_PLAN_RETURN_KEY, '1');
+      openAuthModal();
+    });
     document.getElementById('hero-auth-btn').addEventListener('click', () => {
       if (currentUser) window.location.href = '/goals';
       else openAuthModal();
