@@ -81,6 +81,15 @@
     .task:hover { border-color:var(--line); background:rgba(255,255,255,.025); }
     .task input { width:18px; height:18px; flex:0 0 auto; margin:1px 0 0; accent-color:var(--mint); }
     .task.done span { color:#747d99; text-decoration:line-through; }
+    .custom-task-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; align-items:start; }
+    .custom-task-row .task { min-width:0; }
+    .custom-task-remove { width:36px; min-height:40px; padding:0; border:1px solid transparent; border-radius:8px; color:var(--muted); background:transparent; font-size:18px; line-height:1; }
+    .custom-task-remove:hover { border-color:rgba(255,157,157,.35); color:#ffb3b3; background:rgba(255,157,157,.06); }
+    .custom-task-form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; margin-top:12px; }
+    .custom-task-form input { min-width:0; margin:0; padding:11px 12px; font-size:13px; }
+    .custom-task-form button { min-height:42px; padding:0 14px; border:1px solid rgba(157,140,255,.35); border-radius:8px; color:var(--text); background:rgba(157,140,255,.1); font-size:12px; font-weight:700; }
+    .custom-task-form button:hover { border-color:var(--violet); background:rgba(157,140,255,.17); }
+    .custom-task-status { min-height:17px; margin-top:5px; color:var(--mint); font-size:10px; }
     .week-exercise { display:flex; align-items:flex-start; gap:11px; margin-top:15px; padding:13px; border:1px solid rgba(113,229,193,.22); border-radius:10px; color:var(--text); background:rgba(113,229,193,.055); text-decoration:none; }
     .week-exercise:hover { border-color:rgba(113,229,193,.5); background:rgba(113,229,193,.09); }
     .exercise-part { flex:0 0 auto; padding:5px 8px; border-radius:7px; color:#07140f; background:var(--mint); font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
@@ -168,7 +177,7 @@
     .access-panel label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; font-weight:700; }
     .access-panel input { margin:0 0 10px; }
     .access-note { margin-top:14px; color:#85857c; font-size:11px; line-height:1.5; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week-head{display:block}.week-theme{margin-top:5px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px}.custom-task-form{grid-template-columns:1fr}.custom-task-form button{width:100%} }
   </style>
   <style>
     :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
@@ -513,7 +522,15 @@
 
     function savePlanProgress(saved) { saved.progress = saved.progress || {completed:{},feedback:{}}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
     function visiblePlanWeeks(saved) { const weeks=saved.plan?.weeks||[]; return saved.access?.unlocked ? weeks : weeks.slice(0,1); }
-    function updateProgressSummary(saved) { const actions=visiblePlanWeeks(saved).flatMap(week=>week.actions || []); const visibleKeys=new Set(visiblePlanWeeks(saved).flatMap((week,index)=>(week.actions||[]).map((_,actionIndex)=>`week-${week.week||index+1}-task-${actionIndex}`))); const completed=Object.entries(saved.progress?.completed||{}).filter(([key,value])=>value&&visibleKeys.has(key)).length; document.getElementById('progress-count').textContent=`${completed} of ${actions.length} tasks complete`; document.getElementById('progress-fill').style.width=`${actions.length ? Math.round(completed/actions.length*100) : 0}%`; }
+    function visibleTaskKeys(saved) {
+      return visiblePlanWeeks(saved).flatMap((week,index)=>{
+        const weekKey=`week-${week.week||index+1}`;
+        const generated=(week.actions||[]).map((_,actionIndex)=>`${weekKey}-task-${actionIndex}`);
+        const custom=(saved.customTasks?.[weekKey]||[]).map(task=>`${weekKey}-custom-${task.id}`);
+        return [...generated,...custom];
+      });
+    }
+    function updateProgressSummary(saved) { const keys=visibleTaskKeys(saved), visibleKeys=new Set(keys); const completed=Object.entries(saved.progress?.completed||{}).filter(([key,value])=>value&&visibleKeys.has(key)).length; document.getElementById('progress-count').textContent=`${completed} of ${keys.length} tasks complete`; document.getElementById('progress-fill').style.width=`${keys.length ? Math.round(completed/keys.length*100) : 0}%`; }
 
     const LUCKY_METHOD_FALLBACK = [
       ['Clarify What You Truly Want','Define a concrete 90-day outcome that reflects what matters to you.'],
@@ -549,7 +566,7 @@
       planAccess = saved.access || {unlocked:false,source:'free'};
       saved.access = planAccess;
       const checkoutMessage=document.getElementById('checkout-message'); checkoutMessage.textContent=checkoutNotice; checkoutMessage.style.display=checkoutNotice?'block':'none';
-      saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {};
+      saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {}; saved.customTasks = saved.customTasks || {};
       document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your 90-day plan';
       document.getElementById('result-goal').textContent = answers.goal || plan.milestone_90day || 'Your 90-day goal';
       document.getElementById('result-summary').textContent = plan.summary || '';
@@ -569,13 +586,24 @@
         const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=week.theme || ''; head.append(label,theme);
         const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || '';
         const list=document.createElement('div'); list.className='task-list';
+        const bindTaskCheckbox=(checkbox,item,taskKey)=>checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); const completed=Object.values(saved.progress.completed).filter(Boolean).length; if(checkbox.checked){ trackEvent('task_completed',{week:weekNumber,completed_count:completed,custom:taskKey.includes('-custom-')}); } if(checkbox.checked&&completed===1) maybePromptFeedback('first_action',saved); });
         (week.actions || []).forEach((action,actionIndex)=>{
           const taskKey=`${weekKey}-task-${actionIndex}`; const item=document.createElement('label'); item.className='task';
           const checkbox=document.createElement('input'); checkbox.type='checkbox'; checkbox.checked=Boolean(saved.progress.completed[taskKey]);
           const text=document.createElement('span'); text.textContent=action; item.append(checkbox,text); item.classList.toggle('done',checkbox.checked);
-          checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); const completed=Object.values(saved.progress.completed).filter(Boolean).length; if(checkbox.checked){ trackEvent('task_completed',{week:weekNumber,completed_count:completed}); } if(checkbox.checked&&completed===1) maybePromptFeedback('first_action',saved); });
+          bindTaskCheckbox(checkbox,item,taskKey);
           list.appendChild(item);
         });
+        const appendCustomTask=task=>{
+          const taskKey=`${weekKey}-custom-${task.id}`, row=document.createElement('div'); row.className='custom-task-row';
+          const item=document.createElement('label'); item.className='task'; const checkbox=document.createElement('input'); checkbox.type='checkbox'; checkbox.checked=Boolean(saved.progress.completed[taskKey]); const text=document.createElement('span'); text.textContent=task.text; item.append(checkbox,text); item.classList.toggle('done',checkbox.checked); bindTaskCheckbox(checkbox,item,taskKey);
+          const remove=document.createElement('button'); remove.type='button'; remove.className='custom-task-remove'; remove.setAttribute('aria-label',`Remove custom task: ${task.text}`); remove.title='Remove task'; remove.textContent='×';
+          remove.addEventListener('click',()=>{ saved.customTasks[weekKey]=(saved.customTasks[weekKey]||[]).filter(entry=>entry.id!==task.id); delete saved.progress.completed[taskKey]; row.remove(); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); trackEvent('custom_task_removed',{week:weekNumber}); });
+          row.append(item,remove); list.appendChild(row);
+        };
+        (saved.customTasks[weekKey]||[]).forEach(appendCustomTask);
+        const customForm=document.createElement('form'); customForm.className='custom-task-form'; const customInput=document.createElement('input'); customInput.type='text'; customInput.maxLength=180; customInput.placeholder='Add your own task for this week'; customInput.setAttribute('aria-label',`Add a custom task to week ${weekNumber}`); const customAdd=document.createElement('button'); customAdd.type='submit'; customAdd.textContent='+ Add task'; customForm.append(customInput,customAdd); const customStatus=document.createElement('div'); customStatus.className='custom-task-status';
+        customForm.addEventListener('submit',event=>{ event.preventDefault(); const taskText=customInput.value.trim(); if(!taskText){ customStatus.textContent='Enter a task first.'; customInput.focus(); return; } const current=saved.customTasks[weekKey]||[]; if(current.length>=20){ customStatus.textContent='You can add up to 20 custom tasks per week.'; return; } const task={id:crypto.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`,text:taskText}; saved.customTasks[weekKey]=[...current,task]; appendCustomTask(task); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); customInput.value=''; customStatus.textContent='Task added and saved.'; setTimeout(()=>customStatus.textContent='',1400); trackEvent('custom_task_added',{week:weekNumber}); });
         const fallbackExercises=(plan.exercises || []).filter(ex=>Number(ex.part)>=1&&Number(ex.part)<=6); const weekPart=Number(week.exercise_part); const recommended=weekPart>=1&&weekPart<=6 ? {part:weekPart,reason:week.exercise_reason} : fallbackExercises.length ? fallbackExercises[Math.min(Math.floor(index/4),fallbackExercises.length-1)] : {part:(index%6)+1,reason:'Use this Lucky Method step to connect reflection with this week’s next action.'};
         const weekExercise=recommended ? document.createElement('a') : null;
         if(weekExercise){ weekExercise.className='week-exercise'; weekExercise.href=`/exercises?step=${recommended.part}`; const part=document.createElement('span'); part.className='exercise-part'; part.textContent=`Step ${recommended.part}`; const copy=document.createElement('span'); copy.className='exercise-copy'; const title=document.createElement('strong'); title.textContent='Practice this Lucky Exercise for the week'; const reason=document.createElement('span'); reason.textContent=recommended.reason || 'Use this Lucky Exercise to strengthen the mindset needed for this week’s actions.'; copy.append(title,reason); weekExercise.append(part,copy); }
@@ -587,7 +615,7 @@
         const note=document.createElement('textarea'); note.className='feedback-note'; note.placeholder='What worked this week? What was difficult? What will you adjust next week?'; note.value=currentFeedback.note || '';
         const savedNote=document.createElement('div'); savedNote.className='save-note'; let noteTimer;
         note.addEventListener('input',()=>{ currentFeedback.note=note.value; saved.progress.feedback[weekKey]=currentFeedback; clearTimeout(noteTimer); noteTimer=setTimeout(()=>{ savePlanProgress(saved); savedNote.textContent='Reflection saved'; setTimeout(()=>savedNote.textContent='',1400); },350); });
-        feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
+        feedback.append(feedbackLabel,statuses,note,savedNote); card.append(head,target,list,customForm,customStatus); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
       });
       updateProgressSummary(saved);
       const upgradeCard=document.getElementById('upgrade-card'); upgradeCard.style.display=planAccess.unlocked?'none':'block'; if(!planAccess.unlocked){ loadUpgradeState(); if(!upgradeViewTracked){ upgradeViewTracked=true; trackEvent('upgrade_viewed',{preview_weeks:visibleWeeks.length}); } }
@@ -622,7 +650,7 @@
       const account=await fetchAccountState();
       if(!account?.savedPlan||!account.access?.unlocked) throw new Error('Your full plan is not available yet. Please refresh in a moment.');
       const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-      const saved={...account.savedPlan,access:account.access,progress:current?.ownerId===currentSession.user.id?current.progress:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+      const saved={...account.savedPlan,access:account.access,progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
       localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); renderPlan(saved);
     }
     async function startUpgrade(){
@@ -665,7 +693,7 @@
       state.append(heading,cadence,goal,progress,nextAction,message,actions);
     }
     async function loadAccountabilityState(){ if(!currentSession) return; try { const state=await accountabilityRequest(); renderBuddyMessages(state.messages||[]); renderMatchState(state.match); const localLink=localStorage.getItem(BUDDY_LINK_KEY); if(state.active&&localLink){ showBuddyShare(localLink); scheduleAccountabilitySync(activeSavedPlan); } else if(state.active){ const button=document.getElementById('create-buddy-link'); button.textContent='Create a new private link'; buddyStatus('A buddy link is active. Creating a new link will replace the old one.'); } if(['waiting','matched'].includes(state.match?.status)) scheduleAccountabilitySync(activeSavedPlan); } catch(error){ buddyStatus(error.message,true); } }
-    async function syncAccountabilityProgress(saved){ if(!saved||!currentSession) return; const actions=visiblePlanWeeks(saved).flatMap(week=>week.actions||[]); try { await accountabilityRequest('POST',{action:'progress',completed:saved.progress?.completed||{},total_tasks:actions.length}); } catch {} }
+    async function syncAccountabilityProgress(saved){ if(!saved||!currentSession) return; const taskKeys=visibleTaskKeys(saved); try { await accountabilityRequest('POST',{action:'progress',completed:saved.progress?.completed||{},total_tasks:taskKeys.length}); } catch {} }
     function scheduleAccountabilitySync(saved){ clearTimeout(accountabilitySyncTimer); accountabilitySyncTimer=setTimeout(()=>syncAccountabilityProgress(saved),450); }
     document.getElementById('create-buddy-link').addEventListener('click',async()=>{ const button=document.getElementById('create-buddy-link'); button.disabled=true; button.textContent='Creating private link…'; buddyStatus(''); try { const state=await accountabilityRequest('POST',{action:'create'}); localStorage.setItem(BUDDY_LINK_KEY,state.share_url); showBuddyShare(state.share_url); await syncAccountabilityProgress(activeSavedPlan); buddyStatus('Private link created. Share it only with someone you trust.'); } catch(error){ buddyStatus(error.message,true); button.disabled=false; button.textContent='Create private buddy link'; } });
     document.getElementById('copy-buddy-link').addEventListener('click',async()=>{ try { await navigator.clipboard.writeText(document.getElementById('buddy-link').value); buddyStatus('Buddy link copied.'); } catch { buddyStatus('Could not copy the link automatically.',true); } });
@@ -696,7 +724,8 @@
       try {
         const account=await fetchAccountState();
         if(account?.savedPlan&&currentSession){
-          const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+          const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
+          const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
           localStorage.setItem(PLAN_KEY,JSON.stringify(recovered)); localStorage.removeItem(PENDING_KEY); renderPlan(recovered); return;
         }
         if(draft) await generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard');
@@ -727,7 +756,7 @@
       let saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
       if(currentSession){
         const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
-        if(account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        if(account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,customTasks:localBelongsToUser?saved.customTasks:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(saved&&!localBelongsToUser){ saved=null; }
       }
