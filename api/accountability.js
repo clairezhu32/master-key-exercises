@@ -48,6 +48,36 @@ async function saveGoalData(userId, goalData, serviceRoleKey) {
   if (!response.ok) throw new Error(`Plan update failed (${response.status})`);
 }
 
+function taskEstimateKey(weekNumber, actionIndex) {
+  return `week-${weekNumber}-task-${actionIndex}`;
+}
+
+function inferTaskMinutes(action) {
+  const text = String(action || '').toLowerCase();
+  const explicitMinutes = text.match(/\b(\d{1,3})\s*(?:minutes?|mins?)\b/);
+  if (explicitMinutes) return Math.max(5, Math.min(480, Number(explicitMinutes[1])));
+  const explicitHours = text.match(/\b(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)\b/);
+  if (explicitHours) return Math.max(15, Math.min(480, Math.round(Number(explicitHours[1]) * 60)));
+  if (/\b(mock interview|case practice|presentation|portfolio|workshop)\b/.test(text)) return 60;
+  if (/\b(resume|cover letter|research|analy[sz]e|draft|write|build|create)\b/.test(text)) return 45;
+  if (/\b(apply|submit|reach out|follow up|message|network|review|practice)\b/.test(text)) return 30;
+  if (/\b(schedule|book|confirm|email|choose|list)\b/.test(text)) return 15;
+  return 30;
+}
+
+function buildTaskEstimates(plan, stored = {}) {
+  const estimates = {};
+  for (const [weekIndex, week] of (plan?.weeks || []).entries()) {
+    const weekNumber = Number(week.week || weekIndex + 1);
+    for (const [actionIndex, action] of (week.actions || []).entries()) {
+      const key = taskEstimateKey(weekNumber, actionIndex);
+      const saved = Number(stored?.[key]);
+      estimates[key] = Number.isFinite(saved) && saved >= 5 && saved <= 480 ? saved : inferTaskMinutes(action);
+    }
+  }
+  return estimates;
+}
+
 async function track(eventName, userId, email, properties, serviceRoleKey) {
   await fetch(`${SUPABASE_URL}/rest/v1/mks_events`, {
     method: 'POST',
@@ -80,6 +110,12 @@ async function buddyView(record, serviceRoleKey) {
     milestone: plan.milestone_90day || answers.goal || '',
     start_date: startDate.toISOString().slice(0, 10),
     completed: progress.completed || {},
+    estimates: buildTaskEstimates(plan, answers._task_estimates),
+    messages: (answers._accountability_messages || []).slice(-30).reverse().map((entry) => ({
+      name: String(entry.name || 'Accountability buddy').slice(0, 60),
+      message: String(entry.message || '').slice(0, 500),
+      created_at: entry.created_at,
+    })),
     completed_count: Number(progress.completed_count) || 0,
     total_tasks: access.unlocked ? (Number(progress.total_tasks) || visibleWeeks.flatMap((week) => week.actions || []).length) : visibleWeeks.flatMap((week) => week.actions || []).length,
     updated_at: progress.updated_at || record.generated_at,
@@ -148,7 +184,7 @@ export default async function handler(req, res) {
       const messages = [...(record.goal_data?._accountability_messages || []), entry].slice(-30);
       await saveGoalData(record.user_id, { ...(record.goal_data || {}), _accountability_messages: messages }, serviceRoleKey);
       await track('buddy_encouragement_sent', record.user_id, record.email, {}, serviceRoleKey);
-      return res.status(201).json({ sent: true });
+      return res.status(201).json({ sent: true, message: entry });
     }
 
     if (!user) return res.status(401).json({ error: 'Sign in required' });
@@ -215,7 +251,8 @@ export default async function handler(req, res) {
       if (!goalData._accountability?.token_hash && !['waiting', 'matched'].includes(goalData._buddy_match_profile?.status)) return res.status(200).json({ synced: false });
       const completed = cleanCompleted(body.completed);
       const progress = { completed, completed_count: Object.values(completed).filter(Boolean).length, total_tasks: Math.max(0, Number(body.total_tasks) || 0), updated_at: new Date().toISOString() };
-      await saveGoalData(user.id, { ...goalData, _accountability_progress: progress }, serviceRoleKey);
+      const taskEstimates = buildTaskEstimates(record.plan, goalData._task_estimates);
+      await saveGoalData(user.id, { ...goalData, _accountability_progress: progress, _task_estimates: taskEstimates }, serviceRoleKey);
       return res.status(200).json({ synced: true, progress });
     }
 
