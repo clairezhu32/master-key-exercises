@@ -70,10 +70,15 @@ async function buddyView(record, serviceRoleKey) {
   const answers = record.goal_data || {}, plan = record.plan || {}, progress = answers._accountability_progress || {};
   const access = await getPlanAccess(record.user_id, serviceRoleKey);
   const visibleWeeks = access.unlocked ? (plan.weeks || []) : (plan.weeks || []).slice(0, 1);
+  const startCandidate = answers.start_date || answers.createdAt || record.generated_at;
+  const parsedStart = new Date(startCandidate);
+  const startDate = Number.isNaN(parsedStart.getTime()) ? new Date(record.generated_at || Date.now()) : parsedStart;
   return {
     owner_name: answers._buddy_match_profile?.first_name || answers._accountability?.owner_name || 'Your buddy',
     goal: answers.goal || plan.milestone_90day || 'A meaningful 90-day goal',
+    original_goal: answers.goal || plan.milestone_90day || 'A meaningful 90-day goal',
     milestone: plan.milestone_90day || answers.goal || '',
+    start_date: startDate.toISOString().slice(0, 10),
     completed: progress.completed || {},
     completed_count: Number(progress.completed_count) || 0,
     total_tasks: access.unlocked ? (Number(progress.total_tasks) || visibleWeeks.flatMap((week) => week.actions || []).length) : visibleWeeks.flatMap((week) => week.actions || []).length,
