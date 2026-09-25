@@ -371,6 +371,7 @@
     const PLAN_KEY = 'lucky_builder_plan_v1';
     const PENDING_KEY = 'lucky_builder_generation_pending';
     const PENDING_INVITE_KEY = 'lucky_pending_invite_code';
+    const START_NEW_PLAN_KEY = 'lucky_start_new_plan';
     const cohortMode = window.location.pathname.replace(/\/$/,'') === '/bootcamp' || new URLSearchParams(window.location.search).get('cohort') === 'bootcamp';
     const VISITOR_KEY = 'lucky_visitor_id';
     const BUDDY_LINK_KEY = 'lucky_accountability_buddy_link';
@@ -800,7 +801,13 @@
         if(draft) await generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard');
       } finally { button.disabled=false; button.textContent='Try again'; }
     });
-    document.getElementById('build-another').addEventListener('click', () => { if(document.getElementById('build-another').disabled) return; localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); window.location.reload(); });
+    document.getElementById('build-another').addEventListener('click', event => {
+      const button=event.currentTarget; if(button.disabled) return;
+      button.disabled=true; button.textContent='Starting a new plan…';
+      sessionStorage.setItem(START_NEW_PLAN_KEY,'1');
+      localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY);
+      window.location.reload();
+    });
 
     async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/saved-plan',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
     async function verifyCheckout(sessionId){
@@ -821,11 +828,14 @@
         catch(error){ checkoutNotice=`We received your checkout return, but could not confirm it yet: ${error.message}`; }
       } else if(checkoutStatus==='cancelled') checkoutNotice='Checkout was canceled. Your free first week is still available.';
       if(checkoutStatus){ history.replaceState({},'',location.pathname); }
+      const startNewPlan=sessionStorage.getItem(START_NEW_PLAN_KEY)==='1';
+      if(startNewPlan){ sessionStorage.removeItem(START_NEW_PLAN_KEY); localStorage.removeItem(PLAN_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(PENDING_KEY); }
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
       let saved = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null');
       if(currentSession){
         const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
-        if(account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,customTasks:localBelongsToUser?saved.customTasks:undefined,taskMetrics:localBelongsToUser?saved.taskMetrics:undefined,taskSchedules:localBelongsToUser?saved.taskSchedules:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        if(startNewPlan&&account?.usage?.remaining<=0&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,customTasks:localBelongsToUser?saved.customTasks:undefined,taskMetrics:localBelongsToUser?saved.taskMetrics:undefined,taskSchedules:localBelongsToUser?saved.taskSchedules:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(saved&&!localBelongsToUser){ saved=null; }
       }
