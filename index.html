@@ -91,22 +91,16 @@
     }
     .auth-avatar:hover { opacity: .86; }
     .auth-dropdown {
-      position: absolute; top: calc(100% + 12px); right: 0; z-index: 30; min-width: 210px; padding: 12px;
+      position: absolute; top: calc(100% + 12px); right: 0; z-index: 30; min-width: 116px; padding: 12px;
       border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
       box-shadow: 0 20px 50px rgba(0,0,0,.4);
     }
-    .auth-dropdown-email {
-      margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
-      color: var(--muted); font-size: 11px; line-height: 1.5; word-break: break-all;
-    }
-    .auth-dropdown-actions { display: grid; gap: 10px; }
-    .auth-dropdown a,
+    .auth-dropdown-actions { display: grid; }
     .auth-dropdown button {
-      padding: 0; border: 0; background: none; color: var(--muted); font: 600 12px "DM Sans", sans-serif;
+      width:100%; padding: 3px 0; border: 0; background: none; color: var(--muted); font: 600 12px "DM Sans", sans-serif;
       text-align: left;
       cursor: pointer; transition: color .2s;
     }
-    .auth-dropdown a:hover,
     .auth-dropdown button:hover { color: var(--text); }
 
     .auth-modal-overlay {
@@ -341,10 +335,7 @@
         <div class="auth-user-area" id="auth-user-area" style="display:none">
           <div class="auth-avatar" id="auth-avatar" title="Account"></div>
           <div class="auth-dropdown" id="auth-dropdown" style="display:none">
-            <div class="auth-dropdown-email" id="auth-dropdown-email"></div>
             <div class="auth-dropdown-actions">
-              <a href="/goals">Open my plan</a>
-              <a href="/exercises">Open Lucky Exercises</a>
               <button id="auth-signout-btn">Sign out</button>
             </div>
           </div>
@@ -556,14 +547,12 @@
       const signinBtn = document.getElementById('auth-signin-btn');
       const userArea = document.getElementById('auth-user-area');
       const avatar = document.getElementById('auth-avatar');
-      const emailEl = document.getElementById('auth-dropdown-email');
       const heroAuthBtn = document.getElementById('hero-auth-btn');
       if (currentUser) {
         signinBtn.style.display = 'none';
         userArea.style.display = 'flex';
         const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email || '?';
         avatar.textContent = name[0].toUpperCase();
-        if (emailEl) emailEl.textContent = currentUser.email || '';
         if (heroAuthBtn) heroAuthBtn.textContent = 'Open my saved plan →';
       } else {
         signinBtn.style.display = 'block';
