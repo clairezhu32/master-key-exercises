@@ -1309,12 +1309,12 @@
     <div class="affirmation-feature-grid">
       <article class="library-video-card">
         <div class="library-video-heading">
-          <span class="card-part">Interview practice · 6 min</span>
+          <span class="card-part">Interview practice · 10 min</span>
           <h3>Job Interview Success Visualization</h3>
-          <p>Meditation Escapes · guided confidence and clarity</p>
+          <p>Leonie Lam · guided confidence and interview rehearsal</p>
         </div>
         <div class="inline-video-wrap">
-          <iframe title="Job Interview Success Visualization" src="https://www.youtube.com/embed/V-jY7tajNxE?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          <iframe title="Job Interview Success Visualization" src="https://www.youtube.com/embed/j5CEcbqyWXk?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
         <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
       </article>
@@ -1335,7 +1335,7 @@
   <section class="library-panel active" id="module-sleep">
     <div class="library-panel-head">
       <div><span>Module 03</span><h2>Sleep Tracks</h2></div>
-      <p>Short meditations for the final 10 minutes before bed. Choose one to notice what is already going well, feel grateful, and fall asleep trusting that more good things can unfold while you rest. Listen once before sleep—no overnight playback required.</p>
+      <p>Short guided meditations to complete during the final 5–10 minutes before bed. Choose one practice to release the day, settle your body, and prepare for sleep—no overnight listening required.</p>
     </div>
     <div class="sleep-track-grid" id="sleep-track-grid"></div>
   </section>
@@ -1581,6 +1581,7 @@ const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_KFN0iLRrvEjmcQVUz3RLcA_5gYJ3N2T';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
+let signingOut = false;
 
 // ── Auth UI helpers ───────────────────────────
 function updateAuthUI() {
@@ -1635,24 +1636,50 @@ async function signInWithGoogle() {
   });
 }
 
-async function handleSignOut() {
+function clearLocalAuthSession() {
+  // Supabase stores this project's browser session under this prefix. Clear
+  // only Lucky's auth data so a stalled network request cannot leave the UI
+  // signed in after the user has explicitly signed out.
+  const authKeyPrefix = 'sb-hvuhpnvsxhvvsisrsmaq-auth-token';
   try {
-    // sb.auth.signOut() can genuinely hang, not just fail (a Supabase-
-    // internal-session issue also found in goals.html's auth flows). Race
-    // it against a timeout so a hang can't stall the sign-out button
-    // forever with the account still showing as signed in.
-    await Promise.race([
-      sb.auth.signOut(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('signOut timed out')), 4000)),
-    ]);
-  } catch (err) {
-    console.error('sb.auth.signOut() failed or hung, falling back to local-only signOut:', err);
-    await sb.auth.signOut({ scope: 'local' }).catch(() => {});
+    Object.keys(localStorage)
+      .filter(key => key.startsWith(authKeyPrefix))
+      .forEach(key => localStorage.removeItem(key));
+  } catch (error) {
+    console.warn('Could not clear the cached Lucky session:', error);
   }
+}
+
+async function handleSignOut(event) {
+  if (signingOut) return;
+  signingOut = true;
+  const button = event?.currentTarget;
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Signing out…';
+  }
+
+  // Update the page first. Sign-out should never appear broken just because
+  // the remote auth call is slow or unavailable.
   currentUser = null;
   updateAuthUI();
   document.getElementById('auth-dropdown').style.display = 'none';
+
+  try {
+    await Promise.race([
+      sb.auth.signOut({ scope: 'local' }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Local sign-out timed out')), 2500)),
+    ]);
+  } catch (err) {
+    console.error('Lucky local sign-out failed or hung:', err);
+  } finally {
+    clearLocalAuthSession();
+  }
+
   showToast('Signed out — your progress is still saved locally.');
+  // Reload from a clean auth state so a late INITIAL_SESSION event cannot
+  // restore the user that just signed out.
+  setTimeout(() => window.location.replace('/exercises'), 350);
 }
 
 // ── Cloud sync ────────────────────────────────
@@ -1699,6 +1726,11 @@ async function syncLocalToCloud() {
 
 // ── Auth state listener ───────────────────────
 sb.auth.onAuthStateChange(async (event, session) => {
+  if (signingOut) {
+    currentUser = null;
+    updateAuthUI();
+    return;
+  }
   const wasSignedIn = !!currentUser;
   currentUser = session?.user ?? null;
   updateAuthUI();
@@ -3451,29 +3483,28 @@ async function speakExercise(ex) {
 // ── Lucky Exercises modules ─────────────────────
 const SLEEP_TRACKS = [
   {
-    id: 'grateful-before-sleep',
-    title: 'Feel Grateful Before You Sleep',
-    theme: 'Great Meditation · guided bedtime gratitude',
-    duration: '10 min',
-    youtubeId: 'hANbTU_YsQg',
-    description: 'Recall the people, moments, and small wins that supported you today. Let gratitude be the final feeling you carry into sleep.'
+    id: 'release-the-day',
+    title: 'Five Minutes Before Sleep',
+    theme: 'Guided evening meditation · release the day',
+    duration: '5 min',
+    youtubeId: 'LDuqik4HWMI',
+    description: 'A brief guided practice for slowing down, letting the day end, and arriving at bedtime with less mental noise.'
   },
   {
-    id: 'opportunities-are-coming',
-    title: 'Amazing Opportunities Are Coming',
-    theme: 'Affirmation Pod · guided opportunity affirmations',
-    duration: '10 min',
-    youtubeId: 'V5Z-wBUdRP4',
-    startSeconds: 150,
-    description: 'Listen before sleep and remind yourself that new offers, helpful people, and meaningful possibilities may already be making their way toward you.'
+    id: 'bedtime-body-scan',
+    title: 'Bedtime Body Scan',
+    theme: 'Black Yogi Nico Marie · guided body relaxation',
+    duration: '5 min',
+    youtubeId: '38_QottxPR0',
+    description: 'A short body scan that helps you notice and soften physical tension before turning off the screen for the night.'
   },
   {
-    id: 'open-to-receive',
-    title: 'Open to Receiving Good Things',
-    theme: 'Great Meditation · guided abundance practice',
+    id: 'ease-into-sleep',
+    title: 'Ease Your Mind Into Sleep',
+    theme: 'Goodful · guided breathing and relaxation',
     duration: '10 min',
-    youtubeId: '7OAemJtbyRQ',
-    description: 'Practice openness to support, opportunity, and abundance. End the day trusting that progress can continue even while you pause and restore.'
+    youtubeId: 'aEqlQvczMJQ',
+    description: 'A guided wind-down for releasing distraction and body tension, setting a calm intention, and then putting the device away.'
   }
 ];
 
@@ -3489,7 +3520,7 @@ function renderSleepTracks() {
         <p>${track.theme}</p>
       </div>
       <div class="inline-video-wrap">
-        <iframe title="${track.title}" src="https://www.youtube.com/embed/${track.youtubeId}?rel=0${track.startSeconds ? `&start=${track.startSeconds}` : ''}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe title="${track.title}" src="https://www.youtube.com/embed/${track.youtubeId}?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
       <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
       <p class="library-video-description">${track.description}</p>
