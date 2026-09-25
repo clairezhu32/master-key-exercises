@@ -167,6 +167,10 @@
     .checkout-message { display:none; margin:0 0 14px; padding:11px 13px; border:1px solid rgba(157,140,255,.25); border-radius:9px; color:#cfd3e4; background:rgba(157,140,255,.07); font-size:12px; }
     .result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
     .result-actions > a[href="/exercises"] { display:none !important; }
+    #build-another { order:10; border-color:#b94b4b; color:#fff; background:#a83f3f; }
+    #build-another:hover:not(:disabled) { border-color:#df6868; background:#bd4949; }
+    #build-another:disabled { color:#e2b7b7; background:#653838; opacity:.65; }
+    .result-actions::after { content:"Your current plan will be replaced. A new plan will be generated based on your new goal."; order:11; width:100%; color:#e99a9a; font-size:11px; line-height:1.45; }
     .plan-allowance { width:100%; color:var(--muted); font-size:12px; }
     .saved-state { width:100%; padding:11px 13px; border:1px solid rgba(113,229,193,.2); border-radius:9px; color:var(--mint); background:rgba(113,229,193,.05); font-size:12px; }
     .share-status { width:100%; min-height:18px; color:var(--mint); font-size:11px; }
