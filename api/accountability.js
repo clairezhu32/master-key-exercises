@@ -78,6 +78,31 @@ function buildTaskEstimates(plan, stored = {}) {
   return estimates;
 }
 
+function deriveCareerFunnel(weeks, completed, stored = {}) {
+  const derived = { applications: 0, responses: 0, interviews: 0, offers: 0 };
+  for (const [weekIndex, week] of (weeks || []).entries()) {
+    const weekNumber = Number(week.week || weekIndex + 1);
+    for (const [actionIndex, action] of (week.actions || []).entries()) {
+      if (!completed?.[taskEstimateKey(weekNumber, actionIndex)]) continue;
+      const text = String(action || '').toLowerCase();
+      if (/\boffer(?:s|ed)?\b/.test(text)) derived.offers += 1;
+      else if (/\b(interview|recruiter screen|phone screen|onsite)\b/.test(text) && !/\b(mock|practice|prepare|prep|rehearse)\b/.test(text)) derived.interviews += 1;
+      else if (/\b(response|reply|callback|call back|heard back)\b/.test(text)) derived.responses += 1;
+      else if (/\b(apply|application|submit(?:ted)? resume|send resume)\b/.test(text)) derived.applications += 1;
+    }
+  }
+  return Object.fromEntries(Object.keys(derived).map((key) => {
+    const saved = Number(stored?.[key]);
+    return [key, Number.isFinite(saved) && saved >= 0 ? Math.round(saved) : derived[key]];
+  }));
+}
+
+function planRationale(goal, plan) {
+  const cleanGoal = String(goal || plan?.milestone_90day || 'this 90-day goal').trim().replace(/[.!?]+$/, '').slice(0, 150);
+  const weeks = plan?.weeks || [], firstTheme = String(weeks[0]?.theme || 'a focused first action').trim(), lastTheme = weeks.length > 1 ? String(weeks.at(-1)?.theme || 'a measurable outcome').trim() : 'the 90-day milestone';
+  return `Built around “${cleanGoal},” sequencing weekly action from ${firstTheme} through ${lastTheme}.`;
+}
+
 async function track(eventName, userId, email, properties, serviceRoleKey) {
   await fetch(`${SUPABASE_URL}/rest/v1/mks_events`, {
     method: 'POST',
@@ -103,11 +128,15 @@ async function buddyView(record, serviceRoleKey) {
   const startCandidate = answers.start_date || answers.createdAt || record.generated_at;
   const parsedStart = new Date(startCandidate);
   const startDate = Number.isNaN(parsedStart.getTime()) ? new Date(record.generated_at || Date.now()) : parsedStart;
+  const goal = answers.goal || plan.milestone_90day || 'A meaningful 90-day goal';
+  const isCareerPlan = answers.category_key === 'career' || /\b(career|job|role|resume|interview)\b/i.test(goal);
   return {
     owner_name: answers._buddy_match_profile?.first_name || answers._accountability?.owner_name || 'Your buddy',
-    goal: answers.goal || plan.milestone_90day || 'A meaningful 90-day goal',
-    original_goal: answers.goal || plan.milestone_90day || 'A meaningful 90-day goal',
+    goal,
+    original_goal: goal,
     milestone: plan.milestone_90day || answers.goal || '',
+    rationale: planRationale(goal, { ...plan, weeks: visibleWeeks }),
+    funnel_metrics: isCareerPlan ? deriveCareerFunnel(visibleWeeks, progress.completed || {}, answers._funnel_metrics) : null,
     start_date: startDate.toISOString().slice(0, 10),
     completed: progress.completed || {},
     estimates: buildTaskEstimates(plan, answers._task_estimates),
