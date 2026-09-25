@@ -272,7 +272,7 @@ const PLAN_SCHEMA = {
     },
     weeks: {
       type: 'ARRAY',
-      description: 'Exactly 12 weeks — a full execution cadence. Front-load early weeks on targets/access/outreach and later weeks on prep/close, matching how this specific goal actually plays out over 90 days.',
+      description: 'Exactly 12 weeks — a full execution cadence. Front-load early weeks on targets/access/outreach and later weeks on prep/close, matching how this specific goal actually plays out over 90 days. For career plans, keep networking, resume/application execution, and interview preparation running in parallel every week rather than assigning them to isolated phases.',
       items: {
         type: 'OBJECT',
         properties: {
@@ -337,11 +337,23 @@ Critical honesty rule: never invent a specific real person's name and present th
 The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 6 Lucky Method steps are:
 ${partList}
 
+CAREER-PLAN OPERATING RULES
+When the decision path is career, job search, promotion, or career transition, do not create a passive or purely sequential plan where the person spends several weeks polishing materials before networking, applying, or preparing for interviews. Run these three lanes in parallel in every week:
+1. Network and follow up — identify real warm or relevant contacts, send personalized outreach, request conversations or referrals appropriately, and follow up. If the person has access to Meta Muse, it may be suggested as an optional assistant to organize a user-approved contact list from the person's own connected accounts, draft messages, track follow-ups, or schedule conversations. Never claim Muse has verified professional data, never invent contacts, and never instruct it to send a message without the person's review and approval. Use LinkedIn, company team pages, alumni networks, former colleagues, professional communities, and direct referrals to verify actual professional contacts.
+2. Tailor and submit — select high-fit open roles, revise the master resume for the role's requirements using truthful quantified evidence, complete the application, and log the submission and next follow-up. Do not make “revise resume” an endlessly repeated polishing task; each revision must be tied to one or more actual submissions that week.
+3. Prepare for interviews — practice the formats likely for the target role, including concise career stories and role-specific cases or technical questions; record weak points and use feedback to improve the next practice.
+
+For a career plan, the three weekly actions should normally map one-to-one to these three lanes. Each action must include a count, deliverable, scheduled session, or submitted application. Week 1 must produce a usable master resume, a verified target/contact list, real outreach, at least one submitted high-fit application when a suitable opening exists, and an interview-practice baseline. Weeks 2–12 must continue producing external evidence—replies, conversations, referrals, applications, screens, interview scores, later rounds, or offers—and adjust the weakest conversion step every week. Respect the person's stated weekly hours and reduce quantities when needed rather than dropping an entire lane.
+
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
 function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, first_week, first_week_type, intensity, category, category_key }) {
   const choiceList = value => Array.isArray(value) && value.length ? value.join(', ') : '(not specified)';
+  const careerExecution = category_key === 'career' ? `
+
+CAREER EXECUTION REQUIREMENT
+Build every week around three parallel actions: (1) verified networking/referral outreach and follow-up, optionally using Meta Muse to organize the person's own contacts and draft user-reviewed messages; (2) truthful role-specific resume tailoring followed by actual application submission and tracking; and (3) scheduled interview preparation with a concrete practice output or score. Use the person's stated target role and companies in every action where relevant. Never substitute tool setup, generic learning, or resume polishing for external job-search activity.` : '';
   return `Goal category: ${category || '(not specified)'} (${category_key || 'general'} decision path)
 Current baseline: ${baseline || '(not specified)'}
 Current stage: ${current_stage || '(not specified)'}
@@ -379,7 +391,7 @@ Feedback signals they selected: ${choiceList(obstacle_types)}
 Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
 Evidence review cadence: ${review_cadence || 'Weekly'}
 
-Build their strategic plan now. Treat all six Lucky steps above as core planning inputs, not decorative mindset advice. Week 1 must directly deliver the first-week success test. Later weeks must credibly bridge their baseline to the measurable 90-day outcome, use their chosen real-world actions, test the reframed belief through evidence, and adjust tactics at the stated review cadence without abandoning the meaningful intention.`;
+Build their strategic plan now. Treat all six Lucky steps above as core planning inputs, not decorative mindset advice. Week 1 must directly deliver the first-week success test. Later weeks must credibly bridge their baseline to the measurable 90-day outcome, use their chosen real-world actions, test the reframed belief through evidence, and adjust tactics at the stated review cadence without abandoning the meaningful intention.${careerExecution}`;
 }
 
 async function callGeminiOnce(goalData) {
