@@ -142,6 +142,13 @@
     .scorecard-field label { display:block; margin-bottom:6px; color:var(--muted); font-size:11px; font-weight:700; }
     .scorecard-field textarea { min-height:92px; margin:0; padding:11px; font-size:12px; }
     .save-note { min-height:18px; margin-top:6px; color:var(--mint); font-size:11px; }
+    .week-adjustment { margin-top:14px; padding:14px; border:1px solid rgba(215,255,88,.25); background:rgba(215,255,88,.045); }
+    .week-adjustment-copy { margin-bottom:10px; color:var(--muted); font-size:11px; line-height:1.5; }
+    .adjust-next-week { min-height:42px; padding:0 15px; border:0; border-radius:6px; color:#11110f; background:var(--mint); font-size:12px; font-weight:800; }
+    .adjust-next-week:disabled { opacity:.55; cursor:wait; }
+    .adjust-status { min-height:18px; margin-top:8px; color:var(--mint); font-size:11px; }
+    .adjust-status.error { color:#ff9d9d; }
+    .adjusted-week-note { margin:0 0 13px; padding:10px 12px; border-left:3px solid var(--mint); color:var(--text); background:rgba(215,255,88,.06); font-size:11px; line-height:1.5; }
     .exercise-links { display:flex; flex-wrap:wrap; gap:9px; }
     .exercise-link { padding:10px 13px; border:1px solid rgba(157,140,255,.3); border-radius:8px; color:var(--text); background:rgba(157,140,255,.08); text-decoration:none; font-size:12px; }
     .upgrade-card { display:none; position:relative; overflow:hidden; margin-top:16px; padding:28px; border:1px solid rgba(157,140,255,.4); border-radius:18px; background:linear-gradient(145deg,rgba(157,140,255,.16),rgba(113,229,193,.07)); }
@@ -613,7 +620,7 @@
       });
     }
 
-    function renderPlan(saved) {
+    function renderPlan(saved, preferredWeekNumber=null) {
       const plan = saved.plan || {}, answers = saved.answers || {};
       activeSavedPlan = saved;
       planAccess = saved.access || {unlocked:false,source:'free'};
@@ -638,6 +645,8 @@
         const label=document.createElement('div'); label.className='week-label'; label.textContent=`Week ${weekNumber}`;
         const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=week.theme || ''; head.append(label,theme);
         const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || '';
+        const adjustedNote=saved.weekAdjustments?.[weekKey] ? document.createElement('div') : null;
+        if(adjustedNote){ adjustedNote.className='adjusted-week-note'; adjustedNote.textContent=`Adjusted from your Week ${saved.weekAdjustments[weekKey].fromWeek} feedback.`; }
         const weekProgress=document.createElement('div'); weekProgress.className='week-progress'; weekProgress.dataset.weekProgressKey=weekKey; const weekProgressCopy=document.createElement('div'); weekProgressCopy.className='week-progress-copy'; const weekProgressLabel=document.createElement('strong'); weekProgressLabel.textContent='Weekly progress'; const weekProgressCount=document.createElement('span'); weekProgressCount.dataset.weekProgressCopy=''; weekProgressCopy.append(weekProgressLabel,weekProgressCount); const weekProgressTrack=document.createElement('div'); weekProgressTrack.className='week-progress-track'; const weekProgressFill=document.createElement('div'); weekProgressFill.className='week-progress-fill'; weekProgressFill.dataset.weekProgressFill=''; weekProgressTrack.appendChild(weekProgressFill); weekProgress.append(weekProgressCopy,weekProgressTrack);
         const list=document.createElement('div'); list.className='task-list';
         const appendPlanTask=(action,taskKey,customTask=null)=>{
@@ -666,12 +675,32 @@
         const currentFeedback=saved.progress.feedback[weekKey] || {status:'',note:''};
         ['On track','Need adjustment','Blocked'].forEach(status=>{ const button=document.createElement('button'); button.type='button'; button.className='status-button'; button.textContent=status; button.classList.toggle('selected',currentFeedback.status===status); button.addEventListener('click',()=>{ currentFeedback.status=status; saved.progress.feedback[weekKey]=currentFeedback; statuses.querySelectorAll('.status-button').forEach(item=>item.classList.toggle('selected',item===button)); savePlanProgress(saved); savedNote.textContent='Feedback saved'; }); statuses.appendChild(button); });
         const scorecard=document.createElement('div'); scorecard.className='scorecard-grid'; const savedNote=document.createElement('div'); savedNote.className='save-note'; let noteTimer; const addScorecardField=(property,labelText,placeholder)=>{ const field=document.createElement('div'); field.className='scorecard-field'; const fieldLabel=document.createElement('label'); fieldLabel.textContent=labelText; const input=document.createElement('textarea'); input.placeholder=placeholder; input.value=currentFeedback[property]||(property==='result'?currentFeedback.note:'')||''; input.addEventListener('input',()=>{ currentFeedback[property]=input.value; saved.progress.feedback[weekKey]=currentFeedback; clearTimeout(noteTimer); noteTimer=setTimeout(()=>{ savePlanProgress(saved); savedNote.textContent='Scorecard saved'; setTimeout(()=>savedNote.textContent='',1400); },350); }); field.append(fieldLabel,input); scorecard.appendChild(field); }; addScorecardField('result','What result did you achieve?','Include a number, deliverable, or meaningful outcome.'); addScorecardField('missed','What did you not complete?','Name the unfinished action or blocker honestly.'); addScorecardField('change','What will you change next week?','Choose one specific adjustment.');
-        feedback.append(feedbackLabel,statuses,scorecard,savedNote); card.append(head,target,weekProgress,list,customForm,customStatus); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
+        feedback.append(feedbackLabel,statuses,scorecard,savedNote);
+        const nextVisibleWeek=visibleWeeks[index+1];
+        if(nextVisibleWeek){
+          const adjustment=document.createElement('div'); adjustment.className='week-adjustment'; const adjustmentCopy=document.createElement('p'); adjustmentCopy.className='week-adjustment-copy'; adjustmentCopy.textContent='Finish the scorecard, then let Lucky revise next week around what actually happened.'; const adjustButton=document.createElement('button'); adjustButton.type='button'; adjustButton.className='adjust-next-week'; adjustButton.textContent='Adjust next week →'; const adjustStatus=document.createElement('div'); adjustStatus.className='adjust-status';
+          adjustButton.addEventListener('click',async()=>{
+            const required=['result','missed','change']; if(required.some(key=>!String(currentFeedback[key]||'').trim())){ adjustStatus.className='adjust-status error'; adjustStatus.textContent='Complete all three scorecard questions first. You can write “None” when appropriate.'; return; }
+            adjustButton.disabled=true; adjustButton.textContent='Adjusting next week…'; adjustStatus.className='adjust-status'; adjustStatus.textContent='Lucky is using your feedback to revise the next week.'; savePlanProgress(saved);
+            try {
+              const session=(await sb.auth.getSession()).data.session||currentSession; if(!session?.access_token) throw new Error('Sign in again to adjust your plan.');
+              const completedActions=[],incompleteActions=[]; (week.actions||[]).forEach((action,actionIndex)=>(saved.progress.completed[`${weekKey}-task-${actionIndex}`]?completedActions:incompleteActions).push(action));
+              const response=await fetch('/api/adjust-week',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({current_week:weekNumber,feedback:{...currentFeedback,completed_actions:completedActions,incomplete_actions:incompleteActions}})}); const data=await response.json(); if(!response.ok) throw new Error(data.error||'Lucky could not adjust next week.');
+              const nextWeekNumber=Number(data.adjusted_week_number||nextVisibleWeek.week||weekNumber+1), nextIndex=saved.plan.weeks.findIndex((entry,entryIndex)=>Number(entry.week||entryIndex+1)===nextWeekNumber); if(nextIndex<0) throw new Error('Lucky returned an unexpected week.');
+              saved.plan.weeks[nextIndex]=data.week; const nextWeekKey=`week-${nextWeekNumber}`; saved.weekAdjustments=saved.weekAdjustments||{}; saved.weekAdjustments[nextWeekKey]={fromWeek:weekNumber,adjustedAt:Date.now()};
+              Object.keys(saved.progress.completed||{}).filter(key=>key.startsWith(`${nextWeekKey}-task-`)).forEach(key=>delete saved.progress.completed[key]); Object.keys(saved.taskMetrics||{}).filter(key=>key.startsWith(`${nextWeekKey}-task-`)).forEach(key=>delete saved.taskMetrics[key]); Object.keys(saved.taskSchedules||{}).filter(key=>key.startsWith(`${nextWeekKey}-task-`)).forEach(key=>delete saved.taskSchedules[key]);
+              savePlanProgress(saved); trackEvent('next_week_adjusted',{from_week:weekNumber,adjusted_week:nextWeekNumber}); renderPlan(saved,nextWeekNumber);
+            } catch(error){ adjustButton.disabled=false; adjustButton.textContent='Adjust next week →'; adjustStatus.className='adjust-status error'; adjustStatus.textContent=error.message; }
+          });
+          adjustment.append(adjustmentCopy,adjustButton,adjustStatus); feedback.appendChild(adjustment);
+        }
+        card.append(head,target); if(adjustedNote) card.appendChild(adjustedNote); card.append(weekProgress,list,customForm,customStatus); if(weekExercise) card.appendChild(weekExercise); card.appendChild(feedback); weeks.appendChild(card);
       });
       const weekCards=[...weeks.querySelectorAll('.week')], weekDots=document.getElementById('week-dots'), weekPosition=document.getElementById('week-position'), weekPositionBottom=document.getElementById('week-position-bottom'), weekButtons=[...document.querySelectorAll('[data-week-direction]')];
       weekDots.replaceChildren();
       const firstIncomplete=visibleWeeks.findIndex((week,index)=>{ const weekNumber=week.week||index+1, keys=taskKeysForWeek(saved,`week-${weekNumber}`); return keys.length&&!keys.every(key=>saved.progress.completed[key]); });
-      let activeWeekIndex=Math.max(0,firstIncomplete);
+      const preferredWeekIndex=preferredWeekNumber===null?-1:visibleWeeks.findIndex((week,index)=>Number(week.week||index+1)===Number(preferredWeekNumber));
+      let activeWeekIndex=preferredWeekIndex>=0?preferredWeekIndex:Math.max(0,firstIncomplete);
       const showWeek=(nextIndex,source='button')=>{
         activeWeekIndex=Math.max(0,Math.min(nextIndex,weekCards.length-1));
         weekCards.forEach((card,index)=>{ const active=index===activeWeekIndex; card.classList.toggle('active',active); card.setAttribute('aria-hidden',String(!active)); });
@@ -692,7 +721,7 @@
       const exercises=document.getElementById('result-exercises'); exercises.replaceChildren(); const visibleExerciseParts=new Set(visibleWeeks.map((week,index)=>{const part=Number(week.exercise_part); return part>=1&&part<=6?part:(index%6)+1;})); const recommendedExercises=(plan.exercises || []).filter(ex=>Number(ex.part)>=1&&Number(ex.part)<=6); recommendedExercises.filter(ex=>planAccess.unlocked||visibleExerciseParts.has(Number(ex.part))).forEach(ex=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?step=${ex.part}`; link.textContent=`Step ${ex.part}: ${ex.reason || 'Recommended practice'}`; exercises.appendChild(link)}); if(!exercises.children.length){ [...visibleExerciseParts].slice(0,3).forEach(part=>{const link=document.createElement('a'); link.className='exercise-link'; link.href=`/exercises?step=${part}`; link.textContent=`Step ${part}: Practice the Lucky Method for this week`; exercises.appendChild(link);}); }
       const usage=saved.usage; const buildAnother=document.getElementById('build-another'); const allowance=document.getElementById('plan-allowance');
       if(usage){ allowance.textContent=usage.remaining>0 ? `${usage.remaining} of ${usage.limit} plan generations remaining` : 'You have used all 3 plan generations for this account.'; buildAnother.disabled=usage.remaining<=0; buildAnother.textContent=usage.remaining>0 ? 'Build another plan' : 'Plan limit reached'; }
-      showView('result'); window.scrollTo({top:0}); loadAccountabilityState(); if(Date.now()-(saved.savedAt||Date.now())>=7*86400000) setTimeout(()=>maybePromptFeedback('seven_day',saved),500);
+      showView('result'); if(preferredWeekIndex>=0) document.querySelector('.week-carousel')?.scrollIntoView({behavior:'smooth',block:'start'}); else window.scrollTo({top:0}); loadAccountabilityState(); if(Date.now()-(saved.savedAt||Date.now())>=7*86400000) setTimeout(()=>maybePromptFeedback('seven_day',saved),500);
     }
 
     function planShareText(){ const saved=activeSavedPlan||{}, plan=saved.plan||{}, answers=saved.answers||{}, first=plan.weeks?.[0]?.actions?.[0]||answers.first_week||''; return `My focus for the next 90 days is: ${answers.goal||plan.milestone_90day||'my meaningful goal'}\n\n90-day outcome: ${plan.milestone_90day||answers.goal||''}\nFirst action: ${first}\n\nBuilt with Lucky: ${location.origin}`; }
@@ -720,7 +749,7 @@
       const account=await fetchAccountState();
       if(!account?.savedPlan||!account.access?.unlocked) throw new Error('Your full plan is not available yet. Please refresh in a moment.');
       const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-      const saved={...account.savedPlan,access:account.access,progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,taskMetrics:current?.ownerId===currentSession.user.id?current.taskMetrics:undefined,taskSchedules:current?.ownerId===currentSession.user.id?current.taskSchedules:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+      const saved={...account.savedPlan,access:account.access,progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,taskMetrics:current?.ownerId===currentSession.user.id?current.taskMetrics:undefined,taskSchedules:current?.ownerId===currentSession.user.id?current.taskSchedules:undefined,weekAdjustments:current?.ownerId===currentSession.user.id?current.weekAdjustments:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
       localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); renderPlan(saved);
     }
     async function startUpgrade(){
@@ -795,7 +824,7 @@
         const account=await fetchAccountState();
         if(account?.savedPlan&&currentSession){
           const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-          const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,taskMetrics:current?.ownerId===currentSession.user.id?current.taskMetrics:undefined,taskSchedules:current?.ownerId===currentSession.user.id?current.taskSchedules:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+          const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,taskMetrics:current?.ownerId===currentSession.user.id?current.taskMetrics:undefined,taskSchedules:current?.ownerId===currentSession.user.id?current.taskSchedules:undefined,weekAdjustments:current?.ownerId===currentSession.user.id?current.weekAdjustments:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
           localStorage.setItem(PLAN_KEY,JSON.stringify(recovered)); localStorage.removeItem(PENDING_KEY); renderPlan(recovered); return;
         }
         if(draft) await generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard');
@@ -835,7 +864,7 @@
       if(currentSession){
         const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
         if(startNewPlan&&account?.usage?.remaining<=0&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
-        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,customTasks:localBelongsToUser?saved.customTasks:undefined,taskMetrics:localBelongsToUser?saved.taskMetrics:undefined,taskSchedules:localBelongsToUser?saved.taskSchedules:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,customTasks:localBelongsToUser?saved.customTasks:undefined,taskMetrics:localBelongsToUser?saved.taskMetrics:undefined,taskSchedules:localBelongsToUser?saved.taskSchedules:undefined,weekAdjustments:localBelongsToUser?saved.weekAdjustments:undefined,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(saved&&!localBelongsToUser){ saved=null; }
       }
