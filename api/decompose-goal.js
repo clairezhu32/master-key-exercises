@@ -307,6 +307,107 @@ const PLAN_SCHEMA = {
   required: ['domain_label', 'summary', 'insight', 'milestone_90day', 'lucky_method', 'funnel', 'weeks', 'exercises'],
 };
 
+const ADJUSTED_WEEK_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    week: { type: 'INTEGER' },
+    funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS },
+    theme: { type: 'STRING' },
+    target: { type: 'STRING', description: 'A concrete, measurable outcome for this week.' },
+    actions: { type: 'ARRAY', description: 'Exactly 3 concrete actions sized to the user’s available time.', items: { type: 'STRING' } },
+    exercise_part: { type: 'INTEGER', description: 'A Lucky Method step from 1 through 6.' },
+    exercise_reason: { type: 'STRING' },
+  },
+  required: ['week', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
+};
+
+function cleanWeeklyFeedback(feedback = {}) {
+  const clean = {};
+  for (const key of ['status', 'result', 'missed', 'change']) clean[key] = String(feedback[key] || '').trim().slice(0, 1200);
+  clean.completed_actions = Array.isArray(feedback.completed_actions) ? feedback.completed_actions.map(String).slice(0, 20) : [];
+  clean.incomplete_actions = Array.isArray(feedback.incomplete_actions) ? feedback.incomplete_actions.map(String).slice(0, 20) : [];
+  return clean;
+}
+
+async function generateAdjustedWeek(context) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw Object.assign(new Error('AI planning is not configured'), { status: 500 });
+  const careerRule = context.answers.category_key === 'career' ? `
+This is a career plan. Keep three execution lanes active in parallel: (1) verified networking/referral outreach and follow-up, with Meta Muse only as an optional assistant for organizing the user's own contacts and drafting user-reviewed messages; (2) truthful role-specific resume tailoring tied to actual application submissions; and (3) scheduled interview practice with a measurable output. The three actions should normally map one-to-one to these lanes.` : '';
+  const prompt = `Revise ONLY the next week of a personalized 90-day action plan using the user's completed weekly scorecard.
+
+Protect the original 90-day goal. Respond to what happened in reality: keep what worked, reduce or replace what did not, and apply the user's requested change. Do not punish missed work by stacking it on top of a full new week. Keep exactly 3 actions, each specific, measurable, and feasible within the user's stated weekly hours. Preserve continuity with later weeks without rewriting them. Do not claim guaranteed outcomes.${careerRule}
+
+Goal and onboarding answers:
+${JSON.stringify(context.answers)}
+
+Current week:
+${JSON.stringify(context.currentWeek)}
+
+User feedback and actual execution:
+${JSON.stringify(context.feedback)}
+
+Original next week to revise:
+${JSON.stringify(context.nextWeek)}
+
+Following weeks for continuity only:
+${JSON.stringify(context.followingWeeks)}
+
+Return the revised next-week object. Its week number must remain ${context.nextWeek.week}.`;
+  const response = await fetch(GEMINI_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: 'You are Lucky, a practical execution coach. Revise plans from honest weekly evidence while preserving the user’s meaningful goal.' }] },
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: 'application/json', responseSchema: ADJUSTED_WEEK_SCHEMA, maxOutputTokens: 1800 },
+    }),
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    console.error(`adjust-week Gemini ${response.status}: ${detail}`);
+    const message = response.status === 429 ? 'Weekly adjustment is temporarily rate-limited. Please try again shortly.' : 'Lucky could not adjust next week right now.';
+    throw Object.assign(new Error(message), { status: response.status === 429 ? 429 : 502 });
+  }
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw Object.assign(new Error('Lucky returned an incomplete weekly adjustment.'), { status: 502 });
+  let week;
+  try { week = JSON.parse(text); } catch { throw Object.assign(new Error('Lucky returned an invalid weekly adjustment.'), { status: 502 }); }
+  if (!Array.isArray(week.actions) || week.actions.length !== 3) throw Object.assign(new Error('Lucky returned an incomplete weekly adjustment.'), { status: 502 });
+  return { ...week, week: context.nextWeek.week };
+}
+
+async function adjustNextWeek(user, body, serviceRoleKey) {
+  const currentWeekNumber = Number(body.current_week);
+  const feedback = cleanWeeklyFeedback(body.feedback);
+  if (!Number.isInteger(currentWeekNumber) || currentWeekNumber < 1 || currentWeekNumber >= 12) throw Object.assign(new Error('Choose a week from 1 through 11.'), { status: 400 });
+  if (!feedback.result || !feedback.missed || !feedback.change) throw Object.assign(new Error('Complete all three weekly scorecard questions before adjusting next week.'), { status: 400 });
+  const access = await getPlanAccess(user.id, serviceRoleKey);
+  if (!access.unlocked) throw Object.assign(new Error('Unlock the full plan before adjusting future weeks.'), { status: 403 });
+  const headers = { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` };
+  const recordResponse = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${encodeURIComponent(user.id)}&select=goal_data,plan&limit=1`, { headers });
+  if (!recordResponse.ok) throw new Error(`Plan query failed (${recordResponse.status})`);
+  const record = (await recordResponse.json())[0];
+  const weeks = record?.plan?.weeks;
+  if (!record?.plan || !Array.isArray(weeks)) throw Object.assign(new Error('No saved 90-day plan was found.'), { status: 404 });
+  const currentIndex = weeks.findIndex((week, index) => Number(week.week || index + 1) === currentWeekNumber);
+  if (currentIndex < 0 || currentIndex >= weeks.length - 1) throw Object.assign(new Error('There is no following week to adjust.'), { status: 400 });
+  const nextWeek = weeks[currentIndex + 1];
+  const adjustedWeek = await generateAdjustedWeek({
+    answers: Object.fromEntries(Object.entries(record.goal_data || {}).filter(([key]) => !key.startsWith('_'))),
+    currentWeek: weeks[currentIndex], nextWeek, followingWeeks: weeks.slice(currentIndex + 2, currentIndex + 4), feedback,
+  });
+  const adjustedPlan = { ...record.plan, weeks: weeks.map((week, index) => index === currentIndex + 1 ? adjustedWeek : week) };
+  const history = Array.isArray(record.goal_data?._weekly_adjustments) ? record.goal_data._weekly_adjustments.slice(-19) : [];
+  const goalData = { ...record.goal_data, _weekly_adjustments: [...history, { from_week: currentWeekNumber, adjusted_week: adjustedWeek.week, feedback, adjusted_at: new Date().toISOString() }] };
+  const saveResponse = await fetch(`${SUPABASE_URL}/rest/v1/mks_goal_generations?user_id=eq.${encodeURIComponent(user.id)}`, {
+    method: 'PATCH', headers: { ...headers, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ goal_data: goalData, plan: adjustedPlan }),
+  });
+  if (!saveResponse.ok) throw new Error(`Plan update failed (${saveResponse.status})`);
+  return { week: adjustedWeek, adjusted_week_number: adjustedWeek.week };
+}
+
 function buildSystemPrompt() {
   const partList = PART_THEMES.map((t, i) => `${i + 1}. ${t}`).join('\n');
   return `You are a strategic execution coach. You turn a person's goal into a hyper-specific 90-day plan by adapting a proven 7-stage growth-funnel framework to whatever domain the goal is in (career, business, health, financial, creative, learning, relationships, or anything else).
@@ -562,6 +663,14 @@ export default async function handler(req, res) {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   } catch {
     return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  if (body?.action === 'adjust_week') {
+    try { return res.status(200).json(await adjustNextWeek(user, body, serviceRoleKey)); }
+    catch (error) {
+      console.error(`adjust-week failed for ${user.id}: ${error.message}`);
+      return res.status(error.status || 500).json({ error: error.message || 'Could not adjust next week' });
+    }
   }
 
   const { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, first_week, first_week_type, category, category_key } = body ?? {};
