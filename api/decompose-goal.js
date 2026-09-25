@@ -321,6 +321,11 @@ const ADJUSTED_WEEK_SCHEMA = {
   required: ['week', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
 };
 
+function isCareerPath({ category_key, category, goal } = {}) {
+  const signals = [category_key, category, goal].filter(Boolean).join(' ').toLowerCase().replace(/[_-]+/g, ' ');
+  return /\b(career|job(?:\s+search|\s+hunting)?|employment|promotion|professional|role|position|resume|interview|product manager|data scientist|software engineer)\b/.test(signals);
+}
+
 function cleanWeeklyFeedback(feedback = {}) {
   const clean = {};
   for (const key of ['status', 'result', 'missed', 'change']) clean[key] = String(feedback[key] || '').trim().slice(0, 1200);
@@ -332,7 +337,7 @@ function cleanWeeklyFeedback(feedback = {}) {
 async function generateAdjustedWeek(context) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('AI planning is not configured'), { status: 500 });
-  const careerRule = context.answers.category_key === 'career' ? `
+  const careerRule = isCareerPath(context.answers) ? `
 This is a career plan. Keep three execution lanes active in parallel: (1) verified networking/referral outreach and follow-up, with Meta Muse only as an optional assistant for organizing the user's own contacts and drafting user-reviewed messages; (2) truthful role-specific resume tailoring tied to actual application submissions; and (3) scheduled interview practice with a measurable output. The three actions should normally map one-to-one to these lanes.` : '';
   const prompt = `Revise ONLY the next week of a personalized 90-day action plan using the user's completed weekly scorecard.
 
@@ -451,7 +456,7 @@ Respond with a single JSON object matching the required schema exactly. Do not i
 
 function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key }) {
   const choiceList = value => Array.isArray(value) && value.length ? value.join(', ') : '(not specified)';
-  const careerExecution = category_key === 'career' ? `
+  const careerExecution = isCareerPath({ category_key, category, goal }) ? `
 
 CAREER EXECUTION REQUIREMENT
 Build every week around three parallel actions: (1) verified networking/referral outreach and follow-up, optionally using Meta Muse to organize the person's own contacts and draft user-reviewed messages; (2) truthful role-specific resume tailoring followed by actual application submission and tracking; and (3) scheduled interview preparation with a concrete practice output or score. Use the person's stated target role and companies in every action where relevant. Never substitute tool setup, generic learning, or resume polishing for external job-search activity.` : '';

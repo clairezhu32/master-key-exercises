@@ -103,6 +103,15 @@ function planRationale(goal, plan) {
   return `Built around “${cleanGoal},” sequencing weekly action from ${firstTheme} through ${lastTheme}.`;
 }
 
+function isCareerPlanData(answers, plan, goal) {
+  const signals = [answers?.category_key, answers?.category, answers?.goal_area, plan?.domain_label, goal]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ');
+  return /\b(career|job(?:\s+search|\s+hunting)?|employment|promotion|professional|role|position|resume|interview|product manager|data scientist|software engineer)\b/.test(signals);
+}
+
 async function track(eventName, userId, email, properties, serviceRoleKey) {
   await fetch(`${SUPABASE_URL}/rest/v1/mks_events`, {
     method: 'POST',
@@ -129,7 +138,7 @@ async function buddyView(record, serviceRoleKey) {
   const parsedStart = new Date(startCandidate);
   const startDate = Number.isNaN(parsedStart.getTime()) ? new Date(record.generated_at || Date.now()) : parsedStart;
   const goal = answers.goal || plan.milestone_90day || 'A meaningful 90-day goal';
-  const isCareerPlan = answers.category_key === 'career' || /\b(career|job|role|resume|interview)\b/i.test(goal);
+  const isCareerPlan = isCareerPlanData(answers, plan, goal);
   return {
     owner_name: answers._buddy_match_profile?.first_name || answers._accountability?.owner_name || 'Your buddy',
     goal,
