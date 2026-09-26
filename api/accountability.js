@@ -286,11 +286,13 @@ export default async function handler(req, res) {
     }
 
     if (body.action === 'progress') {
-      if (!goalData._accountability?.token_hash && !['waiting', 'matched'].includes(goalData._buddy_match_profile?.status)) return res.status(200).json({ synced: false });
       const completed = cleanCompleted(body.completed);
       const progress = { completed, completed_count: Object.values(completed).filter(Boolean).length, total_tasks: Math.max(0, Number(body.total_tasks) || 0), updated_at: new Date().toISOString() };
       const taskEstimates = buildTaskEstimates(record.plan, goalData._task_estimates);
-      await saveGoalData(user.id, { ...goalData, _accountability_progress: progress, _task_estimates: taskEstimates }, serviceRoleKey);
+      const funnelMetrics = body.funnel_metrics && typeof body.funnel_metrics === 'object'
+        ? Object.fromEntries(['applications', 'responses', 'interviews', 'offers'].map((key) => [key, Math.max(0, Math.floor(Number(body.funnel_metrics[key]) || 0))]))
+        : goalData._funnel_metrics;
+      await saveGoalData(user.id, { ...goalData, _accountability_progress: progress, _task_estimates: taskEstimates, _funnel_metrics: funnelMetrics }, serviceRoleKey);
       return res.status(200).json({ synced: true, progress });
     }
 
