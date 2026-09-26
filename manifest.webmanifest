@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "Lucky — 90-Day Action Plan",
+  "short_name": "Lucky",
+  "description": "Turn one meaningful goal into a personalized 90-day action plan, track progress, and build momentum.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#11110f",
+  "theme_color": "#11110f",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    { "src": "/icons/lucky-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/lucky-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "My Plan", "short_name": "My Plan", "url": "/goals", "icons": [{ "src": "/icons/lucky-192.png", "sizes": "192x192" }] },
+    { "name": "Lucky Exercises", "short_name": "Exercises", "url": "/exercises", "icons": [{ "src": "/icons/lucky-192.png", "sizes": "192x192" }] }
+  ]
+}

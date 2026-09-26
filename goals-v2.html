@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Build Your 90-Day Action Plan — Lucky</title><style>body{background:#11110f;color:#aaa99e;font:14px Arial,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}</style></head><body><div>Loading your plan…</div><script>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Build Your 90-Day Action Plan — Lucky</title><style>body{background:#11110f;color:#aaa99e;font:14px Arial,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}</style>  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#11110f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lucky">
+  <link rel="apple-touch-icon" href="/icons/lucky-192.png">
+  <script src="/pwa.js" defer></script>
+</head><body><div>Loading your plan…</div><script>
 (async()=>{try{
 const r=await fetch('/goals.html',{cache:'no-store'}); if(!r.ok) throw new Error('load failed'); let h=await r.text();
 function replaceStep(n,next,block){const s=h.indexOf('<div id="step-'+n+'"'); if(s<0)return; const e=h.indexOf(next,s); if(e<0)return; h=h.slice(0,s)+block+'\n    '+h.slice(e);}
