@@ -91,6 +91,14 @@
     .progress-percent { color:var(--mint); font-size:28px; font-weight:800; line-height:1; letter-spacing:-.03em; }
     .progress-track { height:11px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.08); }
     .progress-fill { width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--mint),var(--violet)); transition:width .25s ease; }
+    .owner-plan-meta { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:13px; color:var(--muted); font-size:12px; }
+    .owner-plan-meta strong { color:var(--text); }
+    .owner-rationale { margin:12px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .career-funnel { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:15px; }
+    .career-funnel-item { padding:10px 8px; border:1px solid var(--line); border-radius:7px; background:#181814; text-align:center; }
+    .career-funnel-item strong { display:block; color:var(--mint); font-size:20px; }
+    .career-funnel-item span { color:var(--muted); font-size:10px; }
+    .duration-chip { display:inline-flex; align-items:center; min-height:30px; padding:0 9px; border:1px solid #3f4039; border-radius:999px; color:#b9baaF; font-size:10px; font-weight:700; }
     .task-list { display:grid; gap:9px; list-style:none; }
     .task-block { padding:10px 11px; border:1px solid transparent; border-radius:10px; transition:background .2s,border-color .2s; }
     .task-block:hover { border-color:var(--line); background:rgba(255,255,255,.025); }
@@ -229,7 +237,7 @@
     .access-panel label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; font-weight:700; }
     .access-panel input { margin:0 0 10px; }
     .access-note { margin-top:14px; color:#85857c; font-size:11px; line-height:1.5; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week{min-height:0;padding:18px 15px}.week-head{display:block}.week-theme{margin-top:5px}.week-carousel-nav{gap:8px}.week-carousel-nav.bottom{display:none}.week-position{font-size:12px}.week-nav-button{min-width:74px;min-height:40px;padding:0 10px;font-size:0}.week-nav-button[data-week-direction="prev"]::after{content:'← Prev';font-size:11px}.week-nav-button[data-week-direction="next"]::after{content:'Next →';font-size:11px}.week-dot{width:12px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px}.custom-task-form,.metric-form,.schedule-form,.scorecard-grid{grid-template-columns:1fr}.custom-task-form button,.task-detail-save{width:100%}.task-tools,.task-detail-panel{margin-left:0}.plan-progress{padding:15px}.plan-progress-head{align-items:flex-start}.progress-stats{display:block}.progress-percent{display:block;margin-bottom:4px;font-size:24px} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week{min-height:0;padding:18px 15px}.week-head{display:block}.week-theme{margin-top:5px}.week-carousel-nav{gap:8px}.week-carousel-nav.bottom{display:none}.week-position{font-size:12px}.week-nav-button{min-width:74px;min-height:40px;padding:0 10px;font-size:0}.week-nav-button[data-week-direction="prev"]::after{content:'← Prev';font-size:11px}.week-nav-button[data-week-direction="next"]::after{content:'Next →';font-size:11px}.week-dot{width:12px}.lucky-method{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px}.custom-task-form,.metric-form,.schedule-form,.scorecard-grid{grid-template-columns:1fr}.custom-task-form button,.task-detail-save{width:100%}.task-tools,.task-detail-panel{margin-left:0}.plan-progress{padding:15px}.plan-progress-head{align-items:flex-start}.progress-stats{display:block}.progress-percent{display:block;margin-bottom:4px;font-size:24px}.career-funnel{grid-template-columns:repeat(2,minmax(0,1fr))} }
   </style>
   <style>
     :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
@@ -603,10 +611,62 @@
     function visibleTaskKeys(saved) {
       return visiblePlanWeeks(saved).flatMap((week,index)=>taskKeysForWeek(saved,`week-${week.week||index+1}`));
     }
+    function isCareerPlan(saved) {
+      const answers=saved.answers||{}, haystack=[answers.category_key,answers.category,answers.goal,saved.plan?.domain_label].filter(Boolean).join(' ').toLowerCase();
+      return /career|job[ -]?(search|hunt)|\brole\b|\bposition\b|product manager|\bpm\b|data scientist|software engineer|resume|interview/.test(haystack);
+    }
+    function inferTaskMinutes(action='') {
+      const text=String(action).toLowerCase();
+      if(/interview|mock|case stud|portfolio|presentation/.test(text)) return 60;
+      if(/resume|cover letter|proposal|strategy|research/.test(text)) return 45;
+      if(/apply|application|network|reach out|message|follow up|review/.test(text)) return 30;
+      if(/schedule|email|identify|list|choose|write down/.test(text)) return 15;
+      return 30;
+    }
+    function ownerTaskEntries(saved) {
+      return visiblePlanWeeks(saved).flatMap((week,index)=>{
+        const weekNumber=week.week||index+1, weekKey=`week-${weekNumber}`;
+        const generated=(week.actions||[]).map((text,actionIndex)=>({text,key:`${weekKey}-task-${actionIndex}`,week:weekNumber}));
+        const custom=(saved.customTasks?.[weekKey]||[]).map(task=>({text:task.text,key:`${weekKey}-custom-${task.id}`,week:weekNumber}));
+        return [...generated,...custom];
+      });
+    }
+    function careerFunnelCounts(saved) {
+      const counts={Applications:0,Responses:0,Interviews:0,Offers:0};
+      ownerTaskEntries(saved).filter(task=>saved.progress?.completed?.[task.key]).forEach(task=>{
+        const text=task.text.toLowerCase();
+        if(/offer/.test(text)) counts.Offers+=1;
+        else if(/interview|screen|mock/.test(text)) counts.Interviews+=1;
+        else if(/response|reply|follow.?up|recruiter call/.test(text)) counts.Responses+=1;
+        else if(/apply|application|submit.*resume/.test(text)) counts.Applications+=1;
+      });
+      return counts;
+    }
+    function updateOwnerPlanSummary(saved) {
+      const answers=saved.answers||{}, plan=saved.plan||{}, entries=ownerTaskEntries(saved);
+      const next=entries.find(task=>!saved.progress?.completed?.[task.key]);
+      const firstAction=document.querySelector('#result .first-action');
+      if(firstAction){ firstAction.querySelector('span').textContent=next?`Next up · Week ${next.week}`:'Plan complete'; document.getElementById('result-first-action').textContent=next?.text||'You completed every task in this plan. Take a moment to celebrate and choose what comes next.'; }
+      const startValue=answers.start_date||localDateInputValue(new Date(answers.createdAt||saved.savedAt||Date.now()));
+      const start=new Date(`${startValue}T12:00:00`), now=new Date(), elapsed=Math.max(0,Math.floor((now-start)/86400000)), currentWeek=Math.min(12,Math.max(1,Math.floor(elapsed/7)+1));
+      const milestone=new Date(start); milestone.setDate(milestone.getDate()+89); const daysLeft=Math.max(0,Math.ceil((milestone-now)/86400000));
+      let meta=document.getElementById('owner-plan-meta');
+      if(!meta){ meta=document.createElement('div'); meta.id='owner-plan-meta'; meta.className='owner-plan-meta'; document.querySelector('.plan-progress').appendChild(meta); }
+      meta.innerHTML=`<strong>${daysLeft} days left · Week ${currentWeek} of 12</strong><span>Plan started ${start.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</span>`;
+      let rationale=document.getElementById('owner-rationale');
+      if(!rationale){ rationale=document.createElement('p'); rationale.id='owner-rationale'; rationale.className='owner-rationale'; document.getElementById('result-milestone').after(rationale); }
+      const category=plan.domain_label||answers.category||'your selected goal';
+      rationale.textContent=`Built for ${category.toLowerCase()}, using your goal, available time, constraints and first-week outcome.`;
+      let funnel=document.getElementById('owner-career-funnel');
+      if(!isCareerPlan(saved)){ funnel?.remove(); return; }
+      if(!funnel){ funnel=document.createElement('div'); funnel.id='owner-career-funnel'; funnel.className='career-funnel'; document.querySelector('.plan-progress').appendChild(funnel); }
+      const counts=careerFunnelCounts(saved); funnel.replaceChildren(...Object.entries(counts).map(([label,count])=>{ const item=document.createElement('div'); item.className='career-funnel-item'; const value=document.createElement('strong'); value.textContent=count; const name=document.createElement('span'); name.textContent=label; item.append(value,name); return item; }));
+    }
     function updateProgressSummary(saved) {
       const keys=visibleTaskKeys(saved), visibleKeys=new Set(keys), completed=Object.entries(saved.progress?.completed||{}).filter(([key,value])=>value&&visibleKeys.has(key)).length, percent=keys.length?Math.round(completed/keys.length*100):0;
       document.getElementById('progress-percent').textContent=`${percent}%`; document.getElementById('progress-count').textContent=`${completed} of ${keys.length} tasks complete`; document.getElementById('progress-fill').style.width=`${percent}%`;
       document.querySelectorAll('[data-week-progress-key]').forEach(element=>{ const weekKeys=taskKeysForWeek(saved,element.dataset.weekProgressKey), weekCompleted=weekKeys.filter(key=>saved.progress?.completed?.[key]).length, weekPercent=weekKeys.length?Math.round(weekCompleted/weekKeys.length*100):0; element.querySelector('[data-week-progress-copy]').textContent=`${weekCompleted} of ${weekKeys.length} tasks · ${weekPercent}%`; element.querySelector('[data-week-progress-fill]').style.width=`${weekPercent}%`; });
+      updateOwnerPlanSummary(saved);
     }
     function calendarDateRange(schedule) { const start=new Date(`${schedule.date}T${schedule.time}:00`); if(Number.isNaN(start.getTime())) return null; const end=new Date(start.getTime()+(Number(schedule.duration)||30)*60000); return {start,end}; }
     function localDateInputValue(date=new Date()) { const pad=value=>String(value).padStart(2,'0'); return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`; }
@@ -651,7 +711,7 @@
       planAccess = saved.access || {unlocked:false,source:'free'};
       saved.access = planAccess;
       const checkoutMessage=document.getElementById('checkout-message'); checkoutMessage.textContent=checkoutNotice; checkoutMessage.style.display=checkoutNotice?'block':'none';
-      saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {}; saved.customTasks = saved.customTasks || {}; saved.taskMetrics = saved.taskMetrics || {}; saved.taskSchedules = saved.taskSchedules || {};
+      saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {}; saved.customTasks = saved.customTasks || {}; saved.taskMetrics = saved.taskMetrics || {}; saved.taskSchedules = saved.taskSchedules || {}; saved.taskEstimates=saved.taskEstimates||{};
       document.getElementById('result-domain').textContent = plan.domain_label || answers.category || 'Your 90-day plan';
       document.getElementById('result-goal').textContent = answers.goal || plan.milestone_90day || 'Your 90-day goal';
       document.getElementById('result-summary').textContent = plan.summary || '';
@@ -679,7 +739,7 @@
           const block=document.createElement('div'); block.className='task-block'; const main=document.createElement('div'); main.className='task-main'; const item=document.createElement('label'); item.className='task'; const checkbox=document.createElement('input'); checkbox.type='checkbox'; checkbox.checked=Boolean(saved.progress.completed[taskKey]); const text=document.createElement('span'); text.textContent=action; item.append(checkbox,text); item.classList.toggle('done',checkbox.checked); main.appendChild(item); block.appendChild(main);
           checkbox.addEventListener('change',()=>{ saved.progress.completed[taskKey]=checkbox.checked; item.classList.toggle('done',checkbox.checked); const metric=saved.taskMetrics[taskKey]; if(metric&&checkbox.checked&&Number(metric.current)<Number(metric.target)) metric.current=Number(metric.target); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); const completed=Object.values(saved.progress.completed).filter(Boolean).length; if(checkbox.checked){ trackEvent('task_completed',{week:weekNumber,completed_count:completed,custom:Boolean(customTask)}); } if(checkbox.checked&&completed===1) maybePromptFeedback('first_action',saved); renderMetric(); });
           if(customTask){ const remove=document.createElement('button'); remove.type='button'; remove.className='custom-task-remove'; remove.setAttribute('aria-label',`Remove custom task: ${customTask.text}`); remove.title='Remove task'; remove.textContent='×'; remove.addEventListener('click',()=>{ saved.customTasks[weekKey]=(saved.customTasks[weekKey]||[]).filter(entry=>entry.id!==customTask.id); delete saved.progress.completed[taskKey]; delete saved.taskMetrics[taskKey]; delete saved.taskSchedules[taskKey]; block.remove(); savePlanProgress(saved); updateProgressSummary(saved); scheduleAccountabilitySync(saved); trackEvent('custom_task_removed',{week:weekNumber}); }); main.appendChild(remove); }
-          const tools=document.createElement('div'); tools.className='task-tools'; const metricButton=document.createElement('button'); metricButton.type='button'; metricButton.className='task-tool'; const scheduleButton=document.createElement('button'); scheduleButton.type='button'; scheduleButton.className='task-tool'; tools.append(metricButton,scheduleButton); block.appendChild(tools);
+          const tools=document.createElement('div'); tools.className='task-tools'; const estimate=document.createElement('span'); estimate.className='duration-chip'; const estimatedMinutes=Number(saved.taskEstimates[taskKey])||inferTaskMinutes(action); saved.taskEstimates[taskKey]=estimatedMinutes; estimate.textContent=estimatedMinutes>=60&&estimatedMinutes%60===0?`${estimatedMinutes/60} h`:`${estimatedMinutes} min`; const metricButton=document.createElement('button'); metricButton.type='button'; metricButton.className='task-tool'; const scheduleButton=document.createElement('button'); scheduleButton.type='button'; scheduleButton.className='task-tool'; tools.append(estimate,metricButton,scheduleButton); block.appendChild(tools);
           const metricPanel=document.createElement('div'); metricPanel.className='task-detail-panel'; const schedulePanel=document.createElement('div'); schedulePanel.className='task-detail-panel'; block.append(metricPanel,schedulePanel);
           const renderMetricConfig=(existing={})=>{ metricPanel.replaceChildren(); metricPanel.classList.add('active'); const form=document.createElement('form'); form.className='metric-form'; const suggested=action.match(/\b(\d+(?:\.\d+)?)\b/)?.[1]||''; const targetLabel=document.createElement('label'); targetLabel.textContent='Target'; const targetInput=document.createElement('input'); targetInput.type='number'; targetInput.min='0.01'; targetInput.step='any'; targetInput.required=true; targetInput.value=existing.target||suggested; targetLabel.appendChild(targetInput); const unitLabel=document.createElement('label'); unitLabel.textContent='What are you counting?'; const unitInput=document.createElement('input'); unitInput.type='text'; unitInput.maxLength=40; unitInput.required=true; unitInput.placeholder='applications, workouts, calls…'; unitInput.value=existing.unit||''; unitLabel.appendChild(unitInput); const save=document.createElement('button'); save.type='submit'; save.className='task-detail-save'; save.textContent='Save target'; form.append(targetLabel,unitLabel,save); form.addEventListener('submit',event=>{ event.preventDefault(); const targetValue=Number(targetInput.value), unit=unitInput.value.trim(); if(!Number.isFinite(targetValue)||targetValue<=0||!unit) return; saved.taskMetrics[taskKey]={current:Math.min(Number(existing.current)||0,targetValue),target:targetValue,unit}; savePlanProgress(saved); renderMetric(); trackEvent('task_metric_added',{week:weekNumber}); }); metricPanel.appendChild(form); };
           const renderMetric=()=>{ const metric=saved.taskMetrics[taskKey]; metricButton.textContent=metric?'Edit result target':'Track a result'; metricPanel.replaceChildren(); if(!metric){ metricPanel.classList.remove('active'); return; } metricPanel.classList.add('active'); const summary=document.createElement('div'); summary.className='metric-summary'; const copy=document.createElement('div'); copy.className='metric-copy'; const strong=document.createElement('strong'); strong.textContent=`${Number(metric.current)||0} of ${metric.target}`; copy.append(strong,document.createTextNode(` ${metric.unit}`)); const update=document.createElement('div'); update.className='metric-update'; const currentInput=document.createElement('input'); currentInput.type='number'; currentInput.min='0'; currentInput.max=String(metric.target); currentInput.step='any'; currentInput.value=Number(metric.current)||0; currentInput.setAttribute('aria-label',`Current ${metric.unit} completed`); update.append(document.createTextNode('Progress'),currentInput); summary.append(copy,update); const progressTrack=document.createElement('div'); progressTrack.className='task-progress-track'; const progressFill=document.createElement('div'); progressFill.className='task-progress-fill'; const refreshMetric=()=>{ const current=Math.max(0,Math.min(Number(currentInput.value)||0,Number(metric.target))); metric.current=current; const percent=Math.min(100,Math.round(current/Number(metric.target)*100)); progressFill.style.width=`${percent}%`; strong.textContent=`${current} of ${metric.target}`; const shouldComplete=current>=Number(metric.target); if(checkbox.checked!==shouldComplete){ checkbox.checked=shouldComplete; checkbox.dispatchEvent(new Event('change')); } else { savePlanProgress(saved); } }; currentInput.addEventListener('change',refreshMetric); progressTrack.appendChild(progressFill); const actions=document.createElement('div'); actions.className='calendar-actions'; const edit=document.createElement('button'); edit.type='button'; edit.textContent='Change target'; edit.addEventListener('click',()=>renderMetricConfig(metric)); const remove=document.createElement('button'); remove.type='button'; remove.textContent='Remove tracker'; remove.addEventListener('click',()=>{ delete saved.taskMetrics[taskKey]; savePlanProgress(saved); renderMetric(); }); actions.append(edit,remove); metricPanel.append(summary,progressTrack,actions); progressFill.style.width=`${Math.min(100,Math.round((Number(metric.current)||0)/Number(metric.target)*100))}%`; };
