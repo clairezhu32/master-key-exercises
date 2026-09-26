@@ -1,5 +1,5 @@
-const CACHE = 'lucky-pwa-v1';
-const CORE = ['/', '/goals', '/exercises', '/offline.html', '/manifest.webmanifest', '/icons/lucky-192.png', '/icons/lucky-512.png'];
+const CACHE = 'lucky-pwa-v2';
+const CORE = ['/', '/goals', '/exercises', '/offline', '/manifest.webmanifest', '/icons/lucky-192.png', '/icons/lucky-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
@@ -18,7 +18,7 @@ self.addEventListener('fetch', event => {
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).then(response => {
       const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(request, copy)); return response;
-    }).catch(async () => (await caches.match(request)) || caches.match('/offline.html')));
+    }).catch(async () => (await caches.match(request)) || caches.match('/offline')));
     return;
   }
 
