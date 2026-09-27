@@ -127,6 +127,7 @@ function ownerState(record) {
     created_at: access?.created_at || null,
     messages: (record?.goal_data?._accountability_messages || []).slice(-20).reverse(),
     progress: record?.goal_data?._accountability_progress || null,
+    funnel_metrics: record?.goal_data?._funnel_metrics || null,
   };
 }
 

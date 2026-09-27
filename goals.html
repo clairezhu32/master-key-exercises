@@ -609,7 +609,7 @@
       finally { generationInFlight = false; }
     }
 
-    function savePlanProgress(saved) { saved.progress = saved.progress || {completed:{},feedback:{}}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+    function savePlanProgress(saved) { saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.updatedAt=Date.now(); localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
     function visiblePlanWeeks(saved) { const weeks=saved.plan?.weeks||[]; return saved.access?.unlocked ? weeks : weeks.slice(0,1); }
     function taskKeysForWeek(saved,weekKey) {
       const weeks=visiblePlanWeeks(saved), index=weeks.findIndex((week,weekIndex)=>`week-${week.week||weekIndex+1}`===weekKey);
@@ -846,7 +846,7 @@
       const account=await fetchAccountState();
       if(!account?.savedPlan||!account.access?.unlocked) throw new Error('Your full plan is not available yet. Please refresh in a moment.');
       const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-      const saved={...account.savedPlan,access:account.access,progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,taskMetrics:current?.ownerId===currentSession.user.id?current.taskMetrics:undefined,taskSchedules:current?.ownerId===currentSession.user.id?current.taskSchedules:undefined,weekAdjustments:current?.ownerId===currentSession.user.id?current.weekAdjustments:undefined,funnelMetrics:current?.ownerId===currentSession.user.id?current.funnelMetrics:account.savedPlan?.answers?._funnel_metrics,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+      const localOwned=current?.ownerId===currentSession.user.id; const saved={...account.savedPlan,access:account.access,progress:recoverProgress(localOwned?current.progress:undefined,account.executionState),customTasks:localOwned?current.customTasks:undefined,taskMetrics:localOwned?current.taskMetrics:undefined,taskSchedules:localOwned?current.taskSchedules:undefined,weekAdjustments:localOwned?current.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localOwned?current.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
       localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); renderPlan(saved);
     }
     async function startUpgrade(){
@@ -889,8 +889,9 @@
       state.append(heading,cadence,goal,progress,nextAction,message,actions);
     }
     async function loadAccountabilityState(){ if(!currentSession) return; try { const state=await accountabilityRequest(); renderBuddyMessages(state.messages||[]); renderMatchState(state.match); const localLink=localStorage.getItem(BUDDY_LINK_KEY); if(state.active&&localLink){ showBuddyShare(localLink); scheduleAccountabilitySync(activeSavedPlan); } else if(state.active){ const button=document.getElementById('create-buddy-link'); button.textContent='Create a new private link'; buddyStatus('A buddy link is active. Creating a new link will replace the old one.'); } if(['waiting','matched'].includes(state.match?.status)) scheduleAccountabilitySync(activeSavedPlan); } catch(error){ buddyStatus(error.message,true); } }
-    async function syncAccountabilityProgress(saved){ if(!saved||!currentSession) return; const taskKeys=visibleTaskKeys(saved); try { await accountabilityRequest('POST',{action:'progress',completed:saved.progress?.completed||{},total_tasks:taskKeys.length,funnel_metrics:saved.funnelMetrics||null}); } catch {} }
+    async function syncAccountabilityProgress(saved){ if(!saved||!currentSession?.access_token) return; const taskKeys=visibleTaskKeys(saved); try { const response=await fetch('/api/accountability',{method:'POST',keepalive:true,headers:{Authorization:`Bearer ${currentSession.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({action:'progress',completed:saved.progress?.completed||{},total_tasks:taskKeys.length,funnel_metrics:saved.funnelMetrics||null})}); if(!response.ok) throw new Error('Progress sync failed'); } catch {} }
     function scheduleAccountabilitySync(saved){ clearTimeout(accountabilitySyncTimer); accountabilitySyncTimer=setTimeout(()=>syncAccountabilityProgress(saved),450); }
+    window.addEventListener('pagehide',()=>{ if(activeSavedPlan&&currentSession) syncAccountabilityProgress(activeSavedPlan); });
     document.getElementById('create-buddy-link').addEventListener('click',async()=>{ const button=document.getElementById('create-buddy-link'); button.disabled=true; button.textContent='Creating private link…'; buddyStatus(''); try { const state=await accountabilityRequest('POST',{action:'create'}); localStorage.setItem(BUDDY_LINK_KEY,state.share_url); showBuddyShare(state.share_url); await syncAccountabilityProgress(activeSavedPlan); buddyStatus('Private link created. Share it only with someone you trust.'); } catch(error){ buddyStatus(error.message,true); button.disabled=false; button.textContent='Create private buddy link'; } });
     document.getElementById('copy-buddy-link').addEventListener('click',async()=>{ try { await navigator.clipboard.writeText(document.getElementById('buddy-link').value); buddyStatus('Buddy link copied.'); } catch { buddyStatus('Could not copy the link automatically.',true); } });
     document.getElementById('share-buddy-link').addEventListener('click',async()=>{ const url=document.getElementById('buddy-link').value, text=`I’m working on a 90-day goal with Lucky. Would you be my accountability buddy and check my progress? ${url}`; try { if(navigator.share) await navigator.share({title:'Be my Lucky accountability buddy',text,url}); else { await navigator.clipboard.writeText(text); buddyStatus('Invitation copied.'); } } catch(error){ if(error.name!=='AbortError') buddyStatus('Could not share the invitation.',true); } });
@@ -921,7 +922,7 @@
         const account=await fetchAccountState();
         if(account?.savedPlan&&currentSession){
           const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-          const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:current?.ownerId===currentSession.user.id?current.progress:undefined,customTasks:current?.ownerId===currentSession.user.id?current.customTasks:undefined,taskMetrics:current?.ownerId===currentSession.user.id?current.taskMetrics:undefined,taskSchedules:current?.ownerId===currentSession.user.id?current.taskSchedules:undefined,weekAdjustments:current?.ownerId===currentSession.user.id?current.weekAdjustments:undefined,funnelMetrics:current?.ownerId===currentSession.user.id?current.funnelMetrics:account.savedPlan?.answers?._funnel_metrics,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+          const localOwned=current?.ownerId===currentSession.user.id; const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:recoverProgress(localOwned?current.progress:undefined,account.executionState),customTasks:localOwned?current.customTasks:undefined,taskMetrics:localOwned?current.taskMetrics:undefined,taskSchedules:localOwned?current.taskSchedules:undefined,weekAdjustments:localOwned?current.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localOwned?current.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
           localStorage.setItem(PLAN_KEY,JSON.stringify(recovered)); localStorage.removeItem(PENDING_KEY); renderPlan(recovered); return;
         }
         if(draft) await generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard');
@@ -935,7 +936,14 @@
       window.location.reload();
     });
 
-    async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const response=await fetch('/api/saved-plan',{headers:{Authorization:`Bearer ${currentSession.access_token}`}}); const data=await response.json(); return response.ok ? data : null; } catch { return null; } }
+    async function fetchAccountState() { if(!currentSession?.access_token) return null; try { const headers={Authorization:`Bearer ${currentSession.access_token}`}; const [planResponse,executionResponse]=await Promise.all([fetch('/api/saved-plan',{headers}),fetch('/api/accountability',{headers})]); const data=await planResponse.json(); if(!planResponse.ok) return null; if(executionResponse.ok) data.executionState=await executionResponse.json(); return data; } catch { return null; } }
+    function recoverProgress(localProgress,executionState){
+      const remote=executionState?.progress; if(!remote) return localProgress;
+      const localUpdated=Number(localProgress?.updatedAt)||0, remoteUpdated=Date.parse(remote.updated_at||'')||0;
+      if(localProgress&&localUpdated>remoteUpdated) return localProgress;
+      return {...(localProgress||{}),completed:remote.completed||{},feedback:localProgress?.feedback||{},updatedAt:remoteUpdated};
+    }
+    function recoverFunnelMetrics(localMetrics,executionState){ return executionState?.funnel_metrics||localMetrics; }
     async function verifyCheckout(sessionId){
       const response=await fetch('/api/verify-session',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${currentSession?.access_token||''}`},body:JSON.stringify({sessionId})});
       const data=await response.json(); if(!response.ok) throw new Error(data.error||'Could not confirm your payment'); return data;
@@ -961,7 +969,7 @@
       if(currentSession){
         const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
         if(startNewPlan&&account?.usage?.remaining<=0&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
-        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:localBelongsToUser?saved.progress:undefined,customTasks:localBelongsToUser?saved.customTasks:undefined,taskMetrics:localBelongsToUser?saved.taskMetrics:undefined,taskSchedules:localBelongsToUser?saved.taskSchedules:undefined,weekAdjustments:localBelongsToUser?saved.weekAdjustments:undefined,funnelMetrics:localBelongsToUser?saved.funnelMetrics:account.savedPlan?.answers?._funnel_metrics,usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:recoverProgress(localBelongsToUser?saved.progress:undefined,account.executionState),customTasks:localBelongsToUser?saved.customTasks:undefined,taskMetrics:localBelongsToUser?saved.taskMetrics:undefined,taskSchedules:localBelongsToUser?saved.taskSchedules:undefined,weekAdjustments:localBelongsToUser?saved.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localBelongsToUser?saved.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(saved&&!localBelongsToUser){ saved=null; }
       }
