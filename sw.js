@@ -1,4 +1,4 @@
-const CACHE = 'lucky-pwa-v3';
+const CACHE = 'lucky-pwa-v4';
 const CORE = ['/', '/goals', '/exercises', '/job-prompts', '/offline', '/manifest.webmanifest', '/icons/lucky-192.png', '/icons/lucky-512.png'];
 
 self.addEventListener('install', event => {
@@ -16,7 +16,7 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).then(response => {
+    event.respondWith(fetch(request,{cache:'no-store'}).then(response => {
       const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(request, copy)); return response;
     }).catch(async () => (await caches.match(request)) || caches.match('/offline')));
     return;

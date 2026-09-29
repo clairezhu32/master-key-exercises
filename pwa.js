@@ -1,5 +1,5 @@
 (() => {
-  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+  if ('serviceWorker' in navigator) window.addEventListener('load', async () => { try { const registration=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}); await registration.update(); } catch {} });
 
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   if (standalone) document.documentElement.classList.add('pwa-standalone');
