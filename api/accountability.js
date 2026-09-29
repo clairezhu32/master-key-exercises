@@ -147,6 +147,7 @@ async function buddyView(record, serviceRoleKey) {
     milestone: plan.milestone_90day || answers.goal || '',
     rationale: planRationale(goal, { ...plan, weeks: visibleWeeks }),
     funnel_metrics: isCareerPlan ? deriveCareerFunnel(visibleWeeks, progress.completed || {}, answers._funnel_metrics) : null,
+    plan_length_weeks: Math.max(1, (plan.weeks || []).length || 12),
     start_date: startDate.toISOString().slice(0, 10),
     completed: progress.completed || {},
     estimates: buildTaskEstimates(plan, answers._task_estimates),

@@ -11,7 +11,7 @@ export const config = {
 
 const rateLimitMap = new Map();
 const RATE_WINDOW_MS = 3_600_000;
-const RATE_MAX = 10;
+const RATE_MAX = 30;
 
 // Defaults to the "-latest" alias, but production is pinned to a specific
 // version via the GEMINI_MODEL env var (currently gemini-3.6-flash) as of
@@ -272,18 +272,18 @@ const PLAN_SCHEMA = {
     },
     weeks: {
       type: 'ARRAY',
-      description: 'Exactly 12 weeks — a full execution cadence. Front-load early weeks on targets/access/outreach and later weeks on prep/close, matching how this specific goal actually plays out over 90 days. For career plans, keep networking, resume/application execution, and interview preparation running in parallel every week rather than assigning them to isolated phases.',
+      description: 'For career and job-search plans, return exactly 4 weeks as a rolling execution sprint. For other goals, return exactly 12 weeks. Career weeks keep Apply Jobs, Networking, Skill/Role Research, and Close Gaps active in parallel.',
       items: {
         type: 'OBJECT',
         properties: {
-          week: { type: 'INTEGER', description: '1 through 12.' },
+          week: { type: 'INTEGER', description: 'Sequential week number: 1 through 4 for career plans, otherwise 1 through 12.' },
           funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
           theme: { type: 'STRING' },
           target: { type: 'STRING', description: 'The concrete outcome to hit by the end of this specific week.' },
           actions: {
             type: 'ARRAY',
             items: { type: 'STRING' },
-            description: 'Exactly 3 concrete, doable-today actions for this week.',
+            description: 'Career plans: exactly 4 concrete actions, one for each execution lane. Other plans: exactly 3 concrete actions.',
           },
           exercise_part: { type: 'INTEGER', description: 'The most relevant Lucky Method exercise step for this specific week, from 1 through 6.' },
           exercise_reason: { type: 'STRING', description: 'One concise sentence connecting this exercise to the week’s target, actions, or likely execution obstacle.' },
@@ -338,10 +338,10 @@ async function generateAdjustedWeek(context) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('AI planning is not configured'), { status: 500 });
   const careerRule = isCareerPath(context.answers) ? `
-This is a career plan. Keep three execution lanes active in parallel: (1) verified networking/referral outreach and follow-up, with Meta Muse only as an optional assistant for organizing the user's own contacts and drafting user-reviewed messages; (2) truthful role-specific resume tailoring tied to actual application submissions; and (3) scheduled interview practice with a measurable output. The three actions should normally map one-to-one to these lanes.` : '';
+This is a career plan. Keep four execution lanes active in parallel: (1) apply to selected high-fit jobs, including truthful role-specific resume tailoring tied to submissions; (2) verified networking/referral outreach and follow-up; (3) compare the user's existing skills with recurring requirements in real target postings; and (4) close the highest-priority gap through a small deliverable, practice session, portfolio proof, or interview preparation. Keep exactly four actions, one per lane.` : '';
   const prompt = `Revise ONLY the next week of a personalized 90-day action plan using the user's completed weekly scorecard.
 
-Protect the original 90-day goal. Respond to what happened in reality: keep what worked, reduce or replace what did not, and apply the user's requested change. Do not punish missed work by stacking it on top of a full new week. Keep exactly 3 actions, each specific, measurable, and feasible within the user's stated weekly hours. Preserve continuity with later weeks without rewriting them. Do not claim guaranteed outcomes.${careerRule}
+Protect the original goal. Respond to what happened in reality: keep what worked, reduce or replace what did not, and apply the user's requested change. Do not punish missed work by stacking it on top of a full new week. Keep exactly 3 actions for non-career plans or exactly 4 for career plans, each specific, measurable, and feasible within the user's stated weekly hours. Preserve continuity with later weeks without rewriting them. Do not claim guaranteed outcomes.${careerRule}
 
 Goal and onboarding answers:
 ${JSON.stringify(context.answers)}
@@ -386,7 +386,7 @@ Return the revised next-week object. Its week number must remain ${context.nextW
 async function adjustNextWeek(user, body, serviceRoleKey) {
   const currentWeekNumber = Number(body.current_week);
   const feedback = cleanWeeklyFeedback(body.feedback);
-  if (!Number.isInteger(currentWeekNumber) || currentWeekNumber < 1 || currentWeekNumber >= 12) throw Object.assign(new Error('Choose a week from 1 through 11.'), { status: 400 });
+  if (!Number.isInteger(currentWeekNumber) || currentWeekNumber < 1) throw Object.assign(new Error('Choose a valid completed week.'), { status: 400 });
   if (!feedback.result || !feedback.missed || !feedback.change) throw Object.assign(new Error('Complete all three weekly scorecard questions before adjusting next week.'), { status: 400 });
   const access = await getPlanAccess(user.id, serviceRoleKey);
   if (!access.unlocked) throw Object.assign(new Error('Unlock the full plan before adjusting future weeks.'), { status: 403 });
@@ -440,16 +440,18 @@ Ground everything in the person's measurable outcome, baseline, reason, stated g
 
 Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
 
-The plan also includes a 12-week execution cadence mapped onto the 7 stages (front-loading early stages in early weeks). Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle; repetition is appropriate when a practice should be reinforced. Also choose 3 overall exercises for the plan. The 6 Lucky Method steps are:
+For non-career goals, the plan includes a 12-week execution cadence. For career and job-search goals, return exactly four weeks as a rolling action sprint that the user reviews and adjusts weekly. Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle. Also choose 3 overall exercises for the plan. The 6 Lucky Method steps are:
 ${partList}
 
 CAREER-PLAN OPERATING RULES
-When the decision path is career, job search, promotion, or career transition, do not create a passive or purely sequential plan where the person spends several weeks polishing materials before networking, applying, or preparing for interviews. Run these three lanes in parallel in every week:
-1. Network and follow up — identify real warm or relevant contacts, send personalized outreach, request conversations or referrals appropriately, and follow up. If the person has access to Meta Muse, it may be suggested as an optional assistant to organize a user-approved contact list from the person's own connected accounts, draft messages, track follow-ups, or schedule conversations. Never claim Muse has verified professional data, never invent contacts, and never instruct it to send a message without the person's review and approval. Use LinkedIn, company team pages, alumni networks, former colleagues, professional communities, and direct referrals to verify actual professional contacts.
-2. Tailor and submit — select high-fit open roles, revise the master resume for the role's requirements using truthful quantified evidence, complete the application, and log the submission and next follow-up. Do not make “revise resume” an endlessly repeated polishing task; each revision must be tied to one or more actual submissions that week.
-3. Prepare for interviews — practice the formats likely for the target role, including concise career stories and role-specific cases or technical questions; record weak points and use feedback to improve the next practice.
+When the decision path is career, job search, promotion, or career transition, return exactly four weeks and run these four lanes in parallel every week:
+1. Apply Jobs — select a manageable number of high-fit open roles, use the Job Application Prompt Library to compare requirements and truthfully tailor the resume, submit, and log the application. Never tell the user to apply to every possible role.
+2. Networking — identify verified warm or relevant contacts, send personalized outreach, request conversations or referrals appropriately, and follow up. Never invent contacts or send without user review.
+3. Skill and Role Research — examine real target postings, group recurring requirements, inventory the user's demonstrated skills, and identify the most consequential evidence gap.
+4. Close Gaps — close one priority gap through a small course segment, work sample, portfolio proof, mock interview, or practice deliverable tied to target roles.
 
-For a career plan, the three weekly actions should normally map one-to-one to these three lanes. Each action must include a count, deliverable, scheduled session, or submitted application. Week 1 must produce a usable master resume, a verified target/contact list, real outreach, at least one submitted high-fit application when a suitable opening exists, and an interview-practice baseline. Weeks 2–12 must continue producing external evidence—replies, conversations, referrals, applications, screens, interview scores, later rounds, or offers—and adjust the weakest conversion step every week. Respect the person's stated weekly hours and reduce quantities when needed rather than dropping an entire lane.
+Each career week must contain exactly four actions, in this order and beginning with these labels: “Apply Jobs:”, “Networking:”, “Skill & Role Research:”, and “Close Gaps:”. Every action must include a count, deliverable, or scheduled session. Week 1 establishes the target role, usable master resume, shortlist, first submissions, contacts, and gap baseline. Weeks 2–4 repeat the operating loop and adjust quantities or tactics using actual response evidence. Respect the user's available hours by reducing volume, not by dropping a lane.
+For career plans, the legacy milestone_90day field must describe the concrete four-week outcome; do not extend the generated roadmap beyond Week 4.
 
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
@@ -459,7 +461,7 @@ function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, pro
   const careerExecution = isCareerPath({ category_key, category, goal }) ? `
 
 CAREER EXECUTION REQUIREMENT
-Build every week around three parallel actions: (1) verified networking/referral outreach and follow-up, optionally using Meta Muse to organize the person's own contacts and draft user-reviewed messages; (2) truthful role-specific resume tailoring followed by actual application submission and tracking; and (3) scheduled interview preparation with a concrete practice output or score. Use the person's stated target role and companies in every action where relevant. Never substitute tool setup, generic learning, or resume polishing for external job-search activity.` : '';
+Return exactly four weeks. Build every week around four parallel actions: (1) Apply Jobs—select high-fit roles, use the prompt library to tailor truthfully, submit, and log; (2) Networking—verified outreach and follow-up; (3) Skill and Role Research—compare demonstrated skills with recurring requirements in real target postings; and (4) Close Gaps—complete one focused learning, work-sample, portfolio, or interview-practice deliverable. Use the person's stated target role in every action where relevant. Never substitute endless resume polishing or generic learning for external job-search activity.` : '';
   return `Goal category: ${category || '(not specified)'} (${category_key || 'general'} decision path)
 Current baseline: ${baseline || '(not specified)'}
 Current stage: ${current_stage || '(not specified)'}
@@ -499,6 +501,28 @@ Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
 Evidence review cadence: ${review_cadence || 'Weekly'}
 
 Build their strategic plan now. Treat all six Lucky steps above as core planning inputs, not decorative mindset advice. Week 1 must directly deliver the first-week success test. Later weeks must credibly bridge their baseline to the measurable 90-day outcome, use their chosen real-world actions, test the reframed belief through evidence, and adjust tactics at the stated review cadence without abandoning the meaningful intention.${careerExecution}`;
+}
+
+function normalizeCareerSprint(plan, answers) {
+  if (!isCareerPath(answers) || !plan || !Array.isArray(plan.weeks)) return plan;
+  const labels = ['Apply Jobs:', 'Networking:', 'Skill & Role Research:', 'Close Gaps:'];
+  const fallbacks = [
+    'Apply Jobs: choose high-fit open roles, tailor the resume truthfully with the prompt library, submit, and log each application.',
+    'Networking: identify verified relevant contacts, send personalized outreach, and schedule or follow up on conversations.',
+    'Skill & Role Research: review real target postings, group recurring requirements, and compare them with demonstrated skills.',
+    `Close Gaps: complete one focused proof or practice deliverable for ${answers.gap || 'the highest-priority role requirement'}.`,
+  ];
+  const sourceWeeks = plan.weeks.slice(0, 4);
+  while (sourceWeeks.length < 4) sourceWeeks.push({ ...(sourceWeeks[sourceWeeks.length - 1] || {}), theme: `Review evidence and adjust Week ${sourceWeeks.length + 1}`, target: 'Repeat the four-lane job-search loop and improve the weakest result from last week.' });
+  const weeks = sourceWeeks.map((week, index) => {
+    const source = Array.isArray(week.actions) ? week.actions.slice(0, 4) : [];
+    const actions = labels.map((label, actionIndex) => {
+      const value = String(source[actionIndex] || fallbacks[actionIndex]).trim();
+      return value.toLowerCase().startsWith(label.toLowerCase()) ? value : `${label} ${value}`;
+    });
+    return { ...week, week: index + 1, actions };
+  });
+  return { ...plan, weeks };
 }
 
 async function callGeminiOnce(goalData) {
@@ -620,6 +644,25 @@ async function callGemini(goalData, deadlineAt) {
   }
 }
 
+async function careerDialogueCoach({ question, answer, nextQuestion, context = [] }) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw Object.assign(new Error('AI onboarding is not configured'), { status: 500 });
+  const transcript = context.slice(-4).map(item => `Q: ${String(item.question || '').slice(0, 300)}\nA: ${String(item.answer || '').slice(0, 600)}`).join('\n');
+  const prompt = `You are Lucky, a warm and concise job-search coach conducting a short onboarding conversation.
+Previous context:
+${transcript || '(first answer)'}
+Current question: ${String(question || '').slice(0, 400)}
+User answer: ${String(answer || '').slice(0, 900)}
+Next question: ${String(nextQuestion || '').slice(0, 400)}
+
+Respond with one natural sentence, at most 28 words. Briefly reflect one useful detail from the answer and smoothly lead toward the next question. Do not give a plan yet, praise generically, or repeat the answer verbatim.`;
+  const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 80, temperature: 0.55 } }) });
+  if (!response.ok) throw Object.assign(new Error('AI onboarding is temporarily unavailable'), { status: 502 });
+  const data = await response.json(); const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+  if (!reply) throw Object.assign(new Error('AI onboarding returned an empty response'), { status: 502 });
+  return reply.replace(/^['"]|['"]$/g, '');
+}
+
 export default async function handler(req, res) {
   const requestStart = Date.now();
   if (!['GET', 'POST'].includes(req.method)) {
@@ -671,6 +714,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
+  if (body?.action === 'career_dialogue') {
+    const usage = await claimGeneration(user.id, user.email, serviceRoleKey);
+    if (!usage?.goalData?._beta_access) return res.status(403).json({ error: 'A valid invitation code is required before starting onboarding.', code: 'INVITATION_REQUIRED' });
+    if (!String(body.answer || '').trim()) return res.status(400).json({ error: 'Add a short answer before continuing.' });
+    try { return res.status(200).json({ reply: await careerDialogueCoach({ question: body.question, answer: body.answer, nextQuestion: body.next_question, context: Array.isArray(body.context) ? body.context : [] }) }); }
+    catch (error) { return res.status(error.status || 500).json({ error: error.message || 'Could not continue onboarding.' }); }
+  }
+
   if (body?.action === 'adjust_week') {
     try { return res.status(200).json(await adjustNextWeek(user, body, serviceRoleKey)); }
     catch (error) {
@@ -693,7 +744,8 @@ export default async function handler(req, res) {
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {
-    const plan = await callGemini({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key }, deadlineAt);
+    const generationAnswers = { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key };
+    const plan = normalizeCareerSprint(await callGemini(generationAnswers, deadlineAt), { ...generationAnswers, gap: body?.gap });
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
     const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);

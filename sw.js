@@ -1,5 +1,5 @@
-const CACHE = 'lucky-pwa-v2';
-const CORE = ['/', '/goals', '/exercises', '/offline', '/manifest.webmanifest', '/icons/lucky-192.png', '/icons/lucky-512.png'];
+const CACHE = 'lucky-pwa-v3';
+const CORE = ['/', '/goals', '/exercises', '/job-prompts', '/offline', '/manifest.webmanifest', '/icons/lucky-192.png', '/icons/lucky-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
