@@ -655,7 +655,7 @@ Current question: ${String(question || '').slice(0, 400)}
 User answer: ${String(answer || '').slice(0, 900)}
 Next question: ${String(nextQuestion || '').slice(0, 400)}
 
-Respond with one natural sentence, at most 28 words. Briefly reflect one useful detail from the answer and smoothly lead toward the next question. Do not give a plan yet, praise generically, or repeat the answer verbatim.`;
+Respond with one natural sentence, at most 22 words. Acknowledge one useful detail from the answer. Do not introduce, foreshadow, or repeat the next question. Do not give a plan yet, praise generically, or repeat the answer verbatim.`;
   const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 80, temperature: 0.55 } }) });
   if (!response.ok) throw Object.assign(new Error('AI onboarding is temporarily unavailable'), { status: 502 });
   const data = await response.json(); const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
