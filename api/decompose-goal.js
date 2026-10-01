@@ -28,15 +28,15 @@ const RATE_MAX = 30;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-// The six Lucky Method themes are embedded in the prompt so weekly exercise
-// recommendations stay aligned with the product's vision-to-action framework.
+// Identity-change themes adapted from the attached Chase Hughes transcript.
+// They are framed as reflective behavior-design practices, not clinical claims.
 const PART_THEMES = [
-  'Clarify What You Truly Want',
-  'Visualize the Lived Process',
-  'Reframe a Limiting Belief',
-  'Ask Your Future Self',
-  'Take One Real-World Action',
-  'Commit to the Goal, Release the Route',
+  'Name the Identity You Are Becoming',
+  'See the Two Futures Clearly',
+  'Write the New Identity Code',
+  'Change the Cues Around You',
+  'Build Identity Support with FATE',
+  'Rehearse Until It Feels Natural',
 ];
 
 function isAllowedOrigin(origin) {
@@ -128,20 +128,21 @@ const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing'
 const PLAN_SCHEMA = {
   type: 'OBJECT',
   properties: {
+    plan_mode: { type: 'STRING', enum: ['identity_rewrite'], description: 'Always identity_rewrite.' },
     domain_label: { type: 'STRING', description: "Short label for the goal domain, e.g. 'Career / Job Search', 'Business Launch', 'Marathon Training'." },
     summary: { type: 'STRING', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
     insight: { type: 'STRING', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
-    milestone_90day: { type: 'STRING', description: 'The single concrete, measurable outcome that defines success at day 90.' },
+    milestone_90day: { type: 'STRING', description: 'A first-person identity statement describing who the person is becoming by day 90 and how that identity feels in ordinary life.' },
     lucky_method: {
       type: 'ARRAY',
-      description: 'Exactly 6 personalized guidance steps, in the canonical Lucky Method order. Each step must connect directly to this person’s goal, obstacle and plan—not repeat generic manifestation language.',
+      description: 'Exactly 6 personalized identity-rewrite steps, in the canonical order. Each connects the desired identity to the person’s current self-story and emotional patterns.',
       items: {
         type: 'OBJECT',
         properties: {
           step: { type: 'INTEGER', description: '1 through 6.' },
           title: { type: 'STRING', description: 'Use the exact canonical Lucky Method title for this step.' },
           guidance: { type: 'STRING', description: 'One concise, personalized explanation of how this step applies to the person’s goal and current situation.' },
-          action: { type: 'STRING', description: 'One concrete, observable action or reflection prompt the person can complete.' },
+          action: { type: 'STRING', description: 'One short identity-writing, visualization, cue-change, or emotional-rehearsal practice. Do not assign goal-achievement tasks.' },
         },
         required: ['step', 'title', 'guidance', 'action'],
       },
@@ -272,18 +273,18 @@ const PLAN_SCHEMA = {
     },
     weeks: {
       type: 'ARRAY',
-      description: 'For career and job-search plans, return exactly 4 weeks as a rolling execution sprint. For other goals, return exactly 12 weeks. Career weeks keep Apply Jobs, Networking, Skill/Role Research, and Close Gaps active in parallel.',
+      description: 'Return exactly 12 weeks for every goal. Each week deepens identity and mindset change rather than assigning external goal-achievement tactics.',
       items: {
         type: 'OBJECT',
         properties: {
-          week: { type: 'INTEGER', description: 'Sequential week number: 1 through 4 for career plans, otherwise 1 through 12.' },
+          week: { type: 'INTEGER', description: 'Sequential week number, 1 through 12.' },
           funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
           theme: { type: 'STRING' },
-          target: { type: 'STRING', description: 'The concrete outcome to hit by the end of this specific week.' },
+          target: { type: 'STRING', description: 'The internal identity shift to notice or strengthen by the end of this week.' },
           actions: {
             type: 'ARRAY',
             items: { type: 'STRING' },
-            description: 'Career plans: exactly 4 concrete actions, one for each execution lane. Other plans: exactly 3 concrete actions.',
+            description: 'Exactly 3 identity practices: one writing practice, one visualization or emotional rehearsal, and one cue/environment or social-reinforcement practice. Never assign applications, outreach, deliverables, workouts, purchases, or other goal-achievement tactics.',
           },
           exercise_part: { type: 'INTEGER', description: 'The most relevant Lucky Method exercise step for this specific week, from 1 through 6.' },
           exercise_reason: { type: 'STRING', description: 'One concise sentence connecting this exercise to the week’s target, actions, or likely execution obstacle.' },
@@ -304,7 +305,7 @@ const PLAN_SCHEMA = {
       },
     },
   },
-  required: ['domain_label', 'summary', 'insight', 'milestone_90day', 'lucky_method', 'funnel', 'weeks', 'exercises'],
+  required: ['plan_mode', 'domain_label', 'summary', 'insight', 'milestone_90day', 'lucky_method', 'funnel', 'weeks', 'exercises'],
 };
 
 const ADJUSTED_WEEK_SCHEMA = {
@@ -313,8 +314,8 @@ const ADJUSTED_WEEK_SCHEMA = {
     week: { type: 'INTEGER' },
     funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS },
     theme: { type: 'STRING' },
-    target: { type: 'STRING', description: 'A concrete, measurable outcome for this week.' },
-    actions: { type: 'ARRAY', description: 'Exactly 3 concrete actions sized to the user’s available time.', items: { type: 'STRING' } },
+    target: { type: 'STRING', description: 'The internal identity shift to strengthen this week.' },
+    actions: { type: 'ARRAY', description: 'Exactly 3 identity-rewrite practices: writing, mental rehearsal, and cue/support reinforcement.', items: { type: 'STRING' } },
     exercise_part: { type: 'INTEGER', description: 'A Lucky Method step from 1 through 6.' },
     exercise_reason: { type: 'STRING' },
   },
@@ -337,11 +338,9 @@ function cleanWeeklyFeedback(feedback = {}) {
 async function generateAdjustedWeek(context) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('AI planning is not configured'), { status: 500 });
-  const careerRule = isCareerPath(context.answers) ? `
-This is a career plan. Keep four execution lanes active in parallel: (1) apply to selected high-fit jobs, including truthful role-specific resume tailoring tied to submissions; (2) verified networking/referral outreach and follow-up; (3) compare the user's existing skills with recurring requirements in real target postings; and (4) close the highest-priority gap through a small deliverable, practice session, portfolio proof, or interview preparation. Keep exactly four actions, one per lane.` : '';
-  const prompt = `Revise ONLY the next week of a personalized 90-day action plan using the user's completed weekly scorecard.
+  const prompt = `Revise ONLY the next week of a personalized 90-day identity-rewrite plan using the user's reflection.
 
-Protect the original goal. Respond to what happened in reality: keep what worked, reduce or replace what did not, and apply the user's requested change. Do not punish missed work by stacking it on top of a full new week. Keep exactly 3 actions for non-career plans or exactly 4 for career plans, each specific, measurable, and feasible within the user's stated weekly hours. Preserve continuity with later weeks without rewriting them. Do not claim guaranteed outcomes.${careerRule}
+Protect the identity the person wants to become. Respond to what felt believable, emotionally meaningful, resistant, or artificial. Keep exactly 3 practices: (1) identity writing, (2) visualization or emotional rehearsal, and (3) a cue, environment, authority, tribe, or repetition practice. Do not assign applications, outreach, deliverables, workouts, purchases, or other external goal-achievement tactics. Do not punish missed practice by stacking work. Preserve continuity without rewriting later weeks. Never claim that thoughts guarantee external outcomes or that these practices medically rewire the brain.
 
 Goal and onboarding answers:
 ${JSON.stringify(context.answers)}
@@ -363,7 +362,7 @@ Return the revised next-week object. Its week number must remain ${context.nextW
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: 'You are Lucky, a practical execution coach. Revise plans from honest weekly evidence while preserving the user’s meaningful goal.' }] },
+      systemInstruction: { parts: [{ text: 'You are Lucky, a careful identity-reflection coach. Revise practices from honest weekly experience without making clinical or guaranteed-outcome claims.' }] },
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { responseMimeType: 'application/json', responseSchema: ADJUSTED_WEEK_SCHEMA, maxOutputTokens: 1800 },
     }),
@@ -415,53 +414,43 @@ async function adjustNextWeek(user, body, serviceRoleKey) {
 
 function buildSystemPrompt() {
   const partList = PART_THEMES.map((t, i) => `${i + 1}. ${t}`).join('\n');
-  return `You are a strategic execution coach. You turn a person's goal into a hyper-specific 90-day plan by adapting a proven 7-stage growth-funnel framework to whatever domain the goal is in (career, business, health, financial, creative, learning, relationships, or anything else).
+  return `You are Lucky, an identity-reflection coach. Create a personalized 90-day identity-rewrite journey. The goal is not to tell the person how to achieve the external result. The goal is to help them revise the self-image, beliefs, emotional associations, environmental cues and social expectations from which future choices arise.
 
-The 7 stages, in order:
-1. targets — the specific list of what/who to go after
-2. access_points — the specific roles/channels to reach at each target, and how to actually find them
-3. outreach — a ready-to-send script plus a follow-up, calibrated to the domain
-4. gap_closing — the specific gaps between where they are and what the target expects, each paired with a concrete resource/action
-5. core_prep — the make-or-break moment (interview, pitch, audition, negotiation, launch, event) broken into a task checklist
-6. funnel_metrics — the conversion funnel for this goal with realistic benchmarks, plus how to review and iterate on the weakest step
-7. close — the specific checklist to actually land the outcome
+Use this six-part framework, adapted from the supplied Chase Hughes transcript and the Lucky manifestation method:
+1. Name the Identity You Are Becoming — turn the desired future into a precise first-person identity and an ordinary lived feeling, not a status label or outcome checklist.
+2. See the Two Futures Clearly — contrast the life of the emerging identity with the trajectory of keeping the old identity. Keep this honest and motivating, never frightening, shaming or catastrophic.
+3. Write the New Identity Code — personalize three beliefs, three default ways of being, and three non-negotiable inner standards. These are identity rules, not productivity targets.
+4. Change the Cues Around You — alter small visual, spatial, linguistic or routine cues that automatically call up the old self-story. Keep changes safe, reversible and inexpensive.
+5. Build Identity Support with FATE — Focus (what stays visible), Authority (credible voices or evidence), Tribe (people who expect this healthy identity), and Emotion (a felt relationship with the future self).
+6. Rehearse Until It Feels Natural — use Focus, Emotion, Agitation/novelty and Repetition to rehearse the identity until the language and feeling become familiar. Treat this as reflective practice, not literal brainwashing or a medical intervention.
 
-Use the six-step Lucky Method as an equally important decision framework throughout the plan:
-1. Clarify What You Truly Want — distinguish the person’s own meaningful desire from comparison, status pressure or avoidance; make the day-90 outcome concrete.
-2. Visualize the Lived Process — describe the ordinary behaviors, difficult moments and responses that would make progress real; never rely on outcome-only fantasy.
-3. Reframe a Limiting Belief — identify the belief most likely to distort behavior, separate facts from assumptions and turn it into a testable, believable alternative.
-4. Ask Your Future Self — translate the desired identity into repeated choices the person can make now, without pretending the outcome is guaranteed.
-5. Take One Real-World Action — make every week lead to observable behavior, with a small first action that can begin immediately.
-6. Commit to the Goal, Release the Route — use funnel metrics and weekly feedback to adjust tactics, timing or path while protecting the meaningful intention behind the goal.
+Return all six in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to identity_rewrite.
 
-Return all six in lucky_method, in this exact order, personalized to the person’s answers. The plan must never imply that thoughts control external outcomes. Prefer controllable actions, honest experiments and reality-based feedback.
+The plan must contain exactly 12 weeks. Across the 12 weeks, move through four phases:
+- Weeks 1-3: observe and loosen the old identity.
+- Weeks 4-6: author the new identity code.
+- Weeks 7-9: reinforce it through cues, FATE and emotional rehearsal.
+- Weeks 10-12: integrate it, collect identity evidence and write the next chapter.
 
-Ground everything in the person's measurable outcome, baseline, reason, stated gap, previous attempts, resources, constraints, obstacle, schedule, and first-week success test — never output advice generic enough to apply to any goal in the category. Reference their own numbers, assets, and wording wherever possible.
+Every week must contain exactly three short practices, in this order:
+1. “Write:” a first-person identity rewriting or reflection prompt.
+2. “Rehearse:” a 5-10 minute visualization, future-self dialogue, contrast exercise or emotionally grounded mental rehearsal.
+3. “Reinforce:” a safe cue, environment, authority, tribe or repetition practice that supports the identity.
 
-Critical honesty rule: never invent a specific real person's name and present them as a real, currently-employed hiring manager, recruiter, investor, or contact — you have no way to verify that. Instead, describe the role/type of person to reach and a concrete, real method to find an actual one (LinkedIn search patterns, company site, referrals, communities, directories). You may name real, well-known public organizations when genuinely relevant as examples, but do not fabricate private details about them.
+Do NOT assign methods for attaining the external goal. For a career goal, do not prescribe applications, networking, resume edits, skill-building or interviews. For health, do not prescribe workouts, diets or treatment. For relationships, do not prescribe dates or outreach. The practices may notice choices and collect evidence of identity, but they must center on rewriting the identity rather than completing external tasks.
 
-For non-career goals, the plan includes a 12-week execution cadence. For career and job-search goals, return exactly four weeks as a rolling action sprint that the user reviews and adjusts weekly. Assign the most relevant Lucky Method exercise to every week based on that week's actions and likely execution obstacle. Also choose 3 overall exercises for the plan. The 6 Lucky Method steps are:
+Use gentle, believable language. Do not use fear, shame, coercion, cult tactics, “brainwashing,” or invented neuroscience as persuasion. Never claim these exercises rewire the brain, cure a condition, manifest external events, or guarantee success. Encourage professional help when a response suggests trauma, severe distress or a clinical condition.
+
+The legacy funnel object is required only for compatibility. Reinterpret its stages as a private map of the identity journey; do not turn it into external tactics. The visible weeks and lucky_method are the primary product.
+
+Assign the most relevant Lucky Exercise to every week and choose 3 overall exercises. The six themes are:
 ${partList}
-
-CAREER-PLAN OPERATING RULES
-When the decision path is career, job search, promotion, or career transition, return exactly four weeks and run these four lanes in parallel every week:
-1. Apply Jobs — select a manageable number of high-fit open roles, use the Job Application Prompt Library to compare requirements and truthfully tailor the resume, submit, and log the application. Never tell the user to apply to every possible role.
-2. Networking — identify verified warm or relevant contacts, send personalized outreach, request conversations or referrals appropriately, and follow up. Never invent contacts or send without user review.
-3. Skill and Role Research — examine real target postings, group recurring requirements, inventory the user's demonstrated skills, and identify the most consequential evidence gap.
-4. Close Gaps — close one priority gap through a small course segment, work sample, portfolio proof, mock interview, or practice deliverable tied to target roles.
-
-Each career week must contain exactly four actions, in this order and beginning with these labels: “Apply Jobs:”, “Networking:”, “Skill & Role Research:”, and “Close Gaps:”. Every action must include a count, deliverable, or scheduled session. Week 1 establishes the target role, usable master resume, shortlist, first submissions, contacts, and gap baseline. Weeks 2–4 repeat the operating loop and adjust quantities or tactics using actual response evidence. Respect the user's available hours by reducing volume, not by dropping a lane.
-For career plans, the legacy milestone_90day field must describe the concrete four-week outcome; do not extend the generated roadmap beyond Week 4.
 
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
 function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key }) {
   const choiceList = value => Array.isArray(value) && value.length ? value.join(', ') : '(not specified)';
-  const careerExecution = isCareerPath({ category_key, category, goal }) ? `
-
-CAREER EXECUTION REQUIREMENT
-Return exactly four weeks. Build every week around four parallel actions: (1) Apply Jobs—select high-fit roles, use the prompt library to tailor truthfully, submit, and log; (2) Networking—verified outreach and follow-up; (3) Skill and Role Research—compare demonstrated skills with recurring requirements in real target postings; and (4) Close Gaps—complete one focused learning, work-sample, portfolio, or interview-practice deliverable. Use the person's stated target role in every action where relevant. Never substitute endless resume polishing or generic learning for external job-search activity.` : '';
   return `Goal category: ${category || '(not specified)'} (${category_key || 'general'} decision path)
 Current baseline: ${baseline || '(not specified)'}
 Current stage: ${current_stage || '(not specified)'}
@@ -500,29 +489,12 @@ Feedback signals they selected: ${choiceList(obstacle_types)}
 Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
 Evidence review cadence: ${review_cadence || 'Weekly'}
 
-Build their strategic plan now. Treat all six Lucky steps above as core planning inputs, not decorative mindset advice. Week 1 must directly deliver the first-week success test. Later weeks must credibly bridge their baseline to the measurable 90-day outcome, use their chosen real-world actions, test the reframed belief through evidence, and adjust tactics at the stated review cadence without abandoning the meaningful intention.${careerExecution}`;
+Build their 90-day identity-rewrite journey now. Treat the external goal only as context for the identity they want to embody. Translate action-oriented onboarding answers into identity language rather than assigning those actions. Personalize the old self-story, desired self-image, beliefs, standards, cues, FATE support and FEAR rehearsal. Week 1 begins with observing the old identity without judgment; Week 12 ends with a first-person identity declaration and continuation ritual.`;
 }
 
-function normalizeCareerSprint(plan, answers) {
-  if (!isCareerPath(answers) || !plan || !Array.isArray(plan.weeks)) return plan;
-  const labels = ['Apply Jobs:', 'Networking:', 'Skill & Role Research:', 'Close Gaps:'];
-  const fallbacks = [
-    'Apply Jobs: choose high-fit open roles, tailor the resume truthfully with the prompt library, submit, and log each application.',
-    'Networking: identify verified relevant contacts, send personalized outreach, and schedule or follow up on conversations.',
-    'Skill & Role Research: review real target postings, group recurring requirements, and compare them with demonstrated skills.',
-    `Close Gaps: complete one focused proof or practice deliverable for ${answers.gap || 'the highest-priority role requirement'}.`,
-  ];
-  const sourceWeeks = plan.weeks.slice(0, 4);
-  while (sourceWeeks.length < 4) sourceWeeks.push({ ...(sourceWeeks[sourceWeeks.length - 1] || {}), theme: `Review evidence and adjust Week ${sourceWeeks.length + 1}`, target: 'Repeat the four-lane job-search loop and improve the weakest result from last week.' });
-  const weeks = sourceWeeks.map((week, index) => {
-    const source = Array.isArray(week.actions) ? week.actions.slice(0, 4) : [];
-    const actions = labels.map((label, actionIndex) => {
-      const value = String(source[actionIndex] || fallbacks[actionIndex]).trim();
-      return value.toLowerCase().startsWith(label.toLowerCase()) ? value : `${label} ${value}`;
-    });
-    return { ...week, week: index + 1, actions };
-  });
-  return { ...plan, weeks };
+function normalizeIdentityPlan(plan) {
+  if (!plan || !Array.isArray(plan.weeks)) return plan;
+  return { ...plan, plan_mode: 'identity_rewrite', weeks: plan.weeks.slice(0, 12).map((week, index) => ({ ...week, week: index + 1 })) };
 }
 
 async function callGeminiOnce(goalData) {
@@ -745,7 +717,7 @@ export default async function handler(req, res) {
 
   try {
     const generationAnswers = { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key };
-    const plan = normalizeCareerSprint(await callGemini(generationAnswers, deadlineAt), { ...generationAnswers, gap: body?.gap });
+    const plan = normalizeIdentityPlan(await callGemini(generationAnswers, deadlineAt));
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
     const saved = await saveGenerationResult(user.id, body, { ...plan, intensity }, generationCount, serviceRoleKey, claimed.goalData);
