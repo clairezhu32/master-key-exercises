@@ -31,12 +31,13 @@ const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/
 // Identity-change themes adapted from the attached Chase Hughes transcript.
 // They are framed as reflective behavior-design practices, not clinical claims.
 const PART_THEMES = [
-  'Name the Identity You Are Becoming',
-  'See the Two Futures Clearly',
-  'Write the New Identity Code',
-  'Change the Cues Around You',
-  'Build Identity Support with FATE',
-  'Rehearse Until It Feels Natural',
+  'Target Acquisition',
+  'Threat Modeling',
+  'Identity Engineering',
+  'Environmental Sabotage',
+  'Mammalian Brain Reprogramming (FATE)',
+  'FEAR Protocol',
+  'Identity Integration',
 ];
 
 function isAllowedOrigin(origin) {
@@ -146,11 +147,11 @@ const PLAN_SCHEMA = {
     },
     lucky_method: {
       type: 'ARRAY',
-      description: 'Exactly 6 personalized identity-rewrite steps, in the canonical order. Each connects the desired identity to the person’s current self-story and emotional patterns.',
+      description: 'Exactly 7 personalized steps in transcript order. Step 7 is Identity Integration, a faithful label derived from the transcript’s closing description because the speaker does not explicitly name a distinct seventh step.',
       items: {
         type: 'OBJECT',
         properties: {
-          step: { type: 'INTEGER', description: '1 through 6.' },
+          step: { type: 'INTEGER', description: '1 through 7.' },
           title: { type: 'STRING', description: 'Use the exact canonical Lucky Method title for this step.' },
           guidance: { type: 'STRING', description: 'One concise, personalized explanation of how this step applies to the person’s goal and current situation.' },
           action: { type: 'STRING', description: 'One short identity-writing, visualization, cue-change, or emotional-rehearsal practice. Do not assign goal-achievement tasks.' },
@@ -289,6 +290,7 @@ const PLAN_SCHEMA = {
         type: 'OBJECT',
         properties: {
           week: { type: 'INTEGER', description: 'Sequential week number, 1 through 12.' },
+          framework_step: { type: 'INTEGER', description: 'The identity framework step emphasized this week, from 1 through 7. Weeks 1-7 must map directly to Steps 1-7.' },
           funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
           theme: { type: 'STRING' },
           target: { type: 'STRING', description: 'The internal identity shift to notice or strengthen by the end of this week.' },
@@ -300,7 +302,7 @@ const PLAN_SCHEMA = {
           exercise_part: { type: 'INTEGER', description: 'The most relevant Lucky Method exercise step for this specific week, from 1 through 6.' },
           exercise_reason: { type: 'STRING', description: 'One concise sentence connecting this exercise to the week’s target, actions, or likely execution obstacle.' },
         },
-        required: ['week', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
+        required: ['week', 'framework_step', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
       },
     },
     exercises: {
@@ -323,6 +325,7 @@ const ADJUSTED_WEEK_SCHEMA = {
   type: 'OBJECT',
   properties: {
     week: { type: 'INTEGER' },
+    framework_step: { type: 'INTEGER', description: 'Preserve the original framework step for this week, from 1 through 7.' },
     funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS },
     theme: { type: 'STRING' },
     target: { type: 'STRING', description: 'The internal identity shift to strengthen this week.' },
@@ -330,7 +333,7 @@ const ADJUSTED_WEEK_SCHEMA = {
     exercise_part: { type: 'INTEGER', description: 'A Lucky Method step from 1 through 6.' },
     exercise_reason: { type: 'STRING' },
   },
-  required: ['week', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
+  required: ['week', 'framework_step', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
 };
 
 function isCareerPath({ category_key, category, goal } = {}) {
@@ -368,7 +371,7 @@ ${JSON.stringify(context.nextWeek)}
 Following weeks for continuity only:
 ${JSON.stringify(context.followingWeeks)}
 
-Return the revised next-week object. Its week number must remain ${context.nextWeek.week}.`;
+Return the revised next-week object. Its week number must remain ${context.nextWeek.week} and its framework_step must remain ${context.nextWeek.framework_step || 'the original value'}.`;
   const response = await fetch(GEMINI_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
@@ -427,15 +430,16 @@ function buildSystemPrompt() {
   const partList = PART_THEMES.map((t, i) => `${i + 1}. ${t}`).join('\n');
   return `You are Lucky, an identity-reflection coach. Create a personalized 90-day identity-rewrite journey. The goal is not to tell the person how to achieve the external result. The goal is to help them revise the self-image, beliefs, emotional associations, environmental cues and social expectations from which future choices arise.
 
-Use this six-part framework, adapted from the supplied Chase Hughes transcript and the Lucky manifestation method:
-1. Name the Identity You Are Becoming — turn the desired future into a precise first-person identity and an ordinary lived feeling, not a status label or outcome checklist.
-2. See the Two Futures Clearly — contrast the life of the emerging identity with the trajectory of keeping the old identity. Keep this honest and motivating, never frightening, shaming or catastrophic.
-3. Write the New Identity Code — personalize three beliefs, three default ways of being, and three non-negotiable inner standards. These are identity rules, not productivity targets.
-4. Change the Cues Around You — alter small visual, spatial, linguistic or routine cues that automatically call up the old self-story. Keep changes safe, reversible and inexpensive.
-5. Build Identity Support with FATE — Focus (what stays visible), Authority (credible voices or evidence), Tribe (people who expect this healthy identity), and Emotion (a felt relationship with the future self).
-6. Rehearse Until It Feels Natural — use Focus, Emotion, Agitation/novelty and Repetition to rehearse the identity until the language and feeling become familiar. Treat this as reflective practice, not literal brainwashing or a medical intervention.
+Follow this seven-step sequence from the supplied Chase Hughes transcript:
+1. Target Acquisition — define a precise arrival condition the person can picture and recognize. For an identity transition, specify exactly who they are becoming and how that identity operates in an ordinary difficult moment.
+2. Threat Modeling — create two vivid futures: the desired identity trajectory and the honest trajectory if the old identity remains unchanged. Use calm contrast, not panic, catastrophe, shame or coercion.
+3. Identity Engineering — define exactly three beliefs the new identity holds, three default ways it behaves, and three standards it does not negotiate. These are identity rules, not productivity quotas.
+4. Environmental Sabotage — deliberately change safe, reversible environmental, language, visual, schedule or routine cues that trigger the old identity. “Sabotage” refers only to interrupting old cues, never harming the person or their responsibilities.
+5. Mammalian Brain Reprogramming (FATE) — personalize Focus, Authority, Tribe and Emotion: what remains visible, which credible evidence or voice matters, who expects this identity, and how the future self becomes emotionally real.
+6. FEAR Protocol — personalize Focus, Emotion, Agitation/novelty and Repetition. Use safe novelty and short repeated rehearsal until the identity feels familiar; never describe this as medical brain rewiring.
+7. Identity Integration — consolidate the transcript’s closing outcome: the pattern stops feeling like something the person is forcing and begins to feel like who they are. The spoken transcript calls the framework seven steps but does not explicitly name a separate seventh step; use “Identity Integration” as the transparent, derived label for its concluding integration principle.
 
-Return all six in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to identity_rewrite.
+Return all seven in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to identity_rewrite.
 
 Before building the weeks, diagnose the identity gap. Populate identity_gap with:
 - the current identity and how it habitually operates;
@@ -444,11 +448,20 @@ Before building the weeks, diagnose the identity gap. Populate identity_gap with
 - exactly three non-obvious identity shifts required.
 For a role transition, reason about the actual difference in role identity. Example: Data Scientist -> Product Manager may require a shift from producing rigorous analysis and advising decisions to framing the problem, making tradeoffs under uncertainty, aligning people and owning the outcome. Do not treat the old identity as inferior. Do not reduce the gap to resume keywords, credentials or a generic confidence problem.
 
-The plan must contain exactly 12 weeks. Across the 12 weeks, move through four phases:
-- Weeks 1-3: observe and loosen the old identity.
-- Weeks 4-6: author the new identity code.
-- Weeks 7-9: reinforce it through cues, FATE and emotional rehearsal.
-- Weeks 10-12: integrate it, collect identity evidence and write the next chapter.
+The plan must contain exactly 12 weeks and follow this sequence without reordering:
+- Week 1 — Target Acquisition: define the precise new identity and arrival condition.
+- Week 2 — Threat Modeling: build the two contrasting future trajectories.
+- Week 3 — Identity Engineering: write 3 beliefs, 3 defaults and 3 non-negotiable standards.
+- Week 4 — Environmental Sabotage: interrupt cues that automatically reactivate the old identity.
+- Week 5 — FATE: build Focus, Authority, Tribe and Emotion around the new identity.
+- Week 6 — FEAR: combine Focus, Emotion, safe Agitation/novelty and Repetition.
+- Week 7 — Identity Integration: notice when the new identity begins to feel natural and consolidate it.
+- Week 8 — Repeat Target Acquisition with a more precise identity under real uncertainty.
+- Week 9 — Repeat Threat Modeling without catastrophizing; update the contrast using actual experience.
+- Week 10 — Deepen Identity Engineering using evidence gathered during the first nine weeks.
+- Week 11 — Strengthen Environmental Sabotage and FATE where the old identity still has strong cues.
+- Week 12 — Integrate FEAR and Identity Integration into a continuation ritual and a first-person identity declaration.
+Set framework_step to 1,2,3,4,5,6,7,1,2,3,5,7 for Weeks 1 through 12 respectively.
 
 Every week must contain exactly three short practices, in this order:
 1. “Write:” a first-person identity rewriting or reflection prompt.
@@ -461,7 +474,7 @@ Use gentle, believable language. Do not use fear, shame, coercion, cult tactics,
 
 The legacy funnel object is required only for compatibility. Reinterpret its stages as a private map of the identity journey; do not turn it into external tactics. The visible weeks and lucky_method are the primary product.
 
-Assign the most relevant Lucky Exercise to every week and choose 3 overall exercises. The six themes are:
+Assign the most relevant existing Lucky Exercise to every week and choose 3 overall exercises. The identity framework has seven themes; the exercise library may still map the derived seventh step to the closest existing rehearsal practice:
 ${partList}
 
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
@@ -508,12 +521,18 @@ Feedback signals they selected: ${choiceList(obstacle_types)}
 Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
 Evidence review cadence: ${review_cadence || 'Weekly'}
 
-Build their 90-day identity-rewrite journey now. First infer and clearly articulate the gap between their current identity and desired identity using the specific roles, operating modes, strengths and tensions in their answers. Treat the external goal as context for the identity they want to embody. Translate action-oriented answers into identity language rather than assigning those actions. Personalize the old self-story, desired self-image, beliefs, standards, cues, FATE support and FEAR rehearsal. Week 1 begins with observing the current identity without judgment; Week 12 ends with a first-person identity declaration and continuation ritual.`;
+Build their 90-day identity-rewrite journey now. First infer and clearly articulate the gap between their current identity and desired identity using the specific roles, operating modes, strengths and tensions in their answers. Treat the external goal as context for the identity they want to embody. Translate action-oriented answers into identity language rather than assigning those actions. Follow the seven-step sequence exactly: Week 1 Target Acquisition, Week 2 Threat Modeling, Week 3 Identity Engineering, Week 4 Environmental Sabotage, Week 5 FATE, Week 6 FEAR, Week 7 Identity Integration, then Weeks 8-12 deepen and consolidate the sequence as specified. Week 12 must end with a first-person identity declaration and continuation ritual.`;
 }
 
 function normalizeIdentityPlan(plan) {
   if (!plan || !Array.isArray(plan.weeks)) return plan;
-  return { ...plan, plan_mode: 'identity_rewrite', weeks: plan.weeks.slice(0, 12).map((week, index) => ({ ...week, week: index + 1 })) };
+  const sequence = [
+    [1, 'Target Acquisition'], [2, 'Threat Modeling'], [3, 'Identity Engineering'], [4, 'Environmental Sabotage'],
+    [5, 'Mammalian Brain Reprogramming (FATE)'], [6, 'FEAR Protocol'], [7, 'Identity Integration'],
+    [1, 'Target Acquisition · Refine'], [2, 'Threat Modeling · Update'], [3, 'Identity Engineering · Deepen'],
+    [5, 'Environmental Cues + FATE · Strengthen'], [7, 'FEAR + Identity Integration · Continue'],
+  ];
+  return { ...plan, plan_mode: 'identity_rewrite', weeks: plan.weeks.slice(0, 12).map((week, index) => ({ ...week, week: index + 1, framework_step: sequence[index]?.[0] || week.framework_step, theme: sequence[index]?.[1] || week.theme })) };
 }
 
 async function callGeminiOnce(goalData) {

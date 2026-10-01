@@ -761,12 +761,13 @@
     function downloadCalendarFile(title,details,schedule) { const range=calendarDateRange(schedule); if(!range) return; const stamp=calendarTimestamp(new Date()), uid=`${Date.now()}-${Math.random().toString(36).slice(2)}@lucky`; const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lucky//90-Day Action Plan//EN','BEGIN:VEVENT',`UID:${uid}`,`DTSTAMP:${stamp}`,`DTSTART:${calendarTimestamp(range.start)}`,`DTEND:${calendarTimestamp(range.end)}`,`SUMMARY:${escapeIcs(title)}`,`DESCRIPTION:${escapeIcs(details)}`,'END:VEVENT','END:VCALENDAR'].join('\r\n'); const url=URL.createObjectURL(new Blob([content],{type:'text/calendar;charset=utf-8'})); const link=document.createElement('a'); link.href=url; link.download='lucky-task.ics'; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
 
     const LUCKY_METHOD_FALLBACK = [
-      ['Name the Identity You Are Becoming','Describe the person you are becoming in believable first-person language.'],
-      ['See the Two Futures Clearly','Contrast life inside the emerging identity with the honest trajectory of keeping the old story.'],
-      ['Write the New Identity Code','Define three beliefs, three default ways of being and three inner standards.'],
-      ['Change the Cues Around You','Change small cues that automatically call up the old identity.'],
-      ['Build Identity Support with FATE','Use focus, credible authority, supportive tribe and emotion to make the future self feel real.'],
-      ['Rehearse Until It Feels Natural','Combine focused attention, emotion, safe novelty and repetition without forcing belief.'],
+      ['Target Acquisition','Define the precise identity you are becoming and what arriving there looks and feels like.'],
+      ['Threat Modeling','Build two honest future trajectories: changing identity and keeping the old pattern.'],
+      ['Identity Engineering','Define three beliefs, three default ways of being and three non-negotiable standards.'],
+      ['Environmental Sabotage','Safely interrupt the cues that automatically call up the old identity.'],
+      ['Mammalian Brain Reprogramming (FATE)','Use focus, credible authority, supportive tribe and emotion to make the future self feel real.'],
+      ['FEAR Protocol','Combine focus, emotion, safe novelty and repetition without forcing belief.'],
+      ['Identity Integration','Notice and consolidate the point where the pattern begins to feel like who you are. This label is derived from the transcript’s closing integration principle.'],
     ];
 
     function renderIdentityGap(plan) {
@@ -787,7 +788,7 @@
     function renderLuckyMethod(plan) {
       const firstAction=document.querySelector('#result .first-action');
       let title=document.getElementById('lucky-method-title'), container=document.getElementById('result-lucky-method');
-      if(!title){ title=document.createElement('div'); title.id='lucky-method-title'; title.className='section-title'; title.textContent='Your six-step identity framework'; firstAction.before(title); }
+      if(!title){ title=document.createElement('div'); title.id='lucky-method-title'; title.className='section-title'; title.textContent='Your seven-step identity framework'; firstAction.before(title); }
       if(!container){ container=document.createElement('div'); container.id='result-lucky-method'; container.className='lucky-method'; firstAction.before(container); }
       container.replaceChildren();
       const generated=Array.isArray(plan.lucky_method)?plan.lucky_method:[];
@@ -836,7 +837,7 @@
         const card=document.createElement('article'); card.className='week';
         const head=document.createElement('div'); head.className='week-head';
         const label=document.createElement('div'); label.className='week-label'; const weekName=document.createElement('span'); weekName.textContent=`Week ${weekNumber}`; const weekDate=document.createElement('span'); weekDate.className='week-date'; weekDate.textContent=planWeekDateRange(planStartDate,weekNumber); label.append(weekName,weekDate);
-        const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=week.theme || ''; head.append(label,theme);
+        const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=identityMode&&week.framework_step?`Step ${week.framework_step} · ${week.theme||LUCKY_METHOD_FALLBACK[Number(week.framework_step)-1]?.[0]||''}`:(week.theme||''); head.append(label,theme);
         const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || '';
         const adjustedNote=saved.weekAdjustments?.[weekKey] ? document.createElement('div') : null;
         if(adjustedNote){ adjustedNote.className='adjusted-week-note'; adjustedNote.textContent=`Adjusted from your Week ${saved.weekAdjustments[weekKey].fromWeek} feedback.`; }
