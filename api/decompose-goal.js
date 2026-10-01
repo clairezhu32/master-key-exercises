@@ -141,12 +141,13 @@ const PLAN_SCHEMA = {
       type: 'OBJECT',
       description: 'A specific diagnosis of the distance between the current identity and desired identity. Infer meaningful gaps; do not merely repeat the answers.',
       properties: {
+        motivation: { type: 'STRING', description: 'The person’s primary reason for the transition and how it should shape the identity change.' },
         from_identity: { type: 'STRING', description: 'A concise description of the current identity and its default operating mode.' },
         to_identity: { type: 'STRING', description: 'A concise description of the desired identity and its default operating mode.' },
         transferable_strengths: { type: 'ARRAY', description: 'Exactly 3 strengths from the current identity that remain valuable in the new identity.', items: { type: 'STRING' } },
         gaps: { type: 'ARRAY', description: 'Exactly 3 specific identity-level gaps, each written as a shift from an old default to a new default. Focus on ownership, judgment, voice, standards, uncertainty, relationships or self-concept—not credentials or task lists.', items: { type: 'STRING' } },
       },
-      required: ['from_identity', 'to_identity', 'transferable_strengths', 'gaps'],
+      required: ['motivation', 'from_identity', 'to_identity', 'transferable_strengths', 'gaps'],
     },
     lucky_method: {
       type: 'ARRAY',
@@ -445,11 +446,13 @@ Follow this seven-step sequence from the supplied Chase Hughes transcript:
 Return all seven in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to identity_rewrite.
 
 Before building the weeks, diagnose the identity gap. Populate identity_gap with:
+- the primary motivation for the change and how it changes the emphasis of the new identity;
 - the current identity and how it habitually operates;
 - the desired identity and how it must operate;
 - exactly three strengths that transfer across the change;
 - exactly three non-obvious identity shifts required.
 For a role transition, reason about the actual difference in role identity. Example: Data Scientist -> Product Manager may require a shift from producing rigorous analysis and advising decisions to framing the problem, making tradeoffs under uncertainty, aligning people and owning the outcome. Do not treat the old identity as inferior. Do not reduce the gap to resume keywords, credentials or a generic confidence problem.
+Motivation must materially change the diagnosis. If the motive is income, emphasize self-valuation, leverage, standards and permission to pursue compensation without equating money with worth. If it is impact, emphasize ownership, decisions and influence. If it is strengths, preserve and reposition transferable strengths. If it is interest, emphasize curiosity, permission to explore and intrinsic identification. If it is leadership, emphasize direction, responsibility and relationships. If it is lifestyle, emphasize boundaries, sustainability and a definition of success that protects life outside work.
 
 The plan must contain exactly 12 weeks and follow this sequence without reordering:
 - Week 1 — Target Acquisition: define the precise new identity and arrival condition.
