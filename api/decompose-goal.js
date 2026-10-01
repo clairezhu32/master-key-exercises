@@ -74,6 +74,8 @@ async function getUserFromToken(authHeader, serviceRoleKey) {
 }
 
 const PLAN_GENERATION_LIMIT = 3;
+const UNLIMITED_TEST_EMAILS = new Set(['clairehzhu@gmail.com']);
+const isUnlimitedTester = email => UNLIMITED_TEST_EMAILS.has(String(email || '').trim().toLowerCase());
 
 // Ensure the account has a generation row, then read its durable usage count.
 // Older records predate the counter, so an existing saved plan counts as the
@@ -97,7 +99,8 @@ async function claimGeneration(userId, email, serviceRoleKey) {
   const [record] = await stateRes.json();
   const storedCount = Number(record?.goal_data?._generation_count);
   const used = Number.isFinite(storedCount) ? storedCount : record?.plan ? 1 : 0;
-  return { used, remaining: Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: used < PLAN_GENERATION_LIMIT, goalData: record?.goal_data || {} };
+  const unlimited = isUnlimitedTester(email);
+  return { used, remaining: unlimited ? null : Math.max(0, PLAN_GENERATION_LIMIT - used), allowed: unlimited || used < PLAN_GENERATION_LIMIT, unlimited, goalData: record?.goal_data || {} };
 }
 
 // mks_goal_generations is also the durable copy of the plan itself:
@@ -714,7 +717,7 @@ export default async function handler(req, res) {
       if (!usage.goalData?._beta_access) return res.status(403).json({ error: 'A valid invitation code is required before starting onboarding.', code: 'INVITATION_REQUIRED' });
       return res.status(200).json({ tree: getOnboardingTree(req.query?.category) });
     }
-    return res.status(200).json({ usage: { used: usage.used, remaining: usage.remaining, limit: PLAN_GENERATION_LIMIT } });
+    return res.status(200).json({ usage: { used: usage.used, remaining: usage.remaining, limit: usage.unlimited ? null : PLAN_GENERATION_LIMIT, unlimited: usage.unlimited } });
   }
 
   let body;
@@ -762,7 +765,7 @@ export default async function handler(req, res) {
     if (!saved) { const saveError = new Error('Your plan was created but could not be saved. Please try again.'); saveError.status = 500; throw saveError; }
     const fullPlan = { ...plan, intensity };
     const access = await getPlanAccess(user.id, serviceRoleKey);
-    return res.status(200).json({ plan: access.unlocked ? fullPlan : createPlanPreview(fullPlan), access, usage: { used: generationCount, remaining: PLAN_GENERATION_LIMIT - generationCount, limit: PLAN_GENERATION_LIMIT } });
+    return res.status(200).json({ plan: access.unlocked ? fullPlan : createPlanPreview(fullPlan), access, usage: { used: generationCount, remaining: claimed.unlimited ? null : Math.max(0, PLAN_GENERATION_LIMIT - generationCount), limit: claimed.unlimited ? null : PLAN_GENERATION_LIMIT, unlimited: claimed.unlimited } });
   } catch (err) {
     const status = err.status || 500;
     console.error(`decompose-goal failed in ${Date.now() - requestStart}ms for user ${user.id}: ${err.message}`);

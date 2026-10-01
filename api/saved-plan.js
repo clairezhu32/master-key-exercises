@@ -2,6 +2,7 @@ import { createPlanPreview, getPlanAccess } from '../lib/plan-access.js';
 
 const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const PLAN_LIMIT = 3;
+const UNLIMITED_TEST_EMAILS = new Set(['clairehzhu@gmail.com']);
 
 function isAllowedOrigin(origin) {
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin || '')) return true;
@@ -37,11 +38,12 @@ export default async function handler(req, res) {
     const record = (await response.json())[0] || null;
     const count = Number(record?.goal_data?._generation_count);
     const used = Number.isFinite(count) ? count : record?.plan ? 1 : 0;
+    const unlimited = UNLIMITED_TEST_EMAILS.has(String(user.email || '').trim().toLowerCase());
     const answers = Object.fromEntries(Object.entries(record?.goal_data || {}).filter(([key]) => !key.startsWith('_')));
     const access = await getPlanAccess(user.id, serviceRoleKey);
     const clientPlan = access.unlocked ? record?.plan : createPlanPreview(record?.plan);
     return res.status(200).json({
-      usage: { used, remaining: Math.max(0, PLAN_LIMIT - used), limit: PLAN_LIMIT },
+      usage: { used, remaining: unlimited ? null : Math.max(0, PLAN_LIMIT - used), limit: unlimited ? null : PLAN_LIMIT, unlimited },
       access,
       savedPlan: clientPlan ? { answers, plan: clientPlan, savedAt: record.generated_at, access } : null,
     });
