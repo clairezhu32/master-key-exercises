@@ -436,7 +436,7 @@ function buildSystemPrompt() {
 
 Follow this seven-step sequence from the supplied Chase Hughes transcript:
 1. Target Acquisition — define a precise arrival condition the person can picture and recognize. For an identity transition, specify exactly who they are becoming and how that identity operates in an ordinary difficult moment.
-2. Threat Modeling — create two vivid futures: the desired identity trajectory and the honest trajectory if the old identity remains unchanged. Use calm contrast, not panic, catastrophe, shame or coercion.
+2. Threat Modeling — create two vivid 10-year futures: the desired identity trajectory and the honest trajectory if the old identity remains unchanged. Then extend only the no-change trajectory to 20 years so the cumulative cost becomes visible. Cover work, money, relationships, energy, self-respect and missed possibilities only where relevant to the person's answers. Use calm, plausible contrast—not panic, invented disasters, shame or coercion.
 3. Identity Engineering — define exactly three beliefs the new identity holds, three default ways it behaves, and three standards it does not negotiate. These are identity rules, not productivity quotas.
 4. Environmental Sabotage — deliberately change safe, reversible environmental, language, visual, schedule or routine cues that trigger the old identity. “Sabotage” refers only to interrupting old cues, never harming the person or their responsibilities.
 5. Mammalian Brain Reprogramming (FATE) — personalize Focus, Authority, Tribe and Emotion: what remains visible, which credible evidence or voice matters, who expects this identity, and how the future self becomes emotionally real.
@@ -456,14 +456,14 @@ Motivation must materially change the diagnosis. If the motive is income, emphas
 
 The plan must contain exactly 12 weeks and follow this sequence without reordering:
 - Week 1 — Target Acquisition: define the precise new identity and arrival condition.
-- Week 2 — Threat Modeling: build the two contrasting future trajectories.
+- Week 2 — Threat Modeling: contrast two specific 10-year futures, then extend the unchanged-identity trajectory to Year 20. At least one “Write:” practice must explicitly include both Year 10 futures and the Year 20 cost of no identity change.
 - Week 3 — Identity Engineering: write 3 beliefs, 3 defaults and 3 non-negotiable standards.
 - Week 4 — Environmental Sabotage: interrupt cues that automatically reactivate the old identity.
 - Week 5 — FATE: build Focus, Authority, Tribe and Emotion around the new identity.
 - Week 6 — FEAR: combine Focus, Emotion, safe Agitation/novelty and Repetition.
 - Week 7 — Identity Integration: notice when the new identity begins to feel natural and consolidate it.
 - Week 8 — Repeat Target Acquisition with a more precise identity under real uncertainty.
-- Week 9 — Repeat Threat Modeling without catastrophizing; update the contrast using actual experience.
+- Week 9 — Repeat Threat Modeling without catastrophizing; revise the two Year 10 futures and the Year 20 no-change trajectory using actual experience from the first eight weeks.
 - Week 10 — Deepen Identity Engineering using evidence gathered during the first nine weeks.
 - Week 11 — Strengthen Environmental Sabotage and FATE where the old identity still has strong cues.
 - Week 12 — Integrate FEAR and Identity Integration into a continuation ritual and a first-person identity declaration.
