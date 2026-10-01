@@ -133,6 +133,17 @@ const PLAN_SCHEMA = {
     summary: { type: 'STRING', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
     insight: { type: 'STRING', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
     milestone_90day: { type: 'STRING', description: 'A first-person identity statement describing who the person is becoming by day 90 and how that identity feels in ordinary life.' },
+    identity_gap: {
+      type: 'OBJECT',
+      description: 'A specific diagnosis of the distance between the current identity and desired identity. Infer meaningful gaps; do not merely repeat the answers.',
+      properties: {
+        from_identity: { type: 'STRING', description: 'A concise description of the current identity and its default operating mode.' },
+        to_identity: { type: 'STRING', description: 'A concise description of the desired identity and its default operating mode.' },
+        transferable_strengths: { type: 'ARRAY', description: 'Exactly 3 strengths from the current identity that remain valuable in the new identity.', items: { type: 'STRING' } },
+        gaps: { type: 'ARRAY', description: 'Exactly 3 specific identity-level gaps, each written as a shift from an old default to a new default. Focus on ownership, judgment, voice, standards, uncertainty, relationships or self-concept—not credentials or task lists.', items: { type: 'STRING' } },
+      },
+      required: ['from_identity', 'to_identity', 'transferable_strengths', 'gaps'],
+    },
     lucky_method: {
       type: 'ARRAY',
       description: 'Exactly 6 personalized identity-rewrite steps, in the canonical order. Each connects the desired identity to the person’s current self-story and emotional patterns.',
@@ -305,7 +316,7 @@ const PLAN_SCHEMA = {
       },
     },
   },
-  required: ['plan_mode', 'domain_label', 'summary', 'insight', 'milestone_90day', 'lucky_method', 'funnel', 'weeks', 'exercises'],
+  required: ['plan_mode', 'domain_label', 'summary', 'insight', 'milestone_90day', 'identity_gap', 'lucky_method', 'funnel', 'weeks', 'exercises'],
 };
 
 const ADJUSTED_WEEK_SCHEMA = {
@@ -426,6 +437,13 @@ Use this six-part framework, adapted from the supplied Chase Hughes transcript a
 
 Return all six in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to identity_rewrite.
 
+Before building the weeks, diagnose the identity gap. Populate identity_gap with:
+- the current identity and how it habitually operates;
+- the desired identity and how it must operate;
+- exactly three strengths that transfer across the change;
+- exactly three non-obvious identity shifts required.
+For a role transition, reason about the actual difference in role identity. Example: Data Scientist -> Product Manager may require a shift from producing rigorous analysis and advising decisions to framing the problem, making tradeoffs under uncertainty, aligning people and owning the outcome. Do not treat the old identity as inferior. Do not reduce the gap to resume keywords, credentials or a generic confidence problem.
+
 The plan must contain exactly 12 weeks. Across the 12 weeks, move through four phases:
 - Weeks 1-3: observe and loosen the old identity.
 - Weeks 4-6: author the new identity code.
@@ -449,11 +467,12 @@ ${partList}
 Respond with a single JSON object matching the required schema exactly. Do not include any text outside the JSON.`;
 }
 
-function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key }) {
+function buildUserPrompt({ goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, gap, intensity, category, category_key }) {
   const choiceList = value => Array.isArray(value) && value.length ? value.join(', ') : '(not specified)';
   return `Goal category: ${category || '(not specified)'} (${category_key || 'general'} decision path)
 Current baseline: ${baseline || '(not specified)'}
 Current stage: ${current_stage || '(not specified)'}
+Role-transition evidence for gap diagnosis: ${gap || '(not specified)'}
 
 LUCKY STEP 1 — CLARIFY WHAT THEY TRULY WANT
 Measurable 90-day outcome: ${goal}
@@ -489,7 +508,7 @@ Feedback signals they selected: ${choiceList(obstacle_types)}
 Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
 Evidence review cadence: ${review_cadence || 'Weekly'}
 
-Build their 90-day identity-rewrite journey now. Treat the external goal only as context for the identity they want to embody. Translate action-oriented onboarding answers into identity language rather than assigning those actions. Personalize the old self-story, desired self-image, beliefs, standards, cues, FATE support and FEAR rehearsal. Week 1 begins with observing the old identity without judgment; Week 12 ends with a first-person identity declaration and continuation ritual.`;
+Build their 90-day identity-rewrite journey now. First infer and clearly articulate the gap between their current identity and desired identity using the specific roles, operating modes, strengths and tensions in their answers. Treat the external goal as context for the identity they want to embody. Translate action-oriented answers into identity language rather than assigning those actions. Personalize the old self-story, desired self-image, beliefs, standards, cues, FATE support and FEAR rehearsal. Week 1 begins with observing the current identity without judgment; Week 12 ends with a first-person identity declaration and continuation ritual.`;
 }
 
 function normalizeIdentityPlan(plan) {
@@ -702,7 +721,7 @@ export default async function handler(req, res) {
     }
   }
 
-  const { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, category, category_key } = body ?? {};
+  const { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, gap, category, category_key } = body ?? {};
   if (!goal?.trim()) return res.status(400).json({ error: 'Goal is required' });
 
   const hoursNum = { '1-2': 2, '3-5': 4, '5-10': 7, '10+': 12 }[hours] || 5;
@@ -716,7 +735,7 @@ export default async function handler(req, res) {
   if (!claimed.allowed) return res.status(403).json({ error: 'You have used all three Master Plan generations for this account.', code: 'PLAN_LIMIT_REACHED', usage: { used: claimed.used, remaining: 0, limit: PLAN_GENERATION_LIMIT } });
 
   try {
-    const generationAnswers = { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, intensity, category, category_key };
+    const generationAnswers = { goal, outcome_type, baseline, current_stage, why, process_vision, process_types, limiting_belief, limiting_belief_type, resources, resource_types, reframe, future_self, future_choices, action_types, constraints, obstacle, obstacle_types, review_cadence, hours, schedule, start_date, first_week, first_week_type, gap, intensity, category, category_key };
     const plan = normalizeIdentityPlan(await callGemini(generationAnswers, deadlineAt));
     console.log(`decompose-goal succeeded in ${Date.now() - requestStart}ms for user ${user.id}`);
     const generationCount = claimed.used + 1;
