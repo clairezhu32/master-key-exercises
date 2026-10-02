@@ -132,11 +132,11 @@ const FUNNEL_STAGE_KEYS = ['targets', 'access_points', 'outreach', 'gap_closing'
 const PLAN_SCHEMA = {
   type: 'OBJECT',
   properties: {
-    plan_mode: { type: 'STRING', enum: ['identity_rewrite'], description: 'Always identity_rewrite.' },
+    plan_mode: { type: 'STRING', enum: ['action_mindset'], description: 'Always action_mindset.' },
     domain_label: { type: 'STRING', description: "Short label for the goal domain, e.g. 'Career / Job Search', 'Business Launch', 'Marathon Training'." },
     summary: { type: 'STRING', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
     insight: { type: 'STRING', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
-    milestone_90day: { type: 'STRING', description: 'A first-person identity statement describing who the person is becoming by day 90 and how that identity feels in ordinary life.' },
+    milestone_90day: { type: 'STRING', description: 'A concrete 90-day outcome paired with the identity the person is becoming while pursuing it.' },
     identity_gap: {
       type: 'OBJECT',
       description: 'A specific diagnosis of the distance between the current identity and desired identity. Infer meaningful gaps; do not merely repeat the answers.',
@@ -145,9 +145,10 @@ const PLAN_SCHEMA = {
         from_identity: { type: 'STRING', description: 'A concise description of the current identity and its default operating mode.' },
         to_identity: { type: 'STRING', description: 'A concise description of the desired identity and its default operating mode.' },
         transferable_strengths: { type: 'ARRAY', description: 'Exactly 3 strengths from the current identity that remain valuable in the new identity.', items: { type: 'STRING' } },
+        practical_gaps: { type: 'ARRAY', description: 'Exactly 3 specific capability, proof, positioning, access or execution gaps that the action track should close. For career transitions, infer them from the current and target roles.', items: { type: 'STRING' } },
         gaps: { type: 'ARRAY', description: 'Exactly 3 specific identity-level gaps, each written as a shift from an old default to a new default. Focus on ownership, judgment, voice, standards, uncertainty, relationships or self-concept—not credentials or task lists.', items: { type: 'STRING' } },
       },
-      required: ['motivation', 'from_identity', 'to_identity', 'transferable_strengths', 'gaps'],
+      required: ['motivation', 'from_identity', 'to_identity', 'transferable_strengths', 'practical_gaps', 'gaps'],
     },
     lucky_method: {
       type: 'ARRAY',
@@ -158,7 +159,7 @@ const PLAN_SCHEMA = {
           step: { type: 'INTEGER', description: '1 through 7.' },
           title: { type: 'STRING', description: 'Use the exact canonical Lucky Method title for this step.' },
           guidance: { type: 'STRING', description: 'One concise, personalized explanation of how this step applies to the person’s goal and current situation.' },
-          action: { type: 'STRING', description: 'One short identity-writing, visualization, cue-change, or emotional-rehearsal practice. Do not assign goal-achievement tasks.' },
+          action: { type: 'STRING', description: 'One short mindset practice that supports the real-world actions in this step.' },
         },
         required: ['step', 'title', 'guidance', 'action'],
       },
@@ -289,7 +290,7 @@ const PLAN_SCHEMA = {
     },
     weeks: {
       type: 'ARRAY',
-      description: 'Return exactly 12 weeks for every goal. Each week deepens identity and mindset change rather than assigning external goal-achievement tactics.',
+      description: 'Return exactly 12 weeks for every goal. Each week combines measurable real-world progress with one mindset practice and an identity-evidence prompt.',
       items: {
         type: 'OBJECT',
         properties: {
@@ -297,16 +298,19 @@ const PLAN_SCHEMA = {
           framework_step: { type: 'INTEGER', description: 'The identity framework step emphasized this week, from 1 through 7. Weeks 1-7 must map directly to Steps 1-7.' },
           funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
           theme: { type: 'STRING' },
-          target: { type: 'STRING', description: 'The internal identity shift to notice or strengthen by the end of this week.' },
+          target: { type: 'STRING', description: 'A concise summary connecting this week’s measurable external outcome to its internal identity shift.' },
+          action_outcome: { type: 'STRING', description: 'The tangible, measurable result to produce by the end of the week.' },
+          mindset_shift: { type: 'STRING', description: 'A specific shift written as “From [old default] to [new default].”' },
+          identity_evidence: { type: 'STRING', description: 'One short question asking what observable action or result this week proves the emerging identity.' },
           actions: {
             type: 'ARRAY',
             items: { type: 'STRING' },
-            description: 'Exactly 3 identity practices: one writing practice, one visualization or emotional rehearsal, and one cue/environment or social-reinforcement practice. Never assign applications, outreach, deliverables, workouts, purchases, or other goal-achievement tactics.',
+            description: 'Exactly 4 checkable items in this order: 3 concrete real-world tasks prefixed “Action:” and 1 identity or emotional practice prefixed “Mindset:”. Make action tasks specific, feasible within the stated capacity, and measurable by a number, deliverable, or scheduled event.',
           },
           exercise_part: { type: 'INTEGER', description: 'The most relevant Lucky Method exercise step for this specific week, from 1 through 6.' },
           exercise_reason: { type: 'STRING', description: 'One concise sentence connecting this exercise to the week’s target, actions, or likely execution obstacle.' },
         },
-        required: ['week', 'framework_step', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
+        required: ['week', 'framework_step', 'funnel_stage', 'theme', 'target', 'action_outcome', 'mindset_shift', 'identity_evidence', 'actions', 'exercise_part', 'exercise_reason'],
       },
     },
     exercises: {
@@ -332,12 +336,15 @@ const ADJUSTED_WEEK_SCHEMA = {
     framework_step: { type: 'INTEGER', description: 'Preserve the original framework step for this week, from 1 through 7.' },
     funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS },
     theme: { type: 'STRING' },
-    target: { type: 'STRING', description: 'The internal identity shift to strengthen this week.' },
-    actions: { type: 'ARRAY', description: 'Exactly 3 identity-rewrite practices: writing, mental rehearsal, and cue/support reinforcement.', items: { type: 'STRING' } },
+    target: { type: 'STRING', description: 'A concise summary connecting the measurable outcome to the mindset shift.' },
+    action_outcome: { type: 'STRING', description: 'The tangible, measurable result to produce by the end of the week.' },
+    mindset_shift: { type: 'STRING', description: 'A specific shift written as “From [old default] to [new default].”' },
+    identity_evidence: { type: 'STRING', description: 'A question asking what observable action or result proves the emerging identity.' },
+    actions: { type: 'ARRAY', description: 'Exactly 4 checkable items: 3 concrete tasks prefixed “Action:” and 1 mindset practice prefixed “Mindset:”.', items: { type: 'STRING' } },
     exercise_part: { type: 'INTEGER', description: 'A Lucky Method step from 1 through 6.' },
     exercise_reason: { type: 'STRING' },
   },
-  required: ['week', 'framework_step', 'funnel_stage', 'theme', 'target', 'actions', 'exercise_part', 'exercise_reason'],
+  required: ['week', 'framework_step', 'funnel_stage', 'theme', 'target', 'action_outcome', 'mindset_shift', 'identity_evidence', 'actions', 'exercise_part', 'exercise_reason'],
 };
 
 function isCareerPath({ category_key, category, goal } = {}) {
@@ -356,9 +363,9 @@ function cleanWeeklyFeedback(feedback = {}) {
 async function generateAdjustedWeek(context) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('AI planning is not configured'), { status: 500 });
-  const prompt = `Revise ONLY the next week of a personalized 90-day identity-rewrite plan using the user's reflection.
+  const prompt = `Revise ONLY the next week of a personalized 90-day action-and-mindset plan using the user's reflection.
 
-Protect the identity the person wants to become. Respond to what felt believable, emotionally meaningful, resistant, or artificial. Keep exactly 3 practices: (1) identity writing, (2) visualization or emotional rehearsal, and (3) a cue, environment, authority, tribe, or repetition practice. Do not assign applications, outreach, deliverables, workouts, purchases, or other external goal-achievement tactics. Do not punish missed practice by stacking work. Preserve continuity without rewriting later weeks. Never claim that thoughts guarantee external outcomes or that these practices medically rewire the brain.
+Keep the same framework step, but use actual execution to improve feasibility. Return exactly 4 checkable items in order: (1-3) concrete real-world tasks prefixed “Action:” and (4) one identity, belief, or emotional-rehearsal practice prefixed “Mindset:”. Every action must create a number, deliverable, decision, conversation, scheduled event, or other observable result. The mindset item must directly support the actions rather than replace them. Also return a measurable action_outcome, a “From ... to ...” mindset_shift, and an identity_evidence question. Do not punish missed work by stacking more work. Preserve continuity without rewriting later weeks. Never claim that thoughts guarantee external outcomes or that these practices medically rewire the brain.
 
 Goal and onboarding answers:
 ${JSON.stringify(context.answers)}
@@ -380,7 +387,7 @@ Return the revised next-week object. Its week number must remain ${context.nextW
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: 'You are Lucky, a careful identity-reflection coach. Revise practices from honest weekly experience without making clinical or guaranteed-outcome claims.' }] },
+      systemInstruction: { parts: [{ text: 'You are Lucky, a practical behavior-change coach. Revise real-world actions and mindset support from honest weekly evidence without making clinical or guaranteed-outcome claims.' }] },
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { responseMimeType: 'application/json', responseSchema: ADJUSTED_WEEK_SCHEMA, maxOutputTokens: 1800 },
     }),
@@ -396,8 +403,16 @@ Return the revised next-week object. Its week number must remain ${context.nextW
   if (!text) throw Object.assign(new Error('Lucky returned an incomplete weekly adjustment.'), { status: 502 });
   let week;
   try { week = JSON.parse(text); } catch { throw Object.assign(new Error('Lucky returned an invalid weekly adjustment.'), { status: 502 }); }
-  if (!Array.isArray(week.actions) || week.actions.length !== 3) throw Object.assign(new Error('Lucky returned an incomplete weekly adjustment.'), { status: 502 });
-  return { ...week, week: context.nextWeek.week };
+  if (!Array.isArray(week.actions) || week.actions.length !== 4) throw Object.assign(new Error('Lucky returned an incomplete weekly adjustment.'), { status: 502 });
+  const cleanPrefix = value => String(value || '').replace(/^(?:action|mindset)\s*:\s*/i, '').trim();
+  return {
+    ...week,
+    week: context.nextWeek.week,
+    actions: [
+      ...week.actions.slice(0, 3).map(item => `Action: ${cleanPrefix(item)}`),
+      `Mindset: ${cleanPrefix(week.actions[3])}`,
+    ],
+  };
 }
 
 async function adjustNextWeek(user, body, serviceRoleKey) {
@@ -432,7 +447,9 @@ async function adjustNextWeek(user, body, serviceRoleKey) {
 
 function buildSystemPrompt() {
   const partList = PART_THEMES.map((t, i) => `${i + 1}. ${t}`).join('\n');
-  return `You are Lucky, an identity-reflection coach. Create a personalized 90-day identity-rewrite journey. The goal is not to tell the person how to achieve the external result. The goal is to help them revise the self-image, beliefs, emotional associations, environmental cues and social expectations from which future choices arise.
+  return `You are Lucky, a practical behavior-change coach. Create a personalized 90-day action-and-mindset journey. The plan must help the person make observable progress toward the external goal while changing the identity, beliefs and emotional defaults that determine whether they sustain the work.
+
+Use this causal loop throughout the plan: mindset shift -> real-world action -> observable evidence -> stronger identity -> better next action. Action is the backbone of the product; mindset supports execution and must never replace it. Aim for roughly 70% real-world action and 30% mindset work.
 
 Follow this seven-step sequence from the supplied Chase Hughes transcript:
 1. Target Acquisition — define a precise arrival condition the person can picture and recognize. For an identity transition, specify exactly who they are becoming and how that identity operates in an ordinary difficult moment.
@@ -443,20 +460,21 @@ Follow this seven-step sequence from the supplied Chase Hughes transcript:
 6. FEAR Protocol — personalize Focus, Emotion, Agitation/novelty and Repetition. Use safe novelty and short repeated rehearsal until the identity feels familiar; never describe this as medical brain rewiring.
 7. Identity Integration — consolidate the transcript’s closing outcome: the pattern stops feeling like something the person is forcing and begins to feel like who they are. The spoken transcript calls the framework seven steps but does not explicitly name a separate seventh step; use “Identity Integration” as the transparent, derived label for its concluding integration principle.
 
-Return all seven in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to identity_rewrite.
+Return all seven in lucky_method in this exact order and personalize them with the person's own words. Set plan_mode to action_mindset.
 
 Before building the weeks, diagnose the identity gap. Populate identity_gap with:
 - the primary motivation for the change and how it changes the emphasis of the new identity;
 - the current identity and how it habitually operates;
 - the desired identity and how it must operate;
 - exactly three strengths that transfer across the change;
+- exactly three practical capability, proof, positioning, access or execution gaps that the action track will close;
 - exactly three non-obvious identity shifts required.
 For a role transition, reason about the actual difference in role identity. Example: Data Scientist -> Product Manager may require a shift from producing rigorous analysis and advising decisions to framing the problem, making tradeoffs under uncertainty, aligning people and owning the outcome. Do not treat the old identity as inferior. Do not reduce the gap to resume keywords, credentials or a generic confidence problem.
 Motivation must materially change the diagnosis. If the motive is income, emphasize self-valuation, leverage, standards and permission to pursue compensation without equating money with worth. If it is impact, emphasize ownership, decisions and influence. If it is strengths, preserve and reposition transferable strengths. If it is interest, emphasize curiosity, permission to explore and intrinsic identification. If it is leadership, emphasize direction, responsibility and relationships. If it is lifestyle, emphasize boundaries, sustainability and a definition of success that protects life outside work.
 
-The plan must contain exactly 12 weeks and follow this sequence without reordering:
+The plan must contain exactly 12 weeks and follow this mindset sequence without reordering. The framework step shapes the week’s internal work, while the action track must still advance the external goal:
 - Week 1 — Target Acquisition: define the precise new identity and arrival condition.
-- Week 2 — Threat Modeling: contrast two specific 10-year futures, then extend the unchanged-identity trajectory to Year 20. At least one “Write:” practice must explicitly include both Year 10 futures and the Year 20 cost of no identity change.
+- Week 2 — Threat Modeling: contrast two specific 10-year futures, then extend the unchanged-identity trajectory to Year 20. The “Mindset:” item must explicitly include both Year 10 futures and the Year 20 cost of no identity change, then connect that contrast to one immediate action.
 - Week 3 — Identity Engineering: write 3 beliefs, 3 defaults and 3 non-negotiable standards.
 - Week 4 — Environmental Sabotage: interrupt cues that automatically reactivate the old identity.
 - Week 5 — FATE: build Focus, Authority, Tribe and Emotion around the new identity.
@@ -469,16 +487,19 @@ The plan must contain exactly 12 weeks and follow this sequence without reorderi
 - Week 12 — Integrate FEAR and Identity Integration into a continuation ritual and a first-person identity declaration.
 Set framework_step to 1,2,3,4,5,6,7,1,2,3,5,7 for Weeks 1 through 12 respectively.
 
-Every week must contain exactly three short practices, in this order:
-1. “Write:” a first-person identity rewriting or reflection prompt.
-2. “Rehearse:” a 5-10 minute visualization, future-self dialogue, contrast exercise or emotionally grounded mental rehearsal.
-3. “Reinforce:” a safe cue, environment, authority, tribe or repetition practice that supports the identity.
+Every week must include all of the following:
+- action_outcome: one tangible result achievable that week and measurable by a number, deliverable, decision, conversation or scheduled event;
+- mindset_shift: one specific “From [old default] to [new default]” statement tied to the week’s framework step;
+- exactly 4 checkable actions in order: 3 prefixed “Action:” followed by 1 prefixed “Mindset:”;
+- identity_evidence: one short question asking which observable action, decision or result proves the person is already practicing the new identity.
 
-Do NOT assign methods for attaining the external goal. For a career goal, do not prescribe applications, networking, resume edits, skill-building or interviews. For health, do not prescribe workouts, diets or treatment. For relationships, do not prescribe dates or outreach. The practices may notice choices and collect evidence of identity, but they must center on rewriting the identity rather than completing external tasks.
+The 3 Action items must be specific to the actual goal, sequence logically across 12 weeks, and fit the person’s stated capacity. Do not use vague items such as “work on your goal,” “be more confident,” or “research opportunities.” Include a number, named deliverable or scheduled interaction whenever possible. The Mindset item must be short enough to complete and must make the external actions easier to start, sustain or learn from.
+
+For career transitions, use the actual gap diagnosis to prescribe a balanced mix of target-role research, skill mapping, gap closing, proof-of-work, resume/LinkedIn positioning, networking, applications and interview rehearsal. Do not force all of these into every week; choose the highest-leverage actions for the current stage. For health, relationships, business and other domains, create equally concrete but safe domain-appropriate actions. Never prescribe medical treatment or unsafe behavior.
 
 Use gentle, believable language. Do not use fear, shame, coercion, cult tactics, “brainwashing,” or invented neuroscience as persuasion. Never claim these exercises rewire the brain, cure a condition, manifest external events, or guarantee success. Encourage professional help when a response suggests trauma, severe distress or a clinical condition.
 
-The legacy funnel object is required only for compatibility. Reinterpret its stages as a private map of the identity journey; do not turn it into external tactics. The visible weeks and lucky_method are the primary product.
+The funnel object is the strategic source for the real-world action track. Its stages should be practical, personalized and consistent with the weekly tasks. The visible weeks and lucky_method are the primary product.
 
 Assign the most relevant existing Lucky Exercise to every week and choose 3 overall exercises. The identity framework has seven themes; the exercise library may still map the derived seventh step to the closest existing rehearsal practice:
 ${partList}
@@ -527,7 +548,7 @@ Feedback signals they selected: ${choiceList(obstacle_types)}
 Warning sign that should trigger adjustment: ${obstacle || '(not specified)'}
 Evidence review cadence: ${review_cadence || 'Weekly'}
 
-Build their 90-day identity-rewrite journey now. First infer and clearly articulate the gap between their current identity and desired identity using the specific roles, operating modes, strengths and tensions in their answers. Treat the external goal as context for the identity they want to embody. Translate action-oriented answers into identity language rather than assigning those actions. Follow the seven-step sequence exactly: Week 1 Target Acquisition, Week 2 Threat Modeling, Week 3 Identity Engineering, Week 4 Environmental Sabotage, Week 5 FATE, Week 6 FEAR, Week 7 Identity Integration, then Weeks 8-12 deepen and consolidate the sequence as specified. Week 12 must end with a first-person identity declaration and continuation ritual.`;
+Build their 90-day action-and-mindset journey now. First infer and clearly articulate the gap between their current identity and desired identity using the specific roles, operating modes, strengths and tensions in their answers. Use the external goal to create concrete weekly actions and use the identity framework to help the person execute those actions consistently. Follow the seven-step mindset sequence exactly: Week 1 Target Acquisition, Week 2 Threat Modeling, Week 3 Identity Engineering, Week 4 Environmental Sabotage, Week 5 FATE, Week 6 FEAR, Week 7 Identity Integration, then Weeks 8-12 deepen and consolidate the sequence as specified. Every week needs 3 measurable Action items, 1 directly supportive Mindset item, and an identity-evidence question. Week 12 must end with a first-person identity declaration, a continuation ritual and a concrete next-90-day action.`;
 }
 
 function normalizeIdentityPlan(plan) {
@@ -538,7 +559,27 @@ function normalizeIdentityPlan(plan) {
     [1, 'Target Acquisition · Refine'], [2, 'Threat Modeling · Update'], [3, 'Identity Engineering · Deepen'],
     [5, 'Environmental Cues + FATE · Strengthen'], [7, 'FEAR + Identity Integration · Continue'],
   ];
-  return { ...plan, plan_mode: 'identity_rewrite', weeks: plan.weeks.slice(0, 12).map((week, index) => ({ ...week, week: index + 1, framework_step: sequence[index]?.[0] || week.framework_step, theme: sequence[index]?.[1] || week.theme })) };
+  const cleanPrefix = value => String(value || '').replace(/^(?:action|mindset)\s*:\s*/i, '').trim();
+  return {
+    ...plan,
+    plan_mode: 'action_mindset',
+    weeks: plan.weeks.slice(0, 12).map((week, index) => {
+      const rawActions = Array.isArray(week.actions) ? week.actions.slice(0, 4) : [];
+      const actionItems = rawActions.slice(0, 3).map(item => `Action: ${cleanPrefix(item)}`);
+      while (actionItems.length < 3) actionItems.push(`Action: Complete one measurable step toward ${week.action_outcome || week.target || 'this week’s outcome'}.`);
+      const mindsetItem = `Mindset: ${cleanPrefix(rawActions[3] || `Practice this shift: ${week.mindset_shift || 'respond as the person you are becoming'}.`)}`;
+      return {
+        ...week,
+        week: index + 1,
+        framework_step: sequence[index]?.[0] || week.framework_step,
+        theme: sequence[index]?.[1] || week.theme,
+        action_outcome: week.action_outcome || week.target || 'Produce one observable result this week.',
+        mindset_shift: week.mindset_shift || 'From waiting to feel ready to acting and learning from evidence.',
+        identity_evidence: week.identity_evidence || 'What did you do this week that the person you are becoming would naturally do?',
+        actions: [...actionItems, mindsetItem],
+      };
+    }),
+  };
 }
 
 async function callGeminiOnce(goalData) {
@@ -562,7 +603,7 @@ async function callGeminiOnce(goalData) {
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: PLAN_SCHEMA,
-        maxOutputTokens: 8000,
+        maxOutputTokens: 10000,
       },
     }),
   });
