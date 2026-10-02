@@ -128,6 +128,9 @@ function ownerState(record) {
     messages: (record?.goal_data?._accountability_messages || []).slice(-20).reverse(),
     progress: record?.goal_data?._accountability_progress || null,
     funnel_metrics: record?.goal_data?._funnel_metrics || null,
+    custom_tasks: record?.goal_data?._custom_tasks || {},
+    task_metrics: record?.goal_data?._task_metrics || {},
+    task_schedules: record?.goal_data?._task_schedules || {},
   };
 }
 
@@ -187,6 +190,43 @@ async function stateWithMatch(record, serviceRoleKey) {
 function cleanCompleted(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   return Object.fromEntries(Object.entries(value).slice(0, 500).map(([key, checked]) => [String(key).slice(0, 80), Boolean(checked)]));
+}
+
+function cleanCustomTasks(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const clean = {};
+  for (const [weekKey, tasks] of Object.entries(value).slice(0, 20)) {
+    if (!/^week-\d{1,2}$/.test(weekKey) || !Array.isArray(tasks)) continue;
+    clean[weekKey] = tasks.slice(0, 20).map((task, index) => ({
+      id: String(task?.id || `custom-${index}`).slice(0, 80),
+      text: String(task?.text || '').trim().slice(0, 180),
+    })).filter(task => task.text);
+  }
+  return clean;
+}
+
+function cleanTaskMetrics(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const clean = {};
+  for (const [key, metric] of Object.entries(value).slice(0, 500)) {
+    if (!metric || typeof metric !== 'object' || Array.isArray(metric)) continue;
+    const target = Math.max(0, Number(metric.target) || 0), current = Math.max(0, Number(metric.current) || 0);
+    if (!target) continue;
+    clean[String(key).slice(0, 100)] = { current: Math.min(current, target), target, unit: String(metric.unit || '').slice(0, 40) };
+  }
+  return clean;
+}
+
+function cleanTaskSchedules(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const clean = {};
+  for (const [key, schedule] of Object.entries(value).slice(0, 500)) {
+    if (!schedule || typeof schedule !== 'object' || Array.isArray(schedule)) continue;
+    const date = String(schedule.date || '').slice(0, 10), time = String(schedule.time || '').slice(0, 5), duration = Math.max(5, Math.min(480, Number(schedule.duration) || 30));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) continue;
+    clean[String(key).slice(0, 100)] = { date, time, duration };
+  }
+  return clean;
 }
 
 export default async function handler(req, res) {
@@ -291,10 +331,13 @@ export default async function handler(req, res) {
       const completed = cleanCompleted(body.completed);
       const progress = { completed, completed_count: Object.values(completed).filter(Boolean).length, total_tasks: Math.max(0, Number(body.total_tasks) || 0), updated_at: new Date().toISOString() };
       const taskEstimates = buildTaskEstimates(record.plan, goalData._task_estimates);
+      const customTasks = body.custom_tasks === undefined ? (goalData._custom_tasks || {}) : cleanCustomTasks(body.custom_tasks);
+      const taskMetrics = body.task_metrics === undefined ? (goalData._task_metrics || {}) : cleanTaskMetrics(body.task_metrics);
+      const taskSchedules = body.task_schedules === undefined ? (goalData._task_schedules || {}) : cleanTaskSchedules(body.task_schedules);
       const funnelMetrics = body.funnel_metrics && typeof body.funnel_metrics === 'object'
         ? Object.fromEntries(['applications', 'responses', 'interviews', 'offers'].map((key) => [key, Math.max(0, Math.floor(Number(body.funnel_metrics[key]) || 0))]))
         : goalData._funnel_metrics;
-      await saveGoalData(user.id, { ...goalData, _accountability_progress: progress, _task_estimates: taskEstimates, _funnel_metrics: funnelMetrics }, serviceRoleKey);
+      await saveGoalData(user.id, { ...goalData, _accountability_progress: progress, _task_estimates: taskEstimates, _funnel_metrics: funnelMetrics, _custom_tasks: customTasks, _task_metrics: taskMetrics, _task_schedules: taskSchedules }, serviceRoleKey);
       return res.status(200).json({ synced: true, progress });
     }
 
