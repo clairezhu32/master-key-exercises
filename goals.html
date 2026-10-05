@@ -126,7 +126,9 @@
     .owner-plan-meta { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:13px; color:var(--muted); font-size:12px; }
     .owner-plan-meta strong { color:var(--text); }
     .owner-rationale { margin:12px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
-    .career-funnel { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:15px; }
+    .outcome-funnel { margin-top:15px; padding-top:13px; border-top:1px solid var(--line); }
+    .outcome-funnel-title { margin-bottom:9px; color:var(--muted); font-size:10px; font-weight:700; line-height:1.4; }
+    .career-funnel { display:grid; grid-template-columns:repeat(auto-fit,minmax(92px,1fr)); gap:8px; }
     .career-funnel-item { padding:10px 8px; border:1px solid var(--line); border-radius:7px; background:#181814; text-align:center; }
     .career-funnel-item input { width:100%; border:0; outline:0; color:var(--mint); background:transparent; font-family:inherit; font-size:20px; font-weight:800; text-align:center; -moz-appearance:textfield; }
     .career-funnel-item input:focus { box-shadow:0 1px 0 var(--mint); }
@@ -743,6 +745,13 @@
       const answers=saved.answers||{}, haystack=[answers.category_key,answers.category,answers.goal,saved.plan?.domain_label].filter(Boolean).join(' ').toLowerCase();
       return /career|job[ -]?(search|hunt)|\brole\b|\bposition\b|product manager|\bpm\b|data scientist|software engineer|resume|interview/.test(haystack);
     }
+    function relationshipPlanMode(saved) {
+      const answers=saved.answers||{}, haystack=[answers.outcome_type,answers.goal,answers.process_vision,answers.first_week,saved.plan?.milestone_90day].filter(Boolean).join(' ').toLowerCase();
+      if(/improve communication|repair (?:a|my|our) relationship|deepen (?:an|my|our) existing relationship|set (?:and maintain )?(?:an )?(?:important )?boundary/.test(haystack)) return '';
+      if(/dating|date\b|romantic|boyfriend|girlfriend|partner|single|prospect|mutual (?:attraction|interest)|men\b|women\b|脱单|男朋友|女朋友|约会/.test(haystack)) return 'dating';
+      if(/social life|social circle|friend|friendship|community|new city|reciprocal connection|belong|社交|朋友/.test(haystack)) return 'social';
+      return '';
+    }
     function inferTaskMinutes(action='') {
       const text=String(action).toLowerCase();
       if(/interview|mock|case stud|portfolio|presentation/.test(text)) return 60;
@@ -771,6 +780,20 @@
       if(saved.funnelMetrics) return Object.fromEntries(Object.keys(counts).map(label=>[label,Math.max(0,Number(saved.funnelMetrics[label.toLowerCase()])||0)]));
       return counts;
     }
+    function outcomeFunnelStages(saved) {
+      if(isCareerPlan(saved)) {
+        const counts=careerFunnelCounts(saved);
+        return {title:'Career funnel · update the real results as they happen',stages:Object.entries(counts).map(([label,value])=>({key:label.toLowerCase(),label,value}))};
+      }
+      const mode=relationshipPlanMode(saved), stored=saved.funnelMetrics||{};
+      const definitions=mode==='dating'
+        ? [['people_met','People met'],['mutual_interest','Mutual interest'],['first_dates','First dates'],['repeat_dates','Repeat dates'],['active_prospects','Active prospects']]
+        : mode==='social'
+          ? [['people_met','People met'],['follow_ups','Follow-ups'],['one_to_one_plans','1:1 plans'],['repeat_contact','Repeat contact'],['reciprocal_connections','Reciprocal ties']]
+          : [];
+      if(!definitions.length) return null;
+      return {title:mode==='dating'?'Dating funnel · count reciprocity, not just activity':'Connection funnel · count relationships that progress',stages:definitions.map(([key,label])=>({key,label,value:Math.max(0,Number(stored[key])||0)}))};
+    }
     function updateOwnerPlanSummary(saved) {
       const answers=saved.answers||{}, plan=saved.plan||{}, entries=ownerTaskEntries(saved);
       const next=entries.find(task=>!saved.progress?.completed?.[task.key]);
@@ -787,10 +810,15 @@
       if(!rationale){ rationale=document.createElement('p'); rationale.id='owner-rationale'; rationale.className='owner-rationale'; document.getElementById('result-milestone').after(rationale); }
       const category=plan.domain_label||answers.category||'your selected goal';
       rationale.textContent=`Built for ${category.toLowerCase()}, using your goal, available time, constraints and first-week outcome.`;
-      let funnel=document.getElementById('owner-career-funnel');
-      if(!isCareerPlan(saved)||saved.plan?.plan_mode==='identity_rewrite'){ funnel?.remove(); return; }
-      if(!funnel){ funnel=document.createElement('div'); funnel.id='owner-career-funnel'; funnel.className='career-funnel'; document.querySelector('.plan-progress').appendChild(funnel); }
-      const counts=careerFunnelCounts(saved); funnel.replaceChildren(...Object.entries(counts).map(([label,count])=>{ const item=document.createElement('label'); item.className='career-funnel-item'; const value=document.createElement('input'); value.type='number'; value.min='0'; value.step='1'; value.value=count; value.setAttribute('aria-label',label); const name=document.createElement('span'); name.textContent=label; value.addEventListener('change',()=>{ const current=careerFunnelCounts(saved); saved.funnelMetrics=Object.fromEntries(Object.entries(current).map(([key,amount])=>[key.toLowerCase(),amount])); saved.funnelMetrics[label.toLowerCase()]=Math.max(0,Math.floor(Number(value.value)||0)); value.value=saved.funnelMetrics[label.toLowerCase()]; savePlanProgress(saved); scheduleAccountabilitySync(saved); }); item.append(value,name); return item; }));
+      let funnel=document.getElementById('owner-outcome-funnel')||document.getElementById('owner-career-funnel');
+      const definition=outcomeFunnelStages(saved);
+      if(!definition||saved.plan?.plan_mode==='identity_rewrite'){ funnel?.remove(); return; }
+      if(!funnel){ funnel=document.createElement('div'); document.querySelector('.plan-progress').appendChild(funnel); }
+      funnel.id='owner-outcome-funnel'; funnel.className='outcome-funnel';
+      const funnelTitle=document.createElement('div'); funnelTitle.className='outcome-funnel-title'; funnelTitle.textContent=definition.title;
+      const funnelGrid=document.createElement('div'); funnelGrid.className='career-funnel';
+      funnelGrid.replaceChildren(...definition.stages.map(stage=>{ const item=document.createElement('label'); item.className='career-funnel-item'; const value=document.createElement('input'); value.type='number'; value.min='0'; value.step='1'; value.value=stage.value; value.setAttribute('aria-label',stage.label); const name=document.createElement('span'); name.textContent=stage.label; value.addEventListener('change',()=>{ saved.funnelMetrics={...(saved.funnelMetrics||{}),[stage.key]:Math.max(0,Math.floor(Number(value.value)||0))}; value.value=saved.funnelMetrics[stage.key]; savePlanProgress(saved); scheduleAccountabilitySync(saved); }); item.append(value,name); return item; }));
+      funnel.replaceChildren(funnelTitle,funnelGrid);
     }
     function updateProgressSummary(saved) {
       const keys=visibleTaskKeys(saved), visibleKeys=new Set(keys), completed=Object.entries(saved.progress?.completed||{}).filter(([key,value])=>value&&visibleKeys.has(key)).length, percent=keys.length?Math.round(completed/keys.length*100):0;
@@ -859,7 +887,7 @@
       saved.access = planAccess;
       const checkoutMessage=document.getElementById('checkout-message'); checkoutMessage.textContent=checkoutNotice; checkoutMessage.style.display=checkoutNotice?'block':'none';
       saved.progress = saved.progress || {completed:{},feedback:{}}; saved.progress.completed = saved.progress.completed || {}; saved.progress.feedback = saved.progress.feedback || {}; saved.customTasks = saved.customTasks || {}; saved.taskMetrics = saved.taskMetrics || {}; saved.taskSchedules = saved.taskSchedules || {}; saved.taskEstimates=saved.taskEstimates||{};
-      const totalPlanWeeks=Math.max(1,plan.weeks?.length||12), careerPlan=isCareerPlan(saved), careerSprint=careerPlan&&totalPlanWeeks===4;
+      const totalPlanWeeks=Math.max(1,plan.weeks?.length||12), careerPlan=isCareerPlan(saved), connectionPlan=Boolean(relationshipPlanMode(saved)), careerSprint=careerPlan&&totalPlanWeeks===4;
       const identityMode=plan.plan_mode==='identity_rewrite', dualTrackMode=plan.plan_mode==='action_mindset', mindsetMode=identityMode||dualTrackMode;
       document.querySelector('.plan-progress-head strong').textContent=dualTrackMode?'Action + mindset progress':(identityMode?'Identity practice progress':'Overall plan progress');
       document.querySelector('.first-action span').textContent=dualTrackMode?'Start here · your first real-world action':(identityMode?'Start here · your first identity practice':'Start here · your first action');
@@ -888,7 +916,7 @@
         const theme=document.createElement('div'); theme.className='week-theme'; theme.textContent=mindsetMode&&week.framework_step?`Step ${week.framework_step} · ${week.theme||LUCKY_METHOD_FALLBACK[Number(week.framework_step)-1]?.[0]||''}`:(week.theme||''); head.append(label,theme);
         const target=document.createElement('p'); target.className='week-target'; target.textContent=week.target || '';
         const tracks=dualTrackMode?document.createElement('div'):null;
-        if(tracks){ tracks.className='week-tracks'; const actionTrack=document.createElement('div'); actionTrack.className='week-track action'; const actionLabel=document.createElement('span'); actionLabel.textContent='Make progress'; const actionCopy=document.createElement('strong'); actionCopy.textContent=week.action_outcome||week.target||''; actionTrack.append(actionLabel,actionCopy); const mindsetTrack=document.createElement('div'); mindsetTrack.className='week-track mindset'; const mindsetLabel=document.createElement('span'); mindsetLabel.textContent='Build the identity'; const mindsetCopy=document.createElement('strong'); mindsetCopy.textContent=week.mindset_shift||'From waiting to feel ready to acting and learning from evidence.'; mindsetTrack.append(mindsetLabel,mindsetCopy); tracks.append(actionTrack,mindsetTrack); }
+        if(tracks){ tracks.className='week-tracks'; const actionTrack=document.createElement('div'); actionTrack.className='week-track action'; const actionLabel=document.createElement('span'); actionLabel.textContent=connectionPlan?'Funnel outcome':'Make progress'; const actionCopy=document.createElement('strong'); actionCopy.textContent=week.action_outcome||week.target||''; actionTrack.append(actionLabel,actionCopy); const mindsetTrack=document.createElement('div'); mindsetTrack.className='week-track mindset'; const mindsetLabel=document.createElement('span'); mindsetLabel.textContent='Build the identity'; const mindsetCopy=document.createElement('strong'); mindsetCopy.textContent=week.mindset_shift||'From waiting to feel ready to acting and learning from evidence.'; mindsetTrack.append(mindsetLabel,mindsetCopy); tracks.append(actionTrack,mindsetTrack); }
         const adjustedNote=saved.weekAdjustments?.[weekKey] ? document.createElement('div') : null;
         if(adjustedNote){ const kept=Number(saved.weekAdjustments[weekKey].customTasksKept)||0; adjustedNote.className='adjusted-week-note'; adjustedNote.textContent=`Adjusted from your Week ${saved.weekAdjustments[weekKey].fromWeek} feedback.${kept?` ${kept} task${kept===1?'':'s'} you added manually were kept unchanged.`:''}`; }
         const weekProgress=document.createElement('div'); weekProgress.className='week-progress'; weekProgress.dataset.weekProgressKey=weekKey; const weekProgressCopy=document.createElement('div'); weekProgressCopy.className='week-progress-copy'; const weekProgressLabel=document.createElement('strong'); weekProgressLabel.textContent='Weekly progress'; const weekProgressCount=document.createElement('span'); weekProgressCount.dataset.weekProgressCopy=''; weekProgressCopy.append(weekProgressLabel,weekProgressCount); const weekProgressTrack=document.createElement('div'); weekProgressTrack.className='week-progress-track'; const weekProgressFill=document.createElement('div'); weekProgressFill.className='week-progress-fill'; weekProgressFill.dataset.weekProgressFill=''; weekProgressTrack.appendChild(weekProgressFill); weekProgress.append(weekProgressCopy,weekProgressTrack);

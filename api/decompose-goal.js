@@ -136,7 +136,7 @@ const PLAN_SCHEMA = {
     domain_label: { type: 'STRING', description: "Short label for the goal domain, e.g. 'Career / Job Search', 'Business Launch', 'Marathon Training'." },
     summary: { type: 'STRING', description: "1-2 sentences tying the plan to the person's stated reason for pursuing it." },
     insight: { type: 'STRING', description: 'One sharp, non-obvious strategic insight specific to this goal and this obstacle — not generic motivational text.' },
-    milestone_90day: { type: 'STRING', description: 'A concrete 90-day outcome paired with the identity the person is becoming while pursuing it.' },
+    milestone_90day: { type: 'STRING', description: 'A concrete 90-day outcome paired with the identity the person is becoming while pursuing it. Use an observable funnel result rather than merely listing activities whenever the goal depends on conversion through stages.' },
     identity_gap: {
       type: 'OBJECT',
       description: 'A specific diagnosis of the distance between the current identity and desired identity. Infer meaningful gaps; do not merely repeat the answers.',
@@ -190,7 +190,7 @@ const PLAN_SCHEMA = {
         access_points: {
           type: 'OBJECT',
           properties: {
-            description: { type: 'STRING' },
+            description: { type: 'STRING', description: 'Where and how the person can consistently encounter relevant people, opportunities or channels for this goal.' },
             items: {
               type: 'ARRAY',
               description: 'Provide 3 to 10 access points.',
@@ -256,7 +256,7 @@ const PLAN_SCHEMA = {
         funnel_metrics: {
           type: 'OBJECT',
           properties: {
-            description: { type: 'STRING' },
+            description: { type: 'STRING', description: 'Define the outcome funnel and clearly distinguish controllable inputs from influenced conversion results.' },
             steps: {
               type: 'ARRAY',
               description: 'The ordered conversion funnel for this goal, e.g. outreach sent -> replies -> meetings -> next-round -> close. Provide 3 to 6 steps.',
@@ -299,7 +299,7 @@ const PLAN_SCHEMA = {
           funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS, description: 'Which funnel stage this week is primarily advancing.' },
           theme: { type: 'STRING' },
           target: { type: 'STRING', description: 'A concise summary connecting this week’s measurable external outcome to its internal identity shift.' },
-          action_outcome: { type: 'STRING', description: 'The tangible, measurable result to produce by the end of the week.' },
+          action_outcome: { type: 'STRING', description: 'The tangible, measurable funnel result to aim for by the end of the week. This must describe movement or conversion produced by the actions, not simply restate an activity.' },
           mindset_shift: { type: 'STRING', description: 'A specific shift written as “From [old default] to [new default].”' },
           identity_evidence: { type: 'STRING', description: 'One short question asking what observable action or result this week proves the emerging identity.' },
           actions: {
@@ -337,7 +337,7 @@ const ADJUSTED_WEEK_SCHEMA = {
     funnel_stage: { type: 'STRING', enum: FUNNEL_STAGE_KEYS },
     theme: { type: 'STRING' },
     target: { type: 'STRING', description: 'A concise summary connecting the measurable outcome to the mindset shift.' },
-    action_outcome: { type: 'STRING', description: 'The tangible, measurable result to produce by the end of the week.' },
+    action_outcome: { type: 'STRING', description: 'The tangible, measurable funnel result to aim for by the end of the week, distinct from the activities beneath it.' },
     mindset_shift: { type: 'STRING', description: 'A specific shift written as “From [old default] to [new default].”' },
     identity_evidence: { type: 'STRING', description: 'A question asking what observable action or result proves the emerging identity.' },
     actions: { type: 'ARRAY', description: 'Exactly 4 checkable items: 3 concrete tasks prefixed “Action:” and 1 mindset practice prefixed “Mindset:”.', items: { type: 'STRING' } },
@@ -365,7 +365,7 @@ async function generateAdjustedWeek(context) {
   if (!apiKey) throw Object.assign(new Error('AI planning is not configured'), { status: 500 });
   const prompt = `Revise ONLY the next week of a personalized 90-day action-and-mindset plan using the user's reflection.
 
-Keep the same framework step, but use actual execution to improve feasibility. Return exactly 4 checkable items in order: (1-3) concrete real-world tasks prefixed “Action:” and (4) one identity, belief, or emotional-rehearsal practice prefixed “Mindset:”. Every action must create a number, deliverable, decision, conversation, scheduled event, or other observable result. The mindset item must directly support the actions rather than replace them. Also return a measurable action_outcome, a “From ... to ...” mindset_shift, and an identity_evidence question. Do not punish missed work by stacking more work. Preserve continuity without rewriting later weeks. Never claim that thoughts guarantee external outcomes or that these practices medically rewire the brain.
+Keep the same framework step, but use actual execution to improve feasibility. Return exactly 4 checkable items in order: (1-3) concrete real-world tasks prefixed “Action:” and (4) one identity, belief, or emotional-rehearsal practice prefixed “Mindset:”. Every action must create a number, deliverable, decision, conversation, scheduled event, or other observable result. The mindset item must directly support the actions rather than replace them. Also return a measurable action_outcome, a “From ... to ...” mindset_shift, and an identity_evidence question. action_outcome must describe the funnel conversion the tasks are intended to produce, not merely repeat an activity. For dating goals, optimize toward mutual-interest and repeat-date conversions; for social goals, optimize toward reciprocal repeat contact. Never treat one-sided pursuit or event attendance alone as success. Do not punish missed work by stacking more work. Preserve continuity without rewriting later weeks. Never claim that thoughts guarantee external outcomes or that these practices medically rewire the brain.
 
 Goal and onboarding answers:
 ${JSON.stringify(context.answers)}
@@ -493,9 +493,13 @@ Every week must include all of the following:
 - exactly 4 checkable actions in order: 3 prefixed “Action:” followed by 1 prefixed “Mindset:”;
 - identity_evidence: one short question asking which observable action, decision or result proves the person is already practicing the new identity.
 
-The 3 Action items must be specific to the actual goal, sequence logically across 12 weeks, and fit the person’s stated capacity. Do not use vague items such as “work on your goal,” “be more confident,” or “research opportunities.” Include a number, named deliverable or scheduled interaction whenever possible. The Mindset item must be short enough to complete and must make the external actions easier to start, sustain or learn from.
+The weekly action_outcome and the 3 Action items serve different purposes. action_outcome is the measurable conversion result the week is trying to create; the Action items are controllable inputs that make that result more likely. Never fill action_outcome with a disguised activity such as “attend a hike” or “send three messages.” The 3 Action items must be specific to the actual goal, sequence logically across 12 weeks, and fit the person’s stated capacity. Do not use vague items such as “work on your goal,” “be more confident,” or “research opportunities.” Include a number, named deliverable or scheduled interaction whenever possible. The Mindset item must be short enough to complete and must make the external actions easier to start, sustain or learn from.
 
-For career transitions, use the actual gap diagnosis to prescribe a balanced mix of target-role research, skill mapping, gap closing, proof-of-work, resume/LinkedIn positioning, networking, applications and interview rehearsal. Do not force all of these into every week; choose the highest-leverage actions for the current stage. For health, relationships, business and other domains, create equally concrete but safe domain-appropriate actions. Never prescribe medical treatment or unsafe behavior.
+For career transitions, use the actual gap diagnosis to prescribe a balanced mix of target-role research, skill mapping, gap closing, proof-of-work, resume/LinkedIn positioning, networking, applications and interview rehearsal. Do not force all of these into every week; choose the highest-leverage actions for the current stage.
+
+For dating goals, build an explicit relationship funnel instead of an event-attendance checklist. Unless the user specifies a different target, make the Day-90 north star “three compatible active prospects where interest is mutual and both people are genuinely willing to meet again.” Adapt the stages to: compatible people encountered -> contact or match established -> first meeting/date -> mutual interest confirmed -> repeat meeting/date -> active reciprocal prospects. A person becomes an active prospect only through observable reciprocity: both initiate or respond, both accept or propose plans, and both show curiosity and consistency. Do not count one-sided pursuit, ambiguous politeness or merely attending an event as success. Weekly action_outcomes should name a stage conversion, for example “Move two mutual-interest connections into scheduled second dates,” while the Action items may include attending a recurring activity, starting a more personal conversation, making a clear invitation or following up. Never promise that another person will reciprocate; if a conversion does not happen, review channel quality, fit, signal clarity and follow-up rather than blaming the user.
+
+For friendship or social-circle goals, use the analogous funnel: relevant people encountered -> contact exchanged -> one-on-one follow-up -> repeat contact -> reciprocal connection -> reliable social circle. The Day-90 milestone should count reciprocal relationships, not events attended. For health, business and other domains, create equally concrete but safe domain-appropriate action and outcome funnels. Never prescribe medical treatment or unsafe behavior.
 
 Use gentle, believable language. Do not use fear, shame, coercion, cult tactics, “brainwashing,” or invented neuroscience as persuasion. Never claim these exercises rewire the brain, cure a condition, manifest external events, or guarantee success. Encourage professional help when a response suggests trauma, severe distress or a clinical condition.
 

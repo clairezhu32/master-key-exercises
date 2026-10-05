@@ -3,6 +3,11 @@ import { getPlanAccess } from '../lib/plan-access.js';
 
 const SUPABASE_URL = 'https://hvuhpnvsxhvvsisrsmaq.supabase.co';
 const messageRateLimit = new Map();
+const FUNNEL_METRIC_KEYS = [
+  'applications', 'responses', 'interviews', 'offers',
+  'people_met', 'mutual_interest', 'first_dates', 'repeat_dates', 'active_prospects',
+  'follow_ups', 'one_to_one_plans', 'repeat_contact', 'reciprocal_connections',
+];
 
 function isAllowedOrigin(origin) {
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin || '')) return true;
@@ -112,6 +117,20 @@ function isCareerPlanData(answers, plan, goal) {
   return /\b(career|job(?:\s+search|\s+hunting)?|employment|promotion|professional|role|position|resume|interview|product manager|data scientist|software engineer)\b/.test(signals);
 }
 
+function relationshipPlanModeData(answers, plan, goal) {
+  const signals = [answers?.outcome_type, goal, answers?.process_vision, answers?.first_week, plan?.milestone_90day]
+    .filter(Boolean).join(' ').toLowerCase();
+  if (/improve communication|repair (?:a|my|our) relationship|deepen (?:an|my|our) existing relationship|set (?:and maintain )?(?:an )?(?:important )?boundary/.test(signals)) return '';
+  if (/dating|date\b|romantic|boyfriend|girlfriend|partner|single|prospect|mutual (?:attraction|interest)|men\b|women\b|脱单|男朋友|女朋友|约会/.test(signals)) return 'dating';
+  if (/social life|social circle|friend|friendship|community|new city|reciprocal connection|belong|社交|朋友/.test(signals)) return 'social';
+  return '';
+}
+
+function cleanFunnelMetrics(metrics) {
+  if (!metrics || typeof metrics !== 'object') return null;
+  return Object.fromEntries(FUNNEL_METRIC_KEYS.filter((key) => Object.hasOwn(metrics, key)).map((key) => [key, Math.max(0, Math.floor(Number(metrics[key]) || 0))]));
+}
+
 async function track(eventName, userId, email, properties, serviceRoleKey) {
   await fetch(`${SUPABASE_URL}/rest/v1/mks_events`, {
     method: 'POST',
@@ -143,13 +162,16 @@ async function buddyView(record, serviceRoleKey) {
   const startDate = Number.isNaN(parsedStart.getTime()) ? new Date(record.generated_at || Date.now()) : parsedStart;
   const goal = answers.goal || plan.milestone_90day || 'A meaningful 90-day goal';
   const isCareerPlan = isCareerPlanData(answers, plan, goal);
+  const relationshipMode = relationshipPlanModeData(answers, plan, goal);
+  const storedFunnel = cleanFunnelMetrics(answers._funnel_metrics);
   return {
     owner_name: answers._buddy_match_profile?.first_name || answers._accountability?.owner_name || 'Your buddy',
     goal,
     original_goal: goal,
     milestone: plan.milestone_90day || answers.goal || '',
     rationale: planRationale(goal, { ...plan, weeks: visibleWeeks }),
-    funnel_metrics: isCareerPlan ? deriveCareerFunnel(visibleWeeks, progress.completed || {}, answers._funnel_metrics) : null,
+    funnel_kind: isCareerPlan ? 'career' : relationshipMode,
+    funnel_metrics: isCareerPlan ? deriveCareerFunnel(visibleWeeks, progress.completed || {}, answers._funnel_metrics) : (relationshipMode ? storedFunnel : null),
     plan_length_weeks: Math.max(1, (plan.weeks || []).length || 12),
     start_date: startDate.toISOString().slice(0, 10),
     completed: progress.completed || {},
@@ -334,9 +356,7 @@ export default async function handler(req, res) {
       const customTasks = body.custom_tasks === undefined ? (goalData._custom_tasks || {}) : cleanCustomTasks(body.custom_tasks);
       const taskMetrics = body.task_metrics === undefined ? (goalData._task_metrics || {}) : cleanTaskMetrics(body.task_metrics);
       const taskSchedules = body.task_schedules === undefined ? (goalData._task_schedules || {}) : cleanTaskSchedules(body.task_schedules);
-      const funnelMetrics = body.funnel_metrics && typeof body.funnel_metrics === 'object'
-        ? Object.fromEntries(['applications', 'responses', 'interviews', 'offers'].map((key) => [key, Math.max(0, Math.floor(Number(body.funnel_metrics[key]) || 0))]))
-        : goalData._funnel_metrics;
+      const funnelMetrics = body.funnel_metrics === undefined ? goalData._funnel_metrics : cleanFunnelMetrics(body.funnel_metrics);
       await saveGoalData(user.id, { ...goalData, _accountability_progress: progress, _task_estimates: taskEstimates, _funnel_metrics: funnelMetrics, _custom_tasks: customTasks, _task_metrics: taskMetrics, _task_schedules: taskSchedules }, serviceRoleKey);
       return res.status(200).json({ synced: true, progress });
     }
