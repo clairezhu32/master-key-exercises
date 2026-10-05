@@ -1,4 +1,4 @@
-const CACHE = 'lucky-pwa-v4';
+const CACHE = 'lucky-pwa-v5';
 const CORE = ['/', '/goals', '/exercises', '/job-prompts', '/offline', '/manifest.webmanifest', '/icons/lucky-192.png', '/icons/lucky-512.png'];
 
 self.addEventListener('install', event => {
