@@ -118,12 +118,13 @@ function isCareerPlanData(answers, plan, goal) {
 }
 
 function relationshipPlanModeData(answers, plan, goal) {
-  const signals = [answers?.outcome_type, goal, answers?.process_vision, answers?.first_week, plan?.milestone_90day]
-    .filter(Boolean).join(' ').toLowerCase();
+  const relationshipCategory = /relationship|social/.test([answers?.category_key, answers?.category].filter(Boolean).join(' ').toLowerCase());
+  const signals = [answers?.current_stage, answers?.outcome_type, goal, answers?.process_vision, answers?.action_types, answers?.first_week, plan?.domain_label, plan?.milestone_90day]
+    .flat().filter(Boolean).join(' ').toLowerCase();
   if (/improve communication|repair (?:a|my|our) relationship|deepen (?:an|my|our) existing relationship|set (?:and maintain )?(?:an )?(?:important )?boundary/.test(signals)) return '';
-  if (/dating|date\b|romantic|boyfriend|girlfriend|partner|single|prospect|mutual (?:attraction|interest)|men\b|women\b|脱单|男朋友|女朋友|约会/.test(signals)) return 'dating';
+  if (/dating|date\b|romantic|boyfriend|girlfriend|partner|single|prospect|mutual (?:attraction|interest)|love life|marriage|husband|wife|meet (?:someone|a compatible|men|women)|find (?:someone|a partner|a boyfriend|a girlfriend|love)|men\b|women\b|脱单|男朋友|女朋友|约会|伴侣|结婚/.test(signals)) return 'dating';
   if (/social life|social circle|friend|friendship|community|new city|reciprocal connection|belong|社交|朋友/.test(signals)) return 'social';
-  return '';
+  return relationshipCategory ? 'social' : '';
 }
 
 function cleanFunnelMetrics(metrics) {

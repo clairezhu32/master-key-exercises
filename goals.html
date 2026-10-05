@@ -746,11 +746,12 @@
       return /career|job[ -]?(search|hunt)|\brole\b|\bposition\b|product manager|\bpm\b|data scientist|software engineer|resume|interview/.test(haystack);
     }
     function relationshipPlanMode(saved) {
-      const answers=saved.answers||{}, haystack=[answers.outcome_type,answers.goal,answers.process_vision,answers.first_week,saved.plan?.milestone_90day].filter(Boolean).join(' ').toLowerCase();
+      const answers=saved.answers||{}, relationshipCategory=/relationship|social/.test([answers.category_key,answers.category].filter(Boolean).join(' ').toLowerCase());
+      const haystack=[answers.current_stage,answers.outcome_type,answers.goal,answers.process_vision,answers.action_types,answers.first_week,saved.plan?.domain_label,saved.plan?.milestone_90day].flat().filter(Boolean).join(' ').toLowerCase();
       if(/improve communication|repair (?:a|my|our) relationship|deepen (?:an|my|our) existing relationship|set (?:and maintain )?(?:an )?(?:important )?boundary/.test(haystack)) return '';
-      if(/dating|date\b|romantic|boyfriend|girlfriend|partner|single|prospect|mutual (?:attraction|interest)|men\b|women\b|脱单|男朋友|女朋友|约会/.test(haystack)) return 'dating';
+      if(/dating|date\b|romantic|boyfriend|girlfriend|partner|single|prospect|mutual (?:attraction|interest)|love life|marriage|husband|wife|meet (?:someone|a compatible|men|women)|find (?:someone|a partner|a boyfriend|a girlfriend|love)|men\b|women\b|脱单|男朋友|女朋友|约会|伴侣|结婚/.test(haystack)) return 'dating';
       if(/social life|social circle|friend|friendship|community|new city|reciprocal connection|belong|社交|朋友/.test(haystack)) return 'social';
-      return '';
+      return relationshipCategory?'social':'';
     }
     function inferTaskMinutes(action='') {
       const text=String(action).toLowerCase();
@@ -812,7 +813,7 @@
       rationale.textContent=`Built for ${category.toLowerCase()}, using your goal, available time, constraints and first-week outcome.`;
       let funnel=document.getElementById('owner-outcome-funnel')||document.getElementById('owner-career-funnel');
       const definition=outcomeFunnelStages(saved);
-      if(!definition||saved.plan?.plan_mode==='identity_rewrite'){ funnel?.remove(); return; }
+      if(!definition){ funnel?.remove(); return; }
       if(!funnel){ funnel=document.createElement('div'); document.querySelector('.plan-progress').appendChild(funnel); }
       funnel.id='owner-outcome-funnel'; funnel.className='outcome-funnel';
       const funnelTitle=document.createElement('div'); funnelTitle.className='outcome-funnel-title'; funnelTitle.textContent=definition.title;
