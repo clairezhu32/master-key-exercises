@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lucky Exercises brings together guided exercises, personal affirmations, and calming sleep tracks to support your 90-day action plan.">
+  <meta name="description" content="Lucky Exercises offers AI-narrated success visualizations for interviews, recovery, boundaries, and relationships alongside guided practices and sleep tracks.">
   <meta property="og:title" content="Lucky Exercises — Guided Practices, Personal Affirmations and Sleep Tracks">
   <meta property="og:description" content="Guided practices for clearer action, supportive beliefs, and restorative rest.">
   <meta property="og:type" content="website">
@@ -1257,6 +1257,9 @@
   <meta name="apple-mobile-web-app-title" content="Lucky">
   <link rel="apple-touch-icon" href="/icons/lucky-192.png">
   <script src="/pwa.js" defer></script>
+  <link rel="stylesheet" href="/visualizations.css?v=1">
+  <script src="/visualization-scenes.js?v=1" defer></script>
+  <script src="/visualizations.js?v=1" defer></script>
 </head>
 <body class="exercises-page">
 
@@ -1298,8 +1301,10 @@
   <div class="list-hero">
     <div class="library-kicker">Lucky Exercises</div>
     <h1>Support the person <em>doing the plan.</em></h1>
-    <p>Choose a guided practice for focused action, a short affirmation for a more supportive mindset, or a calming sleep track for the end of the day. These practices support reflection and consistency; they do not guarantee outcomes or replace professional care.</p>
+    <p>Picture yourself handling an important moment with confidence. Start with a short success visualization, then choose a guided practice, an affirmation, or a calming sleep track. These practices support reflection and consistency; they do not guarantee outcomes or replace professional care.</p>
   </div>
+
+  <section id="lucky-visualizations" class="lucky-visualizations" aria-labelledby="lv-title"></section>
 
   <section class="library-panel active" id="module-exercises">
     <div class="library-panel-head">
@@ -3566,6 +3571,7 @@ renderSleepTracks();
 
 // ── View navigation ───────────────────────────
 function showView(name) {
+  if (name !== 'list') window.stopLuckyVisualization?.();
   ['list','exercise','library-item'].forEach(v => {
     document.getElementById(`view-${v}`).classList.toggle('active', v === name);
   });
