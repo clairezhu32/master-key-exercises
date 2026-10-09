@@ -151,6 +151,16 @@ function ownerState(record) {
     custom_tasks: record?.goal_data?._custom_tasks || {},
     task_metrics: record?.goal_data?._task_metrics || {},
     task_schedules: record?.goal_data?._task_schedules || {},
+    adjustment_history: (record?.goal_data?._weekly_adjustments || []).slice(-20).map((entry) => ({
+      from_week: Math.max(1, Number(entry?.from_week) || 1),
+      adjusted_week: Math.max(1, Number(entry?.adjusted_week) || 1),
+      feedback: {
+        result: String(entry?.feedback?.result || '').slice(0, 1200),
+        completed_actions: Array.isArray(entry?.feedback?.completed_actions)
+          ? entry.feedback.completed_actions.map((value) => String(value).slice(0, 500)).slice(0, 20)
+          : [],
+      },
+    })),
   };
 }
 

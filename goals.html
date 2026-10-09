@@ -907,7 +907,7 @@
       renderLuckyMethod(plan);
       const firstAction=plan.weeks?.[0]?.actions?.[0] || answers.first_week || 'Complete one measurable step toward your goal.';
       document.getElementById('result-first-action').textContent=String(firstAction).replace(/^(?:action|mindset)\s*:\s*/i,'');
-      document.getElementById('saved-state').textContent=currentSession?.user?.email ? `✓ Plan saved to ${currentSession.user.email}. Progress is saved in this browser.` : '✓ Your plan is saved. Progress is saved in this browser.';
+      document.getElementById('saved-state').textContent=saved.recoveryNotice||(currentSession?.user?.email ? `✓ Plan saved to ${currentSession.user.email}. Progress is saved in this browser.` : '✓ Your plan is saved. Progress is saved in this browser.');
       const weeks = document.getElementById('result-weeks'); weeks.replaceChildren();
       const visibleWeeks=visiblePlanWeeks(saved);
       const planStartDate=answers.start_date||localDateInputValue(new Date(answers.createdAt||saved.savedAt||Date.now()));
@@ -1032,7 +1032,8 @@
       const account=await fetchAccountState();
       if(!account?.savedPlan||!account.access?.unlocked) throw new Error('Your full plan is not available yet. Please refresh in a moment.');
       const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-      const localOwned=current?.ownerId===currentSession.user.id; const saved={...account.savedPlan,access:account.access,progress:recoverProgress(localOwned?current.progress:undefined,account.executionState),customTasks:recoverObjectState(localOwned?current.customTasks:undefined,account.executionState?.custom_tasks),taskMetrics:recoverObjectState(localOwned?current.taskMetrics:undefined,account.executionState?.task_metrics),taskSchedules:recoverObjectState(localOwned?current.taskSchedules:undefined,account.executionState?.task_schedules),weekAdjustments:localOwned?current.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localOwned?current.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+      const localOwned=current?.ownerId===currentSession.user.id; let saved={...account.savedPlan,access:account.access,progress:recoverProgress(localOwned?current.progress:undefined,account.executionState),customTasks:recoverObjectState(localOwned?current.customTasks:undefined,account.executionState?.custom_tasks),taskMetrics:recoverObjectState(localOwned?current.taskMetrics:undefined,account.executionState?.task_metrics),taskSchedules:recoverObjectState(localOwned?current.taskSchedules:undefined,account.executionState?.task_schedules),weekAdjustments:localOwned?current.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localOwned?current.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+      saved=repairAdjustedExecution(saved,account.executionState);
       localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); renderPlan(saved);
     }
     async function startUpgrade(){
@@ -1108,7 +1109,8 @@
         const account=await fetchAccountState();
         if(account?.savedPlan&&currentSession){
           const current=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');
-          const localOwned=current?.ownerId===currentSession.user.id; const recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:recoverProgress(localOwned?current.progress:undefined,account.executionState),customTasks:recoverObjectState(localOwned?current.customTasks:undefined,account.executionState?.custom_tasks),taskMetrics:recoverObjectState(localOwned?current.taskMetrics:undefined,account.executionState?.task_metrics),taskSchedules:recoverObjectState(localOwned?current.taskSchedules:undefined,account.executionState?.task_schedules),weekAdjustments:localOwned?current.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localOwned?current.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+          const localOwned=current?.ownerId===currentSession.user.id; let recovered={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:recoverProgress(localOwned?current.progress:undefined,account.executionState),customTasks:recoverObjectState(localOwned?current.customTasks:undefined,account.executionState?.custom_tasks),taskMetrics:recoverObjectState(localOwned?current.taskMetrics:undefined,account.executionState?.task_metrics),taskSchedules:recoverObjectState(localOwned?current.taskSchedules:undefined,account.executionState?.task_schedules),weekAdjustments:localOwned?current.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localOwned?current.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()};
+          recovered=repairAdjustedExecution(recovered,account.executionState);
           localStorage.setItem(PLAN_KEY,JSON.stringify(recovered)); localStorage.removeItem(PENDING_KEY); renderPlan(recovered); return;
         }
         if(draft) await generatePlan(draft); else if(await ensureBetaAccess()) showView('wizard');
@@ -1131,6 +1133,36 @@
     }
     function recoverObjectState(localValue,remoteValue){ const local=localValue&&typeof localValue==='object'&&!Array.isArray(localValue)?localValue:{}, remote=remoteValue&&typeof remoteValue==='object'&&!Array.isArray(remoteValue)?remoteValue:{}; return {...remote,...local}; }
     function recoverFunnelMetrics(localMetrics,executionState){ const local=localMetrics&&typeof localMetrics==='object'&&!Array.isArray(localMetrics)?localMetrics:{}, remote=executionState?.funnel_metrics&&typeof executionState.funnel_metrics==='object'&&!Array.isArray(executionState.funnel_metrics)?executionState.funnel_metrics:{}; return {...remote,...local}; }
+    function inferredApplicationCount(value){
+      const text=String(value||'');
+      const patterns=[/\b(?:applied|submitted)(?:\s+(?:to|for))?\s+(\d+)\b/i,/\b(\d+)\s+(?:job\s+)?applications?\b/i,/\b(\d+)\s+(?:jobs?|roles?|positions?)\s+(?:applied|submitted)\b/i];
+      for(const pattern of patterns){ const match=text.match(pattern); if(match) return Math.max(0,Number(match[1])||0); }
+      return 0;
+    }
+    function repairAdjustedExecution(saved,executionState){
+      delete saved.recoveryNotice;
+      const history=Array.isArray(executionState?.adjustment_history)?executionState.adjustment_history:[];
+      if(!history.length) return saved;
+      saved.progress=saved.progress||{completed:{},feedback:{}}; saved.progress.completed=saved.progress.completed||{}; saved.funnelMetrics=saved.funnelMetrics||{};
+      let restoredTasks=0, restoredApplications=0;
+      const normalize=value=>String(value||'').replace(/^(?:action|mindset)\s*:\s*/i,'').replace(/\s+/g,' ').trim().toLowerCase();
+      history.forEach(entry=>{
+        const weekNumber=Number(entry?.from_week), week=(saved.plan?.weeks||[]).find((item,index)=>Number(item.week||index+1)===weekNumber);
+        const completedActions=new Set((entry?.feedback?.completed_actions||[]).map(normalize));
+        (week?.actions||[]).forEach((action,index)=>{ const key=`week-${weekNumber}-task-${index}`; if(completedActions.has(normalize(action))&&!Object.hasOwn(saved.progress.completed,key)){ saved.progress.completed[key]=true; restoredTasks++; } });
+        const resultCount=inferredApplicationCount(entry?.feedback?.result);
+        const completedCount=resultCount||Math.max(0,...(entry?.feedback?.completed_actions||[]).map(inferredApplicationCount));
+        restoredApplications=Math.max(restoredApplications,completedCount);
+      });
+      const previousApplications=Math.max(0,Number(saved.funnelMetrics.applications)||0);
+      if(restoredApplications>previousApplications) saved.funnelMetrics.applications=restoredApplications;
+      if(restoredTasks||restoredApplications>previousApplications){
+        saved.progress.updatedAt=Date.now();
+        const parts=[]; if(restoredTasks) parts.push(`${restoredTasks} completed task${restoredTasks===1?'':'s'}`); if(restoredApplications>previousApplications) parts.push(`${restoredApplications} applications`);
+        saved.recoveryNotice=`✓ Recovered ${parts.join(' and ')} from your saved adjustment history.`;
+      }
+      return saved;
+    }
     async function verifyCheckout(sessionId){
       const response=await fetch('/api/verify-session',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${currentSession?.access_token||''}`},body:JSON.stringify({sessionId})});
       const data=await response.json(); if(!response.ok) throw new Error(data.error||'Could not confirm your payment'); return data;
@@ -1156,7 +1188,7 @@
       if(currentSession){
         const account=await fetchAccountState(), localBelongsToUser=saved?.ownerId===currentSession.user.id;
         if(startNewPlan&&!account?.usage?.unlimited&&account?.usage?.remaining<=0&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
-        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:recoverProgress(localBelongsToUser?saved.progress:undefined,account.executionState),customTasks:recoverObjectState(localBelongsToUser?saved.customTasks:undefined,account.executionState?.custom_tasks),taskMetrics:recoverObjectState(localBelongsToUser?saved.taskMetrics:undefined,account.executionState?.task_metrics),taskSchedules:recoverObjectState(localBelongsToUser?saved.taskSchedules:undefined,account.executionState?.task_schedules),weekAdjustments:localBelongsToUser?saved.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localBelongsToUser?saved.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
+        else if(!startNewPlan&&account?.savedPlan){ saved={...account.savedPlan,access:account.access||account.savedPlan.access||{unlocked:false,source:'free'},progress:recoverProgress(localBelongsToUser?saved.progress:undefined,account.executionState),customTasks:recoverObjectState(localBelongsToUser?saved.customTasks:undefined,account.executionState?.custom_tasks),taskMetrics:recoverObjectState(localBelongsToUser?saved.taskMetrics:undefined,account.executionState?.task_metrics),taskSchedules:recoverObjectState(localBelongsToUser?saved.taskSchedules:undefined,account.executionState?.task_schedules),weekAdjustments:localBelongsToUser?saved.weekAdjustments:undefined,funnelMetrics:recoverFunnelMetrics(localBelongsToUser?saved.funnelMetrics:undefined,account.executionState),usage:account.usage,ownerId:currentSession.user.id,savedAt:new Date(account.savedPlan.savedAt).getTime()||Date.now()}; saved=repairAdjustedExecution(saved,account.executionState); localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(localBelongsToUser&&account?.usage){ saved.usage=account.usage; localStorage.setItem(PLAN_KEY,JSON.stringify(saved)); }
         else if(saved&&!localBelongsToUser){ saved=null; }
       }

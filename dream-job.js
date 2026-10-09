@@ -30,6 +30,18 @@
     $('strip-mocks').textContent=sum(state.metrics,'mocks');
     $('strip-offers').textContent=sum(state.metrics,'offers');
   }
+  function visualFunnel(){
+    const root=$('visual-funnel'),current=currentWeek(),currentPhase=current?.phase||4,startPhase=state.weeks.find(week=>week.week===state.startWeek)?.phase||1;
+    const liveCounts={1:`${sum(state.metrics,'applications')} applications`,2:`${sum(state.metrics,'mocks')} mocks`,3:`${sum(state.metrics,'offers')} offers`,4:'Start strong'};
+    root.innerHTML=[1,2,3,4].map(phaseNumber=>{
+      const phase=window.DreamJobTrack.phaseMeta[phaseNumber];
+      const status=state.currentWeek>12?'done':phaseNumber<startPhase?'fast-forwarded':phaseNumber<currentPhase?'done':phaseNumber===currentPhase?'current':'preview';
+      const stateLabel=status==='done'?'Complete':status==='current'?'You are here':status==='fast-forwarded'?'Fast-forwarded':'Ahead';
+      const weekRange=phaseNumber===1?'Weeks 1–3':phaseNumber===2?'Weeks 4–7':phaseNumber===3?'Weeks 8–10':'Weeks 11–12';
+      return `<article class="dj-funnel-stage ${status}"><span class="dj-funnel-number">${status==='done'?'✓':phaseNumber}</span><div><small>${weekRange} · ${stateLabel}</small><strong>${esc(phase.name)}</strong><span>${esc(phase.verb)} · ${esc(liveCounts[phaseNumber])}</span></div></article>`;
+    }).join('');
+    $('visual-funnel-position').textContent=state.currentWeek>12?'Roadmap complete':`Week ${state.currentWeek} of 12`;
+  }
   function fastForwardChecklist(week){ return `<details class="dj-fast-forward"><summary>Condensed checklist</summary><ul>${week.actions.map(action=>`<li>${esc(action.text)}</li>`).join('')}</ul></details>`; }
   function roadmap(){
     const root=$('roadmap');root.innerHTML='';
@@ -72,7 +84,7 @@
   function render(){
     $('diagnostic-view').hidden=true;$('track-view').hidden=false;
     $('track-headline').textContent=window.DreamJobTrack.headline;$('track-subline').textContent=window.DreamJobTrack.subline;
-    context();metricStrip();roadmap();detail();
+    context();metricStrip();visualFunnel();roadmap();detail();
   }
   function toggleAction(actionId){
     const week=currentWeek(),done=completedActions(week.week)[actionId];
