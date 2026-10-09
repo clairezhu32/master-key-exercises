@@ -1257,9 +1257,6 @@
   <meta name="apple-mobile-web-app-title" content="Lucky">
   <link rel="apple-touch-icon" href="/icons/lucky-192.png">
   <script src="/pwa.js" defer></script>
-  <link rel="stylesheet" href="/visualizations.css?v=1">
-  <script src="/visualization-scenes.js?v=1" defer></script>
-  <script src="/visualizations.js?v=1" defer></script>
 </head>
 <body class="exercises-page">
 
@@ -1301,10 +1298,8 @@
   <div class="list-hero">
     <div class="library-kicker">Lucky Exercises</div>
     <h1>Support the person <em>doing the plan.</em></h1>
-    <p>Picture yourself handling an important moment with confidence. Start with a short success visualization, then choose a guided practice, an affirmation, or a calming sleep track. These practices support reflection and consistency; they do not guarantee outcomes or replace professional care.</p>
+    <p>Choose a guided practice for focused action, a short visualization for a more supportive mindset, or a calming sleep track for the end of the day. These practices support reflection and consistency; they do not guarantee outcomes or replace professional care.</p>
   </div>
-
-  <section id="lucky-visualizations" class="lucky-visualizations" aria-labelledby="lv-title"></section>
 
   <section class="library-panel active" id="module-exercises">
     <div class="library-panel-head">
@@ -1317,7 +1312,7 @@
   <section class="library-panel active" id="module-affirmations">
     <div class="library-panel-head">
       <div><span>Module 02</span><h2>Personal Affirmations</h2></div>
-      <p>Use this short visualization to settle interview anxiety and mentally rehearse a calm, prepared performance. Follow it with spoken practice so confidence is supported by real preparation.</p>
+      <p>Play a visualization here just like any other video in the library. The Lucky AI voice includes interview confidence, recovery, boundaries, and mutual connection in one card.</p>
     </div>
     <div class="affirmation-feature-grid">
       <article class="library-video-card">
@@ -1330,6 +1325,30 @@
           <iframe title="Job Interview Success Visualization" src="https://www.youtube.com/embed/j5CEcbqyWXk?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
         <p class="inline-player-note">Official YouTube player · creator information, controls and ads remain intact.</p>
+      </article>
+      <article class="library-video-card" id="ai-visualization-card">
+        <div class="library-video-heading">
+          <span class="card-part" id="ai-visualization-meta">Lucky AI voice · 3 min</span>
+          <h3 id="ai-visualization-title">Calm, clear interview answers</h3>
+          <p id="ai-visualization-description">See yourself pause at a difficult question, organize your thoughts, and answer with confidence.</p>
+        </div>
+        <div class="inline-audio-wrap">
+          <div class="ai-audio-cover" aria-hidden="true">
+            <span>LUCKY</span>
+            <strong>Success<br>Visualization</strong>
+          </div>
+          <audio id="ai-visualization-audio" controls preload="metadata" src="/audio/visualizations/interview-en-v1.mp3">
+            Your browser does not support audio playback.
+          </audio>
+        </div>
+        <label class="ai-visualization-label" for="ai-visualization-choice">Choose a scene</label>
+        <select class="ai-visualization-choice" id="ai-visualization-choice">
+          <option value="interview">Interview success</option>
+          <option value="recovery">Rest, recovery, and inner strength</option>
+          <option value="boundaries">A kind, steady no</option>
+          <option value="connection">Warmth that meets you halfway</option>
+        </select>
+        <p class="inline-player-note">Original Lucky practice · AI-written and narrated with an AI voice.</p>
       </article>
       <aside class="interview-rehearsal">
         <span>After listening</span>
@@ -3494,6 +3513,54 @@ async function speakExercise(ex) {
 }
 
 // ── Lucky Exercises modules ─────────────────────
+const AI_VISUALIZATIONS = {
+  interview: {
+    title: 'Calm, clear interview answers',
+    description: 'See yourself pause at a difficult question, organize your thoughts, and answer with confidence.',
+    duration: '3 min',
+    src: '/audio/visualizations/interview-en-v1.mp3'
+  },
+  recovery: {
+    title: 'Rest, recovery, and inner strength',
+    description: 'Use gentle recovery imagery to feel supported while you rest and follow your care plan.',
+    duration: '3 min',
+    src: '/audio/visualizations/recovery-en-v1.mp3'
+  },
+  boundaries: {
+    title: 'A kind, steady no',
+    description: 'Rehearse declining an unreasonable request without rushing, overexplaining, or losing your warmth.',
+    duration: '2 min',
+    src: '/audio/visualizations/boundaries-en-v1.mp3'
+  },
+  connection: {
+    title: 'Warmth that meets you halfway',
+    description: 'Imagine expressing interest naturally and enjoying a connection with someone who freely responds.',
+    duration: '2 min',
+    src: '/audio/visualizations/connection-en-v1.mp3'
+  }
+};
+
+const aiVisualizationChoice = document.getElementById('ai-visualization-choice');
+const aiVisualizationAudio = document.getElementById('ai-visualization-audio');
+
+function stopAffirmationAudio() {
+  if (!aiVisualizationAudio) return;
+  aiVisualizationAudio.pause();
+}
+
+function selectAiVisualization(id) {
+  const item = AI_VISUALIZATIONS[id] || AI_VISUALIZATIONS.interview;
+  stopAffirmationAudio();
+  aiVisualizationAudio.src = item.src;
+  aiVisualizationAudio.load();
+  document.getElementById('ai-visualization-title').textContent = item.title;
+  document.getElementById('ai-visualization-description').textContent = item.description;
+  document.getElementById('ai-visualization-meta').textContent = `Lucky AI voice · ${item.duration}`;
+}
+
+aiVisualizationChoice?.addEventListener('change', event => selectAiVisualization(event.target.value));
+window.addEventListener('pagehide', stopAffirmationAudio);
+
 const SLEEP_TRACKS = [
   {
     id: 'release-the-day',
@@ -3571,7 +3638,7 @@ renderSleepTracks();
 
 // ── View navigation ───────────────────────────
 function showView(name) {
-  if (name !== 'list') window.stopLuckyVisualization?.();
+  if (name !== 'list') stopAffirmationAudio();
   ['list','exercise','library-item'].forEach(v => {
     document.getElementById(`view-${v}`).classList.toggle('active', v === name);
   });

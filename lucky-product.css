@@ -384,6 +384,14 @@ body.exercises-page {
 .exercises-page .placeholder-card h3 { margin-top: 58px; font-size: 1.18rem; }
 .exercises-page .placeholder-card p { margin-top: 10px; color: var(--text-dim); font-size: .86rem; line-height: 1.55; }
 .exercises-page .affirmation-feature-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 14px; }
+.exercises-page .affirmation-feature-grid .interview-rehearsal { grid-column: 1 / -1; }
+.exercises-page .inline-audio-wrap { position: relative; min-height: 220px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px; border: 1px solid var(--border); background: radial-gradient(circle at 82% 18%,rgba(215,255,88,.18),transparent 34%),linear-gradient(145deg,#202018,#10100e); }
+.exercises-page .ai-audio-cover { position: absolute; inset: 0; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+.exercises-page .ai-audio-cover span { color: var(--gold); font-size: .68rem; font-weight: 700; letter-spacing: .12em; }
+.exercises-page .ai-audio-cover strong { max-width: 260px; color: var(--text); font-size: clamp(1.65rem,3vw,2.25rem); line-height: .98; letter-spacing: -.04em; }
+.exercises-page .inline-audio-wrap audio { position: relative; z-index: 1; width: 100%; height: 42px; }
+.exercises-page .ai-visualization-label { display: block; margin: 14px 0 7px; color: var(--text-dim); font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.exercises-page .ai-visualization-choice { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 3px; background: #11110f; color: var(--text); font: inherit; }
 .exercises-page .interview-rehearsal { padding: 26px; border: 1px solid var(--border); background: #151510; }
 .exercises-page .interview-rehearsal > span { color: var(--gold); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .exercises-page .interview-rehearsal h3 { margin-top: 20px; color: var(--text); font-size: 1.35rem; line-height: 1.25; }
