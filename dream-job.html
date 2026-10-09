@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A 12-week Dream-Job plan organized around applications, interviews, offers, and negotiation.">
+  <meta name="theme-color" content="#11110f">
+  <title>Dream Job — Lucky</title>
+  <link rel="stylesheet" href="/dream-job.css?v=1">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/lucky-192.png">
+  <script src="/dream-job-data.js?v=1" defer></script>
+  <script src="/dream-job.js?v=1" defer></script>
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <header class="dj-topbar">
+    <a class="dj-brand" href="/"><span>L</span>Lucky</a>
+    <a href="/goals">← All goal areas</a>
+  </header>
+
+  <main>
+    <section class="dj-diagnostic" id="diagnostic-view" aria-labelledby="diagnostic-title">
+      <div class="dj-hero">
+        <div class="dj-kicker">Dream Job · 90-day track</div>
+        <h1 id="diagnostic-title">90 days from first application to signed offer.</h1>
+        <p>Luck = pipeline × preparation. Every application is a lottery ticket you control.</p>
+      </div>
+      <form class="dj-diagnostic-card" id="diagnostic-form">
+        <div class="dj-progress"><span>Personalize your roadmap</span><strong>5 quick questions</strong></div>
+        <fieldset>
+          <legend>Where are you right now?</legend>
+          <p class="dj-field-help">This chooses where “you are here” begins. Earlier weeks stay visible as condensed checklists.</p>
+          <label class="dj-radio"><input type="radio" name="startingPoint" value="not-started" required><span><b>Haven’t started applying</b><small>Begin at Week 1</small></span></label>
+          <label class="dj-radio"><input type="radio" name="startingPoint" value="applying"><span><b>Applying, but little or no response</b><small>Begin at Week 2</small></span></label>
+          <label class="dj-radio"><input type="radio" name="startingPoint" value="interviewing"><span><b>I’m interviewing</b><small>Begin at Week 4</small></span></label>
+          <label class="dj-radio"><input type="radio" name="startingPoint" value="offers"><span><b>I have offer(s) or I’m negotiating</b><small>Begin at Week 8</small></span></label>
+        </fieldset>
+        <label class="dj-field"><span>Target role <b>Required</b></span><input name="targetRole" maxlength="100" placeholder="e.g. AI Product Manager" required></label>
+        <label class="dj-field"><span>Target companies <small>Optional · list up to 10</small></span><textarea name="companies" rows="4" placeholder="OpenAI, Stripe, Airbnb…"></textarea><small id="company-count">0 added, 30 to go</small></label>
+        <fieldset>
+          <legend>Hours per week you can invest</legend>
+          <label class="dj-radio compact"><input type="radio" name="hoursBand" value="under5" required><span><b>Under 5 hours</b><small>Core counts are reduced</small></span></label>
+          <label class="dj-radio compact"><input type="radio" name="hoursBand" value="standard"><span><b>5–10 hours</b><small>Standard weekly counts</small></span></label>
+          <label class="dj-radio compact"><input type="radio" name="hoursBand" value="over10"><span><b>10+ hours</b><small>Core counts plus stretch actions</small></span></label>
+        </fieldset>
+        <label class="dj-field"><span>Any live interview processes? <small>Optional</small></span><textarea name="liveProcesses" rows="3" placeholder="e.g. Stripe recruiter screen Tuesday; Airbnb onsite pending"></textarea></label>
+        <div class="dj-form-error" id="diagnostic-error" role="alert"></div>
+        <button class="dj-primary" type="submit">Build my Dream-Job roadmap →</button>
+      </form>
+    </section>
+
+    <section class="dj-app" id="track-view" hidden>
+      <header class="dj-plan-hero">
+        <div><div class="dj-kicker">Dream Job · Your 90-day roadmap</div><h1 id="track-headline"></h1><p id="track-subline"></p></div>
+        <div class="dj-plan-actions"><button class="dj-secondary" id="adjust-plan" type="button">Adjust my plan</button><button class="dj-text-button" id="regenerate-plan" type="button">Regenerate plan</button></div>
+      </header>
+      <section class="dj-metric-strip" aria-label="Job search funnel metrics">
+        <div><strong id="strip-applications">0</strong><span>applications</span></div>
+        <div><strong id="strip-referrals">0</strong><span>referrals</span></div>
+        <div><strong id="strip-mocks">0</strong><span>mocks</span></div>
+        <div><strong id="strip-offers">0</strong><span>offers</span></div>
+      </section>
+      <div class="dj-context-bar" id="context-bar"></div>
+      <div class="dj-layout">
+        <section class="dj-roadmap" aria-labelledby="roadmap-title"><div class="dj-section-label">The map</div><h2 id="roadmap-title">Your whole mountain</h2><p>All 12 weeks stay visible. Only your current week opens for action.</p><div id="roadmap"></div></section>
+        <section class="dj-week-detail" id="week-detail" aria-live="polite"></section>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="dj-dialog" id="evidence-dialog">
+    <form method="dialog" id="evidence-form"><button class="dj-dialog-close" value="cancel" aria-label="Close">×</button><div class="dj-kicker">Evidence log</div><h2 id="evidence-title">What did you do?</h2><p id="evidence-action"></p><label class="dj-field"><span>One line of evidence</span><input id="evidence-input" maxlength="240" placeholder="e.g. Sent the referral request to Maya at Stripe" required></label><div class="dj-form-error" id="evidence-error"></div><button class="dj-primary" value="default">Save evidence</button></form>
+  </dialog>
+
+  <dialog class="dj-dialog" id="review-dialog">
+    <form method="dialog" id="review-form"><button class="dj-dialog-close" value="cancel" aria-label="Close">×</button><div class="dj-kicker">2-minute retro</div><h2>Complete week review</h2><div id="review-summary"></div><label class="dj-field"><span>Where are you stuck?</span><select id="review-stuck"><option value="none">Not stuck — keep moving</option><option value="resume-no-response">Applications are getting no response</option><option value="application-volume">I’m not shipping enough applications</option><option value="interview-prep">Interview preparation needs work</option><option value="offer-stage">I received an offer</option></select></label><label class="dj-field"><span>One lesson from this week</span><textarea id="review-note" rows="3" maxlength="400" placeholder="What worked, what did not, or what should change?"></textarea></label><div class="dj-form-error" id="review-error"></div><button class="dj-primary" value="default">Save review &amp; continue →</button></form>
+  </dialog>
+
+  <dialog class="dj-dialog" id="adjust-dialog">
+    <form method="dialog" id="adjust-form"><button class="dj-dialog-close" value="cancel" aria-label="Close">×</button><div class="dj-kicker">Remap the roadmap</div><h2>Where should Lucky meet you now?</h2><p>Your completed work and funnel metrics stay saved.</p><label class="dj-field"><span>Move “you are here” to</span><select id="adjust-target"><option value="auto">Let Lucky choose from my funnel</option><option value="1">Define the target</option><option value="2">Fix resume and positioning</option><option value="3">Build application volume</option><option value="4">Prepare for screens</option><option value="6">Run mock interviews</option><option value="8">Evaluate an offer</option><option value="9">Negotiate</option><option value="11">Prepare to start</option></select></label><button class="dj-primary" value="default">Adjust roadmap →</button><p class="dj-open-note">Plan adjustments are open during this test phase.</p></form>
+  </dialog>
+
+  <div class="dj-toast" id="toast" role="status"></div>
+</body>
+</html>

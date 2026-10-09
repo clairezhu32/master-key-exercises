@@ -366,6 +366,7 @@
         <div class="hint">Choose an area to begin. Career and job-search onboarding continues as a short, AI-guided conversation.</div>
         <div class="choices" id="category-choices">
           <button type="button" class="choice" data-value="career">Career or job search</button><button type="button" class="choice" data-value="finances">Money &amp; finances</button>
+          <button type="button" class="choice" data-value="dream-job">Dream Job</button>
           <button type="button" class="choice" data-value="relationships">Relationships &amp; social life</button><button type="button" class="choice" data-value="health">Health &amp; energy</button>
           <button type="button" class="choice" data-value="launch">Business or creative launch</button><button type="button" class="choice" data-value="wellbeing">Personal growth &amp; wellbeing</button>
           <button type="button" class="choice" data-value="other">Something else</button>
@@ -634,6 +635,7 @@
     document.getElementById('category-choices').addEventListener('click',async event=>{
       const button=event.target.closest('.choice'); if(!button) return;
       const next=document.getElementById('next-1'), status=document.getElementById('branch-status'), branch=button.dataset.value;
+      if(branch==='dream-job'){ window.location.assign('/dream-job'); return; }
       if(branch===selectedBranch&&questionTree){ if(branch==='career') startCareerDialogue(); return; }
       const changedExistingBranch=!!selectedBranch&&selectedBranch!==branch;
       document.querySelectorAll('#category-choices .choice').forEach(item=>item.classList.toggle('selected',item===button));
@@ -1176,7 +1178,7 @@
       const categoryFromUrl=new URLSearchParams(location.search).get('category');
       if(categoryFromUrl){
         const normalized=categoryFromUrl.trim().toLowerCase();
-        const aliases={career:'career','career breakthrough':'career',finances:'finances','financial progress':'finances',relationships:'relationships','relationships and social connection':'relationships',health:'health','health and energy':'health',launch:'launch','launching something of my own':'launch',wellbeing:'wellbeing','personal growth and inner wellbeing':'wellbeing',other:'other','something else':'other'};
+        const aliases={career:'career','career breakthrough':'career','dream-job':'dream-job','dream job':'dream-job',finances:'finances','financial progress':'finances',relationships:'relationships','relationships and social connection':'relationships',health:'health','health and energy':'health',launch:'launch','launching something of my own':'launch',wellbeing:'wellbeing','personal growth and inner wellbeing':'wellbeing',other:'other','something else':'other'};
         const categoryKey=aliases[normalized]||normalized;
         const categoryButton=[...document.querySelectorAll('#category-choices .choice')].find(button=>button.dataset.value===categoryKey);
         if(categoryButton) categoryButton.click();
