@@ -134,6 +134,23 @@
     .career-funnel-item input:focus { box-shadow:0 1px 0 var(--mint); }
     .career-funnel-item input::-webkit-inner-spin-button,.career-funnel-item input::-webkit-outer-spin-button { margin:0; -webkit-appearance:none; }
     .career-funnel-item span { color:var(--muted); font-size:10px; }
+    .plan-journey-funnel { margin:4px 0 18px; padding:18px; border:1px solid var(--line); border-radius:10px; background:#181814; }
+    .plan-journey-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:13px; }
+    .plan-journey-head span { display:block; margin-bottom:3px; color:var(--mint); font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .plan-journey-head strong { font-size:17px; }
+    .plan-journey-head small { color:var(--muted); font-size:10px; }
+    .plan-journey-track { display:grid; grid-template-columns:1.2fr 1.08fr .96fr .84fr .72fr; gap:4px; }
+    .plan-journey-stage { min-height:76px; display:grid; grid-template-columns:22px minmax(0,1fr); gap:8px; align-items:center; padding:11px 16px 11px 11px; border:1px solid #46463e; color:var(--muted); background:#22221d; clip-path:polygon(0 0,93% 0,100% 50%,93% 100%,0 100%,7% 50%); opacity:.58; }
+    .plan-journey-stage:first-child { clip-path:polygon(0 0,93% 0,100% 50%,93% 100%,0 100%); }
+    .plan-journey-stage.done { opacity:.82; }
+    .plan-journey-stage.current { border-color:var(--mint); color:var(--text); background:rgba(215,255,88,.11); opacity:1; }
+    .plan-journey-number { width:22px; height:22px; display:grid; place-items:center; border:1px solid #65655c; border-radius:50%; font-size:9px; font-weight:900; }
+    .plan-journey-stage.done .plan-journey-number,.plan-journey-stage.current .plan-journey-number { border-color:var(--mint); color:#11110f; background:var(--mint); }
+    .plan-journey-copy { min-width:0; display:grid; gap:2px; }
+    .plan-journey-copy strong { overflow:hidden; font-size:12px; white-space:nowrap; text-overflow:ellipsis; }
+    .plan-journey-copy small { overflow:hidden; color:var(--muted); font-size:9px; white-space:nowrap; text-overflow:ellipsis; }
+    .plan-journey-stage.current .plan-journey-copy small { color:var(--mint); }
+    .plan-journey-jump { min-height:34px; margin-top:12px; padding:0; border:0; color:var(--mint); background:transparent; font-size:11px; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
     .duration-chip { display:inline-flex; align-items:center; min-height:30px; padding:0 9px; border:1px solid #3f4039; border-radius:999px; color:#b9baaF; font-size:10px; font-weight:700; }
     .task-list { display:grid; gap:9px; list-style:none; }
     .task-block { padding:10px 11px; border:1px solid transparent; border-radius:10px; transition:background .2s,border-color .2s; }
@@ -278,7 +295,7 @@
     .access-panel label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; font-weight:700; }
     .access-panel input { margin:0 0 10px; }
     .access-note { margin-top:14px; color:#85857c; font-size:11px; line-height:1.5; }
-    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week{min-height:0;padding:18px 15px}.week-head{display:block}.week-theme{margin-top:5px}.week-tracks{grid-template-columns:1fr}.week-carousel-nav{gap:8px}.week-carousel-nav.bottom{display:none}.week-position{font-size:12px}.week-nav-button{min-width:74px;min-height:40px;padding:0 10px;font-size:0}.week-nav-button[data-week-direction="prev"]::after{content:'← Prev';font-size:11px}.week-nav-button[data-week-direction="next"]::after{content:'Next →';font-size:11px}.week-dot{width:12px}.lucky-method{grid-template-columns:1fr}.identity-shift{grid-template-columns:1fr}.identity-shift>strong{text-align:center;transform:rotate(90deg)}.identity-gap-grid{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px}.custom-task-form,.metric-form,.schedule-form,.scorecard-grid{grid-template-columns:1fr}.custom-task-form button,.task-detail-save{width:100%}.task-tools,.task-detail-panel{margin-left:0}.plan-progress{padding:15px}.plan-progress-head{align-items:flex-start}.progress-stats{display:block}.progress-percent{display:block;margin-bottom:4px;font-size:24px}.career-funnel{grid-template-columns:repeat(2,minmax(0,1fr))} }
+    @media(max-width:620px) { .card{padding:25px 19px}.choices,.choices.three{grid-template-columns:1fr}.nav{align-items:flex-end}.progress{display:none}.week{min-height:0;padding:18px 15px}.week-head{display:block}.week-theme{margin-top:5px}.week-tracks{grid-template-columns:1fr}.week-carousel-nav{gap:8px}.week-carousel-nav.bottom{display:none}.week-position{font-size:12px}.week-nav-button{min-width:74px;min-height:40px;padding:0 10px;font-size:0}.week-nav-button[data-week-direction="prev"]::after{content:'← Prev';font-size:11px}.week-nav-button[data-week-direction="next"]::after{content:'Next →';font-size:11px}.week-dot{width:12px}.lucky-method{grid-template-columns:1fr}.identity-shift{grid-template-columns:1fr}.identity-shift>strong{text-align:center;transform:rotate(90deg)}.identity-gap-grid{grid-template-columns:1fr}.upgrade-card{padding:22px 18px}.upgrade-benefits{grid-template-columns:1fr}.upgrade-action .primary{width:100%}.plan-topbar{margin-bottom:20px}.top-library-link{min-height:36px;padding:0 11px;font-size:12px}.custom-task-form,.metric-form,.schedule-form,.scorecard-grid{grid-template-columns:1fr}.custom-task-form button,.task-detail-save{width:100%}.task-tools,.task-detail-panel{margin-left:0}.plan-progress{padding:15px}.plan-progress-head{align-items:flex-start}.progress-stats{display:block}.progress-percent{display:block;margin-bottom:4px;font-size:24px}.career-funnel{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-journey-funnel{margin-top:0;padding:15px}.plan-journey-head{align-items:flex-start;flex-direction:column;gap:3px}.plan-journey-track{grid-template-columns:repeat(5,minmax(145px,1fr));overflow-x:auto;padding-bottom:7px;scroll-snap-type:x proximity}.plan-journey-stage{scroll-snap-align:start} }
   </style>
   <style>
     :root { --bg:#11110f; --panel:#181814; --panel2:#22221d; --line:#3c3c34; --text:#f5f4ec; --muted:#aaa99e; --violet:#d7ff58; --violet2:#d7ff58; --mint:#d7ff58; }
@@ -783,6 +800,28 @@
       if(saved.funnelMetrics) return Object.fromEntries(Object.keys(counts).map(label=>[label,Math.max(0,Number(saved.funnelMetrics[label.toLowerCase()])||0)]));
       return counts;
     }
+    function renderCareerJourneyFunnel(saved) {
+      let section=document.getElementById('plan-journey-funnel');
+      if(!isCareerPlan(saved)){ section?.remove(); return; }
+      const counts=careerFunnelCounts(saved), referrals=Math.max(0,Number(saved.funnelMetrics?.referrals)||0), accessCount=Math.max(referrals,counts.Responses);
+      const stages=[
+        {title:'Target',detail:'Role + gap ready'},
+        {title:'Apply',detail:`${counts.Applications} sent`},
+        {title:'Connect',detail:`${accessCount} referrals / replies`},
+        {title:'Interview',detail:`${counts.Interviews} interviews`},
+        {title:'Offer',detail:`${counts.Offers} offers`},
+      ];
+      const currentIndex=counts.Offers>0?4:counts.Interviews>0?3:accessCount>0?2:counts.Applications>0?1:0;
+      if(!section){ section=document.createElement('section'); section.id='plan-journey-funnel'; section.className='plan-journey-funnel'; section.setAttribute('aria-labelledby','plan-journey-title'); document.querySelector('.result-hero .plan-progress').after(section); }
+      const head=document.createElement('div'); head.className='plan-journey-head';
+      const headingWrap=document.createElement('div'), eyebrow=document.createElement('span'), title=document.createElement('strong'), summary=document.createElement('small');
+      eyebrow.textContent='Your path'; title.id='plan-journey-title'; title.textContent='Target → applications → signed offer'; headingWrap.append(eyebrow,title);
+      summary.textContent=`${counts.Applications} applications · ${accessCount} connections · ${counts.Interviews} interviews · ${counts.Offers} offers`; head.append(headingWrap,summary);
+      const track=document.createElement('div'); track.className='plan-journey-track';
+      stages.forEach((stage,index)=>{ const item=document.createElement('div'); item.className=`plan-journey-stage ${index<currentIndex?'done':index===currentIndex?'current':'preview'}`; if(index===currentIndex) item.setAttribute('aria-current','step'); const number=document.createElement('span'); number.className='plan-journey-number'; number.textContent=index<currentIndex?'✓':String(index+1); const copy=document.createElement('div'); copy.className='plan-journey-copy'; const stageTitle=document.createElement('strong'), detail=document.createElement('small'); stageTitle.textContent=stage.title; detail.textContent=index===currentIndex?`You are here · ${stage.detail}`:stage.detail; copy.append(stageTitle,detail); item.append(number,copy); track.appendChild(item); });
+      const jump=document.createElement('button'); jump.type='button'; jump.className='plan-journey-jump'; jump.textContent='Go straight to this week’s actions ↓'; jump.addEventListener('click',()=>document.querySelector('.week-carousel')?.scrollIntoView({behavior:'smooth',block:'start'}));
+      section.replaceChildren(head,track,jump);
+    }
     function outcomeFunnelStages(saved) {
       if(isCareerPlan(saved)) {
         const counts=careerFunnelCounts(saved);
@@ -813,6 +852,7 @@
       if(!rationale){ rationale=document.createElement('p'); rationale.id='owner-rationale'; rationale.className='owner-rationale'; document.getElementById('result-milestone').after(rationale); }
       const category=plan.domain_label||answers.category||'your selected goal';
       rationale.textContent=`Built for ${category.toLowerCase()}, using your goal, available time, constraints and first-week outcome.`;
+      renderCareerJourneyFunnel(saved);
       let funnel=document.getElementById('owner-outcome-funnel')||document.getElementById('owner-career-funnel');
       const definition=outcomeFunnelStages(saved);
       if(!definition){ funnel?.remove(); return; }
@@ -820,7 +860,7 @@
       funnel.id='owner-outcome-funnel'; funnel.className='outcome-funnel';
       const funnelTitle=document.createElement('div'); funnelTitle.className='outcome-funnel-title'; funnelTitle.textContent=definition.title;
       const funnelGrid=document.createElement('div'); funnelGrid.className='career-funnel';
-      funnelGrid.replaceChildren(...definition.stages.map(stage=>{ const item=document.createElement('label'); item.className='career-funnel-item'; const value=document.createElement('input'); value.type='number'; value.min='0'; value.step='1'; value.value=stage.value; value.setAttribute('aria-label',stage.label); const name=document.createElement('span'); name.textContent=stage.label; value.addEventListener('change',()=>{ saved.funnelMetrics={...(saved.funnelMetrics||{}),[stage.key]:Math.max(0,Math.floor(Number(value.value)||0))}; value.value=saved.funnelMetrics[stage.key]; savePlanProgress(saved); scheduleAccountabilitySync(saved); }); item.append(value,name); return item; }));
+      funnelGrid.replaceChildren(...definition.stages.map(stage=>{ const item=document.createElement('label'); item.className='career-funnel-item'; const value=document.createElement('input'); value.type='number'; value.min='0'; value.step='1'; value.value=stage.value; value.setAttribute('aria-label',stage.label); const name=document.createElement('span'); name.textContent=stage.label; value.addEventListener('change',()=>{ saved.funnelMetrics={...(saved.funnelMetrics||{}),[stage.key]:Math.max(0,Math.floor(Number(value.value)||0))}; value.value=saved.funnelMetrics[stage.key]; savePlanProgress(saved); scheduleAccountabilitySync(saved); renderCareerJourneyFunnel(saved); }); item.append(value,name); return item; }));
       funnel.replaceChildren(funnelTitle,funnelGrid);
     }
     function updateProgressSummary(saved) {
