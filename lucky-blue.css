@@ -1,0 +1,408 @@
+/* Lucky blue-and-white product theme — shared across every public surface. */
+:root {
+  color-scheme: light;
+  --bg: #f3f6fb !important;
+  --night: #f3f6fb !important;
+  --navy: #ffffff !important;
+  --panel: #ffffff !important;
+  --panel2: #f7f9fc !important;
+  --panel-2: #f7f9fc !important;
+  --line: #d9e2ec !important;
+  --text: #1c2b3a !important;
+  --muted: #5f6f82 !important;
+  --faint: #7b8a9b !important;
+  --mint: #0866ff !important;
+  --violet: #1877f2 !important;
+  --violet2: #4d8dff !important;
+  --violet-2: #4d8dff !important;
+  --lime: #0866ff !important;
+  --warm: #0a66c2 !important;
+  --danger: #d93025 !important;
+}
+
+html,
+body,
+body.home-page,
+body.exercises-page {
+  color: #1c2b3a !important;
+  background: #f3f6fb !important;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 10% -10%, rgba(8, 102, 255, .1), transparent 31rem),
+    linear-gradient(180deg, #ffffff 0, #f3f6fb 22rem) !important;
+  background-attachment: fixed !important;
+}
+
+::selection { color: #ffffff; background: #0866ff; }
+h1, h2, h3, h4, strong, b { color: #172b43; }
+p, li, small { border-color: #d9e2ec; }
+a:hover { color: #0866ff; }
+
+.nav,
+.header,
+.dj-topbar,
+.topbar,
+.plan-topbar,
+.footer {
+  border-color: #d9e2ec !important;
+  background-color: rgba(255, 255, 255, .92) !important;
+  box-shadow: 0 1px 0 rgba(28, 43, 58, .03) !important;
+  backdrop-filter: blur(14px);
+}
+
+.brand,
+.dj-brand,
+.header-title { color: #172b43 !important; }
+
+.brand-mark,
+.dj-brand span,
+.mark,
+.exercises-page .header-title::before {
+  color: #ffffff !important;
+  background: #0866ff !important;
+  box-shadow: 0 7px 18px rgba(8, 102, 255, .2) !important;
+}
+
+.eyebrow,
+.num,
+.section-kicker,
+.dj-kicker,
+.dj-section-label,
+.tag,
+.week-label,
+.feedback-label,
+.preview-label,
+.exercise-part,
+.save-note,
+.saved-state,
+.buddy-status,
+.share-status {
+  color: #0866ff !important;
+}
+
+button,
+.button,
+.primary,
+.secondary,
+input,
+textarea,
+select {
+  border-color: #cbd7e6 !important;
+}
+
+input,
+textarea,
+select {
+  color: #1c2b3a !important;
+  background: #ffffff !important;
+  box-shadow: inset 0 1px 2px rgba(28, 43, 58, .04) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #0866ff !important;
+  box-shadow: 0 0 0 3px rgba(8, 102, 255, .12) !important;
+}
+
+.primary,
+.button-primary,
+.dj-primary,
+.send,
+.waitlist-form button,
+.task-detail-save,
+.choice.selected,
+.status-button.selected,
+.upgrade-badge,
+.exercise-part {
+  border-color: #0866ff !important;
+  color: #ffffff !important;
+  background: #0866ff !important;
+  box-shadow: 0 7px 18px rgba(8, 102, 255, .17) !important;
+}
+
+.primary:hover,
+.button-primary:hover,
+.dj-primary:hover,
+.send:hover,
+.waitlist-form button:hover {
+  color: #ffffff !important;
+  background: #0757d9 !important;
+  transform: translateY(-1px);
+}
+
+.secondary,
+.button-secondary,
+.dj-secondary,
+.status-button,
+.task-tool,
+.week-nav-button,
+.auth-signin-btn,
+.nav-cta {
+  color: #0757d9 !important;
+  background: #ffffff !important;
+}
+
+.secondary:hover,
+.button-secondary:hover,
+.dj-secondary:hover,
+.status-button:hover,
+.task-tool:hover,
+.week-nav-button:hover:not(:disabled) {
+  border-color: #0866ff !important;
+  color: #0757d9 !important;
+  background: #edf5ff !important;
+}
+
+.card,
+.plan-showcase,
+.preview,
+.path-card,
+.step-card,
+.feature-card,
+.video-card,
+.exercise-card,
+.auth-modal,
+.auth-dropdown,
+.dj-diagnostic-card,
+.dj-week-detail,
+.dj-visual-funnel,
+.dj-week-map-card,
+.dj-dialog,
+.week,
+.plan-progress,
+.first-action,
+.identity-gap,
+.method-step,
+.upgrade-card,
+.buddy-card,
+.buddy-scope,
+.buddy-message,
+.saved-state,
+.checkout-message,
+.plan-journey-funnel,
+.task-detail-panel,
+.week-progress,
+.week-track,
+.scorecard-field,
+.next-up,
+.progress-card,
+.encourage,
+.privacy,
+.note {
+  border-color: #d9e2ec !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(26, 67, 120, .07) !important;
+}
+
+.home-page .hero-editorial::before {
+  border-color: rgba(8, 102, 255, .12) !important;
+  background: rgba(8, 102, 255, .025) !important;
+}
+
+.home-page .hero-editorial::after {
+  background: #0866ff !important;
+  box-shadow: 0 0 22px 6px rgba(8, 102, 255, .28) !important;
+}
+
+.home-page .hero.hero-editorial h1 span,
+.home-page .hero h1 em,
+h1 em {
+  color: #0866ff !important;
+  text-decoration-color: #0866ff !important;
+}
+
+.home-page .hero-editorial .eyebrow,
+.home-page .hero-editorial .hero-copy > p,
+.home-page .hero-copy > p,
+.home-page .hero-signature,
+.lead,
+.summary,
+.hint,
+.insight,
+.dj-hero p,
+.dj-plan-hero p,
+.dj-outcome,
+.dj-roadmap > p,
+.buddy-copy,
+.rationale {
+  color: #5f6f82 !important;
+}
+
+.home-page .plan-showcase {
+  background: linear-gradient(145deg, #ffffff, #eef5ff) !important;
+  box-shadow: 0 24px 70px rgba(8, 102, 255, .12) !important;
+}
+
+.home-page .plan-target,
+.home-page .hero-signature span {
+  border-color: #b8d1f4 !important;
+  color: #0866ff !important;
+  background: #edf5ff !important;
+}
+
+.home-page .plan-week i,
+.method-step-number,
+.task .task-kind,
+.dj-check,
+.plan-journey-number,
+.dj-funnel-number {
+  border-color: #0866ff !important;
+  color: #ffffff !important;
+  background: #0866ff !important;
+}
+
+.home-page .plan-week span,
+.example,
+.task,
+.task span,
+.week-track strong,
+.next-up-task { color: #2c3e52 !important; }
+
+.proof,
+.waitlist-section,
+.video-feature,
+.goal-paths,
+.final-cta,
+.section,
+.cta {
+  border-color: #d9e2ec !important;
+  background-color: transparent !important;
+}
+
+.proof-item,
+.metric-card,
+.dj-metric-strip,
+.dj-metric-strip div,
+.career-funnel-item,
+.dj-metric,
+.funnel-item {
+  border-color: #d9e2ec !important;
+  color: #1c2b3a !important;
+  background: #ffffff !important;
+}
+
+.proof-item strong,
+.dj-metric-strip strong,
+.career-funnel-item input,
+.funnel-item strong,
+.progress-percent { color: #0866ff !important; }
+
+.progress-track,
+.track,
+.task-progress-track,
+.week-progress-track {
+  background: #e3eaf3 !important;
+}
+
+.progress-fill,
+.fill,
+.task-progress-fill,
+.week-progress-fill {
+  background: linear-gradient(90deg, #0866ff, #4d8dff) !important;
+}
+
+.milestone {
+  border-color: #b8d1f4 !important;
+  color: #0757d9 !important;
+  background: #edf5ff !important;
+}
+
+.insight,
+.identity-motivation,
+.dj-mindset,
+.original-goal,
+.context-bar,
+.dj-context-bar {
+  border-color: #0866ff !important;
+  color: #44566c !important;
+  background: #edf5ff !important;
+}
+
+.choice,
+.task-block,
+.custom-task-form button,
+.upgrade-benefits li,
+.match-state,
+.buddy-message,
+.dj-action-card,
+.dj-negotiation,
+.dj-funnel-stage,
+.plan-journey-stage,
+.week-track,
+.week-progress,
+.task-detail-panel {
+  border-color: #d9e2ec !important;
+  color: #1c2b3a !important;
+  background: #f7f9fc !important;
+}
+
+.choice:hover,
+.dj-action-card:hover,
+.path-card:hover,
+.step-card:hover {
+  border-color: #86b5f5 !important;
+  background: #edf5ff !important;
+}
+
+.choice.selected { color: #ffffff !important; }
+.task.done span { color: #8392a5 !important; }
+.task.mindset .task-kind { background: #4d8dff !important; }
+
+.plan-journey-stage.current,
+.dj-funnel-stage.current,
+.dj-week-map-card.current,
+.dj-action-card[aria-checked=true] {
+  border-color: #0866ff !important;
+  background: #edf5ff !important;
+}
+
+.plan-journey-stage.current .plan-journey-copy small,
+.dj-funnel-stage.current small,
+.dj-state,
+.current .dj-state,
+.done .dj-state,
+.dj-evidence,
+.dj-text-button { color: #0866ff !important; }
+
+.week-dot { background: #cbd7e6 !important; }
+.week-dot.active { background: #0866ff !important; }
+
+.job-prompt-link,
+.week-exercise,
+.exercise-link,
+.dj-adjust-suggestion {
+  border-color: #b8d1f4 !important;
+  color: #1c2b3a !important;
+  background: #edf5ff !important;
+}
+
+.job-prompt-link strong,
+.week-exercise strong,
+.exercise-link strong { color: #0757d9 !important; }
+
+pre,
+code {
+  border-color: #d9e2ec !important;
+  color: #243b53 !important;
+  background: #f7f9fc !important;
+}
+
+dialog::backdrop,
+.auth-modal-overlay { background: rgba(21, 43, 73, .48) !important; }
+
+.dj-toast {
+  border-color: #b8d1f4 !important;
+  color: #1c2b3a !important;
+  background: #ffffff !important;
+  box-shadow: 0 14px 40px rgba(26, 67, 120, .18) !important;
+}
+
+@media (max-width: 700px) {
+  body { background-image: linear-gradient(180deg, #ffffff 0, #f3f6fb 18rem) !important; }
+  .card,
+  .dj-diagnostic-card,
+  .dj-week-detail { box-shadow: 0 6px 20px rgba(26, 67, 120, .06) !important; }
+}
