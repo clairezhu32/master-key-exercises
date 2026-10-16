@@ -1,1 +1,485 @@
-Ly8gQWZmaXJtYXRpb24gY2FyZHMgLSA5NiBwcm9mZXNzaW9uYWwgYWZmaXJtYXRpb25zIGFjcm9zcyA4IGpvYi1zZWFyY2ggYmxvY2tlcnMKY29uc3QgQUZGSVJNQVRJT05TID0gWwogIHsKICAgICJpZCI6ICJub3RfcXVhbGlmaWVkLTEiLAogICAgImJsb2NrZXIiOiAibm90X3F1YWxpZmllZCIsCiAgICAidGV4dCI6ICJNeSBleHBlcmllbmNlIGlzIGJyb2FkZXIgdGhhbiBhbnkgc2luZ2xlIGpvYiBkZXNjcmlwdGlvbi4iCiAgfSwKICB7CiAgICAiaWQiOiAibm90X3F1YWxpZmllZC0yIiwKICAgICJibG9ja2VyIjogIm5vdF9xdWFsaWZpZWQiLAogICAgInRleHQiOiAiSSB3YXMgaW52aXRlZCB0byB0aGlzIGNvbnZlcnNhdGlvbiBiZWNhdXNlIEkgYmVsb25nIGluIGl0LiIKICB9LAogIHsKICAgICJpZCI6ICJub3RfcXVhbGlmaWVkLTMiLAogICAgImJsb2NrZXIiOiAibm90X3F1YWxpZmllZCIsCiAgICAidGV4dCI6ICJRdWFsaWZpY2F0aW9ucyBhcmUgYSBzdGFydGluZyBwb2ludDsgbXkganVkZ21lbnQgaXMgdGhlIGFzc2V0LiIKICB9LAogIHsKICAgICJpZCI6ICJub3RfcXVhbGlmaWVkLTQiLAogICAgImJsb2NrZXIiOiAibm90X3F1YWxpZmllZCIsCiAgICAidGV4dCI6ICJJIGhhdmUgc29sdmVkIGhhcmQgcHJvYmxlbXMgYmVmb3JlLiBJIGNhbiBzb2x2ZSB0aGVzZSB0b28uIgogIH0sCiAgewogICAgImlkIjogIm5vdF9xdWFsaWZpZWQtNSIsCiAgICAiYmxvY2tlciI6ICJub3RfcXVhbGlmaWVkIiwKICAgICJ0ZXh0IjogIkV2ZXJ5IGV4cGVydCB3YXMgb25jZSBhIGJlZ2lubmVyIHdobyByZWZ1c2VkIHRvIHF1aXQuIgogIH0sCiAgewogICAgImlkIjogIm5vdF9xdWFsaWZpZWQtNiIsCiAgICAiYmxvY2tlciI6ICJub3RfcXVhbGlmaWVkIiwKICAgICJ0ZXh0IjogIkkgYnJpbmcgYSBwZXJzcGVjdGl2ZSB0aGlzIHRlYW0gZG9lcyBub3QgaGF2ZSB5ZXQuIgogIH0sCiAgewogICAgImlkIjogIm5vdF9xdWFsaWZpZWQtNyIsCiAgICAiYmxvY2tlciI6ICJub3RfcXVhbGlmaWVkIiwKICAgICJ0ZXh0IjogIk15IHRyYWNrIHJlY29yZCBzcGVha3MgbG91ZGVyIHRoYW4gYSBjaGVja2xpc3Qgb2YgcmVxdWlyZW1lbnRzLiIKICB9LAogIHsKICAgICJpZCI6ICJub3RfcXVhbGlmaWVkLTgiLAogICAgImJsb2NrZXIiOiAibm90X3F1YWxpZmllZCIsCiAgICAidGV4dCI6ICJJIGxlYXJuIGZhc3QsIGFuZCBJIGhhdmUgdGhlIHByb29mIHRvIGJhY2sgaXQgdXAuIgogIH0sCiAgewogICAgImlkIjogIm5vdF9xdWFsaWZpZWQtOSIsCiAgICAiYmxvY2tlciI6ICJub3RfcXVhbGlmaWVkIiwKICAgICJ0ZXh0IjogIk5vYm9keSBtZWV0cyBvbmUgaHVuZHJlZCBwZXJjZW50IG9mIGEgam9iIHBvc3RpbmcuIE5vYm9keS4iCiAgfSwKICB7CiAgICAiaWQiOiAibm90X3F1YWxpZmllZC0xMCIsCiAgICAiYmxvY2tlciI6ICJub3RfcXVhbGlmaWVkIiwKICAgICJ0ZXh0IjogIldoYXQgSSBsYWNrIGluIHllYXJzLCBJIG1ha2UgdXAgZm9yIGluIGRyaXZlIGFuZCBhZGFwdGFiaWxpdHkuIgogIH0sCiAgewogICAgImlkIjogIm5vdF9xdWFsaWZpZWQtMTEiLAogICAgImJsb2NrZXIiOiAibm90X3F1YWxpZmllZCIsCiAgICAidGV4dCI6ICJJIGFtIGFsbG93ZWQgdG8gZ3JvdyBpbnRvIGEgcm9sZS4gVGhhdCBpcyBob3cgY2FyZWVycyB3b3JrLiIKICB9LAogIHsKICAgICJpZCI6ICJub3RfcXVhbGlmaWVkLTEyIiwKICAgICJibG9ja2VyIjogIm5vdF9xdWFsaWZpZWQiLAogICAgInRleHQiOiAiTXkgc2tpbGxzIHRyYW5zZmVyLiBNeSB3b3JrIGV0aGljIGNvbXBvdW5kcy4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtMSIsCiAgICAiYmxvY2tlciI6ICJmZWFyX2ZyZWV6ZSIsCiAgICAidGV4dCI6ICJJIGhhdmUgcHJlcGFyZWQuIE15IGJvZHkga25vd3Mgd2hhdCB0byBkby4gSSB0cnVzdCBpdC4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtMiIsCiAgICAiYmxvY2tlciI6ICJmZWFyX2ZyZWV6ZSIsCiAgICAidGV4dCI6ICJBIHBhdXNlIGlzIG5vdCBhIGZhaWx1cmUuIEl0IGlzIG1lIHRoaW5raW5nIGNsZWFybHkuIgogIH0sCiAgewogICAgImlkIjogImZlYXJfZnJlZXplLTMiLAogICAgImJsb2NrZXIiOiAiZmVhcl9mcmVlemUiLAogICAgInRleHQiOiAiSSBzcGVhayBzbG93bHksIGFuZCB0aGF0IG1ha2VzIG1lIHNvdW5kIGNvbmZpZGVudC4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtNCIsCiAgICAiYmxvY2tlciI6ICJmZWFyX2ZyZWV6ZSIsCiAgICAidGV4dCI6ICJOZXJ2ZXMgbWVhbiBJIGNhcmUuIEkgY2hhbm5lbCB0aGF0IGVuZXJneSBpbnRvIGZvY3VzLiIKICB9LAogIHsKICAgICJpZCI6ICJmZWFyX2ZyZWV6ZS01IiwKICAgICJibG9ja2VyIjogImZlYXJfZnJlZXplIiwKICAgICJ0ZXh0IjogIkkgaGF2ZSBhbnN3ZXJlZCBoYXJkZXIgcXVlc3Rpb25zIHRoYW4gdGhlc2UuIgogIH0sCiAgewogICAgImlkIjogImZlYXJfZnJlZXplLTYiLAogICAgImJsb2NrZXIiOiAiZmVhcl9mcmVlemUiLAogICAgInRleHQiOiAiTXkgYnJlYXRoIGlzIG15IGFuY2hvci4gSW5oYWxlLCB0aGVuIHNwZWFrLiIKICB9LAogIHsKICAgICJpZCI6ICJmZWFyX2ZyZWV6ZS03IiwKICAgICJibG9ja2VyIjogImZlYXJfZnJlZXplIiwKICAgICJ0ZXh0IjogIkkgZG9uJ3QgbmVlZCB0byBiZSBwZXJmZWN0LiBJIG5lZWQgdG8gYmUgcHJlc2VudC4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtOCIsCiAgICAiYmxvY2tlciI6ICJmZWFyX2ZyZWV6ZSIsCiAgICAidGV4dCI6ICJGcmVlemluZyBpcyBhIG1vbWVudCwgbm90IGEgdmVyZGljdC4gSSByZWNvdmVyIGFuZCBjb250aW51ZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtOSIsCiAgICAiYmxvY2tlciI6ICJmZWFyX2ZyZWV6ZSIsCiAgICAidGV4dCI6ICJJIHJlaGVhcnNlIHNvIHRoYXQgcHJlc3N1cmUgZmVlbHMgZmFtaWxpYXIuIgogIH0sCiAgewogICAgImlkIjogImZlYXJfZnJlZXplLTEwIiwKICAgICJibG9ja2VyIjogImZlYXJfZnJlZXplIiwKICAgICJ0ZXh0IjogIlRoZSBpbnRlcnZpZXdlciB3YW50cyBtZSB0byBzdWNjZWVkLiBXZSBhcmUgb24gdGhlIHNhbWUgc2lkZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtMTEiLAogICAgImJsb2NrZXIiOiAiZmVhcl9mcmVlemUiLAogICAgInRleHQiOiAiSSBhbnN3ZXIgb25lIHF1ZXN0aW9uIGF0IGEgdGltZS4gVGhhdCBpcyBhbGwgdGhpcyBpcy4iCiAgfSwKICB7CiAgICAiaWQiOiAiZmVhcl9mcmVlemUtMTIiLAogICAgImJsb2NrZXIiOiAiZmVhcl9mcmVlemUiLAogICAgInRleHQiOiAiQ2FsbSBpcyBhIHNraWxsLCBhbmQgSSBwcmFjdGljZSBpdCBkYWlseS4iCiAgfSwKICB7CiAgICAiaWQiOiAiaW1wb3N0ZXItMSIsCiAgICAiYmxvY2tlciI6ICJpbXBvc3RlciIsCiAgICAidGV4dCI6ICJJIGVhcm5lZCBteSBzZWF0LiBEb3VidCBkb2VzIG5vdCBlcmFzZSByZXN1bHRzLiIKICB9LAogIHsKICAgICJpZCI6ICJpbXBvc3Rlci0yIiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIkZlZWxpbmcgbGlrZSBhbiBpbXBvc3RlciBpcyBjb21tb24gYW1vbmcgaGlnaCBhY2hpZXZlcnMuIEkgYW0gaW4gZ29vZCBjb21wYW55LiIKICB9LAogIHsKICAgICJpZCI6ICJpbXBvc3Rlci0zIiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIk15IHdvcmsgaGFzIHJlYWwgaW1wYWN0LCBhbmQgSSBjYW4gcG9pbnQgdG8gaXQuIgogIH0sCiAgewogICAgImlkIjogImltcG9zdGVyLTQiLAogICAgImJsb2NrZXIiOiAiaW1wb3N0ZXIiLAogICAgInRleHQiOiAiSSBkb24ndCBuZWVkIHRvIGtub3cgZXZlcnl0aGluZyB0byBhZGQgdmFsdWUgdG9kYXkuIgogIH0sCiAgewogICAgImlkIjogImltcG9zdGVyLTUiLAogICAgImJsb2NrZXIiOiAiaW1wb3N0ZXIiLAogICAgInRleHQiOiAiQ29tcGV0ZW5jZSBpcyBub3QgdGhlIGFic2VuY2Ugb2YgZG91YnQuIEl0IGlzIGFjdGlvbiBkZXNwaXRlIGRvdWJ0LiIKICB9LAogIHsKICAgICJpZCI6ICJpbXBvc3Rlci02IiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIkkgd2FzIGhpcmVkIGZvciBteSBqdWRnbWVudCwgbm90IGZvciBiZWluZyBmbGF3bGVzcy4iCiAgfSwKICB7CiAgICAiaWQiOiAiaW1wb3N0ZXItNyIsCiAgICAiYmxvY2tlciI6ICJpbXBvc3RlciIsCiAgICAidGV4dCI6ICJBc2tpbmcgcXVlc3Rpb25zIGlzIGEgc3RyZW5ndGgsIG5vdCBhbiBleHBvc3VyZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiaW1wb3N0ZXItOCIsCiAgICAiYmxvY2tlciI6ICJpbXBvc3RlciIsCiAgICAidGV4dCI6ICJJIGJlbG9uZyBoZXJlIGFzIG11Y2ggYXMgYW55b25lIHdobyB3YWxrZWQgaW4gY29uZmlkZW50LiIKICB9LAogIHsKICAgICJpZCI6ICJpbXBvc3Rlci05IiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIk15IGltcG9zdGVyIGZlZWxpbmcgaXMgYSBzaWduIEkgYW0gc3RyZXRjaGluZy4gU3RyZXRjaGluZyBpcyBncm93dGguIgogIH0sCiAgewogICAgImlkIjogImltcG9zdGVyLTEwIiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIkkgZ2l2ZSBteXNlbGYgdGhlIHNhbWUgY3JlZGl0IEkgZ2l2ZSBvdGhlcnMuIgogIH0sCiAgewogICAgImlkIjogImltcG9zdGVyLTExIiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIlN1Y2Nlc3MgZGlkIG5vdCBoYXBwZW4gdG8gbWUgYnkgYWNjaWRlbnQuIEkgYnVpbHQgaXQuIgogIH0sCiAgewogICAgImlkIjogImltcG9zdGVyLTEyIiwKICAgICJibG9ja2VyIjogImltcG9zdGVyIiwKICAgICJ0ZXh0IjogIkkgYW0gYWxsb3dlZCB0byBiZSBib3RoIGxlYXJuaW5nIGFuZCBsZWFkaW5nLiIKICB9LAogIHsKICAgICJpZCI6ICJyZWplY3Rpb24tMSIsCiAgICAiYmxvY2tlciI6ICJyZWplY3Rpb24iLAogICAgInRleHQiOiAiUmVqZWN0aW9uIGlzIGRhdGEsIG5vdCBhIGRpYWdub3NpcyBvZiBteSB3b3J0aC4iCiAgfSwKICB7CiAgICAiaWQiOiAicmVqZWN0aW9uLTIiLAogICAgImJsb2NrZXIiOiAicmVqZWN0aW9uIiwKICAgICJ0ZXh0IjogIkV2ZXJ5ICdubycgbW92ZXMgbWUgY2xvc2VyIHRvIHRoZSByaWdodCAneWVzJy4iCiAgfSwKICB7CiAgICAiaWQiOiAicmVqZWN0aW9uLTMiLAogICAgImJsb2NrZXIiOiAicmVqZWN0aW9uIiwKICAgICJ0ZXh0IjogIkkgY2FuIGhhbmRsZSBkaXNhcHBvaW50bWVudC4gSSBoYXZlIGJlZm9yZS4iCiAgfSwKICB7CiAgICAiaWQiOiAicmVqZWN0aW9uLTQiLAogICAgImJsb2NrZXIiOiAicmVqZWN0aW9uIiwKICAgICJ0ZXh0IjogIkEgcmVqZWN0aW9uIG9mIG15IGFwcGxpY2F0aW9uIGlzIG5vdCBhIHJlamVjdGlvbiBvZiBtZS4iCiAgfSwKICB7CiAgICAiaWQiOiAicmVqZWN0aW9uLTUiLAogICAgImJsb2NrZXIiOiAicmVqZWN0aW9uIiwKICAgICJ0ZXh0IjogIkkgYXBwbHkgYnJvYWRseSBiZWNhdXNlIEkgcmVzcGVjdCBteSBvd24gcG90ZW50aWFsLiIKICB9LAogIHsKICAgICJpZCI6ICJyZWplY3Rpb24tNiIsCiAgICAiYmxvY2tlciI6ICJyZWplY3Rpb24iLAogICAgInRleHQiOiAiVGhlIGNvc3Qgb2Ygbm90IHRyeWluZyBpcyBoaWdoZXIgdGhhbiB0aGUgY29zdCBvZiBoZWFyaW5nIG5vLiIKICB9LAogIHsKICAgICJpZCI6ICJyZWplY3Rpb24tNyIsCiAgICAiYmxvY2tlciI6ICJyZWplY3Rpb24iLAogICAgInRleHQiOiAiSSBzZXBhcmF0ZSB0aGUgb3V0Y29tZSBmcm9tIHRoZSBlZmZvcnQuIFRoZSBlZmZvcnQgaXMgbWluZSB0byBjb250cm9sLiIKICB9LAogIHsKICAgICJpZCI6ICJyZWplY3Rpb24tOCIsCiAgICAiYmxvY2tlciI6ICJyZWplY3Rpb24iLAogICAgInRleHQiOiAiUmVzaWxpZW5jZSBpcyBidWlsdCBvbmUgYXBwbGljYXRpb24gYXQgYSB0aW1lLiIKICB9LAogIHsKICAgICJpZCI6ICJyZWplY3Rpb24tOSIsCiAgICAiYmxvY2tlciI6ICJyZWplY3Rpb24iLAogICAgInRleHQiOiAiSSB3b3VsZCByYXRoZXIgYmUgcmVqZWN0ZWQgZm9yIHRyeWluZyB0aGFuIHJlZ3JldCBuZXZlciBhcHBseWluZy4iCiAgfSwKICB7CiAgICAiaWQiOiAicmVqZWN0aW9uLTEwIiwKICAgICJibG9ja2VyIjogInJlamVjdGlvbiIsCiAgICAidGV4dCI6ICJFYWNoIGludGVydmlldyBtYWtlcyB0aGUgbmV4dCBvbmUgZWFzaWVyLCB3aGF0ZXZlciB0aGUgcmVzdWx0LiIKICB9LAogIHsKICAgICJpZCI6ICJyZWplY3Rpb24tMTEiLAogICAgImJsb2NrZXIiOiAicmVqZWN0aW9uIiwKICAgICJ0ZXh0IjogIkkga2VlcCBnb2luZy4gVGhhdCBpcyB0aGUgd2hvbGUgc3RyYXRlZ3kuIgogIH0sCiAgewogICAgImlkIjogInJlamVjdGlvbi0xMiIsCiAgICAiYmxvY2tlciI6ICJyZWplY3Rpb24iLAogICAgInRleHQiOiAiTXkgdmFsdWUgZG9lcyBub3QgZmx1Y3R1YXRlIHdpdGggYW55IHNpbmdsZSBkZWNpc2lvbi4iCiAgfSwKICB7CiAgICAiaWQiOiAiY29tcGV0aXRpb24tMSIsCiAgICAiYmxvY2tlciI6ICJjb21wZXRpdGlvbiIsCiAgICAidGV4dCI6ICJJIGRvbid0IG5lZWQgdG8gYmVhdCBldmVyeW9uZS4gSSBuZWVkIHRvIGJlIHJpZ2h0IGZvciBvbmUgcm9sZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiY29tcGV0aXRpb24tMiIsCiAgICAiYmxvY2tlciI6ICJjb21wZXRpdGlvbiIsCiAgICAidGV4dCI6ICJDb21wZXRpdGlvbiBmaWx0ZXJzIG91dCB0aGUgY2FzdWFsLiBJIGFtIG5vdCBjYXN1YWwuIgogIH0sCiAgewogICAgImlkIjogImNvbXBldGl0aW9uLTMiLAogICAgImJsb2NrZXIiOiAiY29tcGV0aXRpb24iLAogICAgInRleHQiOiAiTXkgY29tYmluYXRpb24gb2Ygc2tpbGxzIGlzIHVuaXF1ZS4gVGhlcmUgaXMgbm8gZXhhY3Qgc3Vic3RpdHV0ZSBmb3IgbWUuIgogIH0sCiAgewogICAgImlkIjogImNvbXBldGl0aW9uLTQiLAogICAgImJsb2NrZXIiOiAiY29tcGV0aXRpb24iLAogICAgInRleHQiOiAiQSB0b3VnaCBtYXJrZXQgcmV3YXJkcyB0aGUgcHJlcGFyZWQuIEkgcHJlcGFyZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiY29tcGV0aXRpb24tNSIsCiAgICAiYmxvY2tlciI6ICJjb21wZXRpdGlvbiIsCiAgICAidGV4dCI6ICJJIGZvY3VzIG9uIHdoYXQgSSBjb250cm9sOiBteSBjcmFmdCwgbXkgc3RvcnksIG15IGZvbGxvdy10aHJvdWdoLiIKICB9LAogIHsKICAgICJpZCI6ICJjb21wZXRpdGlvbi02IiwKICAgICJibG9ja2VyIjogImNvbXBldGl0aW9uIiwKICAgICJ0ZXh0IjogIlNvbWVvbmUgZ2V0cyBoaXJlZCBmb3IgZXZlcnkgcm9sZS4gVGhlcmUgaXMgbm8gcmVhc29uIGl0IGNhbm5vdCBiZSBtZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiY29tcGV0aXRpb24tNyIsCiAgICAiYmxvY2tlciI6ICJjb21wZXRpdGlvbiIsCiAgICAidGV4dCI6ICJJIHN0YW5kIG91dCBieSBiZWluZyBzcGVjaWZpYywgbm90IGJ5IGJlaW5nIGxvdWQuIgogIH0sCiAgewogICAgImlkIjogImNvbXBldGl0aW9uLTgiLAogICAgImJsb2NrZXIiOiAiY29tcGV0aXRpb24iLAogICAgInRleHQiOiAiVGhlIG1hcmtldCBpcyBjb21wZXRpdGl2ZSBmb3IgZ2VuZXJpYyBjYW5kaWRhdGVzLiBJIGFtIG5vdCBnZW5lcmljLiIKICB9LAogIHsKICAgICJpZCI6ICJjb21wZXRpdGlvbi05IiwKICAgICJibG9ja2VyIjogImNvbXBldGl0aW9uIiwKICAgICJ0ZXh0IjogIkkgdHVybiBjb21wZXRpdGlvbiBpbnRvIGZ1ZWwgZm9yIHNoYXJwZXIgcHJlcGFyYXRpb24uIgogIH0sCiAgewogICAgImlkIjogImNvbXBldGl0aW9uLTEwIiwKICAgICJibG9ja2VyIjogImNvbXBldGl0aW9uIiwKICAgICJ0ZXh0IjogIlNjYXJjaXR5IHRoaW5raW5nIHNocmlua3MgbWUuIEkgcGxheSB0byB3aW4sIG5vdCB0byBzdXJ2aXZlLiIKICB9LAogIHsKICAgICJpZCI6ICJjb21wZXRpdGlvbi0xMSIsCiAgICAiYmxvY2tlciI6ICJjb21wZXRpdGlvbiIsCiAgICAidGV4dCI6ICJNeSBuZXR3b3JrLCBteSBleHBlcmllbmNlLCBteSB2b2ljZSDigJQgdGhhdCBpcyBteSBtb2F0LiIKICB9LAogIHsKICAgICJpZCI6ICJjb21wZXRpdGlvbi0xMiIsCiAgICAiYmxvY2tlciI6ICJjb21wZXRpdGlvbiIsCiAgICAidGV4dCI6ICJJIGhhdmUgY29tcGV0ZWQgYmVmb3JlIGFuZCB3b24uIFRoaXMgaXMgZmFtaWxpYXIgdGVycml0b3J5LiIKICB9LAogIHsKICAgICJpZCI6ICJuZXR3b3JraW5nLTEiLAogICAgImJsb2NrZXIiOiAibmV0d29ya2luZyIsCiAgICAidGV4dCI6ICJOZXR3b3JraW5nIGlzIGp1c3QgYmVpbmcgZ2VudWluZWx5IGN1cmlvdXMgYWJvdXQgcGVvcGxlLiIKICB9LAogIHsKICAgICJpZCI6ICJuZXR3b3JraW5nLTIiLAogICAgImJsb2NrZXIiOiAibmV0d29ya2luZyIsCiAgICAidGV4dCI6ICJPbmUgcmVhbCBjb252ZXJzYXRpb24gYmVhdHMgZmlmdHkgc2hhbGxvdyBjb25uZWN0aW9ucy4iCiAgfSwKICB7CiAgICAiaWQiOiAibmV0d29ya2luZy0zIiwKICAgICJibG9ja2VyIjogIm5ldHdvcmtpbmciLAogICAgInRleHQiOiAiSSBoYXZlIHNvbWV0aGluZyB0byBvZmZlciBpbiBldmVyeSBjb252ZXJzYXRpb24sIGV2ZW4gYXMgYSBsaXN0ZW5lci4iCiAgfSwKICB7CiAgICAiaWQiOiAibmV0d29ya2luZy00IiwKICAgICJibG9ja2VyIjogIm5ldHdvcmtpbmciLAogICAgInRleHQiOiAiUGVvcGxlIHJlbWVtYmVyIHdhcm10aCBtb3JlIHRoYW4gY3JlZGVudGlhbHMuIgogIH0sCiAgewogICAgImlkIjogIm5ldHdvcmtpbmctNSIsCiAgICAiYmxvY2tlciI6ICJuZXR3b3JraW5nIiwKICAgICJ0ZXh0IjogIkkgZm9sbG93IHVwLiBUaGF0IGFsb25lIHB1dHMgbWUgYWhlYWQgb2YgbW9zdC4iCiAgfSwKICB7CiAgICAiaWQiOiAibmV0d29ya2luZy02IiwKICAgICJibG9ja2VyIjogIm5ldHdvcmtpbmciLAogICAgInRleHQiOiAiQXNraW5nIGZvciBhZHZpY2UgaXMgYSBjb21wbGltZW50LCBub3QgYW4gaW1wb3NpdGlvbi4iCiAgfSwKICB7CiAgICAiaWQiOiAibmV0d29ya2luZy03IiwKICAgICJibG9ja2VyIjogIm5ldHdvcmtpbmciLAogICAgInRleHQiOiAiSSBidWlsZCByZWxhdGlvbnNoaXBzIGJlZm9yZSBJIG5lZWQgdGhlbS4iCiAgfSwKICB7CiAgICAiaWQiOiAibmV0d29ya2luZy04IiwKICAgICJibG9ja2VyIjogIm5ldHdvcmtpbmciLAogICAgInRleHQiOiAiTXkgc3RvcnkgaXMgaW50ZXJlc3Rpbmcgd2hlbiBJIHRlbGwgaXQgd2l0aCBjb252aWN0aW9uLiIKICB9LAogIHsKICAgICJpZCI6ICJuZXR3b3JraW5nLTkiLAogICAgImJsb2NrZXIiOiAibmV0d29ya2luZyIsCiAgICAidGV4dCI6ICJJIGJlbG9uZyBpbiByb29tcyB3aGVyZSBteSBmdXR1cmUgaXMgYmVpbmcgZGlzY3Vzc2VkLiIKICB9LAogIHsKICAgICJpZCI6ICJuZXR3b3JraW5nLTEwIiwKICAgICJibG9ja2VyIjogIm5ldHdvcmtpbmciLAogICAgInRleHQiOiAiQSBzaG9ydCwgaG9uZXN0IG1lc3NhZ2Ugb3V0cGVyZm9ybXMgYSBwb2xpc2hlZCBwaXRjaC4iCiAgfSwKICB7CiAgICAiaWQiOiAibmV0d29ya2luZy0xMSIsCiAgICAiYmxvY2tlciI6ICJuZXR3b3JraW5nIiwKICAgICJ0ZXh0IjogIkkgdHJlYXQgZXZlcnkgaW50ZXJhY3Rpb24gYXMgdGhlIHN0YXJ0IG9mIHNvbWV0aGluZywgbm90IGEgdHJhbnNhY3Rpb24uIgogIH0sCiAgewogICAgImlkIjogIm5ldHdvcmtpbmctMTIiLAogICAgImJsb2NrZXIiOiAibmV0d29ya2luZyIsCiAgICAidGV4dCI6ICJDb25maWRlbmNlIGluIG5ldHdvcmtpbmcgaXMgYSBtdXNjbGUuIEkgYW0gdHJhaW5pbmcgaXQuIgogIH0sCiAgewogICAgImlkIjogImNvbmZpZGVuY2UtMSIsCiAgICAiYmxvY2tlciI6ICJjb25maWRlbmNlIiwKICAgICJ0ZXh0IjogIkNvbmZpZGVuY2UgaXMgYnVpbHQgYnkga2VlcGluZyBwcm9taXNlcyB0byBteXNlbGYuIgogIH0sCiAgewogICAgImlkIjogImNvbmZpZGVuY2UtMiIsCiAgICAiYmxvY2tlciI6ICJjb25maWRlbmNlIiwKICAgICJ0ZXh0IjogIkkgd2FsayBpbiBwcmVwYXJlZCwgYW5kIHByZXBhcmF0aW9uIGxvb2tzIGxpa2UgY29uZmlkZW5jZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiY29uZmlkZW5jZS0zIiwKICAgICJibG9ja2VyIjogImNvbmZpZGVuY2UiLAogICAgInRleHQiOiAiTXkgdm9pY2UgZGVzZXJ2ZXMgdGhlIHNhbWUgYWlydGltZSBhcyBhbnlvbmUgZWxzZSdzLiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTQiLAogICAgImJsb2NrZXIiOiAiY29uZmlkZW5jZSIsCiAgICAidGV4dCI6ICJJIHN0b3Agc2hyaW5raW5nIHRvIG1ha2Ugb3RoZXJzIGNvbWZvcnRhYmxlLiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTUiLAogICAgImJsb2NrZXIiOiAiY29uZmlkZW5jZSIsCiAgICAidGV4dCI6ICJJIGhhdmUgaGFuZGxlZCBoYXJkIHRoaW5ncy4gSSBjYW4gaGFuZGxlIHRoaXMgcm9vbS4iCiAgfSwKICB7CiAgICAiaWQiOiAiY29uZmlkZW5jZS02IiwKICAgICJibG9ja2VyIjogImNvbmZpZGVuY2UiLAogICAgInRleHQiOiAiQ29uZmlkZW5jZSBpcyBub3QgYXJyb2dhbmNlLiBJdCBpcyBjbGFyaXR5IGFib3V0IG15IHZhbHVlLiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTciLAogICAgImJsb2NrZXIiOiAiY29uZmlkZW5jZSIsCiAgICAidGV4dCI6ICJJIHNwZWFrIGFib3V0IG15IHdvcmsgd2l0aCBwcmlkZSwgbm90IGFwb2xvZ3kuIgogIH0sCiAgewogICAgImlkIjogImNvbmZpZGVuY2UtOCIsCiAgICAiYmxvY2tlciI6ICJjb25maWRlbmNlIiwKICAgICJ0ZXh0IjogIkkgdHJ1c3QgbXkgcHJlcGFyYXRpb24gYW5kIG15IGluc3RpbmN0cyBlcXVhbGx5LiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTkiLAogICAgImJsb2NrZXIiOiAiY29uZmlkZW5jZSIsCiAgICAidGV4dCI6ICJFdmVyeSBzbWFsbCB3aW4gdG9kYXkgY29tcG91bmRzIGludG8gdG9tb3Jyb3cncyBjb25maWRlbmNlLiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTEwIiwKICAgICJibG9ja2VyIjogImNvbmZpZGVuY2UiLAogICAgInRleHQiOiAiSSBhbSB0aGUgZXhwZXJ0IG9uIG15IG93biBleHBlcmllbmNlLiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTExIiwKICAgICJibG9ja2VyIjogImNvbmZpZGVuY2UiLAogICAgInRleHQiOiAiSSBjaG9vc2UgdG8gYmUgdmlzaWJsZS4gVmlzaWJpbGl0eSBjcmVhdGVzIG9wcG9ydHVuaXR5LiIKICB9LAogIHsKICAgICJpZCI6ICJjb25maWRlbmNlLTEyIiwKICAgICJibG9ja2VyIjogImNvbmZpZGVuY2UiLAogICAgInRleHQiOiAiSSBjYXJyeSBteXNlbGYgbGlrZSBzb21lb25lIHdobyBleHBlY3RzIGdvb2Qgb3V0Y29tZXMuIgogIH0sCiAgewogICAgImlkIjogImRpcmVjdGlvbi0xIiwKICAgICJibG9ja2VyIjogImRpcmVjdGlvbiIsCiAgICAidGV4dCI6ICJDbGFyaXR5IGNvbWVzIGZyb20gYWN0aW9uLCBub3QgZnJvbSB3YWl0aW5nLiIKICB9LAogIHsKICAgICJpZCI6ICJkaXJlY3Rpb24tMiIsCiAgICAiYmxvY2tlciI6ICJkaXJlY3Rpb24iLAogICAgInRleHQiOiAiSSBzdGFydCB3aXRoIHRoZSBzbWFsbGVzdCBuZXh0IHN0ZXAuIE1vbWVudHVtIGRvZXMgdGhlIHJlc3QuIgogIH0sCiAgewogICAgImlkIjogImRpcmVjdGlvbi0zIiwKICAgICJibG9ja2VyIjogImRpcmVjdGlvbiIsCiAgICAidGV4dCI6ICJOb3Qga25vd2luZyB0aGUgd2hvbGUgcGF0aCBpcyBub3JtYWwuIEkgb25seSBuZWVkIHRoZSBuZXh0IG1vdmUuIgogIH0sCiAgewogICAgImlkIjogImRpcmVjdGlvbi00IiwKICAgICJibG9ja2VyIjogImRpcmVjdGlvbiIsCiAgICAidGV4dCI6ICJJIGV4cGxvcmUgYnJvYWRseSwgdGhlbiBjb21taXQgZGVlcGx5LiIKICB9LAogIHsKICAgICJpZCI6ICJkaXJlY3Rpb24tNSIsCiAgICAiYmxvY2tlciI6ICJkaXJlY3Rpb24iLAogICAgInRleHQiOiAiRXZlcnkgZXhwZXJpbWVudCB0ZWFjaGVzIG1lIHNvbWV0aGluZywgZXZlbiB0aGUgb25lcyB0aGF0IGZhaWwuIgogIH0sCiAgewogICAgImlkIjogImRpcmVjdGlvbi02IiwKICAgICJibG9ja2VyIjogImRpcmVjdGlvbiIsCiAgICAidGV4dCI6ICJJIGdpdmUgbXlzZWxmIHBlcm1pc3Npb24gdG8gY2hhbmdlIGRpcmVjdGlvbiB3aXRoIG5ldyBpbmZvcm1hdGlvbi4iCiAgfSwKICB7CiAgICAiaWQiOiAiZGlyZWN0aW9uLTciLAogICAgImJsb2NrZXIiOiAiZGlyZWN0aW9uIiwKICAgICJ0ZXh0IjogIkEgbWVzc3kgc3RhcnQgYmVhdHMgYSBwZXJmZWN0IHBsYW4gdGhhdCBuZXZlciBsYXVuY2hlcy4iCiAgfSwKICB7CiAgICAiaWQiOiAiZGlyZWN0aW9uLTgiLAogICAgImJsb2NrZXIiOiAiZGlyZWN0aW9uIiwKICAgICJ0ZXh0IjogIkkgdGFsayB0byBwZW9wbGUgZG9pbmcgdGhlIHdvcmsgSSB3YW50IHRvIGRvLiBUaGF0IGlzIHJlc2VhcmNoLiIKICB9LAogIHsKICAgICJpZCI6ICJkaXJlY3Rpb24tOSIsCiAgICAiYmxvY2tlciI6ICJkaXJlY3Rpb24iLAogICAgInRleHQiOiAiTXkgY2FyZWVyIGlzIGEgcG9ydGZvbGlvIG9mIGJldHMsIG5vdCBhIHNpbmdsZSBzdHJhaWdodCBsaW5lLiIKICB9LAogIHsKICAgICJpZCI6ICJkaXJlY3Rpb24tMTAiLAogICAgImJsb2NrZXIiOiAiZGlyZWN0aW9uIiwKICAgICJ0ZXh0IjogIkkgZGVmaW5lIHByb2dyZXNzIHdlZWtseSwgbm90IHllYXJseS4iCiAgfSwKICB7CiAgICAiaWQiOiAiZGlyZWN0aW9uLTExIiwKICAgICJibG9ja2VyIjogImRpcmVjdGlvbiIsCiAgICAidGV4dCI6ICJVbmNlcnRhaW50eSBpcyBub3QgYSBzdG9wIHNpZ24uIEl0IGlzIGFuIGludml0YXRpb24gdG8gZXhwbG9yZS4iCiAgfSwKICB7CiAgICAiaWQiOiAiZGlyZWN0aW9uLTEyIiwKICAgICJibG9ja2VyIjogImRpcmVjdGlvbiIsCiAgICAidGV4dCI6ICJJIHdpbGwgZmlndXJlIGl0IG91dCB0aGUgd2F5IEkgYWx3YXlzIGhhdmU6IG9uZSBzdGVwIGF0IGEgdGltZS4iCiAgfQpdOwoKaWYgKHR5cGVvZiB3aW5kb3cgIT09ICJ1bmRlZmluZWQiKSB7IHdpbmRvdy5BRkZJUk1BVElPTlMgPSBBRkZJUk1BVElPTlM7IH0K
+// Affirmation cards - 96 professional affirmations across 8 job-search blockers
+const AFFIRMATIONS = [
+  {
+    "id": "not_qualified-1",
+    "blocker": "not_qualified",
+    "text": "My experience is broader than any single job description."
+  },
+  {
+    "id": "not_qualified-2",
+    "blocker": "not_qualified",
+    "text": "I was invited to this conversation because I belong in it."
+  },
+  {
+    "id": "not_qualified-3",
+    "blocker": "not_qualified",
+    "text": "Qualifications are a starting point; my judgment is the asset."
+  },
+  {
+    "id": "not_qualified-4",
+    "blocker": "not_qualified",
+    "text": "I have solved hard problems before. I can solve these too."
+  },
+  {
+    "id": "not_qualified-5",
+    "blocker": "not_qualified",
+    "text": "Every expert was once a beginner who refused to quit."
+  },
+  {
+    "id": "not_qualified-6",
+    "blocker": "not_qualified",
+    "text": "I bring a perspective this team does not have yet."
+  },
+  {
+    "id": "not_qualified-7",
+    "blocker": "not_qualified",
+    "text": "My track record speaks louder than a checklist of requirements."
+  },
+  {
+    "id": "not_qualified-8",
+    "blocker": "not_qualified",
+    "text": "I learn fast, and I have the proof to back it up."
+  },
+  {
+    "id": "not_qualified-9",
+    "blocker": "not_qualified",
+    "text": "Nobody meets one hundred percent of a job posting. Nobody."
+  },
+  {
+    "id": "not_qualified-10",
+    "blocker": "not_qualified",
+    "text": "What I lack in years, I make up for in drive and adaptability."
+  },
+  {
+    "id": "not_qualified-11",
+    "blocker": "not_qualified",
+    "text": "I am allowed to grow into a role. That is how careers work."
+  },
+  {
+    "id": "not_qualified-12",
+    "blocker": "not_qualified",
+    "text": "My skills transfer. My work ethic compounds."
+  },
+  {
+    "id": "fear_freeze-1",
+    "blocker": "fear_freeze",
+    "text": "I have prepared. My body knows what to do. I trust it."
+  },
+  {
+    "id": "fear_freeze-2",
+    "blocker": "fear_freeze",
+    "text": "A pause is not a failure. It is me thinking clearly."
+  },
+  {
+    "id": "fear_freeze-3",
+    "blocker": "fear_freeze",
+    "text": "I speak slowly, and that makes me sound confident."
+  },
+  {
+    "id": "fear_freeze-4",
+    "blocker": "fear_freeze",
+    "text": "Nerves mean I care. I channel that energy into focus."
+  },
+  {
+    "id": "fear_freeze-5",
+    "blocker": "fear_freeze",
+    "text": "I have answered harder questions than these."
+  },
+  {
+    "id": "fear_freeze-6",
+    "blocker": "fear_freeze",
+    "text": "My breath is my anchor. Inhale, then speak."
+  },
+  {
+    "id": "fear_freeze-7",
+    "blocker": "fear_freeze",
+    "text": "I don't need to be perfect. I need to be present."
+  },
+  {
+    "id": "fear_freeze-8",
+    "blocker": "fear_freeze",
+    "text": "Freezing is a moment, not a verdict. I recover and continue."
+  },
+  {
+    "id": "fear_freeze-9",
+    "blocker": "fear_freeze",
+    "text": "I rehearse so that pressure feels familiar."
+  },
+  {
+    "id": "fear_freeze-10",
+    "blocker": "fear_freeze",
+    "text": "The interviewer wants me to succeed. We are on the same side."
+  },
+  {
+    "id": "fear_freeze-11",
+    "blocker": "fear_freeze",
+    "text": "I answer one question at a time. That is all this is."
+  },
+  {
+    "id": "fear_freeze-12",
+    "blocker": "fear_freeze",
+    "text": "Calm is a skill, and I practice it daily."
+  },
+  {
+    "id": "imposter-1",
+    "blocker": "imposter",
+    "text": "I earned my seat. Doubt does not erase results."
+  },
+  {
+    "id": "imposter-2",
+    "blocker": "imposter",
+    "text": "Feeling like an imposter is common among high achievers. I am in good company."
+  },
+  {
+    "id": "imposter-3",
+    "blocker": "imposter",
+    "text": "My work has real impact, and I can point to it."
+  },
+  {
+    "id": "imposter-4",
+    "blocker": "imposter",
+    "text": "I don't need to know everything to add value today."
+  },
+  {
+    "id": "imposter-5",
+    "blocker": "imposter",
+    "text": "Competence is not the absence of doubt. It is action despite doubt."
+  },
+  {
+    "id": "imposter-6",
+    "blocker": "imposter",
+    "text": "I was hired for my judgment, not for being flawless."
+  },
+  {
+    "id": "imposter-7",
+    "blocker": "imposter",
+    "text": "Asking questions is a strength, not an exposure."
+  },
+  {
+    "id": "imposter-8",
+    "blocker": "imposter",
+    "text": "I belong here as much as anyone who walked in confident."
+  },
+  {
+    "id": "imposter-9",
+    "blocker": "imposter",
+    "text": "My imposter feeling is a sign I am stretching. Stretching is growth."
+  },
+  {
+    "id": "imposter-10",
+    "blocker": "imposter",
+    "text": "I give myself the same credit I give others."
+  },
+  {
+    "id": "imposter-11",
+    "blocker": "imposter",
+    "text": "Success did not happen to me by accident. I built it."
+  },
+  {
+    "id": "imposter-12",
+    "blocker": "imposter",
+    "text": "I am allowed to be both learning and leading."
+  },
+  {
+    "id": "rejection-1",
+    "blocker": "rejection",
+    "text": "Rejection is data, not a diagnosis of my worth."
+  },
+  {
+    "id": "rejection-2",
+    "blocker": "rejection",
+    "text": "Every 'no' moves me closer to the right 'yes'."
+  },
+  {
+    "id": "rejection-3",
+    "blocker": "rejection",
+    "text": "I can handle disappointment. I have before."
+  },
+  {
+    "id": "rejection-4",
+    "blocker": "rejection",
+    "text": "A rejection of my application is not a rejection of me."
+  },
+  {
+    "id": "rejection-5",
+    "blocker": "rejection",
+    "text": "I apply broadly because I respect my own potential."
+  },
+  {
+    "id": "rejection-6",
+    "blocker": "rejection",
+    "text": "The cost of not trying is higher than the cost of hearing no."
+  },
+  {
+    "id": "rejection-7",
+    "blocker": "rejection",
+    "text": "I separate the outcome from the effort. The effort is mine to control."
+  },
+  {
+    "id": "rejection-8",
+    "blocker": "rejection",
+    "text": "Resilience is built one application at a time."
+  },
+  {
+    "id": "rejection-9",
+    "blocker": "rejection",
+    "text": "I would rather be rejected for trying than regret never applying."
+  },
+  {
+    "id": "rejection-10",
+    "blocker": "rejection",
+    "text": "Each interview makes the next one easier, whatever the result."
+  },
+  {
+    "id": "rejection-11",
+    "blocker": "rejection",
+    "text": "I keep going. That is the whole strategy."
+  },
+  {
+    "id": "rejection-12",
+    "blocker": "rejection",
+    "text": "My value does not fluctuate with any single decision."
+  },
+  {
+    "id": "competition-1",
+    "blocker": "competition",
+    "text": "I don't need to beat everyone. I need to be right for one role."
+  },
+  {
+    "id": "competition-2",
+    "blocker": "competition",
+    "text": "Competition filters out the casual. I am not casual."
+  },
+  {
+    "id": "competition-3",
+    "blocker": "competition",
+    "text": "My combination of skills is unique. There is no exact substitute for me."
+  },
+  {
+    "id": "competition-4",
+    "blocker": "competition",
+    "text": "A tough market rewards the prepared. I prepare."
+  },
+  {
+    "id": "competition-5",
+    "blocker": "competition",
+    "text": "I focus on what I control: my craft, my story, my follow-through."
+  },
+  {
+    "id": "competition-6",
+    "blocker": "competition",
+    "text": "Someone gets hired for every role. There is no reason it cannot be me."
+  },
+  {
+    "id": "competition-7",
+    "blocker": "competition",
+    "text": "I stand out by being specific, not by being loud."
+  },
+  {
+    "id": "competition-8",
+    "blocker": "competition",
+    "text": "The market is competitive for generic candidates. I am not generic."
+  },
+  {
+    "id": "competition-9",
+    "blocker": "competition",
+    "text": "I turn competition into fuel for sharper preparation."
+  },
+  {
+    "id": "competition-10",
+    "blocker": "competition",
+    "text": "Scarcity thinking shrinks me. I play to win, not to survive."
+  },
+  {
+    "id": "competition-11",
+    "blocker": "competition",
+    "text": "My network, my experience, my voice — that is my moat."
+  },
+  {
+    "id": "competition-12",
+    "blocker": "competition",
+    "text": "I have competed before and won. This is familiar territory."
+  },
+  {
+    "id": "networking-1",
+    "blocker": "networking",
+    "text": "Networking is just being genuinely curious about people."
+  },
+  {
+    "id": "networking-2",
+    "blocker": "networking",
+    "text": "One real conversation beats fifty shallow connections."
+  },
+  {
+    "id": "networking-3",
+    "blocker": "networking",
+    "text": "I have something to offer in every conversation, even as a listener."
+  },
+  {
+    "id": "networking-4",
+    "blocker": "networking",
+    "text": "People remember warmth more than credentials."
+  },
+  {
+    "id": "networking-5",
+    "blocker": "networking",
+    "text": "I follow up. That alone puts me ahead of most."
+  },
+  {
+    "id": "networking-6",
+    "blocker": "networking",
+    "text": "Asking for advice is a compliment, not an imposition."
+  },
+  {
+    "id": "networking-7",
+    "blocker": "networking",
+    "text": "I build relationships before I need them."
+  },
+  {
+    "id": "networking-8",
+    "blocker": "networking",
+    "text": "My story is interesting when I tell it with conviction."
+  },
+  {
+    "id": "networking-9",
+    "blocker": "networking",
+    "text": "I belong in rooms where my future is being discussed."
+  },
+  {
+    "id": "networking-10",
+    "blocker": "networking",
+    "text": "A short, honest message outperforms a polished pitch."
+  },
+  {
+    "id": "networking-11",
+    "blocker": "networking",
+    "text": "I treat every interaction as the start of something, not a transaction."
+  },
+  {
+    "id": "networking-12",
+    "blocker": "networking",
+    "text": "Confidence in networking is a muscle. I am training it."
+  },
+  {
+    "id": "confidence-1",
+    "blocker": "confidence",
+    "text": "Confidence is built by keeping promises to myself."
+  },
+  {
+    "id": "confidence-2",
+    "blocker": "confidence",
+    "text": "I walk in prepared, and preparation looks like confidence."
+  },
+  {
+    "id": "confidence-3",
+    "blocker": "confidence",
+    "text": "My voice deserves the same airtime as anyone else's."
+  },
+  {
+    "id": "confidence-4",
+    "blocker": "confidence",
+    "text": "I stop shrinking to make others comfortable."
+  },
+  {
+    "id": "confidence-5",
+    "blocker": "confidence",
+    "text": "I have handled hard things. I can handle this room."
+  },
+  {
+    "id": "confidence-6",
+    "blocker": "confidence",
+    "text": "Confidence is not arrogance. It is clarity about my value."
+  },
+  {
+    "id": "confidence-7",
+    "blocker": "confidence",
+    "text": "I speak about my work with pride, not apology."
+  },
+  {
+    "id": "confidence-8",
+    "blocker": "confidence",
+    "text": "I trust my preparation and my instincts equally."
+  },
+  {
+    "id": "confidence-9",
+    "blocker": "confidence",
+    "text": "Every small win today compounds into tomorrow's confidence."
+  },
+  {
+    "id": "confidence-10",
+    "blocker": "confidence",
+    "text": "I am the expert on my own experience."
+  },
+  {
+    "id": "confidence-11",
+    "blocker": "confidence",
+    "text": "I choose to be visible. Visibility creates opportunity."
+  },
+  {
+    "id": "confidence-12",
+    "blocker": "confidence",
+    "text": "I carry myself like someone who expects good outcomes."
+  },
+  {
+    "id": "direction-1",
+    "blocker": "direction",
+    "text": "Clarity comes from action, not from waiting."
+  },
+  {
+    "id": "direction-2",
+    "blocker": "direction",
+    "text": "I start with the smallest next step. Momentum does the rest."
+  },
+  {
+    "id": "direction-3",
+    "blocker": "direction",
+    "text": "Not knowing the whole path is normal. I only need the next move."
+  },
+  {
+    "id": "direction-4",
+    "blocker": "direction",
+    "text": "I explore broadly, then commit deeply."
+  },
+  {
+    "id": "direction-5",
+    "blocker": "direction",
+    "text": "Every experiment teaches me something, even the ones that fail."
+  },
+  {
+    "id": "direction-6",
+    "blocker": "direction",
+    "text": "I give myself permission to change direction with new information."
+  },
+  {
+    "id": "direction-7",
+    "blocker": "direction",
+    "text": "A messy start beats a perfect plan that never launches."
+  },
+  {
+    "id": "direction-8",
+    "blocker": "direction",
+    "text": "I talk to people doing the work I want to do. That is research."
+  },
+  {
+    "id": "direction-9",
+    "blocker": "direction",
+    "text": "My career is a portfolio of bets, not a single straight line."
+  },
+  {
+    "id": "direction-10",
+    "blocker": "direction",
+    "text": "I define progress weekly, not yearly."
+  },
+  {
+    "id": "direction-11",
+    "blocker": "direction",
+    "text": "Uncertainty is not a stop sign. It is an invitation to explore."
+  },
+  {
+    "id": "direction-12",
+    "blocker": "direction",
+    "text": "I will figure it out the way I always have: one step at a time."
+  }
+];
+
+if (typeof window !== "undefined") { window.AFFIRMATIONS = AFFIRMATIONS; }
